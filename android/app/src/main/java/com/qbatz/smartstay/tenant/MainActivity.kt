@@ -1,4 +1,4 @@
-package com.smartstaytenant
+package com.qbatz.smartstay.tenant;
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

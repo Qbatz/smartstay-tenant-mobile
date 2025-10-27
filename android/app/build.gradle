@@ -77,9 +77,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.smartstaytenant"
+    namespace "com.qbatz.smartstay.tenant"
     defaultConfig {
-        applicationId "com.smartstaytenant"
+        applicationId "com.qbatz.smartstay.tenant"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

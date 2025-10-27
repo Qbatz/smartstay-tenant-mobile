@@ -1,4 +1,4 @@
-package com.smartstaytenant
+package com.qbatz.smartstay.tenant;
 
 import android.app.Application
 import com.facebook.react.PackageList
