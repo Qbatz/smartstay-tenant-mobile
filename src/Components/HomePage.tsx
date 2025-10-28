@@ -1,9 +1,12 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity ,Image} from "react-native";
 import Notification from "./Notification";
+// import Bell from "../assets/Images/notification.png"
 
 export default function HomePage() {
   const [notificationshow, setNotificationShow] = useState(false);
+   const [activeTab, setActiveTab] = useState("My Stay");
+  const [activeDot, setActiveDot] = useState(0);
 
   const handleNotificationShow = () => {
     setNotificationShow(true); 
@@ -23,15 +26,29 @@ export default function HomePage() {
     <ScrollView style={styles.container}>
     
       <View style={styles.header}>
+         <View style={styles.profileIcon}>
+         
+           <TouchableOpacity>
+<Image source={require("../assets/Images/Group 1.png")} />
+        </TouchableOpacity>
+        </View>
+        
         <View>
-          <Text style={styles.hostelName}>Smartstay Hostel</Text>
-          <Text style={styles.location}>Kandanchavadi</Text>
+          <Text  style={styles.hostelName}>Smartstay Hostel</Text>
+          <View style={{display:'flex', flexDirection:'row'}}>
+           <Image  source={require("../assets/Images/location.png")} />
+           <Text>Kandanchavadi</Text>
+          </View>
+
         </View>
 
         <View style={styles.profileIcon}>
-          <TouchableOpacity onPress={handleNotificationShow}>
+          {/* <TouchableOpacity onPress={handleNotificationShow}>
             <Text style={styles.profileText}>Notification</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
+           <TouchableOpacity onPress={handleNotificationShow}>
+<Image source={require("../assets/Images/notification.png")} />
+        </TouchableOpacity>
         </View>
 
         <View style={styles.profileIcon}>
@@ -40,15 +57,51 @@ export default function HomePage() {
       </View>
 
      
-      <View style={styles.tabs}>
+      {/* <View style={styles.tabs}>
         <Text style={[styles.tabText, styles.activeTab]}>My Stay</Text>
         <Text style={styles.tabText}>Services</Text>
         <Text style={styles.tabText}>Payments</Text>
+      </View> */}
+       <View style={styles.tabs}>
+        {["My Stay", "Services", "Payments"].map((tab) => (
+          <TouchableOpacity key={tab} onPress={() => setActiveTab(tab)}>
+            <View style={styles.tabItem}>
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === tab && styles.activeTab,
+                ]}
+              >
+                {tab}
+              </Text>
+              {activeTab === tab && <View style={styles.underline} />}
+            </View>
+          </TouchableOpacity>
+        ))}
       </View>
 
       
       <View style={styles.noticeBox}>
         <Text style={styles.noticeText}>Hostel water maintenance on 5th June</Text>
+      </View>
+
+       <View style={styles.dotsContainer}>
+        {[0, 1, 2].map((dot) => (
+          <TouchableOpacity
+            key={dot}
+            onPress={() => {
+              if (dot === 1) handleNotificationShow(); // middle dot opens Notification
+              else setActiveDot(dot);
+            }}
+          >
+            <View
+              style={[
+                styles.dot,
+                activeDot === dot && styles.activeDotStyle,
+              ]}
+            />
+          </TouchableOpacity>
+        ))}
       </View>
 
      
@@ -111,8 +164,9 @@ export default function HomePage() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F8FA", padding: 16 },
   header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 30 },
-  hostelName: { fontSize: 18, fontWeight: "600", color: "#000" },
+  hostelName: { fontSize: 18, fontWeight: "600", color: "#000",marginRight:30},
   location: { color: "#666" },
+  locationiconstyle : {marginTop:10},
   profileIcon: { backgroundColor: "#EAEAEA", borderRadius: 20, padding: 8 },
   profileText: { fontSize: 14 },
   tabs: { flexDirection: "row", justifyContent: "space-around", marginTop: 20 },
@@ -137,4 +191,30 @@ const styles = StyleSheet.create({
   complaintIssue: { fontSize: 14, fontWeight: "500" },
   complaintType: { color: "#777", marginTop: 4 },
   pending: { color: "#FF7A00", fontWeight: "bold" },
+    tabItem: { alignItems: "center" },
+     underline: {
+    height: 3,
+    width: 20,
+    backgroundColor: "#004AAD",
+    borderRadius: 2,
+    marginTop: 4,
+  },
+  dotsContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 10,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#ccc",
+    marginHorizontal: 4,
+  },
+  activeDotStyle: {
+    backgroundColor: "#004AAD",
+    width: 10,
+    height: 10,
+  },
+  
 });
