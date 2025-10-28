@@ -11,6 +11,9 @@ import {
   SafeAreaProvider,
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
+import Dashboard from './Pages/Dashboard';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
@@ -18,6 +21,7 @@ function App() {
   return (
     <SafeAreaProvider>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+                
       <AppContent />
     </SafeAreaProvider>
   );
@@ -25,13 +29,20 @@ function App() {
 
 function AppContent() {
   const safeAreaInsets = useSafeAreaInsets();
+  const Navigation=createStackNavigator();
 
   return (
     <View style={styles.container}>
-      <NewAppScreen
-        templateFileName="App.tsx"
+    <NavigationContainer >
+      <Navigation.Navigator screenOptions={{headerShown:false}}>
+        <Navigation.Screen name='Dashboard' component={Dashboard } />
+      </Navigation.Navigator>
+    </NavigationContainer>
+  
+      {/* <Dashboard
+        templateFileName="App.jsx"
         safeAreaInsets={safeAreaInsets}
-      />
+      /> */}
     </View>
   );
 }
