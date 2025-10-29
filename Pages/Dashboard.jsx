@@ -1,5 +1,5 @@
 import React,{useState} from "react";
-import { View, Text, Dimensions } from "react-native";
+import { View, Text, Dimensions, Image } from "react-native";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import MyStay from './MyStay';
 import Services from './Services'
@@ -13,7 +13,7 @@ function Dashboard(props) {
     const renderTabBar=props=>(<TabBar {...props}
     indicatorStyle={{backgroundColor:'#0227B5'}} style={{backgroundColor:'#ffffff'}}
     inactiveColor="black"
-    activeColor="blue"
+    activeColor="blue"  
     renderLabel={({route, color })=>(<Text style={{color:color}}>
         {route.title}
     </Text>)}  />)
@@ -29,6 +29,9 @@ function Dashboard(props) {
 
         </View>
         <TabView navigationState={{index, routes}}
+        commonOptions={{
+            icon:({route, color})=>(<Image source={require('../Images/buildin.png')} style={{color:color, width:21.12, height:21.12}} name={route.icon}/>)
+        }}
         renderTabBar={renderTabBar}
         renderScene={SceneMap({mystay:MyStay, services:Services, payment:Payment })}
         onIndexChange={setindex}
