@@ -7,7 +7,7 @@
 
 import { NewAppScreen } from '@react-native/new-app-screen';
 import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
-import HomePage from './src/Components/HomePage';
+import MystayPage from './src/Components/MystayPage';
 import {
   SafeAreaProvider,
   useSafeAreaInsets,
@@ -19,7 +19,7 @@ function App() {
   return (
     <SafeAreaProvider>
       {/* <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} /> */}
-      <HomePage />
+      <MystayPage />
     </SafeAreaProvider>
   );
 }
