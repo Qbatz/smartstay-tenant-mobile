@@ -1,19 +1,8 @@
 import React from "react";
-import { View, Text, StyleSheet , Image } from "react-native";
-// import Icon from "react-native-vector-icons/Ionicons";
+import { View, Text, StyleSheet, Image } from "react-native";
 
-interface NotificationItemProps {
-  item: {
-    id: string;
-    title: string;
-    description: string;
-    time: string;
-    type: "alert" | "info" | "bill" | "user" | "complaint" | "resolved";
-  };
-}
-
-const NotificationItem: React.FC<NotificationItemProps> = ({ item }) => {
-  const iconMap: Record<NotificationItemProps["item"]["type"], any> = {
+const NotificationItem = ({ item }) => {
+  const iconMap = {
     alert: require("./money-check.png"),
     info: require("./command.png"),
     bill: require("./command.png"),
@@ -24,7 +13,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ item }) => {
 
   return (
     <View style={styles.card}>
-       <View style={styles.iconContainer}>
+      <View style={styles.iconContainer}>
         <Image source={iconMap[item.type]} style={styles.iconImage} />
       </View>
 
@@ -36,6 +25,8 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ item }) => {
     </View>
   );
 };
+
+export default NotificationItem;
 
 const styles = StyleSheet.create({
   card: {
@@ -59,13 +50,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginRight: 10,
   },
-  contentContainer: {
-    flex: 1,
-  },
   iconImage: {
     width: 24,
     height: 24,
     resizeMode: "contain",
+  },
+  contentContainer: {
+    flex: 1,
   },
   title: {
     fontWeight: "600",
@@ -84,5 +75,3 @@ const styles = StyleSheet.create({
     alignSelf: "flex-end",
   },
 });
-
-export default NotificationItem;
