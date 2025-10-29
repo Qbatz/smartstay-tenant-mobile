@@ -6,30 +6,11 @@ import {
   StyleSheet,
   SafeAreaView,
   TouchableOpacity,
-  ListRenderItem,
-  Image
+  Image,
 } from "react-native";
 import NotificationItem from "./NotificationItem";
-// import Icon from "react-native-vector-icons/Ionicons";
-// import { Ionicons } from '@expo/vector-icons';
 
-
-// Define Notification item type
-interface NotificationData {
-  id: string;
-  title: string;
-  description: string;
-  time: string;
-  date: string;
-  type: "alert" | "info" | "bill" | "user" | "complaint" | "resolved";
-}
-
-// Props for Notification component
-interface NotificationProps {
-  onBack: () => void;
-}
-
-const notifications: NotificationData[] = [
+const notifications = [
   {
     id: "1",
     title: "Hostel Maintenance Alert",
@@ -83,22 +64,16 @@ const notifications: NotificationData[] = [
   },
 ];
 
-const Notification: React.FC<NotificationProps> = ({ onBack }) => {
-  const renderItem: ListRenderItem<NotificationData> = ({ item }) => (
-    <NotificationItem item={item} />
-  );
+const Notification = ({ onBack }) => {
+  const renderItem = ({ item }) => <NotificationItem item={item} />;
 
   return (
     <SafeAreaView style={styles.container}>
       {/* Back Button */}
       <TouchableOpacity style={styles.backButton} onPress={onBack}>
-        {/* <Ionicons name="arrow-back-outline" size={22} color="#004AAD" /> */}
-        {/* <Text style={styles.backText}>Back</Text> */}
-        <Image  source={require("./Line_arrow-left.png")}/>
-             <Text style={styles.header}>Notifications</Text>
-
+        <Image source={require("./Line_arrow-left.png")} />
+        <Text style={styles.header}>Notifications</Text>
       </TouchableOpacity>
-
 
       <FlatList
         data={notifications}
@@ -124,19 +99,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 10,
     marginBottom: 5,
-    cursor:'pointer',
-  },
-  backText: {
-    color: "#004AAD",
-    fontWeight: "600",
-    fontSize: 16,
-    marginLeft: 4,
   },
   header: {
     fontSize: 22,
     fontWeight: "600",
-    // marginBottom: 12,
-    marginLeft:10
+    marginLeft: 10,
   },
   listContainer: {
     paddingBottom: 20,
