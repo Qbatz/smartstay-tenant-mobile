@@ -15,21 +15,37 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import HostelList from './src/Components/HostelList'
 import MystayPage from './src/Components/MystayPage';
+import { UsersContext } from './src/Context/UserContext'
+import React, { useContext } from 'react';
+import UserContext from './src/Context/UserContext'
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
 
+  const context = useContext(UsersContext);
+
+  console.log(context)
+
+  
+
   return (
     <SafeAreaProvider>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-                
-      <AppContent />
+       <UserContext>
+    <AppContent />
+  </UserContext>
+      
+
     </SafeAreaProvider>
+
+
   );
 }
 
 function AppContent() {
-  const Navigation=createStackNavigator();
+
+  const Navigation = createStackNavigator();
+
 
   // // enable this when ontime login is setup
 
@@ -42,21 +58,13 @@ function AppContent() {
   //   </NavigationContainer>
 
   return (
-    <View style={styles.container}>
-    <NavigationContainer >
-      <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='Dashboard'>
-        <Navigation.Screen name="HostelList" component={HostelList} />
-        <Navigation.Screen name='Dashboard' component={Dashboard}/>  
-        <Navigation.Screen name='MyStayPage' component={MystayPage}/> 
-      </Navigation.Navigator>
-    </NavigationContainer>
-  
-      {/* <Dashboard
-        templateFileName="App.jsx"
-        safeAreaInsets={safeAreaInsets}
-      /> */}
-    </View>
-  );
+  <NavigationContainer >
+        <Navigation.Navigator screenOptions={{ headerShown: false }} initialRouteName='Dashboard'>
+          <Navigation.Screen name="HostelList" component={HostelList} />
+          <Navigation.Screen name='Dashboard' component={Dashboard} />
+          <Navigation.Screen name='MyStayPage' component={MystayPage} />
+        </Navigation.Navigator>
+      </NavigationContainer>);
 }
 
 const styles = StyleSheet.create({
@@ -64,5 +72,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
+
+
 
 export default App;
