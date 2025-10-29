@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import Notification from "./Notification";
+import Notification from './Notification';
 
 export default function MystayPage() {
   const [notificationshow, setNotificationShow] = useState(false);
@@ -133,7 +133,7 @@ export default function MystayPage() {
       <View style={styles.quickLinks}>
         <TouchableOpacity style={styles.quickButton}>
           <Image
-            source={require("../assets/Images/receipt-edit.png")}
+            source={require("../assets/Images/receipt.png")}
             style={{ width: 24, height: 24 }}
           />
           <Text style={styles.quickText}>Complaints</Text>

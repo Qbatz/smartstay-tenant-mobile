@@ -4,6 +4,7 @@ import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import MyStay from './MyStay';
 import Services from './Services'
 import Payment from './Payment'
+import Building from '../assets/Images/buildin.png'
 
 function Dashboard(props) {
 
@@ -30,7 +31,7 @@ function Dashboard(props) {
         </View>
         <TabView navigationState={{index, routes}}
         commonOptions={{
-            icon:({route, color})=>(<Image source={require('../Images/buildin.png')} style={{color:color, width:21.12, height:21.12}} name={route.icon}/>)
+            icon:({route, color})=>(<Image source={Building} style={{color:color, width:21.12, height:21.12}} name={route.icon}/>)
         }}
         renderTabBar={renderTabBar}
         renderScene={SceneMap({mystay:MyStay, services:Services, payment:Payment })}

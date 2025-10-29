@@ -31,7 +31,7 @@ function Services(props) {
                 marginRight: 5,
             }}>
                 <View style={{ flexDirection: 'row' }}>
-                    <Image source={require('../Images/Messagef.png')} style={{color:selectedfield===list1.length?'blue':"black", width: 25, height: 25 }} />
+                    <Image source={require('../assets/Images/Messagef.png')} style={{color:selectedfield===list1.length?'blue':"black", width: 25, height: 25 }} />
                     <Text style={{ color: selectedfield == list1.length ? "white" : 'black', fontSize:16, fontWeight:'400',marginLeft:10 }}>Complaints</Text>
                 </View>
 
@@ -49,7 +49,7 @@ function Services(props) {
                 marginRight: 5,
             }}>
                 <View style={{ flexDirection: 'row' }}>
-                    <Image source={require('../Images/Messagef.png')} style={{ width: 25, height: 25 }} />
+                    <Image source={require('../assets/Images/Messagef.png')} style={{ width: 25, height: 25 }} />
                     <Text style={{ color: selectedfield == list2.length ? "white" : 'black', fontSize:16, fontWeight:'400', marginLeft:10 }}>Amenities</Text>
                 </View>
             </TouchableOpacity>
@@ -62,7 +62,7 @@ function Services(props) {
                         <View>
                             <Text style={{ fontSize: 16, fontWeight: '600' }}>{i}</Text>
                             <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop:10 }}>
-                                <Image source={require('../Images/bill.png')} style={{ width: 16, height: 16 }} />
+                                <Image source={require('../assets/Images/bill.png')} style={{ width: 16, height: 16 }} />
                                 <Text>Pipe</Text>
                             </View>
                         </View>

@@ -2,6 +2,10 @@ import React from "react";
 import { View, Text, Image } from "react-native";
 import Swiper from "react-native-swiper";
 import LinearGradient from "react-native-linear-gradient";
+import Electricity from '../assets/Images/electricity.png';
+import Frame from '../assets/Images/Frame.png'
+import FrameAdd from '../assets/Images/Frameadd.png'
+import Receipt from '../assets/Images/receipt.png'
 function MyStay(props) {
     return <View style={{ backgroundColor: '#ffffff' }}>
         <View style={{ height: 120, marginTop: 20 }}>
@@ -28,7 +32,7 @@ function MyStay(props) {
                     </View>
 
                     <View style={{ paddingLeft: 20 }}>
-                        <Image source={require('../Images/electricity.png')} style={{ width: 26, height: 26 }} />
+                        <Image source={Electricity} style={{ width: 26, height: 26 }} />
                     </View>
                 </View>
 
@@ -40,7 +44,7 @@ function MyStay(props) {
                     </View>
 
                     <View style={{ paddingLeft: 20 }}>
-                        <Image source={require('../Images/Frame.png')} style={{ width: 26, height: 26 }} />
+                        <Image source={Frame} style={{ width: 26, height: 26 }} />
                     </View>
                 </View>
             </View>
@@ -53,7 +57,7 @@ function MyStay(props) {
                         <Text style={{ fontSize: 10, color: '#b2b2b4', marginTop: 10 }}>Due date</Text>
                     </View>
                     <View style={{ paddingLeft: 20 }}>
-                        <Image source={require('../Images/electricity.png')} style={{ width: 26, height: 26 }} />
+                        <Image source={Electricity} style={{ width: 26, height: 26 }} />
                     </View>
                 </View>
 
@@ -65,7 +69,7 @@ function MyStay(props) {
                     </View>
 
                     <View style={{ paddingLeft: 20 }}>
-                        <Image source={require('../Images/Frame.png')} style={{ width: 26, height: 26 }} />
+                        <Image source={Frame} style={{ width: 26, height: 26 }} />
                     </View>
                 </View>
             </View>
@@ -79,13 +83,13 @@ function MyStay(props) {
             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                 <View style={{ borderWidth: 1, borderRadius: 10, flex: 1, justifyContent: 'center', alignItems: 'center', marginRight: 5, padding: 10, borderColor: '#EFF2FF' }}>
                     <View>
-                        <Image source={require('../Images/receipt.png')} style={{width:26, height:26}}/>
+                        <Image source={Receipt} style={{width:26, height:26}}/>
                     </View>
                     <Text style={{ fontSize: 10 }}>Complaint</Text>
                 </View>
                 <View style={{ borderWidth: 1, borderRadius: 10, flex: 1, justifyContent: 'center', alignItems: 'center', marginLeft: 5, padding: 10, borderColor: '#EFF2FF' }}>
                     <View>
-                        <Image source={require('../Images/Frameadd.png')} style={{width:24, height:24}}/>
+                        <Image source={FrameAdd} style={{width:24, height:24}}/>
                     </View>
                     <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                         <Text style={{ fontSize: 10 }}>Request</Text>

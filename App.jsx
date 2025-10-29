@@ -10,10 +10,11 @@ import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
 import {
   SafeAreaProvider,
 } from 'react-native-safe-area-context';
-import Dashboard from './Pages/Dashboard';
+import Dashboard from './src/Components/Dashboard';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import HostelList from './Pages/HostelList'
+import HostelList from './src/Components/HostelList'
+import MystayPage from './src/Components/MystayPage';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
@@ -45,7 +46,8 @@ function AppContent() {
     <NavigationContainer >
       <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='Dashboard'>
         <Navigation.Screen name="HostelList" component={HostelList} />
-        <Navigation.Screen name='Dashboard' component={Dashboard}/>   
+        <Navigation.Screen name='Dashboard' component={Dashboard}/>  
+        <Navigation.Screen name='MyStayPage' component={MystayPage}/> 
       </Navigation.Navigator>
     </NavigationContainer>
   
