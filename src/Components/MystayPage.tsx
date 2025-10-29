@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import {
   View,
   Text,
@@ -21,6 +21,7 @@ export default function MystayPage() {
   const handleBack = () => {
     setNotificationShow(false);
   };
+  
 
   if (notificationshow) {
     return <Notification onBack={handleBack} />;
