@@ -15,9 +15,15 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import HostelList from './src/Components/HostelList'
 import MystayPage from './src/Components/MystayPage';
+
+import SplashScreen from "./src/Components/WelComePage/SplashScreen";
+import LogoScreen from "./src/Components/WelComePage/LogoScreen";
+import OnboardingScreen from "./src/Components/WelComePage/OnboardingScreen";
+
 import { UsersContext } from './src/Context/UserContext'
 import React, { useContext } from 'react';
 import UserContext from './src/Context/UserContext'
+
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
@@ -58,13 +64,27 @@ function AppContent() {
   //   </NavigationContainer>
 
   return (
-  <NavigationContainer >
-        <Navigation.Navigator screenOptions={{ headerShown: false }} initialRouteName='Dashboard'>
-          <Navigation.Screen name="HostelList" component={HostelList} />
-          <Navigation.Screen name='Dashboard' component={Dashboard} />
-          <Navigation.Screen name='MyStayPage' component={MystayPage} />
-        </Navigation.Navigator>
-      </NavigationContainer>);
+
+    <View style={styles.container}>
+    <NavigationContainer >
+      <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='SplashScreen'>
+        <Navigation.Screen name="HostelList" component={HostelList} />
+        <Navigation.Screen name='Dashboard' component={Dashboard}/>  
+        <Navigation.Screen name='MyStayPage' component={MystayPage}/> 
+           <Navigation.Screen name="SplashScreen" component={SplashScreen} />
+      <Navigation.Screen name="LogoScreen" component={LogoScreen} />
+       <Navigation.Screen name="OnboardingScreen" component={OnboardingScreen} />
+
+      </Navigation.Navigator>
+    </NavigationContainer>
+  
+      {/* <Dashboard
+        templateFileName="App.jsx"
+        safeAreaInsets={safeAreaInsets}
+      /> */}
+    </View>
+  );
+
 }
 
 const styles = StyleSheet.create({
