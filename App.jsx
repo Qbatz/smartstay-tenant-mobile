@@ -24,10 +24,11 @@ import { UsersContext } from './src/Context/UserContext'
 import React, { useContext } from 'react';
 import UserContext from './src/Context/UserContext'
 
-import VerifyKYC from './src/Components/KycDocuments/VerifyKc'
+import VerifyKYC from './src/Components/KycDocuments/VerifyKYC'
 import KYCUpload from './src/Components/KycDocuments/UploadKc'
 
 import KycSuccessDesign from './src/Components/KycSuccess';
+
 
 
 
