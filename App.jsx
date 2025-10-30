@@ -23,7 +23,12 @@ import OnboardingScreen from "./src/Components/WelComePage/OnboardingScreen";
 import { UsersContext } from './src/Context/UserContext'
 import React, { useContext } from 'react';
 import UserContext from './src/Context/UserContext'
+
+import VerifyKYC from './src/Components/KycDocuments/VerifyKc'
+import KYCUpload from './src/Components/KycDocuments/UploadKc'
+
 import KycSuccessDesign from './src/Components/KycSuccess';
+
 
 
 function App() {
@@ -72,7 +77,7 @@ function AppContent() {
      
     
 
-      <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='SplashScreen'>
+      <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='VerifyKYC'>
         <Navigation.Screen name="HostelList" component={HostelList} />
         <Navigation.Screen name='Dashboard' component={Dashboard}/>  
         <Navigation.Screen name='MyStayPage' component={MystayPage}/> 
@@ -81,7 +86,13 @@ function AppContent() {
         <Navigation.Screen name="OnboardingScreen" component={OnboardingScreen} />
         <Navigation.Screen name="CreateAccount" component={CreateAccount} />
         <Navigation.Screen name="OtpDesign" component={OtpDesign} />
+
+           <Navigation.Screen name="VerifyKYC" component={VerifyKYC} />
+            <Navigation.Screen name="KYCUpload" component={KYCUpload} />
+
+
         <Navigation.Screen name="KycSuccess" component={KycSuccessDesign} />
+
 
       </Navigation.Navigator>
     </NavigationContainer>
