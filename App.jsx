@@ -15,6 +15,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import HostelList from './src/Components/HostelList'
 import MystayPage from './src/Components/MystayPage';
+import CreateAccount from "./src/Components/CreateAccount";
+import OtpDesign from './src/Components/OtpDesign';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
@@ -45,9 +47,12 @@ function AppContent() {
     <View style={styles.container}>
     <NavigationContainer >
       <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='Dashboard'>
-        <Navigation.Screen name="HostelList" component={HostelList} />
-        <Navigation.Screen name='Dashboard' component={Dashboard}/>  
-        <Navigation.Screen name='MyStayPage' component={MystayPage}/> 
+      
+      <Navigation.Screen name="HostelList" component={HostelList} />
+      <Navigation.Screen name='Dashboard' component={Dashboard}/>  
+      <Navigation.Screen name='MyStayPage' component={MystayPage}/> 
+      <Navigation.Screen name="CreateAccount" component={CreateAccount} />
+      <Navigation.Screen name="OtpDesign" component={OtpDesign} />
       </Navigation.Navigator>
     </NavigationContainer>
   
@@ -58,6 +63,9 @@ function AppContent() {
     </View>
   );
 }
+
+
+
 
 const styles = StyleSheet.create({
   container: {
