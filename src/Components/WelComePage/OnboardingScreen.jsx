@@ -2,6 +2,10 @@ import React from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 
 export default function OnboardingScreen({ navigation }) {
+
+  const handleCreateAccount = () => {
+    navigation.navigate("CreateAccount");
+  }
   return (
     <View style={styles.container}>
      
@@ -27,7 +31,7 @@ export default function OnboardingScreen({ navigation }) {
           style={styles.button}
           onPress={() => console.log("Go to login or home")}
         >
-          <Text style={styles.buttonText}>Get Started →</Text>
+          <Text style={styles.buttonText} onPress={handleCreateAccount}>Get Started →</Text>
         </TouchableOpacity>
       </View>
     </View>

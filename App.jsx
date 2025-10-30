@@ -23,6 +23,7 @@ import OnboardingScreen from "./src/Components/WelComePage/OnboardingScreen";
 import { UsersContext } from './src/Context/UserContext'
 import React, { useContext } from 'react';
 import UserContext from './src/Context/UserContext'
+import KycSuccessDesign from './src/Components/KycSuccess';
 
 
 function App() {
@@ -80,7 +81,7 @@ function AppContent() {
         <Navigation.Screen name="OnboardingScreen" component={OnboardingScreen} />
         <Navigation.Screen name="CreateAccount" component={CreateAccount} />
         <Navigation.Screen name="OtpDesign" component={OtpDesign} />
-
+        <Navigation.Screen name="KycSuccess" component={KycSuccessDesign} />
 
       </Navigation.Navigator>
     </NavigationContainer>
