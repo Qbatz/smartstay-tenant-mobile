@@ -15,11 +15,11 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import HostelList from './src/Components/HostelList'
 import MystayPage from './src/Components/MystayPage';
-
+import CreateAccount from "./src/Components/CreateAccount";
+import OtpDesign from './src/Components/OtpDesign';
 import SplashScreen from "./src/Components/WelComePage/SplashScreen";
 import LogoScreen from "./src/Components/WelComePage/LogoScreen";
 import OnboardingScreen from "./src/Components/WelComePage/OnboardingScreen";
-
 import { UsersContext } from './src/Context/UserContext'
 import React, { useContext } from 'react';
 import UserContext from './src/Context/UserContext'
@@ -67,13 +67,20 @@ function AppContent() {
 
     <View style={styles.container}>
     <NavigationContainer >
+
+     
+    
+
       <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='SplashScreen'>
         <Navigation.Screen name="HostelList" component={HostelList} />
         <Navigation.Screen name='Dashboard' component={Dashboard}/>  
         <Navigation.Screen name='MyStayPage' component={MystayPage}/> 
-           <Navigation.Screen name="SplashScreen" component={SplashScreen} />
-      <Navigation.Screen name="LogoScreen" component={LogoScreen} />
-       <Navigation.Screen name="OnboardingScreen" component={OnboardingScreen} />
+        <Navigation.Screen name="SplashScreen" component={SplashScreen} />
+        <Navigation.Screen name="LogoScreen" component={LogoScreen} />
+        <Navigation.Screen name="OnboardingScreen" component={OnboardingScreen} />
+        <Navigation.Screen name="CreateAccount" component={CreateAccount} />
+        <Navigation.Screen name="OtpDesign" component={OtpDesign} />
+
 
       </Navigation.Navigator>
     </NavigationContainer>
@@ -86,6 +93,9 @@ function AppContent() {
   );
 
 }
+
+
+
 
 const styles = StyleSheet.create({
   container: {
