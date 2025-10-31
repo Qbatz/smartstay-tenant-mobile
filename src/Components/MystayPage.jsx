@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import Notification from './Notification';
+import Notification from './Notification/Notification';
 
 export default function MystayPage() {
   const [notificationshow, setNotificationShow] = useState(false);
@@ -40,7 +40,7 @@ export default function MystayPage() {
         <View>
           <Text style={styles.hostelName}>Smartstay Hostel</Text>
           <View style={{ display: "flex", flexDirection: "row" }}>
-            <Image source={require("../assets/Images/location.png")} />
+            <Image source={require("../assets/Images/notification.png")} />
             <Text>Kandanchavadi</Text>
           </View>
         </View>

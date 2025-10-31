@@ -3,12 +3,12 @@ import { View, Text, StyleSheet, Image } from "react-native";
 
 const NotificationItem = ({ item }) => {
   const iconMap = {
-    alert: require("./money-check.png"),
-    info: require("./command.png"),
-    bill: require("./command.png"),
-    user: require("./user-add.png"),
-    complaint: require("./NK.png"),
-    resolved: require("./money-check.png"),
+    alert: require("../../assets/Images/money-check.png"),
+    info: require("../../assets/Images/command.png"),
+    bill: require("../../assets/Images/command.png"),
+    user: require("../../assets/Images/user-add.png"),
+    complaint: require("../../assets/Images/NK.png"),
+    resolved: require("../../assets/Images/money-check.png"),
   };
 
   return (

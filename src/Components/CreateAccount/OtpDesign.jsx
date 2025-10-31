@@ -1,7 +1,9 @@
 import React, { useState, useRef } from "react";
 import { View, Text, TextInput, StyleSheet, Image } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 const OtpDesign = ({ route }) => {
+  const navigation = useNavigation();
   const { phone } = route.params;
   const [otp, setOtp] = useState(["", "", "", ""]);
   const inputs = useRef([]);
@@ -10,8 +12,14 @@ const OtpDesign = ({ route }) => {
     const newOtp = [...otp];
     newOtp[index] = text;
     setOtp(newOtp);
+
     if (text && index < 3) {
       inputs.current[index + 1].focus();
+    }
+
+    if (newOtp.every((digit) => digit !== "")) {
+      const otpValue = newOtp.join("");
+      navigation.navigate("VerifyKYC");
     }
   };
 
@@ -23,7 +31,7 @@ const OtpDesign = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      <Image source={require("../assets/Images/Sm_logo.png")} />
+      <Image source={require("../../assets/Images/Sm_logo.png")} />
       <Text style={styles.title}>Otp Validation</Text>
       <Text style={styles.subtitle}>
         Enter the 4 digit otp sent on +91 {phone} to proceed
