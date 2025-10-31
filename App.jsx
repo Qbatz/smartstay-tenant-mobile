@@ -23,7 +23,7 @@ import OnboardingScreen from "./src/Components/WelComePage/OnboardingScreen";
 import { UsersContext } from './src/Context/UserContext'
 import React, { useContext } from 'react';
 import UserContext from './src/Context/UserContext'
-
+import MyStay from './src/Components/MyStay';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
@@ -67,9 +67,10 @@ function AppContent() {
 
     <View style={styles.container}>
     <NavigationContainer >
-      <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='SplashScreen'>
+      <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='Dashboard'>
         <Navigation.Screen name="HostelList" component={HostelList} />
-        <Navigation.Screen name='Dashboard' component={Dashboard}/>  
+        <Navigation.Screen name='Dashboard' component={Dashboard}/> 
+        <Navigation.Screen name='MyStay' component={MyStay}/>
         <Navigation.Screen name='MyStayPage' component={MystayPage}/> 
            <Navigation.Screen name="SplashScreen" component={SplashScreen} />
       <Navigation.Screen name="LogoScreen" component={LogoScreen} />

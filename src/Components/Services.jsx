@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, ScrollView, Image } from "react-native";
 import { ImageBackground } from "react-native/types_generated/index";
+import {retriveData} from '../Utils/Storage'
+import Framebuild from '../assets/Images/buildframe.png'
 
 function Services(props) {
     const [selectedfield, setselectfield] = useState(0);
@@ -8,7 +10,17 @@ function Services(props) {
     const list1 = ['Washing machine', 'plumbing', 'kitchen']
     const list2 = ['wifi', 'laundry']
 
-    function firstclick(id) {
+    useEffect(()=>{
+        complaintsclick(list1.length);
+     
+        const data= retriveData('token').then(res=>{
+            console.log(res)
+        });
+
+    },[])
+
+
+    function complaintsclick(id) {
         console.log(id)
         setselectfield(id)
     }
@@ -18,7 +30,7 @@ function Services(props) {
     }
     return <View >
         <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'center', alignItems: 'center' }}>
-            <TouchableOpacity onPress={() => firstclick(list1.length)} style={{
+            <TouchableOpacity onPress={() => complaintsclick(list1.length)} style={{
                 backgroundColor: selectedfield === list1.length ? '#1E45E1' : 'white',
                 flex: 1,
                 borderRadius: 10,
@@ -49,7 +61,7 @@ function Services(props) {
                 marginRight: 5,
             }}>
                 <View style={{ flexDirection: 'row' }}>
-                    <Image source={require('../assets/Images/Messagef.png')} style={{ width: 25, height: 25 }} />
+                    <Image source={Framebuild} style={{ width: 25, height: 25 }} />
                     <Text style={{ color: selectedfield == list2.length ? "white" : 'black', fontSize:16, fontWeight:'400', marginLeft:10 }}>Amenities</Text>
                 </View>
             </TouchableOpacity>
@@ -63,12 +75,15 @@ function Services(props) {
                             <Text style={{ fontSize: 16, fontWeight: '600' }}>{i}</Text>
                             <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop:10 }}>
                                 <Image source={require('../assets/Images/bill.png')} style={{ width: 16, height: 16 }} />
-                                <Text>Pipe</Text>
+                                <Text style={{marginLeft:8}}>Pipe</Text>
                             </View>
                         </View>
                         <View>
-                            <Text>2 hrs</Text>
-                            <Text>Inprogress</Text>
+                            <Text style={{color:'#9C9C9C'}}>2 hrs</Text>
+                            <View style={{borderRadius:14, paddingLeft:10, paddingRight:10,paddingTop:5, paddingBottom:5, backgroundColor:'#A5FF9624'}}>
+                                <Text style={{color:'#1D760E'}}>Inprogress</Text>
+                            </View>
+                            
                         </View>
 
                     </View>
