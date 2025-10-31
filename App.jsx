@@ -23,11 +23,17 @@ import OnboardingScreen from "./src/Components/WelComePage/OnboardingScreen";
 import { UsersContext } from './src/Context/UserContext'
 import React, { useContext } from 'react';
 import UserContext from './src/Context/UserContext'
+
 import VerifyKYC from './src/Components/KycDocuments/VerifyKc'
+
+
+// import VerifyKYC from './src/Components/KycDocuments/VerifyKYC'
+
 import KYCUpload from './src/Components/KycDocuments/UploadKc'
 import KycSuccessDesign from './src/Components/KycDocuments/KycSuccess';
 import CustomerProfile from './src/Components/CustomerProfile/CustomerProfile';
 import Notification from './src/Components/Notification/Notification';
+
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
