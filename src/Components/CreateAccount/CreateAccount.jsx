@@ -29,7 +29,7 @@ const CreateAccount = ({ navigation }) => {
     <View style={styles.container}>
       <View style={styles.topContent}>
         <Image
-          source={require("../assets/Images/Sm_logo.png")}
+          source={require("../../assets/Images/Sm_logo.png")}
           style={styles.logo}
         />
         <Text style={styles.title}>Create Your Account</Text>

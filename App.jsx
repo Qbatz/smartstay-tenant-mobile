@@ -15,8 +15,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import HostelList from './src/Components/HostelList'
 import MystayPage from './src/Components/MystayPage';
-import CreateAccount from "./src/Components/CreateAccount";
-import OtpDesign from './src/Components/OtpDesign';
+import CreateAccount from "./src/Components/CreateAccount/CreateAccount";
+import OtpDesign from './src/Components/CreateAccount/OtpDesign';
 import SplashScreen from "./src/Components/WelComePage/SplashScreen";
 import LogoScreen from "./src/Components/WelComePage/LogoScreen";
 import OnboardingScreen from "./src/Components/WelComePage/OnboardingScreen";
@@ -24,12 +24,15 @@ import { UsersContext } from './src/Context/UserContext'
 import React, { useContext } from 'react';
 import UserContext from './src/Context/UserContext'
 
-import VerifyKYC from './src/Components/KycDocuments/VerifyKYC'
+import VerifyKYC from './src/Components/KycDocuments/VerifyKc'
+
+
+// import VerifyKYC from './src/Components/KycDocuments/VerifyKYC'
+
 import KYCUpload from './src/Components/KycDocuments/UploadKc'
-
-import KycSuccessDesign from './src/Components/KycSuccess';
-
-
+import KycSuccessDesign from './src/Components/KycDocuments/KycSuccess';
+import CustomerProfile from './src/Components/CustomerProfile/CustomerProfile';
+import Notification from './src/Components/Notification/Notification';
 
 
 function App() {
@@ -78,7 +81,7 @@ function AppContent() {
      
     
 
-      <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='VerifyKYC'>
+      <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='SplashScreen'>
         <Navigation.Screen name="HostelList" component={HostelList} />
         <Navigation.Screen name='Dashboard' component={Dashboard}/>  
         <Navigation.Screen name='MyStayPage' component={MystayPage}/> 
@@ -93,7 +96,8 @@ function AppContent() {
 
 
         <Navigation.Screen name="KycSuccess" component={KycSuccessDesign} />
-
+        <Navigation.Screen name="CustomerProfile" component={CustomerProfile} />
+         <Navigation.Screen name="Notification" component={Notification} />
 
       </Navigation.Navigator>
     </NavigationContainer>

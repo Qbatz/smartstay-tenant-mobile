@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import NotificationItem from "./NotificationItem";
 
 const notifications = [
@@ -64,16 +65,23 @@ const notifications = [
   },
 ];
 
-const Notification = ({ onBack }) => {
+const Notification = () => {
+  const navigation = useNavigation();
   const renderItem = ({ item }) => <NotificationItem item={item} />;
+  const handleBack = () => navigation.goBack();
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Back Button */}
-      <TouchableOpacity style={styles.backButton} onPress={onBack}>
-        <Image source={require("./Line_arrow-left.png")} />
-        <Text style={styles.header}>Notifications</Text>
+        <View style={{ flexDirection: "row", alignItems: "center" , marginBottom:10}}>
+      <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+       <Image
+             source={require("../../assets/Images/LeftArrow.png")}
+             style={{ height: 25, width: 25 }}
+           />
+       
       </TouchableOpacity>
+       <Text style={styles.header}>Notifications</Text>
+      </View>
 
       <FlatList
         data={notifications}
@@ -93,6 +101,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F9FAFB",
     paddingHorizontal: 16,
+    paddingTop:35
   },
   backButton: {
     flexDirection: "row",
