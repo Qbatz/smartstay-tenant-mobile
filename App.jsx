@@ -24,7 +24,7 @@ import { UsersContext } from './src/Context/UserContext'
 import React, { useContext } from 'react';
 import UserContext from './src/Context/UserContext'
 
-import VerifyKYC from './src/Components/KycDocuments/VerifyKc'
+import VerifyKYC from './src/Components/KycDocuments/VerifyKYC'
 
 
 // import VerifyKYC from './src/Components/KycDocuments/VerifyKYC'
@@ -81,7 +81,7 @@ function AppContent() {
      
     
 
-      <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='SplashScreen'>
+      <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='Dashboard'>
         <Navigation.Screen name="HostelList" component={HostelList} />
         <Navigation.Screen name='Dashboard' component={Dashboard}/>  
         <Navigation.Screen name='MyStayPage' component={MystayPage}/> 
@@ -101,6 +101,10 @@ function AppContent() {
 
       </Navigation.Navigator>
     </NavigationContainer>
+
+    
+
+
   
       {/* <Dashboard
         templateFileName="App.jsx"
