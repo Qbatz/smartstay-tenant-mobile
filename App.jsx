@@ -24,7 +24,7 @@ import { UsersContext } from './src/Context/UserContext'
 import React, { useContext } from 'react';
 import UserContext from './src/Context/UserContext'
 
-import VerifyKYC from './src/Components/KycDocuments/VerifyKc'
+import VerifyKYC from './src/Components/KycDocuments/VerifyKYC'
 
 
 // import VerifyKYC from './src/Components/KycDocuments/VerifyKYC'
@@ -33,6 +33,8 @@ import KYCUpload from './src/Components/KycDocuments/UploadKc'
 import KycSuccessDesign from './src/Components/KycDocuments/KycSuccess';
 import CustomerProfile from './src/Components/CustomerProfile/CustomerProfile';
 import Notification from './src/Components/Notification/Notification';
+import Agreement from './src/Components/RentalAggreements/Aggreements';
+import SignatureScreen from './src/Components/RentalAggreements/SignatureScreen'
 
 
 function App() {
@@ -81,7 +83,7 @@ function AppContent() {
      
     
 
-      <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='SplashScreen'>
+      <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='Agreement'>
         <Navigation.Screen name="HostelList" component={HostelList} />
         <Navigation.Screen name='Dashboard' component={Dashboard}/>  
         <Navigation.Screen name='MyStayPage' component={MystayPage}/> 
@@ -98,6 +100,8 @@ function AppContent() {
         <Navigation.Screen name="KycSuccess" component={KycSuccessDesign} />
         <Navigation.Screen name="CustomerProfile" component={CustomerProfile} />
          <Navigation.Screen name="Notification" component={Notification} />
+         <Navigation.Screen name="Agreement" component={Agreement} />
+         <Navigation.Screen name="SignatureScreen" component={SignatureScreen} />
 
       </Navigation.Navigator>
     </NavigationContainer>
