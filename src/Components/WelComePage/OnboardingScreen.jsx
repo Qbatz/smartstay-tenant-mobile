@@ -1,5 +1,6 @@
 import React from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
+import onboardImg from "../../assets/Images/image 6345209.png"
 
 export default function OnboardingScreen({ navigation }) {
 
@@ -12,7 +13,7 @@ export default function OnboardingScreen({ navigation }) {
 
       <View style={styles.card}>
         <Image
-          source={require("../../assets/Images/image 6345209.png")}
+          source={onboardImg}
           style={styles.image}
         />
         <Text style={styles.title}>Manage Your Stay Smartly</Text>
