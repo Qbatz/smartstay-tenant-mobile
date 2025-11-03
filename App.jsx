@@ -24,16 +24,16 @@ import { UsersContext } from './src/Context/UserContext'
 import React, { useContext } from 'react';
 import UserContext from './src/Context/UserContext'
 
-import VerifyKYC from './src/Components/KycDocuments/VerifyKc'
+// import VerifyKYC from './src/Components/KycDocuments/VerifyKc'
 
 
-// import VerifyKYC from './src/Components/KycDocuments/VerifyKYC'
+import VerifyKYC from './src/Components/KycDocuments/VerifyKYC'
 
 import KYCUpload from './src/Components/KycDocuments/UploadKc'
 import KycSuccessDesign from './src/Components/KycDocuments/KycSuccess';
 import CustomerProfile from './src/Components/CustomerProfile/CustomerProfile';
 import Notification from './src/Components/Notification/Notification';
-
+import EditProfile from './src/Components/CustomerProfile/EditProfile'
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
@@ -45,13 +45,20 @@ function App() {
   
 
   return (
-    <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-       <UserContext>
-    <AppContent />
-  </UserContext>
+  //   <SafeAreaProvider>
+  //     <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+  //      <UserContext>
+  //   <AppContent />
+  // </UserContext>
       
 
+  //   </SafeAreaProvider>
+
+     <SafeAreaProvider>
+      <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
+      <UserContext>
+        <AppContent />
+      </UserContext>
     </SafeAreaProvider>
 
 
@@ -98,6 +105,7 @@ function AppContent() {
         <Navigation.Screen name="KycSuccess" component={KycSuccessDesign} />
         <Navigation.Screen name="CustomerProfile" component={CustomerProfile} />
          <Navigation.Screen name="Notification" component={Notification} />
+         <Navigation.Screen name="EditProfile" component={EditProfile} />
 
       </Navigation.Navigator>
     </NavigationContainer>
