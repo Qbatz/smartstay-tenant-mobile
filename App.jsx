@@ -31,7 +31,7 @@ import VerifyKYC from './src/Components/KycDocuments/VerifyKYC'
 
 
 
-import VerifyKYC from './src/Components/KycDocuments/VerifyKYC'
+// import VerifyKYC from './src/Components/KycDocuments/VerifyKYC'
 
 import KYCUpload from './src/Components/KycDocuments/UploadKc'
 import KycSuccessDesign from './src/Components/KycDocuments/KycSuccess';
@@ -40,6 +40,7 @@ import Notification from './src/Components/Notification/Notification';
 import EditProfile from './src/Components/CustomerProfile/EditProfile'
 import Agreement from './src/Components/RentalAggreements/Aggreements';
 import SignatureScreen from './src/Components/RentalAggreements/SignatureScreen'
+import AgreementViewScreen from './src/Components/RentalAggreements/AggreementView';
 
 
 
@@ -113,6 +114,7 @@ function AppContent() {
         <Navigation.Screen name="EditProfile" component={EditProfile} />
         <Navigation.Screen name="Agreement" component={Agreement} />
         <Navigation.Screen name="SignatureScreen" component={SignatureScreen} />
+         <Navigation.Screen name="AgreementViewScreen" component={AgreementViewScreen} />
 
 
       </Navigation.Navigator>
