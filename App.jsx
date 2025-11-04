@@ -33,6 +33,11 @@ import KYCUpload from './src/Components/KycDocuments/UploadKc'
 import KycSuccessDesign from './src/Components/KycDocuments/KycSuccess';
 import CustomerProfile from './src/Components/CustomerProfile/CustomerProfile';
 import Notification from './src/Components/Notification/Notification';
+import EditProfile from './src/Components/CustomerProfile/EditProfile'
+import Agreement from './src/Components/RentalAggreements/Aggreements';
+import SignatureScreen from './src/Components/RentalAggreements/SignatureScreen'
+import AgreementViewScreen from './src/Components/RentalAggreements/AggreementView';
+
 
 
 function App() {
@@ -45,13 +50,20 @@ function App() {
   
 
   return (
-    <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-       <UserContext>
-    <AppContent />
-  </UserContext>
+  //   <SafeAreaProvider>
+  //     <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+  //      <UserContext>
+  //   <AppContent />
+  // </UserContext>
       
 
+  //   </SafeAreaProvider>
+
+     <SafeAreaProvider>
+      <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
+      <UserContext>
+        <AppContent />
+      </UserContext>
     </SafeAreaProvider>
 
 
@@ -81,7 +93,7 @@ function AppContent() {
      
     
 
-      <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='Dashboard'>
+      <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='Agreement'>
         <Navigation.Screen name="HostelList" component={HostelList} />
         <Navigation.Screen name='Dashboard' component={Dashboard}/>  
         <Navigation.Screen name='MyStayPage' component={MystayPage}/> 
@@ -90,8 +102,6 @@ function AppContent() {
         <Navigation.Screen name="OnboardingScreen" component={OnboardingScreen} />
         <Navigation.Screen name="CreateAccount" component={CreateAccount} />
         <Navigation.Screen name="OtpDesign" component={OtpDesign} />
-       
-        
 
            <Navigation.Screen name="VerifyKYC" component={VerifyKYC} />
             <Navigation.Screen name="KYCUpload" component={KYCUpload} />
@@ -99,7 +109,12 @@ function AppContent() {
 
         <Navigation.Screen name="KycSuccess" component={KycSuccessDesign} />
         <Navigation.Screen name="CustomerProfile" component={CustomerProfile} />
-         <Navigation.Screen name="Notification" component={Notification} />
+        <Navigation.Screen name="Notification" component={Notification} />
+        <Navigation.Screen name="EditProfile" component={EditProfile} />
+        <Navigation.Screen name="Agreement" component={Agreement} />
+        <Navigation.Screen name="SignatureScreen" component={SignatureScreen} />
+         <Navigation.Screen name="AgreementViewScreen" component={AgreementViewScreen} />
+
 
       </Navigation.Navigator>
     </NavigationContainer>

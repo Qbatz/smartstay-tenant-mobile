@@ -8,6 +8,7 @@ import {
   Alert,
 } from "react-native";
 import { launchImageLibrary } from "react-native-image-picker";
+import uploadimg from "../../assets/Images/camera.png"
 
 export default function KYCUpload({ navigation }) {
   const [selectedType, setSelectedType] = useState("Aadhar");
@@ -80,7 +81,7 @@ export default function KYCUpload({ navigation }) {
   ) : (
     <View style={styles.placeholderContainer}>
       <Image
-        source={require("../../assets/Images/camera.png")}
+        source={uploadimg}
        style={styles.uploadedImG}
         resizeMode="contain"
       />
@@ -105,7 +106,7 @@ export default function KYCUpload({ navigation }) {
   ) : (
     <View style={styles.placeholderContainer}>
       <Image
-        source={require("../../assets/Images/camera.png")}
+        source={uploadimg}
         style={styles.uploadedImG}
         resizeMode="contain"
       />
@@ -116,15 +117,18 @@ export default function KYCUpload({ navigation }) {
       </View>
 
    
-    <TouchableOpacity
+    
+<TouchableOpacity
   style={[
     styles.submitButton,
     !(frontImage || backImage) && styles.disabledButton,
   ]}
-  disabled={!(frontImage && backImage)}
+  disabled={!(frontImage || backImage)}
+  onPress={() => navigation.navigate("KycSuccess")}
 >
   <Text style={styles.submitText}>Submit KYC</Text>
 </TouchableOpacity>
+
     </View>
   );
 }

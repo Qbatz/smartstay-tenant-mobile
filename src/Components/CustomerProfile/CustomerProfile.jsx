@@ -9,6 +9,22 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import CustomerImage from "../../assets/Images/Customer_Icon.png";
+import LeftArrow from "../../assets/Images/LeftArrow.png"
+import EditIcon from "../../assets/Images/edit.png"
+import VerifyIcon from "../../assets/Images/verify.png"
+import PendingIcon from "../../assets/Images/pending.png";
+import BedIcon from "../../assets/Images/Bed_Icon.png"
+import RoomIcon from "../../assets/Images/Room.png";
+import HostelImage from "../../assets/Images/Group 1.png"
+import LocationIcon from "../../assets/Images/location.png";
+import MoneyIcon from "../../assets/Images/money.png";
+import RentAmountIcon from "../../assets/Images/money-add.png"
+import DateIcon from "../../assets/Images/calendar.png";
+import ViewIcon from "../../assets/Images/view.png";
+import DownloadIcon from "../../assets/Images/download.png";
+import InfoIcon from "../../assets/Images/info-circle.png"
+import LogoutIcon from "../../assets/Images/logout.png"
 
 
 const CustomerProfile = () => {
@@ -28,6 +44,11 @@ const CustomerProfile = () => {
     setDropdownVisible(false);
   };
 
+  const handleEditProfile = () => {
+    navigation.navigate("EditProfile");
+
+  }
+
    const handleBack = () => navigation.goBack();
 
 
@@ -37,7 +58,7 @@ const CustomerProfile = () => {
         <View style={{ flexDirection: "row", alignItems: "center" }}>
   <TouchableOpacity style={styles.backButton} onPress={handleBack}>
     <Image
-      source={require("../../assets/Images/LeftArrow.png")}
+      source={LeftArrow}
       style={{ height: 25, width: 25 }}
     />
   </TouchableOpacity>
@@ -47,13 +68,13 @@ const CustomerProfile = () => {
         <View style={styles.profileCard}>
           <View style={styles.profileRow}>
             <Image
-              source={require("../../assets/Images/Customer_Icon.png")}
+              source={CustomerImage}
               style={styles.profileImage} resizeMode="contain"
             />
             <View style={{ flex: 1, marginLeft: 10 }}>
                 <View style={{display:'flex', flexDirection:'row'}}>
                 <Text style={styles.profileName}>Rajkumar M</Text>
-                <Image  source={require("../../assets/Images/verify.png")} resizeMode="contain" style={{marginTop:2 , marginLeft:4 , height:20 , width:20}}/>
+                <Image  source={VerifyIcon} resizeMode="contain" style={{marginTop:2 , marginLeft:4 , height:20 , width:20}}/>
                 </View>
 
               <View style={styles.infoRow}>
@@ -63,7 +84,7 @@ const CustomerProfile = () => {
 
   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
   <Image
-    source={require("../../assets/Images/Room.png")}
+    source={RoomIcon}
     style={{ height: 16, width: 16, marginRight: 4 }}
     resizeMode="contain"
   />
@@ -72,7 +93,7 @@ const CustomerProfile = () => {
 
 <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
   <Image
-    source={require("../../assets/Images/Bed_Icon.png")}
+    source={BedIcon}
     style={{ height: 16, width: 16, marginRight: 4 }}
     resizeMode="contain"
   />
@@ -82,8 +103,8 @@ const CustomerProfile = () => {
           
               </View>
             </View>
-            <TouchableOpacity>
-              <Image  source={require("../../assets/Images/edit.png")} resizeMode="contain"
+            <TouchableOpacity onPress={handleEditProfile}>
+              <Image  source={EditIcon} resizeMode="contain"
               style={{height:20 , width:20}}/>
             </TouchableOpacity>
           </View>
@@ -93,7 +114,7 @@ const CustomerProfile = () => {
           <View style={styles.cardRow}>
             <Text style={styles.cardTitle}>KYC Status</Text>
             <View style={styles.statusBadgePending}>
-                   <Image  source={require("../../assets/Images/pending.png")} resizeMode="contain" style={{marginRight:3 , marginTop:4 , height:14 , width:14}}/>
+                   <Image  source={PendingIcon} resizeMode="contain" style={{marginRight:3 , marginTop:4 , height:14 , width:14}}/>
               <Text style={styles.statusText}>Pending</Text>
             </View>
           </View>
@@ -111,14 +132,14 @@ const CustomerProfile = () => {
         activeOpacity={0.8}
       >  
         <Image
-          source={require("../../assets/Images/Group 1.png")}
+          source={HostelImage}
           style={styles.hostelImage}
         />
         <View style={{ flex: 1 }}>
           <Text style={styles.hostelTitle}>{selectedHostel}</Text>
           <View style={styles.locationRow}>
              <Image
-          source={require("../../assets/Images/location.png")}
+          source={LocationIcon}
           resizeMode="contain" style={{ width: 20, height: 20 }}
         />
             <Text style={styles.locationText}>Kandanchavadi</Text>
@@ -159,7 +180,7 @@ const CustomerProfile = () => {
         <Text style={styles.detailLabel}>Joined Date</Text>
         <View style={{display:'flex', flexDirection:'row'}}>
          <Image
-          source={require("../../assets/Images/money.png")}
+          source={DateIcon}
           resizeMode="contain" style={{ width: 20, height: 20 }}
         />
         <Text style={styles.detailValue}>02 May 2024</Text>
@@ -171,7 +192,7 @@ const CustomerProfile = () => {
         <Text style={styles.detailLabel}>Advance Paid</Text>
          <View style={{display:'flex', flexDirection:'row'}}>
          <Image
-          source={require("../../assets/Images/money.png")}
+          source={MoneyIcon}
           resizeMode="contain" style={{ width: 20, height: 20 }}
         />
         <Text style={styles.detailValue}>₹4,000.00</Text>
@@ -183,7 +204,7 @@ const CustomerProfile = () => {
         <Text style={styles.detailLabel}>Monthly Rent</Text>
          <View style={{display:'flex', flexDirection:'row'}}>
         <Image
-          source={require("../../assets/Images/money-add.png")}
+          source={RentAmountIcon}
           resizeMode="contain" style={{ width: 20, height: 20 }}
         />
         <Text style={styles.detailValue}>₹8,000.00</Text>
@@ -195,7 +216,7 @@ const CustomerProfile = () => {
         <Text style={styles.detailLabel}>Due Date</Text>
            <View style={{display:'flex', flexDirection:'row'}}>
        <Image
-          source={require("../../assets/Images/calendar.png")}
+          source={DateIcon}
           resizeMode="contain" style={{ width: 20, height: 20 }}
         />
         <Text style={styles.detailValue}>5th of Every Month</Text>
@@ -222,23 +243,23 @@ const CustomerProfile = () => {
           <View style={styles.buttonRow}>
             <TouchableOpacity style={styles.outlineButton}>
               <Text style={styles.outlineButtonText}>View</Text>
-                 <Image  source={require("../../assets/Images/view.png")} resizeMode="contain" style={{ width: 20, height: 20 , marginLeft:8}}/>
+                 <Image  source={ViewIcon} resizeMode="contain" style={{ width: 20, height: 20 , marginLeft:8}}/>
             </TouchableOpacity>
             <TouchableOpacity style={styles.primaryButtonSmall}>
               <Text style={styles.primaryButtonText}>Download</Text>
-                 <Image  source={require("../../assets/Images/download.png")} resizeMode="contain" style={{ width: 20, height: 20 , marginLeft:8 }}/>
+                 <Image  source={DownloadIcon} resizeMode="contain" style={{ width: 20, height: 20 , marginLeft:8 }}/>
             </TouchableOpacity>
           </View>
         </View>
 
         <View style={styles.helpRow}>
-          <Image  source={require("../../assets/Images/info-circle.png")} resizeMode="contain" style={{ width: 20, height: 20 }}/>
+          <Image  source={InfoIcon} resizeMode="contain" style={{ width: 20, height: 20 }}/>
           <Text style={styles.helpText}>Help & Information</Text>
         </View>
       </ScrollView>
 
       <TouchableOpacity style={styles.logoutButton}>
-        <Image  source={require("../../assets/Images/logout.png")} resizeMode="contain" style={{ width: 20, height: 20 }}/>
+        <Image  source={LogoutIcon} resizeMode="contain" style={{ width: 20, height: 20 }}/>
         <Text style={styles.logoutText}>Logout</Text>
       </TouchableOpacity>
     </View>

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { View, Animated, StyleSheet, Image } from "react-native";
+import smartlogo from "../../assets/Images/smartlogo.png"
 
 export default function LogoScreen({ navigation }) {
   const scaleAnim = useRef(new Animated.Value(0.5)).current;
@@ -21,7 +22,7 @@ export default function LogoScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Animated.Image
-        source={require("../../assets/Images/smartlogo.png")}
+        source={smartlogo}
         style={[styles.logo, { transform: [{ scale: scaleAnim }] }]}
       />
     </View>
