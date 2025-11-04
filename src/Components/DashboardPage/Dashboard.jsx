@@ -1,14 +1,15 @@
-import React, { useState } from "react";
-import { View, Text, Dimensions, Image, TouchableOpacity, } from "react-native";
+import React, { useState, useMemo, useCallback } from "react";
+import { View, Text, Dimensions, Image, TouchableOpacity, Button} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
-import MyStay from './MyStay';
-import Services from './Services'
-import Payment from './Payment'
-import Building from '../assets/Images/buildin.png'
-import Location from '../assets/Images/location.png'
-import Flash from '../assets/Images/flash.png'
-import MobilePayment from '../assets/Images/payment.png'
+import MyStay from '../DashboardPage/MyStay';
+import Services from '../DashboardPage/Services'
+import Payment from '../DashboardPage/Payment'
+import Building from '../../assets/Images/buildin.png'
+import Location from '../../assets/Images/location.png'
+import Flash from '../../assets/Images/flash.png'
+import MobilePayment from '../../assets/Images/payment.png'
+
 
 function Dashboard(props) {
 
@@ -39,7 +40,7 @@ function Dashboard(props) {
     <View style={{ flexDirection: 'row', paddingTop: 10, paddingLeft: 16, paddingRight: 16, justifyContent: 'space-between', paddingLeft: 10, alignItems: 'center' }}>
       <View style={{ display: 'flex', flexDirection: 'row' }}>
         <View >
-          <Image source={require("../assets/Images/Group 1.png")} resizeMode="contain" style={{ marginTop: 2, marginLeft: 4, height: 44, width: 44 }} />
+          <Image source={require("../../assets/Images/Group 1.png")} resizeMode="contain" style={{ marginTop: 2, marginLeft: 4, height: 44, width: 44 }} />
         </View>
         <View style={{ paddingLeft: 7 }}>
           <Text style={{ fontSize: 18, fontWeight: '600', paddingBottom: 5, fontFamily: 'gilroy-semibold', color: '#1B1D21' }}>Smartstay Hostel</Text>
@@ -53,13 +54,13 @@ function Dashboard(props) {
       <View style={{flexDirection: 'row'}}>
         <View style={{}}>
           <TouchableOpacity onPress={handleNotificationShow}>
-            <Image source={require("../assets/Images/notification.png")} resizeMode="contain" style={{  height: 44, width: 44 }} />
+            <Image source={require("../../assets/Images/notification.png")} resizeMode="contain" style={{  height: 44, width: 44 }} />
           </TouchableOpacity>
         </View>
 
         <View style={{ paddingLeft:10 }}>
           <TouchableOpacity onPress={handleProfile}>
-            <Image source={require("../assets/Images/Customer_Icon.png")} resizeMode="contain" style={{ width:44, height:44,borderRadius:22 }} />
+            <Image source={require("../../assets/Images/Customer_Icon.png")} resizeMode="contain" style={{ width:44, height:44,borderRadius:22 }} />
           </TouchableOpacity>
         </View>
       </View>

@@ -10,7 +10,7 @@ import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
 import {
   SafeAreaProvider,
 } from 'react-native-safe-area-context';
-import Dashboard from './src/Components/Dashboard';
+import Dashboard from './src/Components/DashboardPage/Dashboard'
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import HostelList from './src/Components/HostelList'
@@ -90,6 +90,8 @@ function AppContent() {
         <Navigation.Screen name="OnboardingScreen" component={OnboardingScreen} />
         <Navigation.Screen name="CreateAccount" component={CreateAccount} />
         <Navigation.Screen name="OtpDesign" component={OtpDesign} />
+       
+        
 
            <Navigation.Screen name="VerifyKYC" component={VerifyKYC} />
             <Navigation.Screen name="KYCUpload" component={KYCUpload} />

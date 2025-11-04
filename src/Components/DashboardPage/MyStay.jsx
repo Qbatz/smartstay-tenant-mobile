@@ -1,14 +1,13 @@
-import React from "react";
-import { View, Text, Image, FlatList, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
+import React,{useRef} from "react";
+import { View, Text, Image, FlatList, TouchableOpacity, ScrollView, StyleSheet, Button } from "react-native";
 import Swiper from "react-native-swiper";
 import LinearGradient from "react-native-linear-gradient";
-import Electricity from '../assets/Images/electricity.png';
-import Frame from '../assets/Images/Frame.png'
-import FrameAdd from '../assets/Images/Frameadd.png'
-import Receipt from '../assets/Images/receipt.png'
+import Electricity from '../../assets/Images/electricity.png';
+import Frame from '../../assets/Images/Frame.png'
+import FrameAdd from '../../assets/Images/Frameadd.png'
+import Receipt from '../../assets/Images/receipt.png'
 import { TabActions, useNavigation } from "@react-navigation/native";
 import { Screen } from "react-native-screens";
-import Services from "./Services";
 function MyStay(props) {
 
     console.log(props)
@@ -38,10 +37,11 @@ function MyStay(props) {
         }
     };
 
-    function viewallclick() {
-        props.jumpTo('services')
 
-    }
+        function viewallclick(id) {
+            props.jumpTo('services', {complaint: id})
+
+        }
 
     return <View style={{ backgroundColor: '#ffffff', flex: 1 }}>
         <View style={{ height: 110, marginTop: 20 }}>
@@ -65,7 +65,10 @@ function MyStay(props) {
                     <View>
                         <Text style={{ fontSize: 20, fontWeight: '700', color: '#222222' }}> {'\u20B9'} 350</Text>
                         <Text style={{ fontSize: 12, color: '#b2b2b4' }}>Last Month EB Bill </Text>
-                        <Text style={{ fontSize: 10, color: '#b2b2b4', marginTop: 10 }}>Paid On</Text>
+                   <View style={{flexDirection:'row',alignItems:'center',marginTop:10}}>
+                            <Text style={{ fontSize: 10, color: '#b2b2b4' }}>Paid On: </Text>
+                            <Text style={{fontSize:12,fontWeight:600}}>03 Jun</Text>
+                        </View>
                     </View>
 
                     <View style={{ paddingLeft: 20, paddingRight: 10 }}>
@@ -74,10 +77,14 @@ function MyStay(props) {
                 </View>
 
                 <View style={{ borderWidth: 1, flex: 1, paddingTop: 18, paddingLeft: 15, paddingBottom: 18, borderRadius: 10, marginLeft: 7, borderColor: '#dcdcdc', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <View>
+                    <View >
                         <Text style={{ fontSize: 20, fontWeight: '700', color: '#222222' }}>{'\u20B9'} 350</Text>
                         <Text style={{ fontSize: 12, color: '#b2b2b4' }}>Last Month Rent</Text>
-                        <Text style={{ fontSize: 10, color: '#b2b2b4', marginTop: 10 }}>Paid On</Text>
+                        <View style={{flexDirection:'row',alignItems:'center',marginTop:10}}>
+                            <Text style={{ fontSize: 10, color: '#b2b2b4' }}>Paid On: </Text>
+                            <Text style={{fontSize:12,fontWeight:600}}>03 Jun</Text>
+                        </View>
+                        
                     </View>
 
                     <View style={{ paddingLeft: 20, paddingRight: 10 }}>
@@ -91,7 +98,11 @@ function MyStay(props) {
                     <View >
                         <Text style={{ fontSize: 20, fontWeight: '700', color: '#222222' }}>{'\u20B9'} 7333</Text>
                         <Text style={{ fontSize: 12, color: '#FF9500' }}>New Bill Generated</Text>
-                        <Text style={{ fontSize: 10, color: '#b2b2b4', marginTop: 10 }}>Due date</Text>
+                         <View style={{flexDirection:'row',alignItems:'center',marginTop:10}}>
+                            <Text style={{ fontSize: 10, color: '#b2b2b4' }}>Due date: </Text>
+                            <Text style={{fontSize:12,fontWeight:600}}>03 Jun</Text>
+                        </View>
+                        
                     </View>
                     <View style={{ paddingLeft: 20, paddingRight: 10 }}>
                         <Image source={Electricity} style={{ width: 26, height: 26, bottom: 10 }} />
@@ -102,7 +113,10 @@ function MyStay(props) {
                     <View>
                         <Text style={{ fontSize: 20, fontWeight: '700', color: '#222222' }}>{'\u20B9'} 8000</Text>
                         <Text style={{ fontSize: 12, color: '#FF9500' }}>New Bill Generated</Text>
-                        <Text style={{ fontSize: 10, color: '#b2b2b4', marginTop: 10 }}>Due date:</Text>
+                         <View style={{flexDirection:'row',alignItems:'center',marginTop:10}}>
+                           <Text style={{ fontSize: 10, color: '#b2b2b4' }}>Due date:</Text>
+                            <Text style={{fontSize:12,fontWeight:600,marginLeft:5}}>05 Feb</Text>
+                        </View>
                     </View>
 
                     <View style={{ paddingLeft: 20, paddingRight: 10 }}>
@@ -139,7 +153,7 @@ function MyStay(props) {
 
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 12 }}>
             <Text style={{ fontSize: 16, fontWeight: 600 }}>Complaints</Text>
-            <TouchableOpacity onPress={viewallclick}>
+            <TouchableOpacity onPress={()=>viewallclick('complaints')}>
                 <Text style={{ color: '#1E45E1', marginRight: 2, fontSize: 14, fontWeight: 500 }}>view all</Text>
             </TouchableOpacity>
 
@@ -154,7 +168,7 @@ function MyStay(props) {
                         <View>
                             <Text style={{ fontSize: 16, fontWeight: '600' }}>{i.title}</Text>
                             <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 10 }}>
-                                <Image source={require('../assets/Images/bill.png')} style={{ width: 16, height: 16 }} />
+                                <Image source={require('../../assets/Images/bill.png')} style={{ width: 16, height: 16 }} />
                                 <Text>{i.issue}</Text>
                             </View>
                         </View>
@@ -171,10 +185,6 @@ function MyStay(props) {
                 </View>
             })}
         </ScrollView>
-
-
-
-
     </View>
 
 }
