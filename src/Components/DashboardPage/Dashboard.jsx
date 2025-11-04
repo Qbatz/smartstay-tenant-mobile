@@ -4,7 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import MyStay from '../DashboardPage/MyStay';
 import Services from '../DashboardPage/Services'
-import Payment from '../DashboardPage/Payment'
+import Payment from '../Payment'
 import Building from '../../assets/Images/buildin.png'
 import Location from '../../assets/Images/location.png'
 import Flash from '../../assets/Images/flash.png'
@@ -72,7 +72,7 @@ function Dashboard(props) {
           icon: ({ route, color }) => (<Image source={route.icon} style={{ width: 21.12, height: 21.12, tintColor: color }} />)
         }}
         renderTabBar={renderTabBar}
-        renderScene={SceneMap({ mystay: MyStay, services: Services, payment: Payment })}
+        renderScene={SceneMap({ mystay: MyStay, services: Services, payment: Payment})}
         onIndexChange={setindex}
         initialLayout={{ width: Dimensions.get('window').width }}
         style={{ flex: 1, justifyContent: 'center', marginTop:10}} />
