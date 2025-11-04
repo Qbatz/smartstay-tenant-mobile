@@ -97,7 +97,7 @@ function AppContent() {
      
     
 
-      <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='Agreement'>
+      <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='CustomerProfile'>
         <Navigation.Screen name="HostelList" component={HostelList} />
         <Navigation.Screen name='Dashboard' component={Dashboard}/>  
         <Navigation.Screen name='MyStayPage' component={MystayPage}/> 
