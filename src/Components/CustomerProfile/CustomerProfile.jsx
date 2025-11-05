@@ -26,6 +26,7 @@ import DownloadIcon from "../../assets/Images/download.png";
 import InfoIcon from "../../assets/Images/info-circle.png"
 import LogoutIcon from "../../assets/Images/logout.png"
 
+
 const CustomerProfile = () => {
 
          const navigation = useNavigation();

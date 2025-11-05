@@ -10,7 +10,7 @@ import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
 import {
   SafeAreaProvider,
 } from 'react-native-safe-area-context';
-import Dashboard from './src/Components/Dashboard';
+import Dashboard from './src/Components/DashboardPage/Dashboard'
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import HostelList from './src/Components/HostelList'
@@ -24,11 +24,7 @@ import { UsersContext } from './src/Context/UserContext'
 import React, { useContext } from 'react';
 import UserContext from './src/Context/UserContext'
 
-
-// import VerifyKYC from './src/Components/KycDocuments/VerifyKc'
-
 import VerifyKYC from './src/Components/KycDocuments/VerifyKYC'
-
 
 
 // import VerifyKYC from './src/Components/KycDocuments/VerifyKYC'
@@ -97,7 +93,7 @@ function AppContent() {
      
     
 
-      <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='Agreement'>
+      <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='Dashboard'>
         <Navigation.Screen name="HostelList" component={HostelList} />
         <Navigation.Screen name='Dashboard' component={Dashboard}/>  
         <Navigation.Screen name='MyStayPage' component={MystayPage}/> 
@@ -106,8 +102,11 @@ function AppContent() {
         <Navigation.Screen name="OnboardingScreen" component={OnboardingScreen} />
         <Navigation.Screen name="CreateAccount" component={CreateAccount} />
         <Navigation.Screen name="OtpDesign" component={OtpDesign} />
-        <Navigation.Screen name="VerifyKYC" component={VerifyKYC} />
-        <Navigation.Screen name="KYCUpload" component={KYCUpload} />
+
+           <Navigation.Screen name="VerifyKYC" component={VerifyKYC} />
+            <Navigation.Screen name="KYCUpload" component={KYCUpload} />
+
+
         <Navigation.Screen name="KycSuccess" component={KycSuccessDesign} />
         <Navigation.Screen name="CustomerProfile" component={CustomerProfile} />
         <Navigation.Screen name="Notification" component={Notification} />
@@ -119,6 +118,10 @@ function AppContent() {
 
       </Navigation.Navigator>
     </NavigationContainer>
+
+    
+
+
   
       {/* <Dashboard
         templateFileName="App.jsx"
