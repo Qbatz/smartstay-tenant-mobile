@@ -10,15 +10,22 @@ import {
   Pressable,
   TouchableWithoutFeedback,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import SideArrow from "../assets/Images/arrow-up.png";
 import HostelImage from "../assets/Images/Group 1.png";
 import ElectrictyIcon from "../assets/Images/electricity.png";
 import DownloadIcon from "../assets/Images/download.png";
 import ShareIcon from "../assets/Images/Union.png";
 import PaidIcon from "../assets/Images/Checkboxes.png";
-import PaYBillIcon from "../assets/Images/Checkboxes.png";
+import PaYBillIcon from "../assets/Images/direction-right.png";
+import ViewIcon from "../assets/Images/view.png";
+
+
+
 
 const Payment = () => {
+
+     const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState(null);
 
@@ -49,15 +56,107 @@ const Payment = () => {
     },
   ];
 
+
+
+  const staticReceiptData = {
+  configurations: {
+    hostelLogo: "https://example.com/logo.png",
+    receiptType: "Rent",
+    address: "123, Main Road, Chennai",
+    signatureUrl: "https://example.com/signature.png",
+  },
+  stayInfo: {
+    hostelName: "Smart Stay Hostel",
+    floorName: "2nd Floor",
+    roomName: "Room 202",
+    bedName: "B2",
+  },
+  customerInfo: {
+    fullName: "Pon Allwin",
+    customerMobileNo: "9876543210",
+    countryCode: "91",
+    fullAddress: "No. 45, Anna Nagar, Chennai",
+  },
+  receiptInfo: {
+    paidAmount: 5500,
+    receiptNumber: "RCP-1023",
+    transactionDate: "03/11/2025",
+    transactionTime: "10:45 AM",
+  },
+  accountDetails: { bankName: "Cash" },
+};
+
+
   const handleOpenModal = (item) => {
+    console.log("item", item);
+    
     setSelectedPayment(item);
     setModalVisible(true);
   };
+
+   console.log("item", modalVisible);
 
   const handleCloseModal = () => {
     setModalVisible(false);
     setSelectedPayment(null);
   };
+
+// const handleDownload = async () => {
+//   try {
+//     const response = await fetch('https://yourapi.com/get-invoice'); 
+//     const data = await response.json();
+
+//     const fileUrl = data?.invoice_url; 
+//     if (!fileUrl) {
+//       Alert.alert('Error', 'No file URL found.');
+//       return;
+//     }
+
+//     const { config, fs } = ReactNativeBlobUtil;
+//     const downloads = fs.dirs.DownloadDir;
+//     const filePath = `${downloads}/invoice_${Date.now()}.pdf`;
+
+//     await config({
+//       fileCache: true,
+//       appendExt: 'pdf',
+//       path: filePath,
+//       addAndroidDownloads: {
+//         useDownloadManager: true,
+//         notification: true,
+//         path: filePath,
+//         description: 'Downloading invoice...',
+//       },
+//     }).fetch('GET', fileUrl);
+
+//     Alert.alert('Success', 'PDF downloaded successfully.');
+
+    
+//     FileViewer.open(filePath)
+//       .then(() => console.log('File opened successfully'))
+//       .catch((error) => {
+//         console.log('Error opening file:', error);
+//         Alert.alert('Error', 'File downloaded but could not be opened.');
+//       });
+    
+
+//   } catch (error) {
+//     console.log('Download error:', error);
+//     Alert.alert('Error', 'Something went wrong while downloading.');
+//   }
+// };
+
+const handleDownload = () => {
+  console.log("pdf downloading");
+  
+}
+
+const handleReceiptPdfDownload =  () => { 
+  setModalVisible(false);
+   navigation.navigate("ReceiptPdfView");
+};
+
+
+
 
   return (
     <>
@@ -107,7 +206,7 @@ const Payment = () => {
                         {item.status}
                       </Text>
                       {item.status === "Pay Now" ?
-                       (<Image  source={PaidIcon} resizeMode="contain" style={{ width: 20, height: 20 , marginLeft:8 }}/>)
+                       (<Image  source={PaYBillIcon} resizeMode="contain" style={{ width: 20, height: 20 , marginLeft:8 }}/>)
                       : (<Image
                         source={HostelImage}
                         style={{ width: 14, height: 14, marginLeft: 6 }}
@@ -139,22 +238,32 @@ const Payment = () => {
                 <View style={styles.dragIndicator} />
                 {selectedPayment && (
                   <>
-                    <Text style={styles.invoiceId}>#INV001</Text>
+                    
                     <Text style={styles.modalTitle}>
                       {selectedPayment.title}
                     </Text>
+                    <View style={{display:'flex', flexDirection:'row'}}>
+                    <Text style={styles.invoiceId}>#INV001</Text>
+                    <TouchableOpacity
+                 onPress={() => handleReceiptPdfDownload(staticReceiptData)}>
+                    <Image  source={ViewIcon} resizeMode="contain" style={{ width: 15, height: 15, marginLeft:5 , marginTop:2}}/>
+                    </TouchableOpacity>
+                    </View>
 
                     <View style={styles.amountSection}>
-                        <View>
-                      <Text style={styles.label}>Total Amount</Text>
-                      <Text style={styles.totalAmount}>
-                        ₹{selectedPayment.amount.toFixed(2)}
-                      </Text>
+                        <View style={{display:'flex', flexDirection:'row', justifyContent:'space-between'}}>
+                       <Text style={styles.label}>Total Amount</Text>
                       </View>
 
                       <View>
-                      <Image  source={PaidIcon} resizeMode="contain" style={{ width: 20, height: 20 , marginLeft:8 }}/>
-                      <Text style={styles.label}>{selectedPayment.paid === "partial" ? "Partially paid ": "Full Paid"} </Text>
+                       
+                      <Text style={styles.totalAmount}>
+                        ₹{selectedPayment.amount.toFixed(2)}
+                      </Text>
+                      <View style={{display:'flex', flexDirection:'row'}}>
+                      <Image  source={PaidIcon} resizeMode="contain" style={{ width: 20, height: 20 ,}}/>
+                      <Text style={{fontSize:14}}>{selectedPayment.paid === "partial" ? "Partially paid ": "Full Paid"} </Text>
+                      </View>
                       </View>
                     </View>
 
@@ -177,7 +286,7 @@ const Payment = () => {
                           <View style={styles.row}>
                             <Text style={styles.detailLabel}>Remain</Text>
                             <View>
-                            <Text style={[styles.payBillText]}>₹2500.00</Text>
+                            <Text style={[styles.detailValue]}>₹2500.00</Text>
                             <Text style={styles.payBillText}>Full Paid</Text>
                             </View>
                           </View>
@@ -187,22 +296,22 @@ const Payment = () => {
 
                     <View style={{ marginTop: 10 }}>
                         <View style={styles.Billbottom}>
-                      <Text style={styles.detailLabel}>Paid Date</Text>
-                      <Text style={styles.detailValue}>25 Sep 2025</Text>
+                      <Text style={styles.paiddetailLabel}>Paid Date</Text>
+                      <Text style={styles.paiddetailValue}>25 Sep 2025</Text>
                       </View>
 
                        <View style={styles.Billbottom}>
-                      <Text style={[styles.detailLabel, { marginTop: 6 }]}>
+                      <Text style={[styles.paiddetailLabel, { marginTop: 6 }]}>
                         Payment Mode
                       </Text>
-                      <Text style={styles.detailValue}>UPI</Text>
+                      <Text style={styles.paiddetailValue}>UPI</Text>
                       </View>
 
                        <View style={styles.Billbottom}>
-                      <Text style={[styles.detailLabel, { marginTop: 6 }]}>
+                      <Text style={[styles.paiddetailLabel, { marginTop: 6 }]}>
                         Reference number
                       </Text>
-                      <Text style={styles.detailValue}>#RSIN001</Text>
+                      <Text style={styles.paiddetailValue}>#RSIN001</Text>
                       </View>
                     </View>
 
@@ -212,7 +321,7 @@ const Payment = () => {
                         <Text style={styles.shareText}>Share </Text>
                         <Image  source={ShareIcon} resizeMode="contain" style={{ width: 20, height: 20 , marginLeft:8 }}/>
                       </TouchableOpacity>
-                      <TouchableOpacity style={styles.downloadBtn}>
+                      <TouchableOpacity style={styles.downloadBtn} onPress={handleDownload}>
                         <Text style={styles.downloadText}>Download </Text>
                       <Image  source={DownloadIcon} resizeMode="contain" style={{ width: 20, height: 20 , marginLeft:8 }}/>
                       </TouchableOpacity>
@@ -298,7 +407,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     marginBottom: 10,
   },
-  modalTitle: { fontSize: 16, fontWeight: "700", color: "#000" },
+  modalTitle: { fontSize: 20, fontWeight: "600", color: "#000" },
   invoiceId: {
     fontSize: 13,
     color: "#0057FF",
@@ -311,7 +420,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  label: { fontSize: 14, color: "#555" },
+  label: { fontSize: 20, color: "rgba(31, 38, 51, 1)" , fontWeight: "600" },
   totalAmount: { fontSize: 16, fontWeight: "700", color: "#000" },
   detailsSection: { marginVertical: 10 },
   row: {
@@ -319,9 +428,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginVertical: 3,
   },
-  detailLabel: { fontSize: 13, color: "#777" },
-  detailValue: { fontSize: 13, fontWeight: "500", color: "#000" },
+  detailLabel: { fontSize: 13, color: "rgba(31, 38, 51, 1)" },
+  detailValue: { fontSize: 15, fontWeight: "600", color: "rgba(31, 38, 51, 1)" },
   payBillText: { fontSize: 13, color: "#0057FF", fontWeight: "600" },
+  paiddetailLabel: { fontSize: 13, color: "rgba(60, 60, 67, 0.6)" },
+  paiddetailValue: { fontSize: 13, color: "black" ,  fontWeight: "600" ,},
   Billbottom : {display:'flex', flexDirection:'row',   justifyContent: "space-between",},
   buttonRow: {
     flexDirection: "row",
@@ -334,7 +445,10 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 10,
     alignItems: "center",
+     display:'flex',
+    flexDirection:'row',
     marginRight: 10,
+    justifyContent:'center'
   },
   shareText: { color: "#000", fontWeight: "600" },
   downloadBtn: {
@@ -342,7 +456,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#0057FF",
     paddingVertical: 10,
     borderRadius: 10,
+    display:'flex',
+    flexDirection:'row',
     alignItems: "center",
+    justifyContent:'center'
   },
   downloadText: { color: "#fff", fontWeight: "600" },
 });

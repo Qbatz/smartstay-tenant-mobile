@@ -27,6 +27,7 @@ import UserContext from './src/Context/UserContext'
 import VerifyKYC from './src/Components/KycDocuments/VerifyKYC'
 
 
+
 // import VerifyKYC from './src/Components/KycDocuments/VerifyKYC'
 
 import KYCUpload from './src/Components/KycDocuments/UploadKc'
@@ -36,6 +37,7 @@ import Notification from './src/Components/Notification/Notification';
 import EditProfile from './src/Components/CustomerProfile/EditProfile'
 import Agreement from './src/Components/RentalAggreements/Aggreements';
 import SignatureScreen from './src/Components/RentalAggreements/SignatureScreen'
+import ReceiptPdfView from './src/Components/ReceiptPdfviewer';
 import AgreementViewScreen from './src/Components/RentalAggreements/AggreementView';
 
 
@@ -94,7 +96,7 @@ function AppContent() {
     
 
 
-      <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='Dashboard'>
+      <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='SplashScreen'>
 
         <Navigation.Screen name="HostelList" component={HostelList} />
         <Navigation.Screen name='Dashboard' component={Dashboard}/>  
@@ -115,6 +117,7 @@ function AppContent() {
         <Navigation.Screen name="EditProfile" component={EditProfile} />
         <Navigation.Screen name="Agreement" component={Agreement} />
         <Navigation.Screen name="SignatureScreen" component={SignatureScreen} />
+        <Navigation.Screen name="ReceiptPdfView" component={ReceiptPdfView} />
          <Navigation.Screen name="AgreementViewScreen" component={AgreementViewScreen} />
 
 
