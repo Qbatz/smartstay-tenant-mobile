@@ -1,12 +1,48 @@
-import React from "react";
+import React,{useRef,useEffect} from "react";
 import { View, Text, StyleSheet, Image, ScrollView,TouchableOpacity } from "react-native";
 import DocumentIcon from "../../assets/Images/document-text.png";
-import LeftArrow from "../../assets/Images/Line arrow-left.png"
+import LeftArrow from "../../assets/Images/Line arrow-left.png";
+import ViewShot from "react-native-view-shot";
+import RNFS from "react-native-fs";
+import Share from "react-native-share";
+
 
 export default function AgreementViewScreen({ route,navigation }) {
-  const { signature } = route.params || {};
+  // const { signature } = route.params || {};
+   const { signature, download } = route.params || {};
+  const viewRef = useRef();
+
+ useEffect(() => {
+  if (download) {
+    // wait for layout
+    setTimeout(() => {
+      createPDF();
+    }, 1200);
+  }
+}, [download]);
+
+
+ const createPDF = async () => {
+  try {
+    const uri = await viewRef.current.capture();
+    const filePath = `${RNFS.DownloadDirectoryPath}/Agreement_${Date.now()}.jpg`;
+
+    await RNFS.copyFile(uri, filePath);
+
+    await Share.open({
+      url: `file://${filePath}`,
+      type: "image/jpeg",
+    });
+
+    navigation.goBack();
+  } catch (e) {
+    console.log(e);
+  }
+};
+
 
   return (
+    <ViewShot ref={viewRef} style={{ flex:1 }} options={{ format: "png", quality: 1 }}>
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
      <View style={styles.headerContainer}>
   <TouchableOpacity onPress={() => navigation.navigate("SignatureScreen")}>
@@ -74,6 +110,7 @@ export default function AgreementViewScreen({ route,navigation }) {
 
       <View style={{ height:50 }} />
     </ScrollView>
+    </ViewShot>
   );
 }
 
