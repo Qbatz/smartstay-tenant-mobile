@@ -9,44 +9,42 @@ export default function SignatureScreen({ navigation }) {
   const ref = useRef();
   const [signature, setSignature] = useState(null);
   const [canvasKey, setCanvasKey] = useState(1);
+  const [disablebtn , setDisableBtn] = useState(true)
 
 
-  const handleOK = (sig) => {
-    setSignature(sig);
-  };
+ const handleOK = (sig) => {
+  setSignature(sig); 
+  
 
-//   const handleClear = () => {
-//     ref.current.clearSignature();
-//     setSignature(null);
-//   };
+  navigation.navigate("AgreementViewScreen", { signature: sig });
+};
+
+ const handleSubmit = () => {  
+  
+  ref.current.readSignature();
+};
+
+
+
 const handleClear = () => {
   if (ref.current) {
     ref.current.clearSignature();
   }
   setSignature(null);
-  setCanvasKey(prev => prev + 1); // re-render force
+  setCanvasKey(prev => prev + 1); 
 };
 
 
 
 
-  const handleSubmit = () => {
-    if (signature) {
-      console.log("Signature Submitted:", signature);
-      navigation.goBack(); 
-    } else {
-      alert("Please add your signature before submitting.");
-    }
-  };
+ 
+
+
 
   return (
     <View style={styles.container}>
     
-      {/* <Text style={styles.title} >  <Image
-      source={shield}
-      resizeMode="contain"
-      style={styles.shielIcon}
-    />Signature</Text> */}
+     
     <View style={styles.headerRow}>
   <View style={{flexDirection:"row", alignItems:"center"}}>
     <Image source={shield} resizeMode="contain" style={styles.shielIcon} />
@@ -54,7 +52,7 @@ const handleClear = () => {
   </View>
 
   <TouchableOpacity
-//    onPress={() => navigation("Agreement")}
+
  onPress={() => navigation.navigate("Agreement")}
    >
     <Image
@@ -71,17 +69,19 @@ const handleClear = () => {
         Please draw your signature to legally sign the Document
       </Text>
 
-      {/* Signature Box */}
+    
       <View style={styles.signatureContainer}>
  <Signature
-  key={canvasKey}            // <-- important
+  key={canvasKey}
   ref={ref}
   onOK={handleOK}
   onClear={handleClear}
   autoClear={false}
+  onBegin={() => setSignature("started")}   
   descriptionText=""
   webStyle={style.webStyle}
 />
+
 
 
 
@@ -99,9 +99,15 @@ const handleClear = () => {
       </View>
 
     
-      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-        <Text style={styles.submitText}>Submit</Text>
-      </TouchableOpacity>
+   <TouchableOpacity 
+   
+  
+    style={[styles.submitButton, !signature && styles.disabledButton]}
+    disabled={!signature}
+    onPress={handleSubmit} >
+  <Text style={styles.submitText}>Submit</Text>
+</TouchableOpacity>
+
     </View>
   );
 }
@@ -116,7 +122,7 @@ const styles = StyleSheet.create({
   flexDirection:"row",
   alignItems:"center",
   justifyContent:"space-between",
-  marginBottom: 20
+  marginTop:40
 },
 
 closeIcon:{
@@ -144,10 +150,14 @@ signatureContainer: {
   height: 350,
   marginTop: 25,
   padding: 0,
-  // overflow:"hidden",  // remove
+  
 },
-
-
+ disabledButton: {
+    backgroundColor: "#C7D2FE",
+  },
+EnableButton : {
+  backgroundColor:"#2563EB"
+},
   clearButton: {
     position: "absolute",
     top: 8,
@@ -201,10 +211,10 @@ const style = {
       border-radius:10px;
       border:none !important;
       border-width:0 !important;
-      height:100% !important;         /* VERY IMPORTANT */
+      height:100% !important;        
     }
     canvas {
-      height:100% !important;         /* VERY IMPORTANT */
+      height:100% !important;     
       width:100% !important;
       border:none !important;
       margin:0 !important;

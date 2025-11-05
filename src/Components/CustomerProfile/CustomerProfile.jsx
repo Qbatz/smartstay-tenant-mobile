@@ -24,7 +24,9 @@ import DateIcon from "../../assets/Images/calendar.png";
 import ViewIcon from "../../assets/Images/view.png";
 import DownloadIcon from "../../assets/Images/download.png";
 import InfoIcon from "../../assets/Images/info-circle.png"
-import LogoutIcon from "../../assets/Images/logout.png"
+import LogoutIcon from "../../assets/Images/logout.png";
+
+
 
 const CustomerProfile = () => {
 
@@ -37,6 +39,23 @@ const CustomerProfile = () => {
     { id: 2, name: "StayEasy Hostel", location: "Velachery" },
     { id: 3, name: "ComfortNest", location: "Thoraipakkam" },
   ];
+  const requestPermission = async () => {
+  if (Platform.OS === "android") {
+    const permission = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES
+    );
+    return permission === PermissionsAndroid.RESULTS.GRANTED;
+  }
+  return true;
+};
+
+const handleDownload = () => {
+  navigation.navigate("AgreementViewScreen", { 
+    download: true,
+    
+  });
+};
+
 
   const handleSelectHostel = (hostel) => {
     setSelectedHostel(hostel.name);
@@ -229,7 +248,7 @@ const CustomerProfile = () => {
           <Text style={styles.warningText}>
             Complete your Rental Agreement E-Sign to fully activate your account.
           </Text>
-          <TouchableOpacity style={styles.primaryButton}>
+          <TouchableOpacity style={styles.primaryButton} onPress={() => navigation.navigate("Agreement")}>
             <Text style={styles.primaryButtonText}>Complete E-Sign Now</Text>
           </TouchableOpacity>
         </View>
@@ -240,14 +259,20 @@ const CustomerProfile = () => {
             View your Rental Agreement Details as PDF
           </Text>
           <View style={styles.buttonRow}>
-            <TouchableOpacity style={styles.outlineButton}>
+            <TouchableOpacity style={styles.outlineButton}  onPress={() => navigation.navigate("AgreementViewScreen")}>
               <Text style={styles.outlineButtonText}>View</Text>
                  <Image  source={ViewIcon} resizeMode="contain" style={{ width: 20, height: 20 , marginLeft:8}}/>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.primaryButtonSmall}>
+            {/* <TouchableOpacity style={styles.primaryButtonSmall}>
               <Text style={styles.primaryButtonText}>Download</Text>
                  <Image  source={DownloadIcon} resizeMode="contain" style={{ width: 20, height: 20 , marginLeft:8 }}/>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
+         <TouchableOpacity style={styles.primaryButtonSmall} onPress={handleDownload}>
+  <Text style={styles.primaryButtonText}>Download</Text>
+  <Image source={DownloadIcon} resizeMode="contain" style={{ width: 20, height: 20 , marginLeft:8 }}/>
+</TouchableOpacity>
+
+
           </View>
         </View>
 

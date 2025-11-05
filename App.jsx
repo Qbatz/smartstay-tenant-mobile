@@ -10,7 +10,7 @@ import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
 import {
   SafeAreaProvider,
 } from 'react-native-safe-area-context';
-import Dashboard from './src/Components/Dashboard';
+import Dashboard from './src/Components/DashboardPage/Dashboard'
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import HostelList from './src/Components/HostelList'
@@ -23,9 +23,6 @@ import OnboardingScreen from "./src/Components/WelComePage/OnboardingScreen";
 import { UsersContext } from './src/Context/UserContext'
 import React, { useContext } from 'react';
 import UserContext from './src/Context/UserContext'
-
-
-// import VerifyKYC from './src/Components/KycDocuments/VerifyKc'
 
 import VerifyKYC from './src/Components/KycDocuments/VerifyKYC'
 
@@ -41,6 +38,8 @@ import EditProfile from './src/Components/CustomerProfile/EditProfile'
 import Agreement from './src/Components/RentalAggreements/Aggreements';
 import SignatureScreen from './src/Components/RentalAggreements/SignatureScreen'
 import ReceiptPdfView from './src/Components/ReceiptPdfviewer';
+import AgreementViewScreen from './src/Components/RentalAggreements/AggreementView';
+
 
 
 function App() {
@@ -96,7 +95,9 @@ function AppContent() {
      
     
 
+
       <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='SplashScreen'>
+
         <Navigation.Screen name="HostelList" component={HostelList} />
         <Navigation.Screen name='Dashboard' component={Dashboard}/>  
         <Navigation.Screen name='MyStayPage' component={MystayPage}/> 
@@ -105,8 +106,11 @@ function AppContent() {
         <Navigation.Screen name="OnboardingScreen" component={OnboardingScreen} />
         <Navigation.Screen name="CreateAccount" component={CreateAccount} />
         <Navigation.Screen name="OtpDesign" component={OtpDesign} />
-        <Navigation.Screen name="VerifyKYC" component={VerifyKYC} />
-        <Navigation.Screen name="KYCUpload" component={KYCUpload} />
+
+           <Navigation.Screen name="VerifyKYC" component={VerifyKYC} />
+            <Navigation.Screen name="KYCUpload" component={KYCUpload} />
+
+
         <Navigation.Screen name="KycSuccess" component={KycSuccessDesign} />
         <Navigation.Screen name="CustomerProfile" component={CustomerProfile} />
         <Navigation.Screen name="Notification" component={Notification} />
@@ -114,10 +118,15 @@ function AppContent() {
         <Navigation.Screen name="Agreement" component={Agreement} />
         <Navigation.Screen name="SignatureScreen" component={SignatureScreen} />
         <Navigation.Screen name="ReceiptPdfView" component={ReceiptPdfView} />
+         <Navigation.Screen name="AgreementViewScreen" component={AgreementViewScreen} />
 
 
       </Navigation.Navigator>
     </NavigationContainer>
+
+    
+
+
   
       {/* <Dashboard
         templateFileName="App.jsx"
