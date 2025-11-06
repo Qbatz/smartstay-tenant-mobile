@@ -12,10 +12,10 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { launchImageLibrary } from "react-native-image-picker";
 import CustomerImage from "../../assets/Images/Customer_Icon.png";
 import LeftArrow from "../../assets/Images/LeftArrow.png";
 import CameraIcon from "../../assets/Images/camera_Icon.png"
+import { pickSingleFile } from "../UploadFileScreen/uploadFilePage"; 
 
 const EditProfile = () => {
   const navigation = useNavigation();
@@ -30,23 +30,36 @@ const EditProfile = () => {
     console.log("Saved profile:", { name, gender, dob, profileImage });
     navigation.goBack();
   };
-
-  const handleImagePick = () => {
-    const options = {
-      mediaType: "photo",
-      quality: 1,
-    };
-    launchImageLibrary(options, (response) => {
-      if (response.didCancel) {
-        console.log("User cancelled image picker");
-      } else if (response.errorCode) {
-        console.log("ImagePicker Error:", response.errorMessage);
+ const handleImagePick = async () => {
+    try {
+      const image = await pickSingleFile();
+      
+      if (image) {
+        console.log("Selected image:", image);
+        setProfileImage({ uri: image.uri });
       } else {
-        const uri = response.assets?.[0]?.uri;
-        if (uri) setProfileImage({ uri });
+        console.log("User cancelled image selection");
       }
-    });
+    } catch (error) {
+      console.log("Image pick error:", error);
+    }
   };
+  // const handleImagePick = () => {
+  //   const options = {
+  //     mediaType: "photo",
+  //     quality: 1,
+  //   };
+  //   launchImageLibrary(options, (response) => {
+  //     if (response.didCancel) {
+  //       console.log("User cancelled image picker");
+  //     } else if (response.errorCode) {
+  //       console.log("ImagePicker Error:", response.errorMessage);
+  //     } else {
+  //       const uri = response.assets?.[0]?.uri;
+  //       if (uri) setProfileImage({ uri });
+  //     }
+  //   });
+  // };
 
   return (
     <View style={styles.container}>

@@ -30,7 +30,7 @@ import VerifyKYC from './src/Components/KycDocuments/VerifyKYC'
 
 // import VerifyKYC from './src/Components/KycDocuments/VerifyKYC'
 
-import KYCUpload from './src/Components/KycDocuments/UploadKc'
+import KYCUpload from './src/Components/KycDocuments/UploadKYC'
 import KycSuccessDesign from './src/Components/KycDocuments/KycSuccess';
 import CustomerProfile from './src/Components/CustomerProfile/CustomerProfile';
 import Notification from './src/Components/Notification/Notification';
