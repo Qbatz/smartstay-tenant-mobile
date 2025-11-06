@@ -24,7 +24,8 @@ import { UsersContext } from './src/Context/UserContext'
 import React, { useContext } from 'react';
 import UserContext from './src/Context/UserContext'
 
-import VerifyKYC from './src/Components/KycDocuments/VerifyKYC'
+import VerifyKYC from './src/Components/KycDocuments/VerifyKYC';
+import SuccessModal from './src/Components/ToastFile/TostFilePage'
 
 
 
@@ -96,7 +97,7 @@ function AppContent() {
     
 
 
-      <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='SplashScreen'>
+      <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='KYCUpload'>
 
         <Navigation.Screen name="HostelList" component={HostelList} />
         <Navigation.Screen name='Dashboard' component={Dashboard}/>  
@@ -119,6 +120,7 @@ function AppContent() {
         <Navigation.Screen name="SignatureScreen" component={SignatureScreen} />
         <Navigation.Screen name="ReceiptPdfView" component={ReceiptPdfView} />
          <Navigation.Screen name="AgreementViewScreen" component={AgreementViewScreen} />
+            <Navigation.Screen name="SuccessModal" component={SuccessModal} />
 
 
       </Navigation.Navigator>
