@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 
-const KycSuccessDesign = () => {
+const KycSuccessDesign = ({ navigation }) => {
   return (
     <View style={styles.container}>
     
@@ -23,7 +23,7 @@ const KycSuccessDesign = () => {
       </Text>
 
      
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Dashboard")}>
         <Text style={styles.buttonText}>Continue</Text>
       </TouchableOpacity>
     </View>
