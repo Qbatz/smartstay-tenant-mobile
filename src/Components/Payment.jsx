@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   Modal,
   Pressable,
-  TouchableWithoutFeedback,
+  TouchableWithoutFeedback,  Linking, Alert
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import SideArrow from "../assets/Images/arrow-up.png";
@@ -145,10 +145,42 @@ const Payment = () => {
 //   }
 // };
 
-const handleDownload = () => {
-  console.log("pdf downloading");
-  
-}
+
+
+const handleDownload = async () => {
+  try {
+    const response = await fetch("https://smartstaytestingapi.s3remotica.com/invoice/invoice-list-pdf", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTkzLCJzdWIiOjE5MywidXNlcl90eXBlIjoiYWRtaW4iLCJyb2xlX2lkIjowLCJwbGFuX2NvZGUiOiJvbmVfZGF5IiwicGxhbl9zdGF0dXMiOjEsImlhdCI6MTc2MjQxMDIzOSwiZXhwIjoxNzYyNDEyMDM5fQ.BNCXjNx4B9AH0UV9Yy_dXnnBLzjfDUY7qOJOzuxlS2E`,
+      },
+      body: JSON.stringify({
+        Date: "2025-11-01",
+        User_Id: "NOTI1629",
+        id: 2148,
+      }),
+    });
+
+    const data = await response.json();
+
+    const pdfUrl = data?.pdf_url;
+
+    if (pdfUrl) {
+      const supported = await Linking.canOpenURL(pdfUrl);
+      if (supported) {
+        await Linking.openURL(pdfUrl);
+      } else {
+        Alert.alert("Error", "Cannot open this PDF link");
+      }
+    } else {
+      Alert.alert("No PDF found in response");
+    }
+  } catch (error) {
+    console.error("PDF open error:", error);
+    Alert.alert("Error", "Failed to open PDF");
+  }
+};
 
 const handleReceiptPdfDownload =  () => { 
   setModalVisible(false);
