@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState ,useContext} from "react";
 import {
   View,
   Text,
@@ -7,8 +7,10 @@ import {
   StyleSheet,
   Image,
 } from "react-native";
+import { ApiContext } from "../UseCotextFile/UseContectApi";
 
 const CreateAccount = ({ navigation }) => {
+  const { sendOtp } = useContext(ApiContext);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
@@ -19,11 +21,16 @@ const CreateAccount = ({ navigation }) => {
 };
 
 
-  const handleGetOtp = () => {
-    if (phoneNumber.length === 10) {
-      navigation.navigate("OtpDesign", { phone: phoneNumber });
-    }
-  };
+ 
+  const handleGetOtp = async () => {
+  let res = await sendOtp(phoneNumber);
+  if(res?.success === true){
+     navigation.navigate("OtpDesign", { phone: phoneNumber });
+  }
+  else{
+     alert("Failed to send OTP");
+  }
+}
 
   return (
     <View style={styles.container}>
