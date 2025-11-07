@@ -19,6 +19,7 @@ import ShareIcon from "../assets/Images/Union.png";
 import PaidIcon from "../assets/Images/Checkboxes.png";
 import PaYBillIcon from "../assets/Images/direction-right.png";
 import ViewIcon from "../assets/Images/view.png";
+import FilterIcon from "../assets/Images/Filter_Icon.png"
 
 
 
@@ -54,7 +55,48 @@ const Payment = () => {
       statusColor: "#FFB300",
       paid: "partial",
     },
+     {
+      title: "June Month Rental",
+      date: "04 Jun 2025",
+      amount: 4000,
+      status: "Paid to",
+      statusColor: "#00C853",
+      paid: true,
+    },
+     {
+      title: "July Month Rental",
+      date: "04 Aug 2025",
+      amount: 6000,
+      status: "Paid to",
+      statusColor: "#00C853",
+      paid: true,
+    },
+     {
+      title: "January Month Rental",
+      date: "12 Jan 2025",
+      amount: 8000,
+      status: "Paid to",
+      statusColor: "#00C853",
+      paid: true,
+    },
+     {
+      title: "Feb Month Rental",
+      date: "12 Feb 2025",
+      amount: 6000,
+      status: "Paid to",
+      statusColor: "#00C853",
+      paid: true,
+    },
+     {
+      title: "Sep Month Rental",
+      date: "02 Oct 2025",
+      amount: 12000,
+      status: "Pay Now",
+      statusColor: "#0057FF",
+      paid: false,
+    },
   ];
+
 
 
 
@@ -365,6 +407,14 @@ const handleReceiptPdfDownload =  () => {
           </View>
         </TouchableWithoutFeedback>
       </Modal>
+
+      <TouchableOpacity style={styles.filterFab} >
+ <Image 
+ source={FilterIcon} 
+ resizeMode="contain" 
+ style={styles.filterIcon}
+ />
+ </TouchableOpacity>
     </>
   );
 };
@@ -375,8 +425,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    paddingHorizontal: 16,
-    paddingTop: 10,
+    // paddingHorizontal: 16,
+    paddingTop: 20,
   },
   card: {
     flexDirection: "row",
@@ -494,4 +544,18 @@ const styles = StyleSheet.create({
     justifyContent:'center'
   },
   downloadText: { color: "#fff", fontWeight: "600" },
+  filterFab: {
+ position: 'absolute', 
+ bottom: 40,
+ right: 10, 
+ borderRadius: 30,
+ width: 60,
+ height: 60,
+ justifyContent: 'center',
+ alignItems: 'center',
+ },
+ filterIcon: {
+   width: 60,
+   height: 60,
+ },
 });

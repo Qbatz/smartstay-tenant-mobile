@@ -23,12 +23,9 @@ import OnboardingScreen from "./src/Components/WelComePage/OnboardingScreen";
 import { UsersContext } from './src/Context/UserContext'
 import React, { useContext } from 'react';
 import UserContext from './src/Context/UserContext'
-
+import { LoginProvider } from "./src/Context/LoginContext"; 
 import VerifyKYC from './src/Components/KycDocuments/VerifyKYC';
 import SuccessModal from './src/Components/ToastFile/TostFilePage'
-
-
-
 // import VerifyKYC from './src/Components/KycDocuments/VerifyKYC'
 
 import KYCUpload from './src/Components/KycDocuments/UploadKYC'
@@ -41,16 +38,13 @@ import SignatureScreen from './src/Components/RentalAggreements/SignatureScreen'
 import ReceiptPdfView from './src/Components/ReceiptPdfviewer';
 import AgreementViewScreen from './src/Components/RentalAggreements/AggreementView';
 
-
-
 function App() {
+
   const isDarkMode = useColorScheme() === 'dark';
 
   const context = useContext(UsersContext);
 
   console.log(context)
-
-  
 
   return (
   //   <SafeAreaProvider>
@@ -62,14 +56,21 @@ function App() {
 
   //   </SafeAreaProvider>
 
-     <SafeAreaProvider>
+    //  <SafeAreaProvider>
+    //   <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
+    //   <UserContext>
+    //     <AppContent />
+    //   </UserContext>
+    // </SafeAreaProvider>
+
+   <SafeAreaProvider>
       <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
-      <UserContext>
-        <AppContent />
-      </UserContext>
+      <LoginProvider>
+        <UserContext>
+          <AppContent />
+        </UserContext>
+      </LoginProvider>
     </SafeAreaProvider>
-
-
   );
 }
 
@@ -92,12 +93,7 @@ function AppContent() {
 
     <View style={styles.container}>
     <NavigationContainer >
-
-     
-    
-
-
-      <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='KYCUpload'>
+      <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='SplashScreen'>
 
         <Navigation.Screen name="HostelList" component={HostelList} />
         <Navigation.Screen name='Dashboard' component={Dashboard}/>  
@@ -107,11 +103,8 @@ function AppContent() {
         <Navigation.Screen name="OnboardingScreen" component={OnboardingScreen} />
         <Navigation.Screen name="CreateAccount" component={CreateAccount} />
         <Navigation.Screen name="OtpDesign" component={OtpDesign} />
-
-           <Navigation.Screen name="VerifyKYC" component={VerifyKYC} />
-            <Navigation.Screen name="KYCUpload" component={KYCUpload} />
-
-
+        <Navigation.Screen name="VerifyKYC" component={VerifyKYC} />
+        <Navigation.Screen name="KYCUpload" component={KYCUpload} />
         <Navigation.Screen name="KycSuccess" component={KycSuccessDesign} />
         <Navigation.Screen name="CustomerProfile" component={CustomerProfile} />
         <Navigation.Screen name="Notification" component={Notification} />
@@ -119,9 +112,8 @@ function AppContent() {
         <Navigation.Screen name="Agreement" component={Agreement} />
         <Navigation.Screen name="SignatureScreen" component={SignatureScreen} />
         <Navigation.Screen name="ReceiptPdfView" component={ReceiptPdfView} />
-         <Navigation.Screen name="AgreementViewScreen" component={AgreementViewScreen} />
-            <Navigation.Screen name="SuccessModal" component={SuccessModal} />
-
+        <Navigation.Screen name="AgreementViewScreen" component={AgreementViewScreen} />
+        <Navigation.Screen name="SuccessModal" component={SuccessModal} />
 
       </Navigation.Navigator>
     </NavigationContainer>

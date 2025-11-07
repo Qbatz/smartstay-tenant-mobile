@@ -1,6 +1,7 @@
-import React, { useState, useRef } from "react";
-import { View, Text, TextInput, StyleSheet, Image } from "react-native";
+import React, { useState, useRef, useContext } from "react";
+import { View, Text, TextInput, StyleSheet, Image, Alert , TouchableOpacity, } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { LoginContext } from "../../Context/LoginContext"; 
 
 const OtpDesign = ({ route }) => {
   const navigation = useNavigation();
@@ -8,7 +9,9 @@ const OtpDesign = ({ route }) => {
   const [otp, setOtp] = useState(["", "", "", ""]);
   const inputs = useRef([]);
 
-  const handleOtpChange = (text, index) => {
+  const { verifyOtp , resendOtp } = useContext(LoginContext); 
+
+  const handleOtpChange = async (text, index) => {
     const newOtp = [...otp];
     newOtp[index] = text;
     setOtp(newOtp);
@@ -17,9 +20,17 @@ const OtpDesign = ({ route }) => {
       inputs.current[index + 1].focus();
     }
 
+
     if (newOtp.every((digit) => digit !== "")) {
       const otpValue = newOtp.join("");
-      navigation.navigate("VerifyKYC");
+      console.log("Entered OTP:", otpValue);
+       navigation.navigate("VerifyKYC");
+      // try {
+      //   await verifyOtp(phone, otpValue); 
+      //   navigation.navigate("VerifyKYC"); 
+      // } catch (error) {
+      //   Alert.alert("Error", "Failed to verify OTP");
+      // }
     }
   };
 
@@ -51,10 +62,13 @@ const OtpDesign = ({ route }) => {
           />
         ))}
       </View>
-
+      
       <Text style={styles.resendText}>
-        Didn’t receive OTP? <Text style={styles.resendLink}>Resend</Text>
+        Didn’t receive OTP?
+         <TouchableOpacity   onPress={resendOtp}>
+         <Text style={styles.resendLink}>Resend</Text></TouchableOpacity>
       </Text>
+     
     </View>
   );
 };
