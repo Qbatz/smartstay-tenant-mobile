@@ -26,6 +26,10 @@ import UserContext from './src/Context/UserContext'
 import { LoginProvider } from "./src/Context/LoginContext"; 
 import VerifyKYC from './src/Components/KycDocuments/VerifyKYC';
 import SuccessModal from './src/Components/ToastFile/TostFilePage'
+import VerifyKYC from './src/Components/KycDocuments/VerifyKYC'
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
+
 // import VerifyKYC from './src/Components/KycDocuments/VerifyKYC'
 
 import KYCUpload from './src/Components/KycDocuments/UploadKYC'
@@ -62,6 +66,7 @@ function App() {
     //     <AppContent />
     //   </UserContext>
     // </SafeAreaProvider>
+  <GestureHandlerRootView>
 
    <SafeAreaProvider>
       <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
@@ -71,6 +76,9 @@ function App() {
         </UserContext>
       </LoginProvider>
     </SafeAreaProvider>
+    </GestureHandlerRootView>
+
+
   );
 }
 
