@@ -5,7 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,FlatList,
+  Image, Linking, Alert
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -24,7 +24,8 @@ import DateIcon from "../../assets/Images/calendar.png";
 import ViewIcon from "../../assets/Images/view.png";
 import DownloadIcon from "../../assets/Images/download.png";
 import InfoIcon from "../../assets/Images/info-circle.png"
-import LogoutIcon from "../../assets/Images/logout.png"
+import LogoutIcon from "../../assets/Images/logout.png";
+
 
 
 const CustomerProfile = () => {
@@ -38,6 +39,44 @@ const CustomerProfile = () => {
     { id: 2, name: "StayEasy Hostel", location: "Velachery" },
     { id: 3, name: "ComfortNest", location: "Thoraipakkam" },
   ];
+ 
+
+const handleDownload = async () => {
+  try {
+    const response = await fetch("https://smartstaytestingapi.s3remotica.com/invoice/invoice-list-pdf", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTkzLCJzdWIiOjE5MywidXNlcl90eXBlIjoiYWRtaW4iLCJyb2xlX2lkIjowLCJwbGFuX2NvZGUiOiJvbmVfZGF5IiwicGxhbl9zdGF0dXMiOjEsImlhdCI6MTc2MjQxMDIzOSwiZXhwIjoxNzYyNDEyMDM5fQ.BNCXjNx4B9AH0UV9Yy_dXnnBLzjfDUY7qOJOzuxlS2E`,
+      },
+      body: JSON.stringify({
+        Date: "2025-11-01",
+        User_Id: "NOTI1629",
+        id: 2148,
+      }),
+    });
+
+    const data = await response.json();
+
+    const pdfUrl = data?.pdf_url;
+
+    if (pdfUrl) {
+      const supported = await Linking.canOpenURL(pdfUrl);
+      if (supported) {
+        await Linking.openURL(pdfUrl);
+      } else {
+        Alert.alert("Error", "Cannot open this PDF link");
+      }
+    } else {
+      Alert.alert("No PDF found in response");
+    }
+  } catch (error) {
+    console.error("PDF open error:", error);
+    Alert.alert("Error", "Failed to open PDF");
+  }
+};
+
+
 
   const handleSelectHostel = (hostel) => {
     setSelectedHostel(hostel.name);
@@ -48,6 +87,12 @@ const CustomerProfile = () => {
     navigation.navigate("EditProfile");
 
   }
+
+  const handleLogout = () => {
+    navigation.navigate("SplashScreen");
+  }
+
+  
 
    const handleBack = () => navigation.goBack();
 
@@ -230,7 +275,7 @@ const CustomerProfile = () => {
           <Text style={styles.warningText}>
             Complete your Rental Agreement E-Sign to fully activate your account.
           </Text>
-          <TouchableOpacity style={styles.primaryButton}>
+          <TouchableOpacity style={styles.primaryButton} onPress={() => navigation.navigate("Agreement")}>
             <Text style={styles.primaryButtonText}>Complete E-Sign Now</Text>
           </TouchableOpacity>
         </View>
@@ -241,14 +286,20 @@ const CustomerProfile = () => {
             View your Rental Agreement Details as PDF
           </Text>
           <View style={styles.buttonRow}>
-            <TouchableOpacity style={styles.outlineButton}>
+            <TouchableOpacity style={styles.outlineButton}  onPress={() => navigation.navigate("AgreementViewScreen")}>
               <Text style={styles.outlineButtonText}>View</Text>
                  <Image  source={ViewIcon} resizeMode="contain" style={{ width: 20, height: 20 , marginLeft:8}}/>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.primaryButtonSmall}>
+            {/* <TouchableOpacity style={styles.primaryButtonSmall}>
               <Text style={styles.primaryButtonText}>Download</Text>
                  <Image  source={DownloadIcon} resizeMode="contain" style={{ width: 20, height: 20 , marginLeft:8 }}/>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
+         <TouchableOpacity style={styles.primaryButtonSmall} onPress={handleDownload}>
+  <Text style={styles.primaryButtonText}>Download</Text>
+  <Image source={DownloadIcon} resizeMode="contain" style={{ width: 20, height: 20 , marginLeft:8 }}/>
+</TouchableOpacity>
+
+
           </View>
         </View>
 
@@ -256,12 +307,16 @@ const CustomerProfile = () => {
           <Image  source={InfoIcon} resizeMode="contain" style={{ width: 20, height: 20 }}/>
           <Text style={styles.helpText}>Help & Information</Text>
         </View>
-      </ScrollView>
 
-      <TouchableOpacity style={styles.logoutButton}>
+<View style={{ marginTop: 20, }}>
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Image  source={LogoutIcon} resizeMode="contain" style={{ width: 20, height: 20 }}/>
         <Text style={styles.logoutText}>Logout</Text>
       </TouchableOpacity>
+      </View>
+      </ScrollView>
+
+    
     </View>
   );
 };
@@ -503,14 +558,13 @@ const styles = StyleSheet.create({
     color: "#555",
   },
   logoutButton: {
-    width:"90%",
+    width:"100%",
     flexDirection: "row",
     paddingVertical: 15,
     borderTopWidth: 1,
     borderColor: "#eee",
     backgroundColor: "#FFF0F0",
     paddingLeft:5,
-    marginLeft:"5%",
     borderRadius:7
   },
   logoutText: {
