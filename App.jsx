@@ -23,8 +23,8 @@ import OnboardingScreen from "./src/Components/WelComePage/OnboardingScreen";
 import { UsersContext } from './src/Context/UserContext'
 import React, { useContext } from 'react';
 import UserContext from './src/Context/UserContext'
-
 import VerifyKYC from './src/Components/KycDocuments/VerifyKYC'
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 
 // import VerifyKYC from './src/Components/KycDocuments/VerifyKYC'
@@ -58,13 +58,18 @@ function App() {
       
 
   //   </SafeAreaProvider>
+  <GestureHandlerRootView>
 
      <SafeAreaProvider>
       <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
       <UserContext>
         <AppContent />
+        
+
+        
       </UserContext>
     </SafeAreaProvider>
+    </GestureHandlerRootView>
 
 
   );
