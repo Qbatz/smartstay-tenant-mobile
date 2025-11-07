@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState , useContext } from "react";
 import {
   View,
   Text,
@@ -7,8 +7,11 @@ import {
   StyleSheet,
   Image,
 } from "react-native";
+import { LoginContext } from "../../Context/LoginContext";
 
 const CreateAccount = ({ navigation }) => {
+
+  const { sendOtp } = useContext(LoginContext);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
@@ -16,14 +19,20 @@ const CreateAccount = ({ navigation }) => {
   const numericText = text.replace(/[^0-9]/g, '');
   setPhoneNumber(numericText);
   setIsButtonDisabled(numericText.length < 10);
+
 };
 
 
-  const handleGetOtp = () => {
-    if (phoneNumber.length === 10) {
+const handleGetOtp = async () => {
+  if (phoneNumber.length === 10) {
+    const success = await sendOtp(phoneNumber);
+    if (success) {
       navigation.navigate("OtpDesign", { phone: phoneNumber });
     }
-  };
+  }
+};
+
+
 
   return (
     <View style={styles.container}>
