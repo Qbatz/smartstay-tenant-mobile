@@ -26,7 +26,6 @@ import UserContext from './src/Context/UserContext'
 import { LoginProvider } from "./src/Context/LoginContext"; 
 import VerifyKYC from './src/Components/KycDocuments/VerifyKYC';
 import SuccessModal from './src/Components/ToastFile/TostFilePage'
-import VerifyKYC from './src/Components/KycDocuments/VerifyKYC'
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 
@@ -101,7 +100,7 @@ function AppContent() {
 
     <View style={styles.container}>
     <NavigationContainer >
-      <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='SplashScreen'>
+      <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='Dashboard'>
 
         <Navigation.Screen name="HostelList" component={HostelList} />
         <Navigation.Screen name='Dashboard' component={Dashboard}/>  
