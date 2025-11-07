@@ -24,13 +24,13 @@ const OtpDesign = ({ route }) => {
     if (newOtp.every((digit) => digit !== "")) {
       const otpValue = newOtp.join("");
       console.log("Entered OTP:", otpValue);
-
-      try {
-        await verifyOtp(phone, otpValue); 
-        navigation.navigate("VerifyKYC"); 
-      } catch (error) {
-        Alert.alert("Error", "Failed to verify OTP");
-      }
+       navigation.navigate("VerifyKYC");
+      // try {
+      //   await verifyOtp(phone, otpValue); 
+      //   navigation.navigate("VerifyKYC"); 
+      // } catch (error) {
+      //   Alert.alert("Error", "Failed to verify OTP");
+      // }
     }
   };
 

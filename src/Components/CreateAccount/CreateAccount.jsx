@@ -25,10 +25,13 @@ const CreateAccount = ({ navigation }) => {
 
 const handleGetOtp = async () => {
   if (phoneNumber.length === 10) {
-    const success = await sendOtp(phoneNumber);
-    if (success) {
+    // const success = await sendOtp(phoneNumber);
       navigation.navigate("OtpDesign", { phone: phoneNumber });
-    }
+    // if (success) {
+    //   console.log("otpsend sucessfully");
+      
+    //   navigation.navigate("OtpDesign", { phone: phoneNumber });
+    // }
   }
 };
 
