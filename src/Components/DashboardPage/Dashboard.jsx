@@ -79,7 +79,7 @@ function Dashboard(props) {
   };
 
   const sheetRef = useRef(null)
-  const snapPoints = useMemo(() => ['25%', '55%'], [])
+  const snapPoints = useMemo(() => ['25%', '60%'], [])
 
   const handleOpen = (complaint, value) => {
 
@@ -160,7 +160,7 @@ function Dashboard(props) {
   // -------Amenities click------
   const ref = useRef(null)
 
-  const snap = useMemo(() => ['45%'], [])
+  const snap = useMemo(() => ['50%'], [])
 
   const handleAmenity = (item, value, tag) => {
     if (tag == 'My-Amenities') {
