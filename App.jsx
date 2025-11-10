@@ -21,12 +21,13 @@ import SplashScreen from "./src/Components/WelComePage/SplashScreen";
 import LogoScreen from "./src/Components/WelComePage/LogoScreen";
 import OnboardingScreen from "./src/Components/WelComePage/OnboardingScreen";
 import { UsersContext } from './src/Context/UserContext'
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import UserContext from './src/Context/UserContext'
 import { LoginProvider } from "./src/Context/LoginContext"; 
 import VerifyKYC from './src/Components/KycDocuments/VerifyKYC';
 import SuccessModal from './src/Components/ToastFile/TostFilePage'
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { NativeModules } from 'react-native';
 
 
 // import VerifyKYC from './src/Components/KycDocuments/VerifyKYC'
@@ -47,7 +48,18 @@ function App() {
 
   const context = useContext(UsersContext);
 
-  console.log(context)
+  console.log(NativeModules)
+
+  const { NotificationModule }=NativeModules;
+
+  useEffect(()=>{
+    NotificationModule.fetchFcmToken().then(r=>{
+      console.log(r)
+    }).catch(error=>{
+      console.log(error)
+    })
+  },[])
+
 
   return (
   //   <SafeAreaProvider>
