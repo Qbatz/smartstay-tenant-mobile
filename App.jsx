@@ -51,9 +51,16 @@ function App() {
   console.log(NativeModules)
 
   const { NotificationModule }=NativeModules;
+  const{CommonModule}=NativeModules;
 
   useEffect(()=>{
     NotificationModule.fetchFcmToken().then(r=>{
+      console.log(r)
+    }).catch(error=>{
+      console.log(error)
+    })
+
+    CommonModule.fetchSerialNumber().then(r=>{
       console.log(r)
     }).catch(error=>{
       console.log(error)
