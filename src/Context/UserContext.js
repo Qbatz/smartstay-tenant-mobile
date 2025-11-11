@@ -6,9 +6,8 @@ const UserContext=(props)=> {
 
     const [accessToken, settoken]=useState();
     const [complaint, setcomplaint]=useState();
-
-    console.log('nothing showing')
-    console.log(complaint)
+    const [SerialNo, setSerialNo]=useState();
+    const [phoneNumber, setPhoneNo]=useState();
 
 
     useEffect(()=>{
@@ -22,8 +21,16 @@ const UserContext=(props)=> {
     function amenitiesfn(value){
         setcomplaint(value)
     }
+    function serialNofn(value){
+        setSerialNo(value)
+    }
+    function PhoneNofn(value){
+        setPhoneNo(value)
+    }
 
-    return<UsersContext.Provider value={{accessToken:accessToken, jumpComplain:jumpcomplainfn, Complaint:complaint,Amenities:amenitiesfn}} >
+    return<UsersContext.Provider value={{accessToken:accessToken, jumpComplain:jumpcomplainfn, Complaint:complaint,Amenities:amenitiesfn, serialNo:serialNofn, SerialNo:SerialNo,
+        phoneNo:PhoneNofn,phoneNumber:phoneNumber
+    }} >
         {props.children}
     </UsersContext.Provider>
 

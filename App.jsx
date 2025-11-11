@@ -46,26 +46,7 @@ function App() {
 
   const isDarkMode = useColorScheme() === 'dark';
 
-  const context = useContext(UsersContext);
 
-  console.log(NativeModules)
-
-  const { NotificationModule }=NativeModules;
-  const{CommonModule}=NativeModules;
-
-  useEffect(()=>{
-    NotificationModule.fetchFcmToken().then(r=>{
-      console.log(r)
-    }).catch(error=>{
-      console.log(error)
-    })
-
-    CommonModule.fetchSerialNumber().then(r=>{
-      console.log(r)
-    }).catch(error=>{
-      console.log(error)
-    })
-  },[])
 
 
   return (
@@ -103,6 +84,25 @@ function App() {
 function AppContent() {
 
   const Navigation = createStackNavigator();
+  const { NotificationModule,CommonModule }=NativeModules;
+
+  const context = useContext(UsersContext);
+
+  useEffect(()=>{
+    NotificationModule.fetchFcmToken().then(r=>{
+      console.log(r)
+    }).catch(error=>{
+      console.log(error)
+    })
+
+    CommonModule.fetchSerialNumber().then(r=>{
+      context.serialNo(r)
+    }).catch(error=>{
+      console.log(error)
+    })
+  },[])
+
+
 
 
   // // enable this when ontime login is setup
@@ -119,7 +119,7 @@ function AppContent() {
 
     <View style={styles.container}>
     <NavigationContainer >
-      <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='Dashboard'>
+      <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='SplashScreen'>
 
         <Navigation.Screen name="HostelList" component={HostelList} />
         <Navigation.Screen name='Dashboard' component={Dashboard}/>  
