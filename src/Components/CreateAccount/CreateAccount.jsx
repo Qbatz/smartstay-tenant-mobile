@@ -8,6 +8,7 @@ import {
   Image,
 } from "react-native";
 import { LoginContext } from "../../Context/LoginContext";
+import { verifyPhoneNo } from "../../Action/LoginAction";
 
 const CreateAccount = ({ navigation }) => {
 
@@ -15,7 +16,7 @@ const CreateAccount = ({ navigation }) => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
- const handlePhoneChange = (text) => {
+ const handlePhoneChange = (text) => { 
   const numericText = text.replace(/[^0-9]/g, '');
   setPhoneNumber(numericText);
   setIsButtonDisabled(numericText.length < 10);
@@ -25,13 +26,12 @@ const CreateAccount = ({ navigation }) => {
 
 const handleGetOtp = async () => {
   if (phoneNumber.length === 10) {
-    // const success = await sendOtp(phoneNumber);
+
+    const dat= await verifyPhoneNo(phoneNumber)
+
+    if(dat.status==200){
       navigation.navigate("OtpDesign", { phone: phoneNumber });
-    // if (success) {
-    //   console.log("otpsend sucessfully");
-      
-    //   navigation.navigate("OtpDesign", { phone: phoneNumber });
-    // }
+    }
   }
 };
 
