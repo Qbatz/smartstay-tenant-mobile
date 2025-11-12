@@ -2,35 +2,43 @@ import React, { useState, useRef, useContext } from "react";
 import { View, Text, TextInput, StyleSheet, Image, Alert , TouchableOpacity, } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { LoginContext } from "../../Context/LoginContext"; 
+import { verifyOtp } from "../../Action/LoginAction";
+import { UsersContext } from "../../Context/UserContext";
+import { storeData } from "../../Utils/Storage";
+import { ACCESS_TOKEN } from "../../Utils/Constant";
 
-const OtpDesign = ({ route }) => {
+const OtpDesign =({ route }) => {
+  console.log(route.params.phone)
   const navigation = useNavigation();
   const { phone } = route.params;
-  const [otp, setOtp] = useState(["", "", "", ""]);
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const inputs = useRef([]);
 
-  const { verifyOtp , resendOtp } = useContext(LoginContext); 
+  const context=useContext(UsersContext)
+  console.log(context.SerialNo)
+  // const { verifyOtp , resendOtp } = useContext(LoginContext); 
 
   const handleOtpChange = async (text, index) => {
     const newOtp = [...otp];
     newOtp[index] = text;
     setOtp(newOtp);
 
-    if (text && index < 3) {
+    if (text && index < 5) {
       inputs.current[index + 1].focus();
     }
 
+   
 
     if (newOtp.every((digit) => digit !== "")) {
       const otpValue = newOtp.join("");
       console.log("Entered OTP:", otpValue);
-       navigation.navigate("VerifyKYC");
-      // try {
-      //   await verifyOtp(phone, otpValue); 
-      //   navigation.navigate("VerifyKYC"); 
-      // } catch (error) {
-      //   Alert.alert("Error", "Failed to verify OTP");
-      // }
+      const data= await verifyOtp(route.params.phone,otpValue,context.SerialNo)
+      if(data.status==200){
+        storeData(ACCESS_TOKEN,data.data)
+        storeData(ACCESS_TOKEN,route.params.phone)
+        context.phoneNo(route.params.phone)
+           navigation.navigate("VerifyKYC");
+      }      
     }
   };
 
@@ -65,7 +73,7 @@ const OtpDesign = ({ route }) => {
       
       <Text style={styles.resendText}>
         Didn’t receive OTP?
-         <TouchableOpacity   onPress={resendOtp}>
+         <TouchableOpacity >
          <Text style={styles.resendLink}>Resend</Text></TouchableOpacity>
       </Text>
      
@@ -83,8 +91,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   otpBox: {
-    width: 55,
-    height: 55,
+    width: 50,
+    height: 50,
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 8,

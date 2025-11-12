@@ -2,7 +2,7 @@ import axios from "axios";
 import { retriveData } from "../Utils/Storage"
 
 const AxiosConfig = axios.create({
-  baseURL: "https://tenentapi.s3remotica.com",
+  baseURL: "https://tenentdevapi.qbatz.com",
   headers: {
     "Content-Type": "application/json",
   },
@@ -20,6 +20,7 @@ AxiosConfig.interceptors.request.use(
     return config;
   },
   (error) => {
+    console.log(error)
     return Promise.reject(error);
   }
 );
