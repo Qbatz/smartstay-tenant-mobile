@@ -1,10 +1,10 @@
 import React from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from "react-native";
-import RoomSerach from '../../assets/Images/roomsearch_logo.png'
-import Qr from '../../assets/Images/QR.png'
-import paytm from '../../assets/Images/Paytm.png'
-import phonepe from '../../assets/Images/Phonepe.png'
-import gpay from '../../assets/Images/GPay.png'
+import RoomSerach from '../../assets/Images/roomsearch_logo.png';
+import Qr from '../../assets/Images/pdfImage/QRimg.png';
+import paytm from '../../assets/Images/pdfImage/Paytmimg.png';
+import phonepe from '../../assets/Images/pdfImage/PhonepeImg.png'
+import gpay from '../../assets/Images/pdfImage/GPayimg.png'
 import signature from '../../assets/Images/signature.png'
 const InvoiceDesign = () => {
   return (

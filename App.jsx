@@ -146,7 +146,7 @@ function AppContent() {
 
     <View style={styles.container}>
     <NavigationContainer >
-      <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='Paymentdesign'>
+      <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='InvoiceDesign'>
 
         <Navigation.Screen name="HostelList" component={HostelList} />
         <Navigation.Screen name='Dashboard' component={Dashboard}/>  
