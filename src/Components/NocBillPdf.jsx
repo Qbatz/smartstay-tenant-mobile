@@ -1,11 +1,11 @@
 import React from "react";
 import { View, Text, Image, ScrollView, StyleSheet } from "react-native";
 import HostelImage from "../assets/Images/Group 1.png";
-import QRCode from "../assets/Images/QR.png";
+import QRCode from "../assets/Images/qrcode.png";
 import SigantureIcon from "../assets/Images/signature.png";
-import PaytmIcon from "../assets/Images/Paytm.png";
-import GooglePayIcon from "../assets/Images/GPay.png";
-import PhonepeIcon from "../assets/Images/Phonepe.png";
+import PaytmIcon from "../assets/Images/paytm.png";
+import GooglePayIcon from "../assets/Images/gpay.png";
+import PhonepeIcon from "../assets/Images/phonepe.png";
 
 const NOCBillPdf = ({ route }) => {
   const { pdfDetails } = route.params || {};
