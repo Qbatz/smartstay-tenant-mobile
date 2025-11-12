@@ -48,6 +48,7 @@ import NOCReceiptPdf from './src/Components/NocReceipt';
 import InvoiceDesign from './src/Components/Payments/BillPDF';
 
 
+
 function App() {
 
   const isDarkMode = useColorScheme() === 'dark';
@@ -171,6 +172,8 @@ function AppContent() {
         <Navigation.Screen name="NocBillPdf" component={NOCBillPdf} />
         <Navigation.Screen name="NocReceiptPdf" component={NOCReceiptPdf} />
          <Navigation.Screen name="InvoiceDesign" component={InvoiceDesign} />
+         
+         
 
 
 
