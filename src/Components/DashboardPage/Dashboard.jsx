@@ -51,6 +51,7 @@ function Dashboard(props) {
   const [showPopUp, setShowPopUp] = useState(false)
   const [selectedReason, setSelectedReason] = useState(null);
   const [monthlyplan,setPlan]=useState();
+  const [deletevisible,setdeleteVisible]=useState(false)
 
 
 
@@ -331,9 +332,9 @@ console.log(available)
 
           </View>
         ) : (
-          <View>
+          <View style={{flex:1}}>
             {selectedComplaint && (
-              <View>
+              <View >
                 <View style={{ flexDirection: "row", justifyContent: "space-between", paddingLeft: 5, paddingRight: 8, marginBottom: 10, paddingTop: 10, }}>
                   <View>
                     <Text style={{ fontSize: 18, fontWeight: "500", fontFamily: "gilroy-semibold", }} >

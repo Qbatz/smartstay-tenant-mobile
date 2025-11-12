@@ -41,18 +41,24 @@ import Agreement from './src/Components/RentalAggreements/Aggreements';
 import SignatureScreen from './src/Components/RentalAggreements/SignatureScreen'
 import ReceiptPdfView from './src/Components/ReceiptPdfviewer';
 import AgreementViewScreen from './src/Components/RentalAggreements/AggreementView';
+
+import NOCBillPdf from './src/Components/NocBillPdf';
+import NOCReceiptPdf from './src/Components/NocReceipt';
+
 import InvoiceDesign from './src/Components/Payments/BillPDF';
+
 
 function App() {
 
   const isDarkMode = useColorScheme() === 'dark';
 
-  const context = useContext(UsersContext);
+
 
   console.log(NativeModules)
 
   const { NotificationModule }=NativeModules;
   const{CommonModule}=NativeModules;
+  
 
   useEffect(()=>{
     NotificationModule.fetchFcmToken().then(r=>{
@@ -67,6 +73,7 @@ function App() {
       console.log(error)
     })
   },[])
+
 
 
   return (
@@ -104,6 +111,25 @@ function App() {
 function AppContent() {
 
   const Navigation = createStackNavigator();
+  const { NotificationModule,CommonModule }=NativeModules;
+
+  const context = useContext(UsersContext);
+
+  useEffect(()=>{
+    NotificationModule.fetchFcmToken().then(r=>{
+      console.log(r)
+    }).catch(error=>{
+      console.log(error)
+    })
+
+    CommonModule.fetchSerialNumber().then(r=>{
+      context.serialNo(r)
+    }).catch(error=>{
+      console.log(error)
+    })
+  },[])
+
+
 
 
   // // enable this when ontime login is setup
@@ -141,7 +167,12 @@ function AppContent() {
         <Navigation.Screen name="ReceiptPdfView" component={ReceiptPdfView} />
         <Navigation.Screen name="AgreementViewScreen" component={AgreementViewScreen} />
         <Navigation.Screen name="SuccessModal" component={SuccessModal} />
-        <Navigation.Screen name="InvoiceDesign" component={InvoiceDesign} />
+
+        <Navigation.Screen name="NocBillPdf" component={NOCBillPdf} />
+        <Navigation.Screen name="NocReceiptPdf" component={NOCReceiptPdf} />
+         <Navigation.Screen name="InvoiceDesign" component={InvoiceDesign} />
+
+
 
       </Navigation.Navigator>
     </NavigationContainer>
