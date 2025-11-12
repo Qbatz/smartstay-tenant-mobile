@@ -41,11 +41,11 @@ import Agreement from './src/Components/RentalAggreements/Aggreements';
 import SignatureScreen from './src/Components/RentalAggreements/SignatureScreen'
 import ReceiptPdfView from './src/Components/ReceiptPdfviewer';
 import AgreementViewScreen from './src/Components/RentalAggreements/AggreementView';
-
 import NOCBillPdf from './src/Components/NocBillPdf';
 import NOCReceiptPdf from './src/Components/NocReceipt';
-
 import InvoiceDesign from './src/Components/Payments/BillPDF';
+
+
 
 
 function App() {
@@ -146,7 +146,7 @@ function AppContent() {
 
     <View style={styles.container}>
     <NavigationContainer >
-      <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='SplashScreen'>
+      <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='Paymentdesign'>
 
         <Navigation.Screen name="HostelList" component={HostelList} />
         <Navigation.Screen name='Dashboard' component={Dashboard}/>  
@@ -173,7 +173,7 @@ function AppContent() {
          <Navigation.Screen name="InvoiceDesign" component={InvoiceDesign} />
 
 
-
+        
       </Navigation.Navigator>
     </NavigationContainer>
 
