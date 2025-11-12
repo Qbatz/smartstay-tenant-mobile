@@ -15,12 +15,13 @@ import SideArrow from "../assets/Images/arrow-up.png";
 import HostelImage from "../assets/Images/Group 1.png";
 import ElectrictyIcon from "../assets/Images/electricity.png";
 import DownloadIcon from "../assets/Images/download.png";
+import DownloadBlueIcon from "../assets/Images/download_Blue.png";
 import ShareIcon from "../assets/Images/Union.png";
 import PaidIcon from "../assets/Images/Checkboxes.png";
 import PaYBillIcon from "../assets/Images/direction-right.png";
 import ViewIcon from "../assets/Images/view.png";
 import FilterIcon from "../assets/Images/Filter_Icon.png"
-
+import ArrowRightIcon from "../assets/Images/arrow-right.png";
 
 
 
@@ -334,10 +335,46 @@ const handleReceiptPdfDownload =  () => {
                       <Text style={styles.totalAmount}>
                         ₹{selectedPayment.amount.toFixed(2)}
                       </Text>
-                      <View style={{display:'flex', flexDirection:'row'}}>
-                      <Image  source={PaidIcon} resizeMode="contain" style={{ width: 20, height: 20 ,}}/>
-                      <Text style={{fontSize:14}}>{selectedPayment.paid === "partial" ? "Partially paid ": "Full Paid"} </Text>
-                      </View>
+
+ {selectedPayment.status === "Pay Now"  && (
+ <View
+                    style={[
+                      styles.statusBadge,
+                      {
+                        backgroundColor:
+                             "rgba(254, 243, 198, 1)",
+                      },
+                    ]}
+                  >
+                    <View style={{ flexDirection: "row" , justifyContent:'center'}}>
+                      <Text
+                        style={[styles.statusText, { color: "rgba(187, 77, 0, 1)"}]}
+                      >
+                      Pending
+                      </Text>
+                    
+                    </View>
+                  </View>
+ )
+}
+                      
+
+                   {(selectedPayment.status === "Partially Paid to" || selectedPayment.status === "Paid to") && (
+  <View style={{ display: "flex", flexDirection: "row" }}>
+    <Image
+      source={PaidIcon}
+      resizeMode="contain"
+      style={{ width: 20, height: 20 }}
+    />
+    <Text style={{ fontSize: 14 }}>
+      {selectedPayment.status === "Partially Paid to" ? "Partially Paid" : "Full Paid"}
+    </Text>
+  </View>
+)}
+
+                    
+
+
                       </View>
                     </View>
 
@@ -361,18 +398,41 @@ const handleReceiptPdfDownload =  () => {
                             <Text style={styles.detailLabel}>Remain</Text>
                             <View>
                             <Text style={[styles.detailValue]}>₹2500.00</Text>
-                            <Text style={styles.payBillText}>Full Paid</Text>
+                            <Text style={styles.payBillText}>Pay Bill</Text>
                             </View>
                           </View>
                         </>
                       )}
                     </View>
 
-                    <View style={{ marginTop: 10 }}>
-                        <View style={styles.Billbottom}>
-                      <Text style={styles.paiddetailLabel}>Paid Date</Text>
+                <View
+  style={{
+    borderBottomColor: 'grey',
+    borderBottomWidth: 0.4,
+    marginVertical: 8,
+    opacity:0.4
+  }}
+/>
+
+
+                      <View style={styles.Billbottom}>
+                      <Text style={styles.paiddetailLabel}>{selectedPayment.status === "Pay Now" ? "Due Date": "Paid Date"} </Text>
                       <Text style={styles.paiddetailValue}>25 Sep 2025</Text>
                       </View>
+      {selectedPayment.status === "Pay Now" && (
+         <View style={{marginTop:5}}>
+          <Text style={{fontSize:13 , color:'rgba(60, 60, 67, 0.6)'}}>Notes & Instructions</Text>
+           <Text style={{fontSize:13 , color:'rgba(34, 34, 34, 1)', fontWeight:600}}>Kindly pay on or before the due date  </Text>
+            <Text style={{fontSize:13 , color:'rgba(34, 34, 34, 1)', fontWeight:600}}>Late fee may apply after 3 days of due date</Text>
+             <Text style={{fontSize:13 , color:'rgba(34, 34, 34, 1)', fontWeight:600}}>For any billing errors, contact hostel admin</Text>
+         </View>
+      )}
+
+
+
+{selectedPayment.status !== "Pay Now" && (
+  <View style={{ marginTop: 10 }}>
+                      
 
                        <View style={styles.Billbottom}>
                       <Text style={[styles.paiddetailLabel, { marginTop: 6 }]}>
@@ -388,18 +448,43 @@ const handleReceiptPdfDownload =  () => {
                       <Text style={styles.paiddetailValue}>#RSIN001</Text>
                       </View>
                     </View>
+)}
+                  
 
                     {/* Buttons */}
-                    <View style={styles.buttonRow}>
+
+                    {selectedPayment.status === "Pay Now" ?
+                    (
+              <View style={styles.buttonRow}>
+                      <TouchableOpacity style={styles.shareBtn} onPress={handleDownload}>
+                        <Text style={{fontWeight:600 , color:'rgba(7, 28, 112, 1)'}}>Dowload Bill </Text>
+                      <Image  source={DownloadBlueIcon} resizeMode="contain" style={{ width: 17, height: 17 , marginLeft:8 ,marginBottom:4 }}/>
+                      </TouchableOpacity>
+                      <TouchableOpacity style={styles.downloadBtn} >
+                        <Text style={styles.downloadText}>Pay Now </Text>
+                   <Image  source={ArrowRightIcon} resizeMode="contain" style={{ width: 20, height: 20 , marginLeft:8 }}/>
+                      </TouchableOpacity>
+              </View>
+                    )
+
+                    : (
+
+              <View style={styles.buttonRow}>
                       <TouchableOpacity style={styles.shareBtn}>
                         <Text style={styles.shareText}>Share </Text>
-                        <Image  source={ShareIcon} resizeMode="contain" style={{ width: 20, height: 20 , marginLeft:8 }}/>
+                        <Image  source={ShareIcon} resizeMode="contain" style={{ width: 17, height: 17 , marginLeft:8 }}/>
                       </TouchableOpacity>
                       <TouchableOpacity style={styles.downloadBtn} onPress={handleDownload}>
                         <Text style={styles.downloadText}>Download </Text>
                       <Image  source={DownloadIcon} resizeMode="contain" style={{ width: 20, height: 20 , marginLeft:8 }}/>
                       </TouchableOpacity>
                     </View>
+                    )
+
+                    }
+                   
+
+                    
                   </>
                 )}
               </View>
@@ -512,7 +597,7 @@ const styles = StyleSheet.create({
   },
   detailLabel: { fontSize: 13, color: "rgba(31, 38, 51, 1)" },
   detailValue: { fontSize: 15, fontWeight: "600", color: "rgba(31, 38, 51, 1)" },
-  payBillText: { fontSize: 13, color: "#0057FF", fontWeight: "600" },
+  payBillText: { fontSize: 13, color: "#0057FF", fontWeight: "600" , marginLeft:10 , marginTop:5},
   paiddetailLabel: { fontSize: 13, color: "rgba(60, 60, 67, 0.6)" },
   paiddetailValue: { fontSize: 13, color: "black" ,  fontWeight: "600" ,},
   Billbottom : {display:'flex', flexDirection:'row',   justifyContent: "space-between",},

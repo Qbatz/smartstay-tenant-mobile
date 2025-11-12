@@ -3,9 +3,10 @@ import { View, Text, Image, ScrollView, StyleSheet } from "react-native";
 import HostelImage from "../assets/Images/Group 1.png";
 import PaymentReceivedIcon from "../assets/Images/paymentreceived.png";
 import SigantureIcon from "../assets/Images/signature.png";
+import RefundIcon from "../assets/Images/Refund_image.png";
 // import Pdf from "react-native-pdf";
 
-const ReceiptPdfViewer = ({ route }) => {
+const NocReciptPdf = ({ route }) => {
   const { pdfDetails } = route.params || {};
 
   const receiptname = "PaymentReceipt"
@@ -35,7 +36,7 @@ const ReceiptPdfViewer = ({ route }) => {
               ? "Security Deposit Receipt"
               : "Final Settlement Receipt"} */}
 
-           {receiptname === "SecurityDeposit" ?  "Security Deposit Receipt":"Payment Receipt"}  
+          Final Settlement Receipt
           </Text>
         </View>
 
@@ -84,7 +85,12 @@ const ReceiptPdfViewer = ({ route }) => {
 
     <View style={styles.detailRow}>
       <Text style={styles.label}>Payment Mode :</Text>
-      <Text style={[styles.value, { color: "#1E45E1" }]}>UPI / Net Banking</Text>
+      <Text style={[styles.value, { color: "black" }]}>UPI / Net Banking</Text>
+    </View>
+
+    <View style={styles.detailRow}>
+      <Text style={styles.label}>Transaction ID : :</Text>
+      <Text style={[styles.value, { color: "black" }]}>87665545209</Text>
     </View>
   </View>
 </View>
@@ -92,10 +98,8 @@ const ReceiptPdfViewer = ({ route }) => {
 
         <View style={styles.amountBox}>
           <View style={{display:'flex', alignItems:"center", justifyContent:'center' , flex:1}}>
-          <Text style={styles.amountTitle}>TOTAL PAID AMOUNT</Text>
-          {receiptname === "SecurityDeposit" && (
-          <Text style={{ fontSize: 12, color: "#4B4B4B",  marginBottom:6 ,  }}>Security Deposit (Advance)</Text>
-          )}
+          <Text style={styles.amountTitle}>TOTAL REFUNDED AMOUNT</Text>  
+          <Text style={{ fontSize: 8, color: "#4B4B4B",  marginBottom:6 ,  }}>Security Deposit (Advance)</Text>
           </View>
           <View style={{flex:1}}>
           <View style={styles.amountValueBox}>
@@ -135,7 +139,7 @@ const ReceiptPdfViewer = ({ route }) => {
      </View>
      <View style={{flex:1 , paddingLeft:40 , }}>
         <Image
-      source={PaymentReceivedIcon}
+      source={RefundIcon}
       style={styles.signature}
       resizeMode="contain"
     />
@@ -143,76 +147,111 @@ const ReceiptPdfViewer = ({ route }) => {
      </View>
 
 
-    <View>
-  <Text style={styles.sectionTitle}>Payment for</Text>
+    <View style={{ marginTop: 0}}>
+          <Text style={styles.sectionTitle}>Payment for</Text>
 
-  {receiptname=== "SecurityDeposit" ? (
-    <View style={styles.securityTable}>
-      <View style={[styles.tableRow, styles.tableHeader]}>
-        <Text style={[styles.tableCell, { flex: 0.5 }]}>S.NO</Text>
-        <Text style={[styles.tableCell, { flex: 2 }]}>DESCRIPTION</Text>
-        <Text style={[styles.tableCell, { flex: 1, textAlign: "right" }]}>
-          AMOUNT / INR
-        </Text>
-      </View>
+          <View style={styles.dualTable}>
+            <View style={styles.tableHalf}>
+              <View style={[styles.tableRow, styles.tableHeader]}>
+                <Text style={[styles.tableCell, { flex: 1 }]}>REFUND</Text>
+                <Text style={[styles.tableCell, { flex: 1, textAlign: "right" }]}>
+                  AMOUNT / INR
+                </Text>
+              </View>
 
-      <View style={styles.tableRow}>
-        <Text style={[styles.tableCell, { flex: 0.5 }]}>1</Text>
-        <Text style={[styles.tableCell, { flex: 2 }]}>
-          Security Deposit (Advance) - Deductions
-        </Text>
-        <Text style={[styles.tableCell, { flex: 1, textAlign: "right" }]}>
-          Rs: 12,530.00
-        </Text>
-      </View>
+              <View style={styles.tableRow}>
+                <Text style={[styles.tableCell, { flex: 1 }]}>Security Deposit</Text>
+                <Text style={[styles.tableCell, { flex: 1, textAlign: "right" }]}>
+                  ₹ 12,000.00
+                </Text>
+              </View>
 
-      <View style={[styles.tableRow, styles.totalRow]}>
-        <Text style={[styles.tableCell, { flex: 2.5, fontWeight: "600" }]}>
-          Total
-        </Text>
-        <Text
-          style={[
-            styles.tableCell,
-            { flex: 1, textAlign: "right", fontWeight: "600" },
-          ]}
-        >
-          ₹ 12,530.00
-        </Text>
-      </View>
-    </View>
-  ) : (
-    <View style={styles.table}>
-      <View style={[styles.row, styles.headerRow]}>
-        <Text style={[styles.cell, styles.headerCell, { flex: 1 }]}>
-          INVOICE.NO
-        </Text>
-        <Text style={[styles.cell, styles.headerCell, { flex: 1 }]}>
-          INV. DATE
-        </Text>
-        <Text style={[styles.cell, styles.headerCell, { flex: 1.2 }]}>
-          INVOICE AMOUNT
-        </Text>
-        <Text style={[styles.cell, styles.headerCell, { flex: 1.2 }]}>
-          PAYMENT AMOUNT / INR
-        </Text>
-      </View>
+              <View style={[styles.tableRow, styles.totalRow]}>
+                <Text style={[styles.tableCell, { flex: 1, fontWeight: "600" }]}>
+                  Total
+                </Text>
+                <Text
+                  style={[
+                    styles.tableCell,
+                    { flex: 1, textAlign: "right", fontWeight: "600" },
+                  ]}
+                >
+                  ₹ 12,000.00
+                </Text>
+              </View>
+            </View>
 
-      <View style={styles.row}>
-        <Text
-          style={[
-            styles.cell,
-            { flex: 1, color: "#0A68FF", textDecorationLine: "underline" },
-          ]}
-        >
-          #INV001
-        </Text>
-        <Text style={[styles.cell, { flex: 1 }]}>29 Aug 2025</Text>
-        <Text style={[styles.cell, { flex: 1.2 }]}>₹9,300.00</Text>
-        <Text style={[styles.cell, { flex: 1.2 }]}>₹6,000.00</Text>
-      </View>
-    </View>
-  )}
-</View>
+            <View style={{ width: 1, backgroundColor: "#ddd" }} />
+
+            <View style={styles.tableHalf}>
+              <View style={[styles.tableRow, styles.tableHeader]}>
+                <Text style={[styles.tableCell, { flex: 1 }]}>DEDUCTIONS</Text>
+                <Text style={[styles.tableCell, { flex: 1, textAlign: "right" }]}>
+                  AMOUNT / INR
+                </Text>
+              </View>
+
+              <View style={styles.tableRow}>
+                <Text style={[styles.tableCell, { flex: 1 }]}>Maintenance</Text>
+                <Text style={[styles.tableCell, { flex: 1, textAlign: "right" }]}>
+                  ₹ 2,000.00
+                </Text>
+              </View>
+
+              <View style={styles.tableRow}>
+                <Text
+                  style={[
+                    styles.tableCell,
+                    { flex: 1, color: "#0A68FF", textDecorationLine: "underline" },
+                  ]}
+                >
+                  INV002 Due Pending
+                </Text>
+                <Text style={[styles.tableCell, { flex: 1, textAlign: "right" }]}>
+                  ₹ 5,100.00
+                </Text>
+              </View>
+
+              <View style={styles.tableRow}>
+                <Text
+                  style={[
+                    styles.tableCell,
+                    { flex: 1, color: "#0A68FF", textDecorationLine: "underline" },
+                  ]}
+                >
+                  INV019 EB Bill
+                </Text>
+                <Text style={[styles.tableCell, { flex: 1, textAlign: "right" }]}>
+                  ₹ 1,000.00
+                </Text>
+              </View>
+
+              <View style={[styles.tableRow, styles.totalRow]}>
+                <Text
+                  style={[
+                    styles.tableCell,
+                    { flex: 1, fontWeight: "600", color: "red" },
+                  ]}
+                >
+                  Total Deductions
+                </Text>
+                <Text
+                  style={[
+                    styles.tableCell,
+                    {
+                      flex: 1,
+                      textAlign: "right",
+                      fontWeight: "600",
+                      color: "red",
+                    },
+                  ]}
+                >
+                  - ₹ 8,100.00
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
 
 
 
@@ -344,7 +383,7 @@ value: {
     display:'flex',
     flexDirection:'row'
   },
-  amountTitle: { fontSize: 12, fontWeight: "bold", color: "#000", marginRight:20},
+  amountTitle: { fontSize: 10, fontWeight: "bold", color: "#000", },
   amountValueBox: {
     flexDirection: "row",
     alignItems: "center",
@@ -405,63 +444,25 @@ signText: {
     fontWeight: "500",
     marginBottom: 8,
   },
-  table: {
+sectionTitle: { fontSize: 13, color: "#000", fontWeight: "500", marginBottom: 8 },
+  dualTable: {
     borderWidth: 1,
     borderColor: "#ddd",
-    borderRadius: 5,
+    borderRadius: 8,
+    flexDirection: "row",
     overflow: "hidden",
   },
-  row: {
+  tableHalf: { flex: 1 },
+  tableRow: {
     flexDirection: "row",
     borderBottomWidth: 1,
     borderColor: "#ddd",
-  },
-  headerRow: {
-    backgroundColor: "#f9f9f9",
-  },
-  cell: {
     paddingVertical: 8,
     paddingHorizontal: 10,
-    fontSize: 10,
-    color: "#000",
   },
-  headerCell: {
-    fontWeight: "600",
-    color: "#333",
-    fontSize: 9,
-  },
-
-  securityTable: {
-  borderWidth: 1,
-  borderColor: "#ddd",
-  borderRadius: 8,
-  overflow: "hidden",
-  marginTop: 6,
-},
-
-tableRow: {
-  flexDirection: "row",
-  borderBottomWidth: 1,
-  borderColor: "#ddd",
-  paddingVertical: 8,
-  paddingHorizontal: 10,
-  backgroundColor: "#fff",
-},
-
-tableHeader: {
-  backgroundColor: "#f9f9f9",
-},
-
-tableCell: {
-  fontSize: 11,
-  color: "#000",
-},
-
-totalRow: {
-  backgroundColor: "#f9f9f9",
-  borderTopWidth: 1,
-  borderColor: "#ddd",
-},
+  tableHeader: { backgroundColor: "#f9f9f9" },
+  tableCell: { fontSize: 11, color: "#000" },
+  totalRow: { backgroundColor: "#f9f9f9" },
 
    footerContainer: {
     flexDirection: "row",
@@ -488,4 +489,4 @@ totalRow: {
 
 });
 
-export default ReceiptPdfViewer;
+export default NocReciptPdf;
