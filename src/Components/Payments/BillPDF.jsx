@@ -78,11 +78,31 @@ const InvoiceDesign = () => {
   </View>
 
   <View style={styles.invStyle}>
-    <Text style={styles.invSty}>Invoice : <Text style={styles.bold}>#INV001</Text></Text>
-    <Text style={styles.invSty}>Date: <Text style={styles.bold}>31 March 2025</Text></Text>
-    <Text style={styles.invSty}>Joining Date: <Text style={styles.bold}>02 Mar 2025</Text></Text>
-    <Text style={styles.invSty}>Time: <Text style={styles.bold}> 11:56:24 AM </Text>  </Text>
-    <Text style={styles.invSty}>Rental Period: <Text style={styles.bold}>Mar 02 - Apr 01</Text></Text>
+  
+    <Text style={styles.invSty}>
+  Invoice : {' '}
+  <Text style={styles.bold}>#INV001</Text>
+</Text>
+   
+     <Text style={styles.invSty}>
+  Date : {' '}
+  <Text style={styles.bold}>31 March 2025</Text>
+</Text>
+   
+      <Text style={styles.invSty}>
+  Joining Date: {' '}
+  <Text style={styles.bold}>02 Mar 2025</Text>
+</Text>
+   
+       <Text style={styles.invSty}>
+  Time: {' '}
+  <Text style={styles.bold}>11:56:24 AM</Text>
+</Text>
+   
+      <Text style={styles.invSty}>
+  Rental Period: {' '}
+  <Text style={styles.bold}>Mar 02 - Apr 01</Text>
+</Text>
   </View>
 </View>
 
@@ -198,7 +218,7 @@ const InvoiceDesign = () => {
             source={signature}
             style={styles.signature}
           />
-          <Text style={styles.authText}>Authorized Signature</Text>
+          <Text style={styles.authText} numberOfLines={1}>Authorized Signature</Text>
         </View>
       </View>
 
@@ -236,9 +256,14 @@ const styles = StyleSheet.create({
   },
   headerSub: { 
     color: "#000000", 
-    fontSize: 12, 
+    fontSize: 11, 
     marginTop: 4,
     textAlign: 'right'
+  },
+  label:{
+fontSize:12,
+fontFamily:"Gilroy",
+fontWeight:500
   },
   invoiceMonth: { 
     alignItems: "flex-end",
@@ -291,9 +316,13 @@ invStyle: {
 invSty: {
   fontSize: 12,
   marginBottom: 2,
-  textAlign: "right", // Right align text within each line
-  width: '100%', // Ensure full width for right alignment
+//   textAlign: "right", // Right align text within each line
+//   width: '100%', // Ensure full width for right alignment
 },
+bold: { 
+    fontWeight: "600" ,
+    fontSize:10
+  },
   sectionTitle: { 
     fontWeight: "700", 
     marginBottom: 6,
@@ -302,14 +331,14 @@ invSty: {
   },
   name: { 
     fontWeight: "600", 
-    fontSize: 12, 
+    fontSize: 10, 
     marginBottom: 4,
     
 
   },
   info: { 
     color: "#333", 
-    fontSize: 12,
+    fontSize: 10,
     marginBottom: 2,
     fontWeight:600
   },
@@ -319,9 +348,7 @@ invSty: {
     marginBottom: 3,
     textAlign: "right"
   },
-  bold: { 
-    fontWeight: "600" 
-  },
+  
   accountSection: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -337,11 +364,11 @@ invSty: {
     color: "#1E45E1", 
     fontWeight: "700", 
     marginBottom: 10,
-    fontSize: 13
+    fontSize: 12
   },
   accountText: { 
     color: "#333", 
-    fontSize: 13, 
+    fontSize: 11, 
     marginBottom: 4 
   },
   accountRight: { 
@@ -353,7 +380,7 @@ invSty: {
     marginBottom: 8 
   },
   qrText: {
-    fontSize: 12,
+    fontSize: 10,
     color: "#666",
     marginBottom: 8,
   },
@@ -379,13 +406,13 @@ invSty: {
   },
   termsTitle: { 
     fontWeight: "700", 
-    marginBottom: 8,
-    fontSize: 13,
+    marginBottom: 4,
+    fontSize: 12,
     color: "#1E45E1",
   },
   termsText: { 
     color: "#444", 
-    fontSize: 13, 
+    fontSize: 11, 
     lineHeight: 18 
   },
   signatureSection: {
@@ -401,9 +428,11 @@ invSty: {
     marginBottom: 5,
   },
   authText: { 
-    fontSize: 12, 
+    fontSize: 10, 
     color: "#444",
-    textAlign: "center"
+    textAlign: "center",
+    whiteSpace:"nowrap"
+    
   },
   paymentSummarySection: {
     padding: 20,

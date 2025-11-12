@@ -41,8 +41,10 @@ import Agreement from './src/Components/RentalAggreements/Aggreements';
 import SignatureScreen from './src/Components/RentalAggreements/SignatureScreen'
 import ReceiptPdfView from './src/Components/ReceiptPdfviewer';
 import AgreementViewScreen from './src/Components/RentalAggreements/AggreementView';
+
 import NOCBillPdf from './src/Components/NocBillPdf';
 import NOCReceiptPdf from './src/Components/NocReceipt';
+
 import InvoiceDesign from './src/Components/Payments/BillPDF';
 
 
@@ -165,9 +167,11 @@ function AppContent() {
         <Navigation.Screen name="ReceiptPdfView" component={ReceiptPdfView} />
         <Navigation.Screen name="AgreementViewScreen" component={AgreementViewScreen} />
         <Navigation.Screen name="SuccessModal" component={SuccessModal} />
+
         <Navigation.Screen name="NocBillPdf" component={NOCBillPdf} />
         <Navigation.Screen name="NocReceiptPdf" component={NOCReceiptPdf} />
          <Navigation.Screen name="InvoiceDesign" component={InvoiceDesign} />
+
 
 
       </Navigation.Navigator>
