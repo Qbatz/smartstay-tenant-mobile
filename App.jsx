@@ -41,6 +41,8 @@ import Agreement from './src/Components/RentalAggreements/Aggreements';
 import SignatureScreen from './src/Components/RentalAggreements/SignatureScreen'
 import ReceiptPdfView from './src/Components/ReceiptPdfviewer';
 import AgreementViewScreen from './src/Components/RentalAggreements/AggreementView';
+import Payment from './src/Components/Payment';
+import InvoiceDesign from './src/Components/Payments/BillPDF';
 
 function App() {
 
@@ -140,6 +142,8 @@ function AppContent() {
         <Navigation.Screen name="ReceiptPdfView" component={ReceiptPdfView} />
         <Navigation.Screen name="AgreementViewScreen" component={AgreementViewScreen} />
         <Navigation.Screen name="SuccessModal" component={SuccessModal} />
+        <Navigation.Screen name="Payment" component={Payment} />
+         <Navigation.Screen name="InvoiceDesign" component={InvoiceDesign} />
 
       </Navigation.Navigator>
     </NavigationContainer>
