@@ -22,13 +22,16 @@ import { launchImageLibrary } from "react-native-image-picker";
 import AmenitiesPic from '../../assets/Images/amenities.png'
 import { UsersContext } from "../../Context/UserContext";
 import BottomSheet,{BottomSheetView} from "@gorhom/bottom-sheet";
+import { complaints } from "../../Action/HostelAction";
 
 function Services(props) {
+    console.log(props)
 
     const commonContext = useContext(UsersContext)
 
     console.log(commonContext.Complaint)
     console.log(props)
+    const [complaintsList,setComplaintsList]=useState([])
     const [selectedfield, setselectfield] = useState(0);
     const [modulevisible, setModalVisible] = useState(false)
     const [selectedComplaint, setselectComplaint] = useState(null);
@@ -41,16 +44,8 @@ function Services(props) {
     const [selectedValue, setSelectedValue] = useState(null);
     const [isFocus, setIsFocus] = useState(false);
 
+    console.log(selectedfield)
 
-    // const sheetRef = useRef(null)
-    // const snapPoints = useMemo(() => ['25%', '75%'], [])
-
-
-    // const handleClose = useCallback(() => {
-    //     sheetRef.current?.close();
-    // }, []);
-
-    const images = [{ id: 1, source: Damage1 }, { id: 2, source: Damage2 }, { id: 3, source: Damage3 }]
 
     useEffect(() => {
         const data = [{ id: 1, person: 'You', comment: 'When will solve', date: '20 Jan -12.35pm' }, { id: 2, person: 'Priya', comment: 'Complaint assigned and rectify soon', date: '21 Jan -11.35pm' }, { id: 3, person: 'You', comment: 'Thank you', date: '21 Jan -2.35pm' }]
@@ -58,7 +53,7 @@ function Services(props) {
     }, [])
 
     useEffect(() => {
-        firstclick(list1.length)
+        firstclick('Complaint')
     }, [])
 
 
@@ -97,17 +92,24 @@ function Services(props) {
         }
     };
 
+    useEffect(()=>{
+        complaints(props.hostel[0].hostelId,commonContext.getToken).then(r=>{
+            setComplaintsList(r?.data)
+            console.log(r)
+        })
+    },[])
+
     useEffect(() => {
         console.log(commonContext.Complaint)
         if (commonContext.Complaint == 'complaint') {
-            firstclick(list1.length)
+            firstclick('Complaint')
             console.log('nothissdfsd')
         }
     }, [commonContext.Complaint])
 
-    function firstclick(id) {
-        console.log(id)
-        setselectfield(id)
+    function firstclick(value) {
+        console.log(value)
+        setselectfield(value)
     }
     function secondclick(id) {
         console.log(id)
@@ -170,8 +172,8 @@ function Services(props) {
     }
     return <View style={{ flex: 1, position: 'relative' }}>
         <View style={{ flexDirection: 'row', marginTop: 20, justifyContent: 'center', alignItems: 'center' }}>
-            <TouchableOpacity onPress={() => firstclick(list1.length)} style={{
-                backgroundColor: selectedfield === list1.length ? '#1E45E1' : 'white',
+            <TouchableOpacity onPress={() => firstclick("Complaint")} style={{
+                backgroundColor: selectedfield === "Complaint" ? '#1E45E1' : 'white',
                 flex: 1,
                 borderRadius: 10,
                 paddingTop: 13,
@@ -184,10 +186,10 @@ function Services(props) {
             }}>
                 <View style={{ flexDirection: 'row' }}>
                     <View style={{ borderWidth: 1, borderRadius: 4, paddingTop: 4, paddingBottom: 4, paddingLeft: 4, paddingRight: 4, backgroundColor: '#ffff', borderColor: '#ffffff' }}>
-                        <Image source={MessagePic} style={{ tintColor: selectedfield === list1.length ? '#1E45E1' : "#4B4B4B", width: 18.67, height: 17.8 }} />
+                        <Image source={MessagePic} style={{ tintColor: selectedfield === 'Complaint' ? '#1E45E1' : "#4B4B4B", width: 18.67, height: 17.8 }} />
                     </View>
 
-                    <Text style={{ color: selectedfield == list1.length ? "white" : 'black', fontSize: 16, fontWeight: '400', marginLeft: 10 }}>Complaints</Text>
+                    <Text style={{ color: selectedfield == 'Complaint' ? "white" : 'black', fontSize: 16, fontWeight: '400', marginLeft: 10 }}>Complaints</Text>
                 </View>
 
             </TouchableOpacity>
@@ -212,13 +214,13 @@ function Services(props) {
             </TouchableOpacity>
         </View>
 
-        {selectedfield == list1.length && list1.length > 0 ? <FlatList showsVerticalScrollIndicator={false}
+        {selectedfield ==  'Complaint'  ? complaintsList.length>0? <FlatList showsVerticalScrollIndicator={false}
             style={{ marginTop: 10, position: 'relative' }}
             keyExtractor={(item) => item.id}
-            data={list1}
+            data={complaintsList}
             renderItem={({ item }) => {
                 const { backgroundColor, textColor } = getStatusColor(item.status);
-                return <View key={item.id}  >
+                return <View key={item.complaintId}  >
                 <TouchableOpacity onPress={() => props.onOpen(item,1)}>
                         <View style={{
                             borderWidth: 1, borderRadius: 8, marginTop: 10, flexDirection: 'row',
@@ -227,21 +229,21 @@ function Services(props) {
                             <View style={{ paddingLeft: 20, paddingTop: 20, paddingBottom: 20, flex: 1 }}>
                                 <Text numberOfLines={1} ellipsizeMode="tail"
                                     style={{ fontSize: 16, fontWeight: '600', maxWidth: '90%' }}>
-                                    {item.title}
+                                    {item.description}
                                 </Text>
 
                                 <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 10 }}>
                                     <Image source={require('../../assets/Images/bill.png')}
                                         style={{ width: 16, height: 16 }} />
                                     <Text style={{ marginLeft: 8, fontSize: 14, fontWeight: '400' }}>
-                                        {item.issue}
+                                        {item.complaintTypeName}
                                     </Text>
                                 </View>
                             </View>
 
                             <View style={{ justifyContent: 'flex-end', paddingRight: 10, paddingTop: 20, paddingBottom: 16 }}>
                                 <Text style={{ bottom: 10, color: '#9C9C9C', fontSize: 12, fontWeight: '400' }}>
-                                    {item.time}
+                                    {item.complaintDate}
                                 </Text>
                                 <View
                                     style={{ borderRadius: 15, paddingHorizontal: 10, paddingVertical: 3, backgroundColor: backgroundColor, marginTop: 2 }}>
@@ -251,13 +253,9 @@ function Services(props) {
                         </View>
                     </TouchableOpacity>
 
-
                 </View>
 
-            }} /> : null}
-
-
-        {selectedfield === list2.length ? (
+            }} /> : <Text>No Complaints Found</Text>  : 
             <ScrollView
                 style={{ marginTop: 10 }}
                 showsVerticalScrollIndicator={false}
@@ -338,13 +336,17 @@ function Services(props) {
                         </View>
                     )}
                 />
-            </ScrollView>
-        ) : null}
+            </ScrollView>}
+
+
+        {/* {selectedfield === list2.length ? (
+            
+        ) : null} */}
 
 
 
 
-        {selectedfield == list1.length && <View style={{ position: 'absolute', bottom: 35, right: -3 }}>
+        {selectedfield == 'Complaint' && <View style={{ position: 'absolute', bottom: 35, right: -3 }}>
             <TouchableOpacity onPress={()=>props.onSheet(0)}>
                 <Image source={AddComplaint} style={{ width: 48, height: 47 }} />
             </TouchableOpacity>

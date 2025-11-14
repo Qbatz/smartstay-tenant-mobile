@@ -1,4 +1,4 @@
-import React , {useState} from "react";
+import React , {useContext, useEffect, useState} from "react";
 import {
   View,
   Text,
@@ -25,14 +25,35 @@ import ViewIcon from "../../assets/Images/view.png";
 import DownloadIcon from "../../assets/Images/download.png";
 import InfoIcon from "../../assets/Images/info-circle.png"
 import LogoutIcon from "../../assets/Images/logout.png";
+import { UsersContext } from "../../Context/UserContext";
+import { remoteData, storeData } from "../../Utils/Storage";
+import { ACCESS_TOKEN, LOGGEDIN, PHONE_NO } from "../../Utils/Constant";
+import { customerDetails } from "../../Action/CustomerAction";
 
 
 
 const CustomerProfile = () => {
 
+  const context=useContext(UsersContext)
+
          const navigation = useNavigation();
   const [selectedHostel, setSelectedHostel] = useState("Smartstay Hostel");
   const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [customer,setCustomers]=useState()
+
+  console.log(customer)
+
+
+
+  useEffect(()=>{
+    customerDetails(context.getToken).then(r=>{
+      console.log(r.data)
+      setCustomers(r.data)
+    }).catch(error=>{
+      console.log(error)
+    })
+  },[])
+
 
   const hostels = [
     { id: 1, name: "Smartstay Hostel", location: "Kandanchavadi" },
@@ -89,7 +110,15 @@ const handleDownload = async () => {
   }
 
   const handleLogout = () => {
-    navigation.navigate("SplashScreen");
+    context.logout('false')
+    remoteData(ACCESS_TOKEN)
+    remoteData(PHONE_NO)
+    storeData(LOGGEDIN,"false")
+    context.updateToken(null)
+
+
+    
+    // navigation.navigate("SplashScreen");
   }
 
   
@@ -118,7 +147,7 @@ const handleDownload = async () => {
             />
             <View style={{ flex: 1, marginLeft: 10 }}>
                 <View style={{display:'flex', flexDirection:'row'}}>
-                <Text style={styles.profileName}>Rajkumar M</Text>
+                <Text style={styles.profileName}>{customer?.firstName}</Text>
                 <Image  source={VerifyIcon} resizeMode="contain" style={{marginTop:2 , marginLeft:4 , height:20 , width:20}}/>
                 </View>
 

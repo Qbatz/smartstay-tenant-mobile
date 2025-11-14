@@ -5,7 +5,7 @@ import { LoginContext } from "../../Context/LoginContext";
 import { verifyOtp } from "../../Action/LoginAction";
 import { UsersContext } from "../../Context/UserContext";
 import { storeData } from "../../Utils/Storage";
-import { ACCESS_TOKEN } from "../../Utils/Constant";
+import { ACCESS_TOKEN,PHONE_NO,LOGGEDIN } from "../../Utils/Constant";
 
 const OtpDesign =({ route }) => {
   console.log(route.params.phone)
@@ -33,11 +33,15 @@ const OtpDesign =({ route }) => {
       const otpValue = newOtp.join("");
       console.log("Entered OTP:", otpValue);
       const data= await verifyOtp(route.params.phone,otpValue,context.SerialNo)
+      console.log(data)
       if(data.status==200){
         storeData(ACCESS_TOKEN,data.data)
-        storeData(ACCESS_TOKEN,route.params.phone)
+        storeData(PHONE_NO,route.params.phone)
+        storeData(LOGGEDIN,"true")
         context.phoneNo(route.params.phone)
-           navigation.navigate("VerifyKYC");
+        context.updateToken(data.data)
+          //  navigation.navigate("HostelList");
+           context.loggedin("true")
       }      
     }
   };

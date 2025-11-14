@@ -1,12 +1,20 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { UsersContext } from '../../Context/UserContext';
 
-export default function VerifyKYC({ navigation }) {
+export default function VerifyKYC({ navigation, route }) {
+
+  console.log(route)
+
+  const context=useContext(UsersContext)
+
   return (
     <View style={styles.container}>
       <TouchableOpacity
         style={styles.skipButton}
-        onPress={() => navigation.navigate('Dashboard')}
+        onPress={() => {
+      navigation.navigate('Dashboard', {hostel: route.params.hostel})
+  } }
       >
         <Text style={styles.skipText}>Skip</Text>
       </TouchableOpacity>

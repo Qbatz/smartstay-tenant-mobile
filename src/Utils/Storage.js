@@ -9,3 +9,8 @@ export const retriveData=async(key)=>{
     const data = await AsyncStorage.getItem(key)
     return data;
 }
+
+export const remoteData=async(key)=>{
+    const data=await AsyncStorage.removeItem(key)
+    return data;
+}

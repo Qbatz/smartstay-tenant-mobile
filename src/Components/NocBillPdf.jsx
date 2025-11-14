@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, Image, ScrollView, StyleSheet } from "react-native";
 import HostelImage from "../assets/Images/Group 1.png";
-import QRCode from "../assets/Images/qrcode.png";
+import QRCode from "../assets/Images/QR.png";
 import SigantureIcon from "../assets/Images/signature.png";
 import PaytmIcon from "../assets/Images/paytm.png";
 import GooglePayIcon from "../assets/Images/gpay.png";
