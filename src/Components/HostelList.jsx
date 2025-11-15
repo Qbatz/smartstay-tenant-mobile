@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,30 +8,28 @@ import {
   FlatList,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { hostelList } from "../Action/HostelAction";
+import { UsersContext } from "../Context/UserContext";
 
-const hostels = [
-  {
-    id: "1",
-    name: "Smartstay Hostel",
-    location: "Kandanchavadi",
-    image: require("../assets/Images/Group 1.png"),
-  },
-  {
-    id: "2",
-    name: "Royal Grand Hostel",
-    location: "Solinganallur",
-    image: require("../assets/Images/Group 1.png"),
-  },
-  {
-    id: "3",
-    name: "RR Hostel",
-    location: "Perungudi",
-    image: require("../assets/Images/Group 1.png"),
-  },
-];
 
 const HostelList = ({ navigation }) => {
-  const [selectedHostel, setSelectedHostel] = useState(hostels[0].id);
+
+  const context=useContext(UsersContext)
+  const [hostels,setHostelList]=useState([]);
+  const [selectedHostel, setSelectedHostel] = useState();
+
+    useEffect(()=>{
+      if(context.getToken != null){
+         hostelList(context.getToken).then(r=>{
+          console.log(r)
+          setHostelList(r)
+        }).catch(error=>{
+          console.log(error)
+        })
+
+      }
+       
+  },[context.getToken])
 
   const handleSelect = (id) => {
     setSelectedHostel(id);
@@ -39,7 +37,8 @@ const HostelList = ({ navigation }) => {
 
   const handleGo = () => {
     if (selectedHostel) {
-      navigation.navigate("HomeScreen", { hostelId: selectedHostel });
+      console.log(hostels)
+      navigation.navigate("VerifyKYC", { hostel: hostels });
     }
   };
 
@@ -47,22 +46,22 @@ const HostelList = ({ navigation }) => {
     <TouchableOpacity
       style={[
         styles.hostelCard,
-        selectedHostel === item.id && styles.selectedCard,
+        selectedHostel === item.hostelId&& styles.selectedCard,
       ]}
-      onPress={() => handleSelect(item.id)}
+      onPress={() => handleSelect(item.hostelId)}
     >
       <View style={styles.cardLeft}>
-        <Image source={item.image} style={styles.hostelImage} />
+        <Image source={item.hostelPic} style={styles.hostelImage} />
         <View>
-          <Text style={styles.hostelName}>{item.name}</Text>
+          <Text style={styles.hostelName}>{item.hostelName}</Text>
           <View style={styles.locationRow}>
             <Ionicons name="location-outline" size={16} color="#0057FF" />
-            <Text style={styles.locationText}>{item.location}</Text>
+            <Text style={styles.locationText}>{item.city}</Text>
           </View>
         </View>
       </View>
 
-      {selectedHostel === item.id ? (
+      {selectedHostel === item.hostelId ? (
         <Ionicons name="radio-button-on" size={22} color="#0057FF" />
       ) : (
         <Ionicons name="radio-button-off" size={22} color="#aaa" />
@@ -78,7 +77,7 @@ const HostelList = ({ navigation }) => {
 
         <FlatList
           data={hostels}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.hostelId}
           renderItem={renderHostel}
           style={{ marginTop: 20 }}
         />

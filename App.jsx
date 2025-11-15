@@ -21,9 +21,9 @@ import SplashScreen from "./src/Components/WelComePage/SplashScreen";
 import LogoScreen from "./src/Components/WelComePage/LogoScreen";
 import OnboardingScreen from "./src/Components/WelComePage/OnboardingScreen";
 import { UsersContext } from './src/Context/UserContext'
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import UserContext from './src/Context/UserContext'
-import { LoginProvider } from "./src/Context/LoginContext"; 
+import { LoginProvider } from "./src/Context/LoginContext";
 import VerifyKYC from './src/Components/KycDocuments/VerifyKYC';
 import SuccessModal from './src/Components/ToastFile/TostFilePage'
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -44,47 +44,52 @@ import AgreementViewScreen from './src/Components/RentalAggreements/AggreementVi
 import NOCBillPdf from './src/Components/NocBillPdf';
 import NOCReceiptPdf from './src/Components/NocReceipt';
 import InvoiceDesign from './src/Components/Payments/BillPDF';
+import { retriveData } from './src/Utils/Storage';
+import { ACCESS_TOKEN, LOGGEDIN } from './src/Utils/Constant';
+
 
 
 
 
 function App() {
+  // console.log(props)
 
   const isDarkMode = useColorScheme() === 'dark';
 
 
+  const [loggedIn, setloggein] = useState()
+  const [token, setToken] = useState();
 
   console.log(NativeModules)
 
-  const { NotificationModule }=NativeModules;
-  const{CommonModule}=NativeModules;
-  
+  const { NotificationModule } = NativeModules;
+  const { CommonModule } = NativeModules;
 
-  useEffect(()=>{
-    NotificationModule.fetchFcmToken().then(r=>{
+  useEffect(() => {
+    retriveData(LOGGEDIN).then(r => {
       console.log(r)
-    }).catch(error=>{
-      console.log(error)
+      setloggein(r)
     })
 
-    CommonModule.fetchSerialNumber().then(r=>{
+    retriveData(ACCESS_TOKEN).then(r => {
       console.log(r)
-    }).catch(error=>{
-      console.log(error)
+      setToken(r)
     })
-  },[])
+  }, [])
+
+
 
 
 
   return (
-  //   <SafeAreaProvider>
-  //     <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-  //      <UserContext>
-  //   <AppContent />
-  // </UserContext>
-      
+    //   <SafeAreaProvider>
+    //     <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+    //      <UserContext>
+    //   <AppContent />
+    // </UserContext>
 
-  //   </SafeAreaProvider>
+
+    //   </SafeAreaProvider>
 
     //  <SafeAreaProvider>
     //   <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
@@ -92,42 +97,75 @@ function App() {
     //     <AppContent />
     //   </UserContext>
     // </SafeAreaProvider>
-  <GestureHandlerRootView>
+    <GestureHandlerRootView>
 
-   <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
-      <LoginProvider>
-        <UserContext>
-          <AppContent />
-        </UserContext>
-      </LoginProvider>
-    </SafeAreaProvider>
+      <SafeAreaProvider>
+        <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
+        <LoginProvider>
+          <UserContext>
+            <AppContent isLoggedIn={loggedIn} token={token} />
+          </UserContext>
+        </LoginProvider>
+      </SafeAreaProvider>
     </GestureHandlerRootView>
 
 
   );
 }
 
-function AppContent() {
-
+function AppContent(props) {
+  console.log(props)
   const Navigation = createStackNavigator();
-  const { NotificationModule,CommonModule }=NativeModules;
+  const { NotificationModule, CommonModule } = NativeModules;
 
   const context = useContext(UsersContext);
+  const [isLoggedIn, setIsLoggedIn] = useState(props.isLoggedIn)
 
-  useEffect(()=>{
-    NotificationModule.fetchFcmToken().then(r=>{
+  console.log(isLoggedIn)
+
+  useEffect(() => {
+    NotificationModule.fetchFcmToken().then(r => {
       console.log(r)
-    }).catch(error=>{
+    }).catch(error => {
       console.log(error)
     })
 
-    CommonModule.fetchSerialNumber().then(r=>{
+    CommonModule.fetchSerialNumber().then(r => {
       context.serialNo(r)
-    }).catch(error=>{
+    }).catch(error => {
       console.log(error)
     })
-  },[])
+
+    if(props.token==null){
+      context.updateToken(props.token)
+    }
+
+    retriveData(LOGGEDIN).then(r=>{
+      if(LOGGEDIN=="true"){
+        setIsLoggedIn('true')
+      }
+    })
+  }, [])
+
+  useEffect(() => {
+    if (context.LoggedIn) {
+      setIsLoggedIn(context.LoggedIn)
+    }
+
+    retriveData(ACCESS_TOKEN).then(r=>{
+      console.log(r)
+      context.updateToken(r)
+    })
+
+    console.log(context)
+  }, [context.LoggedIn])
+
+
+
+
+
+
+
 
 
 
@@ -145,7 +183,44 @@ function AppContent() {
   return (
 
     <View style={styles.container}>
-    <NavigationContainer >
+
+      {isLoggedIn === "true" ? <NavigationContainer>
+        <Navigation.Navigator screenOptions={{ headerShown: false }}>
+          <Navigation.Screen name='HostelList' component={HostelList} />
+          <Navigation.Screen name="VerifyKYC" component={VerifyKYC} />
+          <Navigation.Screen name="KYCUpload" component={KYCUpload} />
+          <Navigation.Screen name="KycSuccess" component={KycSuccessDesign} />
+          <Navigation.Screen name='Dashboard' component={Dashboard} />
+          <Navigation.Screen name="CustomerProfile" component={CustomerProfile} />
+          <Navigation.Screen name="Notification" component={Notification} />
+          <Navigation.Screen name="EditProfile" component={EditProfile} />
+          <Navigation.Screen name="Agreement" component={Agreement} />
+          <Navigation.Screen name="SignatureScreen" component={SignatureScreen} />
+          <Navigation.Screen name="ReceiptPdfView" component={ReceiptPdfView} />
+          <Navigation.Screen name="AgreementViewScreen" component={AgreementViewScreen} />
+          <Navigation.Screen name="SuccessModal" component={SuccessModal} />
+          <Navigation.Screen name="NocBillPdf" component={NOCBillPdf} />
+          <Navigation.Screen name="NocReceiptPdf" component={NOCReceiptPdf} />
+          <Navigation.Screen name="InvoiceDesign" component={InvoiceDesign} />
+        </Navigation.Navigator>
+
+
+
+      </NavigationContainer> : <NavigationContainer>
+
+        <Navigation.Navigator screenOptions={{ headerShown: false }} initialRouteName='SplashScreen'>
+          <Navigation.Screen name="LogoScreen" component={LogoScreen} />
+          <Navigation.Screen name="SplashScreen" component={SplashScreen} />
+          <Navigation.Screen name="OnboardingScreen" component={OnboardingScreen} />
+          <Navigation.Screen name="CreateAccount" component={CreateAccount} />
+          <Navigation.Screen name="OtpDesign" component={OtpDesign} />
+        </Navigation.Navigator>
+      </NavigationContainer>}
+
+
+
+
+      {/* <NavigationContainer >
       <Navigation.Navigator screenOptions={{headerShown:false}} initialRouteName='SplashScreen'>
 
         <Navigation.Screen name="HostelList" component={HostelList} />
@@ -175,12 +250,12 @@ function AppContent() {
 
         
       </Navigation.Navigator>
-    </NavigationContainer>
-
-    
+    </NavigationContainer> */}
 
 
-  
+
+
+
       {/* <Dashboard
         templateFileName="App.jsx"
         safeAreaInsets={safeAreaInsets}

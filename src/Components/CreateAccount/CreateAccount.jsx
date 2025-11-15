@@ -28,6 +28,7 @@ const handleGetOtp = async () => {
   if (phoneNumber.length === 10) {
 
     const dat= await verifyPhoneNo(phoneNumber)
+    console.log(dat)
 
     if(dat.status==200){
       navigation.navigate("OtpDesign", { phone: phoneNumber });

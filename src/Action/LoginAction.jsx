@@ -1,4 +1,3 @@
-import { useContext } from "react"
 import AxiosConfig from "../Config/AxiosConfig"
 
  
@@ -9,7 +8,7 @@ export const verifyPhoneNo= async(phoneNo)=>{
         mobile:phoneNo
     }
 
-   const response=await AxiosConfig.post("/v2/customers-users/verify-mobile", data)
+   const response=await AxiosConfig.post("/v2/tenant/user/verify-mobile", data)
    return response;
 }
 
@@ -21,6 +20,6 @@ export const verifyOtp =async(phoneNo,otp,serialNo)=>{
 
     }
 
-    const response=await AxiosConfig.post("/v2/customers-users/verify-otp", data)
+    const response=await AxiosConfig.post("/v2/tenant/user/verify-otp", data)
     return response;
 }

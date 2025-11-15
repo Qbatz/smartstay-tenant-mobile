@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useRef, useEffect } from "react";
+import React, { useState, useMemo, useCallback, useRef, useEffect, useContext } from "react";
 import { View, Text, Dimensions, Image, TouchableOpacity, Button, FlatList, TextInput, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
@@ -29,9 +29,16 @@ import calenderTick from '../../assets/Images/calendar-tick.png'
 import { launchImageLibrary } from "react-native-image-picker";
 import Exclamation from '../../assets/Images/exclamation.png'
 import DeleteIcon from '../../assets/Images/deleteIcon.png'
+import HostelProfile from "../../assets/Images/Group 1.png"
+import { hostelDetails } from "../../Action/HostelAction";
+import { UsersContext } from "../../Context/UserContext";
 
 
 function Dashboard(props) {
+
+  const context=useContext(UsersContext)
+
+  console.log(props)
 
   const navigation = useNavigation();
   const [index, setindex] = useState(0);
@@ -83,6 +90,7 @@ function Dashboard(props) {
   const snapPoints = useMemo(() => ['25%', '60%'], [])
 
   const handleOpen = (complaint, value) => {
+    console.log(complaint)
 
     sheetRef.current?.snapToIndex(value);
     console.log('nothing happing')
@@ -125,7 +133,9 @@ function Dashboard(props) {
         enableTouchThrough={false}
         style={{ ...StyleSheet.absoluteFillObject }}
         onPress={()=>{
-          setComment(false)}}
+          setComment(false)
+          setSelectComplaint()
+        }}
 
       />
     ),
@@ -134,7 +144,7 @@ function Dashboard(props) {
   // ---------Add compalint-----
   const shetRef = useRef(null)
 
-  const snappoint = useMemo(() => ['80%'], [])
+  const snappoint = useMemo(() => ['90%'], [])
 
   const handle = (value) => {
 
@@ -227,34 +237,48 @@ function Dashboard(props) {
   const renderScene = ({ route,jumpTo }) => {
     switch (route.key) {
       case 'mystay':
-        return <MyStay jumpTo={jumpTo}/>;
+        return <MyStay hostel={props.route.params.hostel} jumpTo={jumpTo}/>;
       case 'services':
-        return <Services onOpen={handleOpen} onSheet={handle} onAmenities={handleAmenity} jumpTo={jumpTo}/>;
+        return <Services  onOpen={handleOpen} onSheet={handle} onAmenities={handleAmenity} jumpTo={jumpTo} hostel={props.route.params.hostel}/>;
       case 'payment':
         return <Payment jumpTo={jumpTo} />;
       default:
         return null;
     }
   };
+
+  // ----------
+
+ 
+
 console.log(available)
 
-  return <View style={{ flex: 1, backgroundColor: '#ffffff', paddingTop: 10, position: 'relative' }}>
-    <View style={{ flexDirection: 'row', paddingTop: 10, paddingLeft: 16, paddingRight: 16, justifyContent: 'space-between', paddingLeft: 10, alignItems: 'center' }}>
-      <View style={{ display: 'flex', flexDirection: 'row' }}>
+  return <View style={style.mainDashb}>
+    <View style={style.container}>
+      <View style={{display: 'flex', flexDirection: 'row' }}>
+
         <View >
-          <Image source={require("../../assets/Images/Group 1.png")} resizeMode="contain" style={{ marginTop: 2, marginLeft: 4, height: 44, width: 44 }} />
+          <Image source={HostelProfile} resizeMode="contain" style={{ marginTop: 2, marginLeft: 4, height: 44, width: 44 }} />
         </View>
+
         <View style={{ paddingLeft: 7 }}>
-          <Text style={{ fontSize: 18, fontWeight: '600', paddingBottom: 5, fontFamily: 'gilroy-semibold', color: '#1B1D21' }}>Smartstay Hostel</Text>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Text style={{ fontSize: 18, fontWeight: '600', paddingBottom: 5, fontFamily: 'gilroy-semibold', color: '#1B1D21' }}>
+            {props.route.params.hostel[0].hostelName}
+          </Text>
+
+          <View style={{flexDirection: 'row', alignItems: 'center' }}>
+
             <Image source={Location} style={{ width: 12.75, height: 14.17 }} />
-            <Text style={{ marginLeft: 7, fontSize: 14, alignItems: 'center', color: '#4B4B4B' }}>Kandanchavadi</Text>
+
+            <Text style={{ marginLeft: 7, fontSize: 14, alignItems: 'center', color: '#4B4B4B' }}>
+              {props.route.params.hostel[0].city}
+            </Text>
           </View>
 
         </View>
       </View>
       <View style={{ flexDirection: 'row' }}>
-        <View style={{}}>
+        <View >
           <TouchableOpacity onPress={handleNotificationShow}>
             <Image source={require("../../assets/Images/notification.png")} resizeMode="contain" style={{ height: 44, width: 44 }} />
           </TouchableOpacity>
@@ -283,34 +307,33 @@ console.log(available)
 
     {/* -------BOTTOMSHEET--------- */}
 
-
-
     <BottomSheet ref={sheetRef} index={-1} snapPoints={snapPoints} enableDynamicSizing={false} enablePanDownToClose={true}
       backgroundStyle={{
         backgroundColor: "#fff", borderTopLeftRadius: 20, borderTopRightRadius: 20, borderWidth: 1,
         borderColor: '#ccc'
       }} handleIndicatorStyle={{ backgroundColor: '#aaa' }} backdropComponent={renderBackdrop}>
+
       <View style={{ flex: 1, paddingLeft: 20, paddingRight: 20 }}>
         {comment ? (
           <View style={{ flex: 1, justifyContent: 'space-between' }}>
             <View>
-              <Text>Comment</Text>
+              <Text style={{fontSize:18,fontWeight:400}}>Comments</Text>
               {/* Divider */}
               <View style={{ height: 1, backgroundColor: "#eee", marginVertical: 10 }} />
 
               <FlatList keyExtractor={(item) => item.id}
                 data={commentnote}
                 renderItem={({ item }) => {
-                  return <View style={{ paddingTop: 10, flexDirection: 'row', flex: 1 }}>
+                  return <View style={{ paddingTop: 15, flexDirection: 'row', flex: 1 }}>
                     <View>
                       <Image source={Customer} style={{ width: 35, height: 35 }} />
                     </View>
                     <View style={{ paddingLeft: 10, flex: 1 }}>
                       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                         <Text style={{ fontSize: 12, color: '#4B4B4B', fontWeight: 400 }}>{item.person}</Text>
-                        <Text>{item.date}</Text>
+                        <Text style={{fontSize:10,fontWeight:400,color:'#6E6E6E'}}>{item.date}</Text>
                       </View>
-                      <Text style={{ fontSize: 14, fontWeight: 400, marginTop: 5 }}>{item.comment}</Text>
+                      <Text style={{fontSize: 14, fontWeight: 400, marginTop: 5}}>{item.comment}</Text>
                     </View>
                   </View>
                 }} />
@@ -338,10 +361,10 @@ console.log(available)
                 <View style={{ flexDirection: "row", justifyContent: "space-between", paddingLeft: 5, paddingRight: 8, marginBottom: 10, paddingTop: 10, }}>
                   <View>
                     <Text style={{ fontSize: 18, fontWeight: "500", fontFamily: "gilroy-semibold", }} >
-                      {selectedComplaint.title}
+                      {selectedComplaint.complaintTypeName}
                     </Text>
                     <Text style={{ fontSize: 12.8, fontWeight: "400", color: "#424242", marginTop: 6 }}>
-                      {selectedComplaint.time}
+                      {selectedComplaint.complaintDate}
                     </Text>
                   </View>
 
@@ -372,7 +395,7 @@ console.log(available)
 
                   <View style={{ flexDirection: "row", justifyContent: "space-between", paddingTop: 8, }}>
                     {selectedComplaint.assignedTo != null ? <Text style={{ fontSize: 15, fontWeight: "500" }}>
-                      {selectedComplaint.assignedTo}</Text>
+                      {selectedComplaint.assigneeName}</Text>
                       : <Text style={{ fontSize: 14, fontWeight: "500", color: "#FF3B30", }}>
                         Not Assigned Yet
                       </Text>
@@ -489,7 +512,7 @@ console.log(available)
 
           <View style={{ paddingTop: 16 }}>
             <Text style={{ fontSize: 14, fontWeight: 400 }}>Complaint message</Text>
-            <View style={{ borderWidth: 1, borderRadius: 10, marginTop: 8, paddingTop: 7, paddingLeft: 10, borderColor: '#e5e5e5' }}>
+            <View style={{ borderWidth: 1, borderRadius: 10, marginTop: 8, paddingTop: 7, paddingLeft: 10, borderColor: '#e5e5e5',height:80 }}>
               <TextInput placeholder="Enter message" />
             </View>
           </View>
@@ -772,7 +795,8 @@ console.log(available)
         <View style={{ height: 1, width: '100%', backgroundColor: "#eee", marginTop: 4 }} />
 
         <View style={{ paddingHorizontal: 20, paddingVertical: 13 }}>
-          <Text style={{ flexWrap: 'wrap', width: "80%", color: '#4B4B4B', flexShrink: 1, lineHeight: 24 }}>Please let us know the reason before deleting.</Text>
+          <Text style={{ flexWrap: 'wrap', width: "80%", color: '#4B4B4B', flexShrink: 1, lineHeight: 24 }}>
+            Please let us know the reason before deleting.</Text>
 
           <View style={{paddingTop:15}}>
               {reasons.map((item, index) => (
@@ -836,4 +860,9 @@ console.log(available)
   </View>
 
 }
+
+const style=StyleSheet.create({
+  mainDashb:{ flex: 1, backgroundColor: '#ffffff', paddingTop: 10, position: 'relative' },
+  container: { flexDirection: 'row', paddingTop: 10, paddingLeft: 16, paddingRight: 16, justifyContent: 'space-between', paddingLeft: 10, alignItems: 'center' }
+})
 export default Dashboard;
