@@ -30,7 +30,7 @@ import { launchImageLibrary } from "react-native-image-picker";
 import Exclamation from '../../assets/Images/exclamation.png'
 import DeleteIcon from '../../assets/Images/deleteIcon.png'
 import HostelProfile from "../../assets/Images/Group 1.png"
-import { hostelDetails } from "../../Action/HostelAction";
+import { getComplaints, hostelDetails } from "../../Action/HostelAction";
 import { UsersContext } from "../../Context/UserContext";
 
 
@@ -62,10 +62,6 @@ function Dashboard(props) {
 
 
 
-  console.log(monthlyplan)
-
-
-
   const complainttype = [{ label: 'Plumbing', value: '1' }, { label: 'Electricity', value: '2' }, { label: 'Room Maintanence', value: '3' }, { label: 'Canteen food', value: '4' }, { label: 'Canteen food', value: '4' }]
 
 
@@ -90,12 +86,13 @@ function Dashboard(props) {
   const snapPoints = useMemo(() => ['25%', '60%'], [])
 
   const handleOpen = (complaint, value) => {
-    console.log(complaint)
 
     sheetRef.current?.snapToIndex(value);
-    console.log('nothing happing')
-    console.log(sheetRef)
-    setSelectComplaint(complaint)
+
+    getComplaints(props.route.params.hostel[0].hostelId,complaint.complaintId,context.getToken).then(r=>{
+      setSelectComplaint(r.data)
+    })
+    
   }
 
   const commentclick = () => {
@@ -103,7 +100,6 @@ function Dashboard(props) {
   }
 
   const imageclick = (id) => {
-    console.log(id)
     setdeleteVisible(true)
     setimageid(id)
   }
@@ -357,8 +353,9 @@ console.log(available)
         ) : (
           <View style={{flex:1}}>
             {selectedComplaint && (
-              <View >
-                <View style={{ flexDirection: "row", justifyContent: "space-between", paddingLeft: 5, paddingRight: 8, marginBottom: 10, paddingTop: 10, }}>
+              <View style={{justifyContent:'space-between',flex:1}} >
+                <View>
+                      <View style={{ flexDirection: "row", justifyContent: "space-between", paddingLeft: 5, paddingRight: 8, marginBottom: 10, paddingTop: 10, }}>
                   <View>
                     <Text style={{ fontSize: 18, fontWeight: "500", fontFamily: "gilroy-semibold", }} >
                       {selectedComplaint.complaintTypeName}
@@ -394,7 +391,7 @@ console.log(available)
                   <Text style={{ fontSize: 12, fontWeight: "400", color: "#4B4B4B" }}> Assigned to</Text>
 
                   <View style={{ flexDirection: "row", justifyContent: "space-between", paddingTop: 8, }}>
-                    {selectedComplaint.assignedTo != null ? <Text style={{ fontSize: 15, fontWeight: "500" }}>
+                    {selectedComplaint.assigneeName != null ? <Text style={{ fontSize: 15, fontWeight: "500" }}>
                       {selectedComplaint.assigneeName}</Text>
                       : <Text style={{ fontSize: 14, fontWeight: "500", color: "#FF3B30", }}>
                         Not Assigned Yet
@@ -430,9 +427,11 @@ console.log(available)
                       </View>
                     )}
                   />
+                  </View>
                 </View>
-
-                {/* COMMENT INPUT */}
+                
+              <View>
+                      {/* COMMENT INPUT */}
                 <View style={{ paddingTop: 22 }}>
                   <View style={{ padding: 4, borderRadius: 10, borderWidth: 1, justifyContent: "space-between", flexDirection: "row", alignItems: "center", }} >
                     <TextInput placeholder="Add your Comment" />
@@ -448,7 +447,7 @@ console.log(available)
                 <TouchableOpacity>
                   <View
                     style={{
-                      padding: 13, borderRadius: 10, borderWidth: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: 15,
+                      padding: 13, borderRadius: 10, borderWidth: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: 15,marginBottom:20,
                       backgroundColor: selectedComplaint.status === "Pending" ? "#FFEEEEA3" : selectedComplaint.status === "Inpogress" ? "#FFF6E7" : "lightgreen",
                       borderColor: selectedComplaint.status === "Pending" ? "#FFD5D5" : selectedComplaint.status === "Inpogress" ? "#FFE7C6" : "lightgreen",
                     }}>
@@ -466,6 +465,9 @@ console.log(available)
                     </Text>
                   </View>
                 </TouchableOpacity>
+
+              </View>
+                
               </View>
             )}
           </View>
