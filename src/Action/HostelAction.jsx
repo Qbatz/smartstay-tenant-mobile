@@ -7,7 +7,6 @@ export const hostelList=async(token)=>{
             Authorization: 'Bearer ' + token
         }
     })
-    console.log(response)
     return response.data;
     
 }
@@ -20,7 +19,6 @@ export const hostelDetails=async(hostelId,token)=>{
             Authorization: 'Bearer ' + token
         }
     })
-    console.log(response)
     return response;
 
 }
@@ -31,11 +29,19 @@ export const complaints=async(hostelId,token)=>{
             Authorization: 'Bearer ' + token
         }
     })
-    console.log(response)
     return response
 
 }
 
 export const addComplaints=async()=>{
         const response=await AxiosConfig.post('/v2/complaints/{hostelId}')
+}
+
+export const getComplaints=async(hostelId,complaintId,token)=>{
+    const response=await AxiosConfig.get('/v2/complaints/' + hostelId + "/" + complaintId, {
+        headers: {
+            Authorization: 'Bearer ' + token
+        }
+    })
+    return response;
 }

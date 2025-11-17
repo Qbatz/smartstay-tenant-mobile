@@ -216,7 +216,7 @@ function Services(props) {
 
         {selectedfield ==  'Complaint'  ? complaintsList.length>0? <FlatList showsVerticalScrollIndicator={false}
             style={{ marginTop: 10, position: 'relative' }}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item.complaintId}
             data={complaintsList}
             renderItem={({ item }) => {
                 const { backgroundColor, textColor } = getStatusColor(item.status);
