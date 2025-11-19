@@ -41,9 +41,11 @@ const EditProfile = (route) => {
 
     const payloads= {
         firstName: name,
-        dob:dob,
+        dob:dob.toLocaleDateString('en-GB'),
         gender:gender,
     }
+
+    console.log("Payloads:", payloads);
 
     const formDate=new FormData();
 
@@ -191,7 +193,7 @@ const EditProfile = (route) => {
               display={Platform.OS === "ios" ? "spinner" : "default"}
               onChange={(event, selectedDate) => {
                 setShowDatePicker(false);
-                if (selectedDate) setDob(selectedDate.getDate()+ "/" + selectedDate.getMonth()+ "/" + selectedDate.getFullYear());
+                if (selectedDate) setDob(selectedDate);
               }}
             />
           )}
