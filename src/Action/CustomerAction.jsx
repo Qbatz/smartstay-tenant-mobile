@@ -2,7 +2,7 @@ import AxiosConfig from "../Config/AxiosConfig";
 
 export const customerDetails=async(token)=>{
 
-    const response=await AxiosConfig.get("/v2/tenants/details", {
+    const response=await AxiosConfig.get("/v2/customer/details", {
         headers: {
             Authorization: 'Bearer ' + token
         }
