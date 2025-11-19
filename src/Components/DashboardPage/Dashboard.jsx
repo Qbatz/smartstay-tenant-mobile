@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback, useRef, useEffect, useContext } from "react";
-import { View, Text, Dimensions, Image, TouchableOpacity, Button, FlatList, TextInput, StyleSheet } from "react-native";
+import { View, Text, Dimensions, Image, TouchableOpacity, Button, FlatList, TextInput, StyleSheet, Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import MyStay from '../DashboardPage/MyStay';
@@ -30,20 +30,20 @@ import { launchImageLibrary } from "react-native-image-picker";
 import Exclamation from '../../assets/Images/exclamation.png'
 import DeleteIcon from '../../assets/Images/deleteIcon.png'
 import HostelProfile from "../../assets/Images/Group 1.png"
-import { getComplaints, hostelDetails } from "../../Action/HostelAction";
+import { addComplaints, getAmenties, getComplaints, hostelDetails } from "../../Action/HostelAction";
 import { UsersContext } from "../../Context/UserContext";
+import Room from '../../assets/Images/Room.png'
+import Bed from '../../assets/Images/Bed_Icon.png'
 
 
 function Dashboard(props) {
 
-  const context=useContext(UsersContext)
+  const context = useContext(UsersContext)
 
   console.log(props)
 
   const navigation = useNavigation();
   const [index, setindex] = useState(0);
-  const [type, setType] = useState();
-  const [data, setData] = useState();
   const [selectedComplaint, setSelectComplaint] = useState(null);
   const [comment, setComment] = useState(false)
   const [imageid, setimageid] = useState();
@@ -57,26 +57,27 @@ function Dashboard(props) {
   const [available, setAvailable] = useState(null)
   const [showPopUp, setShowPopUp] = useState(false)
   const [selectedReason, setSelectedReason] = useState(null);
-  const [monthlyplan,setPlan]=useState();
-  const [deletevisible,setdeleteVisible]=useState(false)
-
-
+  const [monthlyplan, setPlan] = useState();
+  const [deletevisible, setdeleteVisible] = useState(false)
+  const [complaintDescription, setDespriction] = useState()
+  const [imageuri, setImageuri] = useState([])
+ 
 
   const complainttype = [{ label: 'Plumbing', value: '1' }, { label: 'Electricity', value: '2' }, { label: 'Room Maintanence', value: '3' }, { label: 'Canteen food', value: '4' }, { label: 'Canteen food', value: '4' }]
 
-
   const images = [{ id: 1, source: Damage1 }, { id: 2, source: Damage2 }, { id: 3, source: Damage3 }]
+
+
   useEffect(() => {
     const data = [{ id: 1, person: 'You', comment: 'When will solve', date: '20 Jan -12.35pm' }, { id: 2, person: 'Priya', comment: 'Complaint assigned and rectify soon', date: '21 Jan -11.35pm' }, { id: 3, person: 'You', comment: 'Thank you', date: '21 Jan -2.35pm' }]
     setCommentNote(data)
   }, [])
 
 
+
   const handleNotificationShow = () => {
     navigation.navigate("Notification");
   };
-
-
 
   const handleProfile = () => {
     navigation.navigate("CustomerProfile");
@@ -89,10 +90,10 @@ function Dashboard(props) {
 
     sheetRef.current?.snapToIndex(value);
 
-    getComplaints(props.route.params.hostel[0].hostelId,complaint.complaintId,context.getToken).then(r=>{
+    getComplaints(props.route.params.hostel[0].hostelId, complaint.complaintId, context.getToken).then(r => {
       setSelectComplaint(r.data)
     })
-    
+
   }
 
   const commentclick = () => {
@@ -104,9 +105,9 @@ function Dashboard(props) {
     setimageid(id)
   }
 
-  const handleClose = useCallback(() => {
-    sheetRef.current?.close();
-  }, []);
+  // const handleClose = useCallback(() => {
+  //   sheetRef.current?.close();
+  // }, []);
 
   const textmessage = (value) => {
     setCommentmessage(value)
@@ -128,9 +129,13 @@ function Dashboard(props) {
         opacity={0.4} // optional if you want darker tint
         enableTouchThrough={false}
         style={{ ...StyleSheet.absoluteFillObject }}
-        onPress={()=>{
+        onPress={() => {
           setComment(false)
           setSelectComplaint()
+          setDespriction()
+          setSelectedValue()
+          setImageuri([])
+          setmediaImage([])
         }}
 
       />
@@ -156,35 +161,83 @@ function Dashboard(props) {
         aspect: [1, 1],
         quality: 1,
       });
-      console.log(result)
       setmediaImage([...mediaimage, result.assets[0].uri])
+      setImageuri([...imageuri, result.assets[0]])
     } catch (error) {
       console.log(error)
 
     }
   }
 
+
+  const submitClick = () => {
+    const payloads = {
+      complaintTypeId: selectedValue,
+      description: complaintDescription,
+    }
+
+    console.log(payloads)
+
+    const formData = new FormData();
+
+    const jsonBase64 = btoa(JSON.stringify(payloads));
+
+    formData.append("payloads", {
+      uri: "data:application/json;base64," + jsonBase64,
+      type: "application/json",
+      name: "payload.json",
+    });
+
+    if (imageuri) {
+
+      imageuri.forEach((img, index) => {
+        formData.append("complaintImage", {
+          uri: img.uri,
+          type: img.type || "image/jpeg",
+          name: img.fileName || "profile.jpg"
+        })
+
+      })
+
+
+    }
+
+    addComplaints(props.route.params.hostel[0].hostelId, context.getToken, formData).then(r => {
+      console.log(r)
+    })
+  }
   // -------Amenities click------
   const ref = useRef(null)
 
   const snap = useMemo(() => ['50%'], [])
 
   const handleAmenity = (item, value, tag) => {
+    console.log(item.amenityId)
     if (tag == 'My-Amenities') {
       ref.current?.snapToIndex(value);
-      setmyAminites(item)
       setTag(tag)
+
+      getAmenties(props.route.params.hostel[0].hostelId, item.amenityId, context.getToken).then(r => {
+        console.log(r)
+        setmyAminites(r.data)
+      })
+
     }
     else {
       ref.current?.snapToIndex(value)
-      setAvailable(item)
       setTag(null)
+      getAmenties(props.route.params.hostel[0].hostelId, item.amenityId, context.getToken).then(r => {
+        console.log(r)
+        setAvailable(r.data)
+      })
+
     }
   }
 
-  const plan=(id)=>{
+  const plan = (id) => {
     setPlan(id)
   }
+
   // -----Editclick Bottom sheet-----
 
   const shtRef = useRef(null)
@@ -211,14 +264,16 @@ function Dashboard(props) {
     "Other",
   ];
 
-  const cancel=()=>{
+  const cancel = () => {
     setShowPopUp(false)
     setSelectedReason(null)
   }
-  const deleteItem=()=>{
+  const deleteItem = () => {
     setShowPopUp(false)
     setSelectedReason(null)
   }
+
+
 
   // ---------------------------
   const routes = [{ key: 'mystay', title: 'MyStay', icon: Building }, { key: 'services', title: 'Services', icon: Flash }, { key: 'payment', title: 'Payment', icon: MobilePayment }]
@@ -230,12 +285,12 @@ function Dashboard(props) {
       {route.title}
     </Text>)} />)
 
-  const renderScene = ({ route,jumpTo }) => {
+  const renderScene = ({ route, jumpTo }) => {
     switch (route.key) {
       case 'mystay':
-        return <MyStay hostel={props.route.params.hostel} jumpTo={jumpTo}/>;
+        return <MyStay hostel={props.route.params.hostel}  jumpTo={jumpTo} />;
       case 'services':
-        return <Services  onOpen={handleOpen} onSheet={handle} onAmenities={handleAmenity} jumpTo={jumpTo} hostel={props.route.params.hostel}/>;
+        return <Services onOpen={handleOpen} onSheet={handle} onAmenities={handleAmenity} jumpTo={jumpTo} hostel={props.route.params.hostel} />;
       case 'payment':
         return <Payment jumpTo={jumpTo} />;
       default:
@@ -245,13 +300,9 @@ function Dashboard(props) {
 
   // ----------
 
- 
-
-console.log(available)
-
   return <View style={style.mainDashb}>
     <View style={style.container}>
-      <View style={{display: 'flex', flexDirection: 'row' }}>
+      <View style={{ display: 'flex', flexDirection: 'row' }}>
 
         <View >
           <Image source={HostelProfile} resizeMode="contain" style={{ marginTop: 2, marginLeft: 4, height: 44, width: 44 }} />
@@ -262,7 +313,7 @@ console.log(available)
             {props.route.params.hostel[0].hostelName}
           </Text>
 
-          <View style={{flexDirection: 'row', alignItems: 'center' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
 
             <Image source={Location} style={{ width: 12.75, height: 14.17 }} />
 
@@ -313,7 +364,7 @@ console.log(available)
         {comment ? (
           <View style={{ flex: 1, justifyContent: 'space-between' }}>
             <View>
-              <Text style={{fontSize:18,fontWeight:400}}>Comments</Text>
+              <Text style={{ fontSize: 18, fontWeight: 400 }}>Comments</Text>
               {/* Divider */}
               <View style={{ height: 1, backgroundColor: "#eee", marginVertical: 10 }} />
 
@@ -327,9 +378,9 @@ console.log(available)
                     <View style={{ paddingLeft: 10, flex: 1 }}>
                       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                         <Text style={{ fontSize: 12, color: '#4B4B4B', fontWeight: 400 }}>{item.person}</Text>
-                        <Text style={{fontSize:10,fontWeight:400,color:'#6E6E6E'}}>{item.date}</Text>
+                        <Text style={{ fontSize: 10, fontWeight: 400, color: '#6E6E6E' }}>{item.date}</Text>
                       </View>
-                      <Text style={{fontSize: 14, fontWeight: 400, marginTop: 5}}>{item.comment}</Text>
+                      <Text style={{ fontSize: 14, fontWeight: 400, marginTop: 5 }}>{item.comment}</Text>
                     </View>
                   </View>
                 }} />
@@ -351,123 +402,123 @@ console.log(available)
 
           </View>
         ) : (
-          <View style={{flex:1}}>
+          <View style={{ flex: 1 }}>
             {selectedComplaint && (
-              <View style={{justifyContent:'space-between',flex:1}} >
+              <View style={{ justifyContent: 'space-between', flex: 1 }} >
                 <View>
-                      <View style={{ flexDirection: "row", justifyContent: "space-between", paddingLeft: 5, paddingRight: 8, marginBottom: 10, paddingTop: 10, }}>
-                  <View>
-                    <Text style={{ fontSize: 18, fontWeight: "500", fontFamily: "gilroy-semibold", }} >
-                      {selectedComplaint.complaintTypeName}
-                    </Text>
-                    <Text style={{ fontSize: 12.8, fontWeight: "400", color: "#424242", marginTop: 6 }}>
-                      {selectedComplaint.complaintDate}
-                    </Text>
-                  </View>
-
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <TouchableOpacity onPress={() => editClick(0)} style={{ paddingRight: 10 }}>
-                      <Image source={Edit} style={{ width: 17.72, height: 17.72 }} />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={deleteClick} style={{ paddingLeft: 10 }}>
-                      <Image source={Delete} style={{ width: 17.72, height: 17.72 }} />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-
-                {/* -----Divider */}
-                <View style={{ height: 1, backgroundColor: "#eee", marginVertical: 10 }} />
-
-                {/* DESCRIPTION */}
-                <View style={{ paddingTop: 5 }}>
-                  <Text style={{ fontSize: 12, fontWeight: "400", color: "#4B4B4B" }}>Description </Text>
-                  <Text style={{ fontSize: 16, fontWeight: "400", marginTop: 9 }}>
-                    {selectedComplaint.description}
-                  </Text>
-                </View>
-
-                {/* ASSIGNED TO */}
-                <View style={{ paddingTop: 10 }}>
-                  <Text style={{ fontSize: 12, fontWeight: "400", color: "#4B4B4B" }}> Assigned to</Text>
-
-                  <View style={{ flexDirection: "row", justifyContent: "space-between", paddingTop: 8, }}>
-                    {selectedComplaint.assigneeName != null ? <Text style={{ fontSize: 15, fontWeight: "500" }}>
-                      {selectedComplaint.assigneeName}</Text>
-                      : <Text style={{ fontSize: 14, fontWeight: "500", color: "#FF3B30", }}>
-                        Not Assigned Yet
+                  <View style={{ flexDirection: "row", justifyContent: "space-between", paddingLeft: 5, paddingRight: 8, marginBottom: 10, paddingTop: 10, }}>
+                    <View>
+                      <Text style={{ fontSize: 18, fontWeight: "500", fontFamily: "gilroy-semibold", }} >
+                        {selectedComplaint.complaintTypeName}
                       </Text>
-                    }
+                      <Text style={{ fontSize: 12.8, fontWeight: "400", color: "#424242", marginTop: 6 }}>
+                        {selectedComplaint.complaintDate}
+                      </Text>
+                    </View>
 
-                    {selectedComplaint.PhoneNO != null ?
-                      <Text style={{ fontSize: 12, color: "#1E45E1", fontWeight: "400" }}>
-                        {selectedComplaint.PhoneNO}
-                      </Text> : null}
+                    <View style={{ flexDirection: "row", alignItems: "center" }}>
+                      <TouchableOpacity onPress={() => editClick(0)} style={{ paddingRight: 10 }}>
+                        <Image source={Edit} style={{ width: 17.72, height: 17.72 }} />
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={deleteClick} style={{ paddingLeft: 10 }}>
+                        <Image source={Delete} style={{ width: 17.72, height: 17.72 }} />
+                      </TouchableOpacity>
+                    </View>
                   </View>
-                </View>
 
-                {/* ATTACHED IMAGES */}
-                <View style={{ paddingTop: 15 }}>
-                  <Text style={{ fontSize: 12, fontWeight: "400", color: "#4B4B4B" }}> Attached images</Text>
+                  {/* -----Divider */}
+                  <View style={{ height: 1, backgroundColor: "#eee", marginVertical: 10 }} />
 
-                  <FlatList horizontal
-                    style={{ paddingTop: 15 }}
-                    keyExtractor={(item) => item.id.toString()}
-                    data={images}
-                    renderItem={({ item }) => (
-                      <View key={item.id}
-                        style={{ paddingLeft: 10, position: "relative" }}>
-                        <TouchableOpacity onPress={() => imageclick(item.id)}>
-                          <Image source={item.source} style={{ width: 90, height: 70, borderRadius: 5 }} />
-                          {imageid === item.id && deletevisible && (
-                            <TouchableOpacity style={{ position: "absolute", bottom: 25, right: 35, }} >
-                              <Image source={Trash} style={{ width: 21.09, height: 21.09, }} />
-                            </TouchableOpacity>
-                          )}
-                        </TouchableOpacity>
-                      </View>
-                    )}
-                  />
-                  </View>
-                </View>
-                
-              <View>
-                      {/* COMMENT INPUT */}
-                <View style={{ paddingTop: 22 }}>
-                  <View style={{ padding: 4, borderRadius: 10, borderWidth: 1, justifyContent: "space-between", flexDirection: "row", alignItems: "center", }} >
-                    <TextInput placeholder="Add your Comment" />
-                    <TouchableOpacity onPress={commentclick}>
-                      <Image
-                        source={CommentMesg}
-                        style={{ width: 23, height: 23, marginRight: 15, }} />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-
-                {/* STATUS BUTTON */}
-                <TouchableOpacity>
-                  <View
-                    style={{
-                      padding: 13, borderRadius: 10, borderWidth: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: 15,marginBottom:20,
-                      backgroundColor: selectedComplaint.status === "Pending" ? "#FFEEEEA3" : selectedComplaint.status === "Inpogress" ? "#FFF6E7" : "lightgreen",
-                      borderColor: selectedComplaint.status === "Pending" ? "#FFD5D5" : selectedComplaint.status === "Inpogress" ? "#FFE7C6" : "lightgreen",
-                    }}>
-                    <Image source={Group}
-                      style={{
-                        width: 17.93, height: 18, marginTop: 4,
-                        tintColor: selectedComplaint.status === "Pending" ? "#FF3B30" : selectedComplaint.status === "Inpogress" ? "#FF9500" : "green",
-                      }} />
-                    <Text
-                      style={{
-                        color: selectedComplaint.status === "Pending" ? "#FF3B30" : selectedComplaint.status === "Inpogress" ? "#FF9500" : "green",
-                        fontSize: 14.11, fontWeight: "600", marginLeft: 10,
-                      }}>
-                      {selectedComplaint.status}
+                  {/* DESCRIPTION */}
+                  <View style={{ paddingTop: 5 }}>
+                    <Text style={{ fontSize: 12, fontWeight: "400", color: "#4B4B4B" }}>Description </Text>
+                    <Text style={{ fontSize: 16, fontWeight: "400", marginTop: 9 }}>
+                      {selectedComplaint.description}
                     </Text>
                   </View>
-                </TouchableOpacity>
 
-              </View>
-                
+                  {/* ASSIGNED TO */}
+                  <View style={{ paddingTop: 10 }}>
+                    <Text style={{ fontSize: 12, fontWeight: "400", color: "#4B4B4B" }}> Assigned to</Text>
+
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", paddingTop: 8, }}>
+                      {selectedComplaint.assigneeName != null ? <Text style={{ fontSize: 15, fontWeight: "500" }}>
+                        {selectedComplaint.assigneeName}</Text>
+                        : <Text style={{ fontSize: 14, fontWeight: "500", color: "#FF3B30", }}>
+                          Not Assigned Yet
+                        </Text>
+                      }
+
+                      {selectedComplaint.PhoneNO != null ?
+                        <Text style={{ fontSize: 12, color: "#1E45E1", fontWeight: "400" }}>
+                          {selectedComplaint.PhoneNO}
+                        </Text> : null}
+                    </View>
+                  </View>
+
+                  {/* ATTACHED IMAGES */}
+                  <View style={{ paddingTop: 15 }}>
+                    <Text style={{ fontSize: 12, fontWeight: "400", color: "#4B4B4B" }}> Attached images</Text>
+
+                    <FlatList horizontal
+                      style={{ paddingTop: 15 }}
+                      keyExtractor={(item) => item.id.toString()}
+                      data={images}
+                      renderItem={({ item }) => (
+                        <View key={item.id}
+                          style={{ paddingLeft: 10, position: "relative" }}>
+                          <TouchableOpacity onPress={() => imageclick(item.id)}>
+                            <Image source={item.source} style={{ width: 90, height: 70, borderRadius: 5 }} />
+                            {imageid === item.id && deletevisible && (
+                              <TouchableOpacity style={{ position: "absolute", bottom: 25, right: 35, }} >
+                                <Image source={Trash} style={{ width: 21.09, height: 21.09, }} />
+                              </TouchableOpacity>
+                            )}
+                          </TouchableOpacity>
+                        </View>
+                      )}
+                    />
+                  </View>
+                </View>
+
+                <View>
+                  {/* COMMENT INPUT */}
+                  <View style={{ paddingTop: 22 }}>
+                    <View style={{ padding: 4, borderRadius: 10, borderWidth: 1, justifyContent: "space-between", flexDirection: "row", alignItems: "center", }} >
+                      <TextInput placeholder="Add your Comment" />
+                      <TouchableOpacity onPress={commentclick}>
+                        <Image
+                          source={CommentMesg}
+                          style={{ width: 23, height: 23, marginRight: 15, }} />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+
+                  {/* STATUS BUTTON */}
+                  <TouchableOpacity>
+                    <View
+                      style={{
+                        padding: 13, borderRadius: 10, borderWidth: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: 15, marginBottom: 20,
+                        backgroundColor: selectedComplaint.status === "Pending" ? "#FFEEEEA3" : selectedComplaint.status === "Inpogress" ? "#FFF6E7" : "lightgreen",
+                        borderColor: selectedComplaint.status === "Pending" ? "#FFD5D5" : selectedComplaint.status === "Inpogress" ? "#FFE7C6" : "lightgreen",
+                      }}>
+                      <Image source={Group}
+                        style={{
+                          width: 17.93, height: 18, marginTop: 4,
+                          tintColor: selectedComplaint.status === "Pending" ? "#FF3B30" : selectedComplaint.status === "Inpogress" ? "#FF9500" : "green",
+                        }} />
+                      <Text
+                        style={{
+                          color: selectedComplaint.status === "Pending" ? "#FF3B30" : selectedComplaint.status === "Inpogress" ? "#FF9500" : "green",
+                          fontSize: 14.11, fontWeight: "600", marginLeft: 10,
+                        }}>
+                        {selectedComplaint.status}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+
+                </View>
+
               </View>
             )}
           </View>
@@ -490,11 +541,11 @@ console.log(available)
           <View style={{ paddingTop: 20 }}>
             <Text>Complaint type</Text>
 
-            <Dropdown style={{ borderWidth: 1, borderRadius: 10, paddingVertical: 10, marginTop: 10, borderColor: '#e5e5e5' }}
+            <Dropdown style={{ borderWidth: 1, borderRadius: 10, paddingVertical: 10, marginTop: 10, borderColor: '#e5e5e5', paddingLeft: 15 }}
               onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
               data={complainttype}
               containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
-              placeholderStyle={{ fontSize: 14, paddingLeft: 10 }}
+              placeholderStyle={{ fontSize: 14 }}
               placeholder="Select a type"
               labelField="label"
               valueField="value"
@@ -514,8 +565,8 @@ console.log(available)
 
           <View style={{ paddingTop: 16 }}>
             <Text style={{ fontSize: 14, fontWeight: 400 }}>Complaint message</Text>
-            <View style={{ borderWidth: 1, borderRadius: 10, marginTop: 8, paddingTop: 7, paddingLeft: 10, borderColor: '#e5e5e5',height:80 }}>
-              <TextInput placeholder="Enter message" />
+            <View style={{ borderWidth: 1, borderRadius: 10, marginTop: 8, paddingTop: 7, paddingLeft: 10, borderColor: '#e5e5e5', height: 80 }}>
+              <TextInput value={complaintDescription} placeholder="Enter message" onChangeText={(value) => setDespriction(value)} />
             </View>
           </View>
 
@@ -545,6 +596,7 @@ console.log(available)
           <View>
             {mediaimage.length > 0 ? <FlatList horizontal showsHorizontalScrollIndicator={true} style={{ paddingTop: 20 }} key={(item) => item.id}
               data={mediaimage}
+              // keyExtractor={(item, index) => index.toString()}
               renderItem={({ item }) => {
                 console.log(item)
                 return <View style={{ padding: 5 }}>
@@ -556,7 +608,7 @@ console.log(available)
         </View>
 
         <View style={{ paddingBottom: 20 }}>
-          <TouchableOpacity style={{ paddingTop: 12, paddingBottom: 12, borderWidth: 1, borderRadius: 22, justifyContent: 'center', alignItems: 'center', backgroundColor: '#1E45E1', borderColor: '#1E45E1' }}>
+          <TouchableOpacity onPress={submitClick} style={{ paddingTop: 12, paddingBottom: 12, borderWidth: 1, borderRadius: 22, justifyContent: 'center', alignItems: 'center', backgroundColor: '#1E45E1', borderColor: '#1E45E1' }}>
             <Text style={{ fontSize: 14, fontWeight: 600, color: '#ffffff' }}>Submit</Text>
           </TouchableOpacity>
         </View>
@@ -571,12 +623,12 @@ console.log(available)
         backgroundColor: "#fff", borderRadius: 20, borderWidth: 1,
         borderColor: '#ccc'
       }} handleIndicatorStyle={{ backgroundColor: '#aaa' }}>
-      <View style={{ paddingLeft: 25, paddingRight: 30,flex:1 }}>
+      <View style={{ paddingLeft: 25, paddingRight: 30, flex: 1 }}>
         {tag == 'My-Amenities' ? (<View>
           <View style={{ paddingTop: 12 }}>
             {myAmenitis && <View>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <Text style={{ fontSize: 23, fontWeight: 500, fontStyle: 'Gilroy-Semibold' }}>{myAmenitis.Amenities}</Text>
+                <Text style={{ fontSize: 23, fontWeight: 500, fontStyle: 'Gilroy-Semibold' }}>{myAmenitis.amenityName}</Text>
                 <View style={{ justifyContent: 'center', paddingTop: 7 }}>
                   <Image source={Dot} style={{ width: 30.85, height: 30.85 }} />
 
@@ -611,7 +663,7 @@ console.log(available)
                     <Text style={{ fontSize: 12, color: '#1E45E1' }}>Change Plan</Text>
                   </TouchableOpacity>
                 </View>
-                <Text style={{ fontSize: 16, fontWeight: 600, marginTop: 9 }}>399 /month</Text>
+                <Text style={{ fontSize: 16, fontWeight: 600, marginTop: 9 }}>{'\u20B9'}{myAmenitis.amenityAmount} /month</Text>
               </View>
 
               <View style={{ paddingTop: 15 }}>
@@ -628,56 +680,58 @@ console.log(available)
 
 
           </View>
-        </View>) : tag == null  ? (<View style={{flex:1}}>
+        </View>) : tag == null ? (<View style={{ flex: 1 }}>
 
-          {available && <View style={{paddingTop:10,flex:1,paddingBottom:20}}>
-            <Text style={{fontSize: 23, fontWeight: 500}}>{available.Available}</Text>
-            <View style={{ width: '100%', height: 1, backgroundColor: "#eee", marginTop:18 }} />
-            <View style={{justifyContent:'space-between',flex:1}}>
-                  <View style={{paddingTop:10}}>
-                  <Text style={{fontSize:12,fontWeight:400,color:'#4B4B4B'}}>Description</Text>
+          {available && <View style={{ paddingTop: 10, flex: 1, paddingBottom: 20 }}>
+            <Text style={{ fontSize: 23, fontWeight: 500 }}>{available.amenityName}</Text>
+            <View style={{ width: '100%', height: 1, backgroundColor: "#eee", marginTop: 18 }} />
+            <View style={{ justifyContent: 'space-between', flex: 1 }}>
+              <View style={{ paddingTop: 10 }}>
+                <Text style={{ fontSize: 12, fontWeight: 400, color: '#4B4B4B' }}>Description</Text>
 
-                  <View style={{paddingTop:14}}>
-                      <Text style={{fontSize:16,fontWeight:400,marginBottom:2}}>Gear,Non Gear</Text>
-                      <Text style={{fontSize:16,fontWeight:400,marginTop:2}}>24/7 Access, pickup lopp from lobby</Text>
+                <View style={{ paddingTop: 14 }}>
+                  <Text style={{ fontSize: 16, fontWeight: 400, marginBottom: 2 }}>Gear,Non Gear</Text>
+                  <Text style={{ fontSize: 16, fontWeight: 400, marginTop: 2 }}>24/7 Access, pickup lopp from lobby</Text>
+                </View>
+
+                <View style={{ paddingTop: 20 }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <Text style={{ fontSize: 12, fontWeight: 400, color: '#4B4B4B' }}>Price Plans</Text>
+                    <TouchableOpacity>
+                      <Text style={{ fontSize: 12, fontWeight: 400, color: '#1E45E1', textDecorationLine: 'underline' }}>Select plan</Text>
+                    </TouchableOpacity>
                   </View>
 
-                  <View style={{paddingTop:20}}>
-                        <View style={{flexDirection:'row',justifyContent:'space-between'}}>
-                            <Text style={{fontSize:12,fontWeight:400,color:'#4B4B4B'}}>Price Plans</Text>
-                            <TouchableOpacity>
-                                  <Text style={{fontSize:12,fontWeight:400,color:'#1E45E1',textDecorationLine:'underline'}}>Select plan</Text>
-                            </TouchableOpacity>
-                        </View>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <View style={{ paddingTop: 10, flexDirection: 'row' }}>
+                      <Text style={{ fontSize: 16, fontWeight: 600 }}>{'\u20B9'}{available.amenityAmount}</Text>
+                      <Text style={{ fontSize: 16, fontWeight: 400, color: '#4B4B4B' }}>/month</Text>
+                    </View>
 
-                      <View style={{flexDirection:'row',justifyContent:'space-between'}}>
-                          <View style={{paddingTop:10,flexDirection:'row'}}>
-                            <Text style={{fontSize:16,fontWeight:600}}>399</Text>
-                            <Text style={{fontSize:16,fontWeight:400,color:'#4B4B4B'}}>/month</Text>
-                        </View> 
+                    <TouchableOpacity onPress={() => plan('plan')} style={{
+                      borderWidth: 2, width: 20, height: 20, borderRadius: 10,
+                      borderColor: plan == 'plan' ? borderColor : monthlyplan == 'plan' ? "#1E45E1" : "#ccc", justifyContent: 'center', marginTop: 12
+                    }}>
 
-                        <TouchableOpacity onPress={()=>plan('plan')} style={{borderWidth:2,width:20,height:20,borderRadius:10, 
-                          borderColor:plan=='plan'? borderColor: monthlyplan=='plan' ? "#1E45E1" : "#ccc",justifyContent:'center',marginTop:12}}>
+                      <View style={{ justifyContent: 'center', alignItems: 'center' }}  >
 
-                              <View style={{justifyContent:'center',alignItems:'center'}}  >
-
-                              {monthlyplan === 'plan' && (
-                             <View style={{ height: 10, width: 10, borderRadius: 5, backgroundColor: "#1E45E1" }} />
-                              )}
-                            </View>
-                        </TouchableOpacity>
-
+                        {monthlyplan === 'plan' && (
+                          <View style={{ height: 10, width: 10, borderRadius: 5, backgroundColor: "#1E45E1" }} />
+                        )}
                       </View>
-                                           
+                    </TouchableOpacity>
+
                   </View>
-            </View>
-             <View >
-                           <TouchableOpacity style={{backgroundColor:'#1d41d5',paddingVertical:12,alignItems:'center',borderRadius:20}}>
-                              <Text style={{fontSize:14.11,fontWeight:600,color:'#ffffff'}}>Request Amenity</Text>
-                           </TouchableOpacity>
+
+                </View>
+              </View>
+              <View >
+                <TouchableOpacity style={{ backgroundColor: '#1d41d5', paddingVertical: 12, alignItems: 'center', borderRadius: 20 }}>
+                  <Text style={{ fontSize: 14.11, fontWeight: 600, color: '#ffffff' }}>Request Amenity</Text>
+                </TouchableOpacity>
               </View>
             </View>
-            
+
           </View>}
         </View>) : null}
 
@@ -710,7 +764,7 @@ console.log(available)
               labelField="label"
               valueField="value"
               value={selectedValue}
-              
+
               onChange={item => {
                 setSelectedValue(item.value)
               }}
@@ -781,7 +835,7 @@ console.log(available)
     </BottomSheet>
 
     {showPopUp && <View style={{ position: 'absolute', backgroundColor: '#rgba(0, 0, 0, 0.1)', width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center' }}>
-      <View style={{ width: '90%', backgroundColor: '#ffffff', borderWidth: 1, borderRadius: 8, borderColor: '#E5E7EB',paddingBottom:15 }}>
+      <View style={{ width: '90%', backgroundColor: '#ffffff', borderWidth: 1, borderRadius: 8, borderColor: '#E5E7EB', paddingBottom: 15 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 18, paddingVertical: 13, }}>
           <View style={{ flexDirection: 'row' }}>
             <Image source={Exclamation} style={{ width: 25, height: 25 }} />
@@ -800,58 +854,62 @@ console.log(available)
           <Text style={{ flexWrap: 'wrap', width: "80%", color: '#4B4B4B', flexShrink: 1, lineHeight: 24 }}>
             Please let us know the reason before deleting.</Text>
 
-          <View style={{paddingTop:15}}>
-              {reasons.map((item, index) => (
-            <TouchableOpacity
-              key={index}
-              onPress={() => setSelectedReason(item)}
-              style={{
-                flexDirection: "row", alignItems: "center",
-                backgroundColor:
-                  selectedReason === item ? "#F5F7FF" : "#FAFAFA",
-                borderRadius: 8, paddingVertical: 10, paddingHorizontal: 12,
-                marginBottom: 10,
-                borderWidth: selectedReason === item ? 1 : 0,
-                borderColor: "#1E45E1",
-              }}
-            >
-              <View style={{ height: 20, width: 20, borderRadius: 10, borderWidth: 2,
-                         borderColor: selectedReason === item ? "#1E45E1" : "#ccc",
-                        alignItems: "center",
-                         justifyContent: "center",
-                         marginRight: 10,}} >
+          <View style={{ paddingTop: 15 }}>
+            {reasons.map((item, index) => (
+              <TouchableOpacity
+                key={index}
+                onPress={() => setSelectedReason(item)}
+                style={{
+                  flexDirection: "row", alignItems: "center",
+                  backgroundColor:
+                    selectedReason === item ? "#F5F7FF" : "#FAFAFA",
+                  borderRadius: 8, paddingVertical: 10, paddingHorizontal: 12,
+                  marginBottom: 10,
+                  borderWidth: selectedReason === item ? 1 : 0,
+                  borderColor: "#1E45E1",
+                }}
+              >
+                <View style={{
+                  height: 20, width: 20, borderRadius: 10, borderWidth: 2,
+                  borderColor: selectedReason === item ? "#1E45E1" : "#ccc",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginRight: 10,
+                }} >
 
-                {selectedReason === item && (
-                  <View
-                    style={{ height: 10, width: 10, borderRadius: 5,
-                      backgroundColor: "#1E45E1",
-                    }}
-                  />
-                )}
-              </View>
-              <Text style={{ color: "#000", fontSize: 14 }}>{item}</Text>
-            </TouchableOpacity>
-          ))}
+                  {selectedReason === item && (
+                    <View
+                      style={{
+                        height: 10, width: 10, borderRadius: 5,
+                        backgroundColor: "#1E45E1",
+                      }}
+                    />
+                  )}
+                </View>
+                <Text style={{ color: "#000", fontSize: 14 }}>{item}</Text>
+              </TouchableOpacity>
+            ))}
 
-          {selectedReason=='Other'?<View style={{borderRadius:10,backgroundColor:'#FAFAFA',height:80}}>
-            <TextInput placeholder="Enter the reason" style={{marginLeft:5}}/>
-          </View>:null}
+            {selectedReason == 'Other' ? <View style={{ borderRadius: 10, backgroundColor: '#FAFAFA', height: 80 }}>
+              <TextInput placeholder="Enter the reason" style={{ marginLeft: 5 }} />
+            </View> : null}
 
           </View>
-          
+
         </View>
 
-        <View style={{flexDirection:'row',justifyContent:'flex-end',paddingRight:13,}}>
-            <TouchableOpacity onPress={cancel} style={{paddingRight:10,borderRadius:8,paddingVertical:8,paddingHorizontal:15,justifyContent:'center'}}>
-                  <Text style={{fontSize:14,fontWeight:400,color:'#4B4B4B'}}>Cancel</Text>
-            </TouchableOpacity>
+        <View style={{ flexDirection: 'row', justifyContent: 'flex-end', paddingRight: 13, }}>
+          <TouchableOpacity onPress={cancel} style={{ paddingRight: 10, borderRadius: 8, paddingVertical: 8, paddingHorizontal: 15, justifyContent: 'center' }}>
+            <Text style={{ fontSize: 14, fontWeight: 400, color: '#4B4B4B' }}>Cancel</Text>
+          </TouchableOpacity>
 
-            <TouchableOpacity onPress={deleteItem}
-            disabled={selectedReason==null?true:false} style={{backgroundColor: selectedReason!=null?'#1E45E1':'#788fed',
-              borderWidth:2,borderRadius:8,paddingVertical:8,paddingHorizontal:15,borderColor:'#C3DDFD'
+          <TouchableOpacity onPress={deleteItem}
+            disabled={selectedReason == null ? true : false} style={{
+              backgroundColor: selectedReason != null ? '#1E45E1' : '#788fed',
+              borderWidth: 2, borderRadius: 8, paddingVertical: 8, paddingHorizontal: 15, borderColor: '#C3DDFD'
             }}>
-                  <Text style={{fontSize:14,fontWeight:600,color:'#FFFFFF'}}>Delete</Text>
-            </TouchableOpacity>
+            <Text style={{ fontSize: 14, fontWeight: 600, color: '#FFFFFF' }}>Delete</Text>
+          </TouchableOpacity>
         </View>
 
 
@@ -859,12 +917,14 @@ console.log(available)
       </View>
     </View>}
 
+{/* ------Request bed change------- */}
+
   </View>
 
 }
 
-const style=StyleSheet.create({
-  mainDashb:{ flex: 1, backgroundColor: '#ffffff', paddingTop: 10, position: 'relative' },
+const style = StyleSheet.create({
+  mainDashb: { flex: 1, backgroundColor: '#ffffff', paddingTop: 10, position: 'relative' },
   container: { flexDirection: 'row', paddingTop: 10, paddingLeft: 16, paddingRight: 16, justifyContent: 'space-between', paddingLeft: 10, alignItems: 'center' }
 })
 export default Dashboard;
