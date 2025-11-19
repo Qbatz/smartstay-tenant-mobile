@@ -22,7 +22,7 @@ import { launchImageLibrary } from "react-native-image-picker";
 import AmenitiesPic from '../../assets/Images/amenities.png'
 import { UsersContext } from "../../Context/UserContext";
 import BottomSheet,{BottomSheetView} from "@gorhom/bottom-sheet";
-import { complaints } from "../../Action/HostelAction";
+import { assignAmenities, complaints, unassignAmeties } from "../../Action/HostelAction";
 
 function Services(props) {
     console.log(props)
@@ -34,15 +34,15 @@ function Services(props) {
     const [complaintsList,setComplaintsList]=useState([])
     const [selectedfield, setselectfield] = useState(0);
     const [modulevisible, setModalVisible] = useState(false)
-    const [selectedComplaint, setselectComplaint] = useState(null);
-    const [deletevisible, setdeleteVisible] = useState(false);
-    const [imageid, setimageid] = useState();
     const [comment, setComment] = useState(false)
 
     const [commentnote, setCommentNote] = useState(null)
     const [commentMessage, setCommentmessage] = useState();
     const [selectedValue, setSelectedValue] = useState(null);
     const [isFocus, setIsFocus] = useState(false);
+
+    const[assignedAmenities,setAssignedAmenity]=useState([])
+    const[unassignedAmenities,setUnasignedAmenities]=useState([])
 
     console.log(selectedfield)
 
@@ -56,13 +56,6 @@ function Services(props) {
         firstclick('Complaint')
     }, [])
 
-
-
-    const list1 = [{ id: 1, title: 'Washing machine', issue: 'Plumbing', status: 'Pending', time: '02 hours ago', description: 'Washing machine problem in room3', assignedTo: 'Ram', PhoneNO: '9183472227' },
-    { id: 2, title: 'Water Tap Leakage', issue: 'Plumbing', status: 'Inpogress', time: '01 hours ago', description: 'Tap leakage problem in room4', assignedTo: 'Sam', PhoneNO: '9183478227' }, { id: 3, title: 'Charging port was not working', issue: 'Electricity', status: 'Resolved', time: '15 mins ago', description: 'Charging port problem in room6', assignedTo: 'Rahul', PhoneNO: '9183471227' },
-    { id: 4, title: 'Room maintanence', issue: 'Maintanence', status: 'Pending', time: '1 day ago', description: 'Room is not cleaned in room3', assignedTo: 'Abin', PhoneNO: '9181472227' }, { id: 5, title: 'Locker Problem', issue: 'Maintanence', status: 'Resolved', time: '02 hours ago', description: 'Locker is working in room3', assignedTo: 'Ram', PhoneNO: '9183472327' },
-    { id: 6, title: 'Shower not working', issue: 'Plumbing', status: 'Inpogress', time: '11 hours ago', description: 'Bathroom shower problem in room3', assignedTo: null, PhoneNO: null }, { id: 7, title: 'Home not clean', issue: 'Maintanence', status: 'Resolved', time: '03 hours ago', description: 'Dust and insects problem in room5', assignedTo: 'Sabum', PhoneNO: '9183472227' },
-    { id: 8, title: 'Electricity', issue: 'Electricity', status: 'Pending', time: '05 hours ago', description: 'Power issue problem in room3', assignedTo: 'Nithin', PhoneNO: '8183472227' }, { id: 9, title: 'Water Tap Leakage', issue: 'Plumbing', status: 'Pending', time: '02 hours ago', description: 'Washing machine problem in room3', assignedTo: 'Ramu', PhoneNO: '9183472227' }, { id: 10, title: 'Charging port was not working', issue: 'Electricity', status: 'Resolved', time: '02 hours ago', description: 'Washing machine problem in room3', assignedTo: 'Ram', PhoneNO: '9183472227' }]
 
     const list2 = [{ id: 1, Amenities: 'wifi', Amount: '339/Month' }, { id: 2, Amenities: 'Laundry', Amount: '299/month' }, { id: 3, Amenities: 'Food', Amount: '1500/month' }]
 
@@ -94,7 +87,17 @@ function Services(props) {
 
     useEffect(()=>{
         complaints(props.hostel[0].hostelId,commonContext.getToken).then(r=>{
-            setComplaintsList(r?.data)
+            setComplaintsList(r?.data?.content)
+            console.log(r)
+        })
+
+        assignAmenities(props.hostel[0].hostelId,commonContext.getToken).then(r=>{
+            setAssignedAmenity(r.data)
+            console.log(r)
+        })
+
+        unassignAmeties(props.hostel[0].hostelId,commonContext.getToken).then(r=>{
+            setUnasignedAmenities(r.data)
             console.log(r)
         })
     },[])
@@ -111,9 +114,9 @@ function Services(props) {
         console.log(value)
         setselectfield(value)
     }
-    function secondclick(id) {
-        console.log(id)
-        setselectfield(id)
+    function secondclick(value) {
+        console.log(value)
+        setselectfield(value)
         commonContext.Amenities('amenities')
     }
 
@@ -134,19 +137,7 @@ function Services(props) {
         setModalVisible(false)
         setComment(false)
     }
-    const imageclick = (id) => {
-        console.log(id)
-        setdeleteVisible(true)
-        setimageid(id)
-    }
-
-    const commentclick = () => {
-        setComment(true)
-    }
-
-    const textmessage = (value) => {
-        setCommentmessage(value)
-    }
+   
 
     const sendclick = () => {
         const data = {
@@ -193,8 +184,8 @@ function Services(props) {
                 </View>
 
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => secondclick(list2.length)} style={{
-                backgroundColor: selectedfield === list2.length ? '#1E45E1' : 'white',
+            <TouchableOpacity onPress={() => secondclick('Amenities')} style={{
+                backgroundColor: selectedfield === 'Amenities' ? '#1E45E1' : 'white',
                 flex: 1,
                 borderRadius: 10,
                 borderColor: '#f4f4f4',
@@ -207,9 +198,9 @@ function Services(props) {
             }}>
                 <View style={{ flexDirection: 'row' }}>
                     <View style={{ borderWidth: 1, borderRadius: 4, paddingTop: 4, paddingBottom: 4, paddingLeft: 4, paddingRight: 4, backgroundColor: '#ffff', borderColor: '#ffffff' }}>
-                        <Image source={AmenitiesPic} style={{ width: 18, height: 17, tintColor: selectedfield === list2.length ? '#1E45E1' : '#4B4B4B' }} />
+                        <Image source={AmenitiesPic} style={{ width: 18, height: 17, tintColor: selectedfield === 'Amenities' ? '#1E45E1' : '#4B4B4B' }} />
                     </View>
-                    <Text style={{ color: selectedfield == list2.length ? "white" : 'black', fontSize: 16, fontWeight: '400', marginLeft: 10 }}>Amenities</Text>
+                    <Text style={{ color: selectedfield == 'Amenities' ? "white" : 'black', fontSize: 16, fontWeight: '400', marginLeft: 10 }}>Amenities</Text>
                 </View>
             </TouchableOpacity>
         </View>
@@ -267,8 +258,8 @@ function Services(props) {
                 </View>
 
                 <FlatList
-                    data={list2}
-                    keyExtractor={(item) => item.id}
+                    data={assignedAmenities}
+                    keyExtractor={(item) => item.amenityId}
                     scrollEnabled={false} // important! to avoid conflict with parent ScrollView
                     renderItem={({ item }) => (
                         <View style={{ paddingTop: 10 }}>
@@ -287,10 +278,9 @@ function Services(props) {
                                 }}
                             >
                                 <View>
-                                    <Text style={{ fontSize: 16, fontWeight: '600' }}>{item.Amenities}</Text>
-                                    <View style={{ flexDirection: 'row', paddingTop: 7 }}>
-                                        <Text style={{ fontSize: 14, color: '#4B4B4B' }}>{'\u20B9'}</Text>
-                                        <Text style={{ fontSize: 14, color: '#4B4B4B' }}>{item.Amount}</Text>
+                                    <Text style={{ fontSize: 16, fontWeight: '600' }}>{item.amenityName}</Text>
+                                    <View style={{ paddingTop: 7 }}>
+                                        <Text style={{ fontSize: 14, color: '#4B4B4B' }}>{'\u20B9'}{item.amenityAmount}/month</Text>
                                     </View>
                                 </View>
                                 <Image source={RightDirection} style={{ width: 26, height: 26 }} />
@@ -308,8 +298,8 @@ function Services(props) {
                 </View>
 
                 <FlatList
-                    data={list3}
-                    keyExtractor={(item) => item.id}
+                    data={unassignedAmenities}
+                    keyExtractor={(item) => item.amenityId}
                     scrollEnabled={false} // disable inner scrolling
                     renderItem={({ item }) => (
                         <View style={{ paddingTop: 10 }}>
@@ -327,7 +317,7 @@ function Services(props) {
                                     borderColor: '#edf3ff',
                                 }}
                             >
-                                <Text style={{ fontSize: 16, fontWeight: '500' }}>{item.Available}</Text>
+                                <Text style={{ fontSize: 16, fontWeight: '500' }}>{item.amenityName}</Text>
                                 <Image source={AddSquare} style={{ width: 22, height: 22 }} />
                             </View>
 

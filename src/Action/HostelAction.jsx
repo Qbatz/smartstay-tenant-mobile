@@ -2,19 +2,18 @@ import AxiosConfig from "../Config/AxiosConfig";
 
 export const hostelList=async(token)=>{
      
-    const response= await AxiosConfig.get("/v2/hostels", {
+    const response= await AxiosConfig.get("/v2/tenant/hostels", {
         headers: {
             Authorization: 'Bearer ' + token
         }
     })
-    return response.data;
-    
+    return response.data;   
 }
 
 export const hostelDetails=async(hostelId,token)=>{
 
     console.log(hostelId)
-    const response=await AxiosConfig.get("/v2/hostels/" + hostelId, {
+    const response=await AxiosConfig.get("/v2/tenant/hostels/" + hostelId, {
         headers: {
             Authorization: 'Bearer ' + token
         }
@@ -29,16 +28,62 @@ export const complaints=async(hostelId,token)=>{
             Authorization: 'Bearer ' + token
         }
     })
+    console.log(response)
     return response
 
 }
 
-export const addComplaints=async()=>{
-        const response=await AxiosConfig.post('/v2/complaints/{hostelId}')
+export const addComplaints=async(hostelId,token,formData)=>{
+
+    console.log(formData)
+    try{
+         const response=await AxiosConfig.post('/v2/complaints/' + hostelId, formData,   {
+            headers: {
+                Authorization: 'Bearer ' + token,
+                 "Content-Type": "multipart/form-data",
+            }
+        })
+        console.log(response)
+        return response;
+    }catch(error){
+        console.log(error.response)
+    }
+         
+    
+      
 }
 
 export const getComplaints=async(hostelId,complaintId,token)=>{
     const response=await AxiosConfig.get('/v2/complaints/' + hostelId + "/" + complaintId, {
+        headers: {
+            Authorization: 'Bearer ' + token
+        }
+    })
+    return response;
+}
+
+export const assignAmenities=async(hostelId,token)=>{
+
+    const response =await AxiosConfig.get('/v2/amenities/assigned/' + hostelId, {
+        headers: {
+            Authorization: 'Bearer ' + token
+        }
+    })
+    console.log(response)
+    return response;
+}
+
+export const unassignAmeties=async(hostelId, token)=>{
+    const response=await AxiosConfig.get('/v2/amenities/unassigned/' + hostelId, {
+        headers: {
+            Authorization: 'Bearer ' + token
+        }
+    })
+    return response;
+}
+
+export const getAmenties=async(hostelId,amenityId,token)=>{
+    const response=await AxiosConfig.get('/v2/amenities/' + hostelId + "/" +amenityId, {
         headers: {
             Authorization: 'Bearer ' + token
         }
