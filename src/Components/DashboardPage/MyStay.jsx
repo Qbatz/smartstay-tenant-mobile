@@ -166,7 +166,7 @@ function MyStay(props) {
                     <Text style={{ fontSize: 10, marginTop: 5 }}>Complaint</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity 
+                <TouchableOpacity onPress={()=>props.onRequestBed(0)}
                     style={{
                         borderWidth: 1, borderRadius: 10, flex: 1, justifyContent: 'center', alignItems: 'center',
                         marginLeft: 5, padding: 10, borderColor: '#EFF2FF' }}>

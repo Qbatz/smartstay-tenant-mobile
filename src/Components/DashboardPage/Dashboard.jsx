@@ -61,11 +61,21 @@ function Dashboard(props) {
   const [deletevisible, setdeleteVisible] = useState(false)
   const [complaintDescription, setDespriction] = useState()
   const [imageuri, setImageuri] = useState([])
+  const [changeBed, setChangeBed] = useState(null);
+  const [bedType, setBedType] = useState(null)
+  const [urgencyType, setUrgencyType] = useState(null)
  
 
   const complainttype = [{ label: 'Plumbing', value: '1' }, { label: 'Electricity', value: '2' }, { label: 'Room Maintanence', value: '3' }, { label: 'Canteen food', value: '4' }, { label: 'Canteen food', value: '4' }]
 
   const images = [{ id: 1, source: Damage1 }, { id: 2, source: Damage2 }, { id: 3, source: Damage3 }]
+
+   const bed = [{ label: 'Disturbance in current room', value: '1' }, { label: 'Roommate issues', value: '2' }, { label: 'Need more privacy/space', value: '3' },
+  { label: 'Maintanence issues', value: '4' }, { label: 'Prefer other sharing type', value: '5' }, { label: 'Others', value: '6' }]
+
+  const selectBed = [{ label: 'Single Sharing', value: '1' }, { label: 'Double Sharing', value: '2' }, { label: 'Triple Sharing', value: '3' }]
+
+  const urgency = [{ label: 'Within 2-3 days', value: '1' }, { label: 'Within 1 Week', value: '2' }, { label: 'Next Month Start', value: '3' }]
 
 
   useEffect(() => {
@@ -136,6 +146,9 @@ function Dashboard(props) {
           setSelectedValue()
           setImageuri([])
           setmediaImage([])
+          setChangeBed(null)
+          setBedType(null)
+          setUrgencyType(null)
         }}
 
       />
@@ -273,6 +286,15 @@ function Dashboard(props) {
     setSelectedReason(null)
   }
 
+  //-----------Requestbed
+
+  const sheetRf = useRef(null); 
+  const snapPnt = useMemo(() => ['90%'], [])
+
+  const requestBed = (value) => {
+    sheetRf.current?.expand(value)
+
+  }
 
 
   // ---------------------------
@@ -288,7 +310,7 @@ function Dashboard(props) {
   const renderScene = ({ route, jumpTo }) => {
     switch (route.key) {
       case 'mystay':
-        return <MyStay hostel={props.route.params.hostel}  jumpTo={jumpTo} />;
+        return <MyStay hostel={props.route.params.hostel} onRequestBed={requestBed} jumpTo={jumpTo} />;
       case 'services':
         return <Services onOpen={handleOpen} onSheet={handle} onAmenities={handleAmenity} jumpTo={jumpTo} hostel={props.route.params.hostel} />;
       case 'payment':
@@ -918,6 +940,209 @@ function Dashboard(props) {
     </View>}
 
 {/* ------Request bed change------- */}
+
+          <BottomSheet ref={sheetRf} snapPoints={snapPnt} index={-1} enableDynamicSizing={false} enablePanDownToClose={true}
+      backdropComponent={renderBackdrop} backgroundStyle={{
+        backgroundColor: "#fff", borderRadius: 20, borderWidth: 1, borderColor: '#ccc'
+      }}
+      handleIndicatorStyle={{ backgroundColor: '#aaa' }}>
+
+      <View style={{ paddingTop: 15, paddingHorizontal: 25, justifyContent: 'space-between', flex: 1 }}>
+        <View>
+          <Text style={{ fontSize: 20, fontWeight: 600 }}>Request Bed Change</Text>
+
+          <View style={{ paddingTop: 20 }}>
+            <Text style={{ fontSize: 12, fontWeight: 400 }}>Current Bed</Text>
+
+            <View style={{
+              backgroundColor: '#F6F8FF', borderRadius: 10, paddingVertical: 17,
+              paddingHorizontal: 8, marginTop: 10, flexDirection: 'row'
+            }}>
+              <View style={{ backgroundColor: '#F9D796', paddingVertical: 4.64, paddingHorizontal: 9.28, alignSelf: 'flex-start', borderRadius: 46.38 }}>
+                <Text style={{ color: '#642B00', fontSize: 10.82, fontWeight: 400 }}>
+                  Ground Floor</Text>
+              </View>
+
+              <View style={{flexDirection: 'row', paddingLeft: 20, alignItems: 'center'}}>
+                <Image source={Room} style={{ width: 21.17, height: 21.17 }} />
+                <Text style={{ marginLeft: 10, fontSize: 15.97, fontWeight: 400 }}>203</Text>
+              </View>
+
+              <View style={{ flexDirection: 'row', paddingLeft: 10, alignItems: 'center' }}>
+                <Image source={Bed} style={{ width: 21.17, height: 21.17 }} />
+                <Text style={{ marginLeft: 10, fontSize: 15.97, fontWeight: 400 }}>300</Text>
+              </View>
+            </View>
+          </View>
+
+          <View style={{ paddingTop: 15 }}>
+            <Text style={{ fontSize: 14, fontWeight: 400 }}>Reason for Bed change</Text>
+
+            <Dropdown style={{ borderWidth: 1, borderRadius: 10, paddingVertical: 15, marginTop: 10, borderColor: '#e5e5e5',paddingLeft:10 }}
+              onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
+              data={bed}
+              containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
+              placeholderStyle={{ fontSize: 14, paddingRight: 10 }}
+              selectedTextStyle={{fontSize:15,fontWeight:400}}
+              placeholder="Select Reason"
+              labelField="label"
+              valueField="value"
+              value={changeBed}
+
+              onChange={item => {
+                console.log(item.value)
+                setChangeBed(item.value)
+              }}
+
+              renderRightIcon={() => (
+                <Ionicons name={isFocus ? "chevron-up" : "chevron-down"} size={22} color="#000"
+                  style={{ paddingRight: 10 }} />
+              )}
+              renderItem={(item, index) => {
+                const isSelected = item.value === changeBed;
+
+                return (
+                  <TouchableOpacity onPress={() => {
+                    setChangeBed(item.value)
+                  }}
+                    style={{
+                      paddingVertical: 14,
+                      paddingHorizontal: 14,
+                      borderRadius: 10,
+                      marginVertical: 5,
+                      marginRight:10,
+                      marginTop:10,
+                      backgroundColor: isSelected ? "#1D4ED8" : "#F5F5F5",
+
+                    }}
+                  >
+                    <Text
+                      style={{color: isSelected ? "#fff" : "#000",fontSize: 15, }}>
+                      {item.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              }}
+            />
+
+          </View>
+
+          <View style={{ paddingTop: 15 }}>
+            <Text style={{ fontSize: 14, fontWeight: 400 }}>Preffered Bed Type</Text>
+
+            <Dropdown style={{ borderWidth: 1, borderRadius: 10, paddingVertical: 15, marginTop: 10, borderColor: '#e5e5e5',paddingLeft:10 }}
+              onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
+              data={selectBed}
+              containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
+              placeholderStyle={{ fontSize: 14, paddingRight: 10 }}
+              selectedTextStyle={{fontSize:15,fontWeight:400}}
+              placeholder="Select Reason"
+              labelField='label'
+              valueField='value'
+              value={bedType}
+
+              onChange={item => {
+                setBedType(item.value)
+              }}
+
+              renderRightIcon={() => (
+                <Ionicons name={isFocus ? "chevron-up" : "chevron-down"} size={22} color="#000"
+                  style={{ paddingRight: 10 }} />
+              )} 
+
+                renderItem={(item, index) => {
+                const isSelected = item.value === bedType;
+
+                return (
+                  <TouchableOpacity onPress={() => {
+                    setBedType(item.value)
+                  }}
+                    style={{
+                      paddingVertical: 14,
+                      paddingHorizontal: 14,
+                      borderRadius: 10,
+                      marginVertical: 5,
+                      marginRight:10,
+                      marginTop:10,
+                      backgroundColor: isSelected ? "#1D4ED8" : "#F5F5F5",
+                    }}
+                  >
+                    <Text
+                      style={{color: isSelected ? "#fff" : "#000",fontSize: 15, }}>
+                      {item.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              }}
+              
+              />
+          </View>
+
+          <View style={{ paddingTop: 15 }}>
+            <Text>Bed Change Urgency</Text>
+
+            <Dropdown style={{ borderWidth: 1, borderRadius: 10, paddingVertical: 15, borderColor: '#e5e5e5', marginTop: 10,paddingLeft:10 }}
+              onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
+              data={urgency}
+              containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
+              placeholderStyle={{ fontSize: 14, paddingRight: 10 }}
+              selectedTextStyle={{fontSize:15,fontWeight:400}}
+              placeholder="Select Reason"
+              labelField="label"
+              valueField="value"
+              value={urgencyType}
+
+              onChange={item => {
+                setUrgencyType(item.value)
+              }}
+
+              renderRightIcon={() => (
+                <Ionicons name={isFocus ? "chevron-up" : "chevron-down"} size={22} color="#000"
+                  style={{ paddingRight: 10 }} />
+              )}
+
+               renderItem={(item, index) => {
+                const isSelected = item.value === urgencyType;
+
+                return (
+                  <TouchableOpacity onPress={() => {
+                    setUrgencyType(item.value)
+                  }}
+                    style={{
+                      paddingVertical: 14,
+                      paddingHorizontal: 14,
+                      borderRadius: 10,
+                      marginVertical: 5,
+                      marginRight:10,
+                      marginTop:10,
+                      backgroundColor: isSelected ? "#1D4ED8" : "#F5F5F5",
+                    }}
+                  >
+                    <Text
+                      style={{color: isSelected ? "#fff" : "#000",fontSize: 15,fontWeight:400 }}>
+                      {item.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              }}
+            />
+          </View>
+
+        </View>
+
+
+        
+        <TouchableOpacity style={{
+          paddingVertical: 16, paddingHorizontal: 32, borderRadius: 50,
+          backgroundColor: changeBed!=null&&bedType!=null&&urgencyType!=null?'#1E45E1':'#788fed',
+           alignItems: 'center',marginBottom:15
+        }} disabled={changeBed==null&&bedType==null&&urgencyType==null?true:false}>
+          <Text style={{fontSize: 14, fontWeight: 600, color: '#FFFFFF'}}>Submit Request</Text>
+        </TouchableOpacity>
+
+      </View>
+
+    </BottomSheet>
 
   </View>
 
