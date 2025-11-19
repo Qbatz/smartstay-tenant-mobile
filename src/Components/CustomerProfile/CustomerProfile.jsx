@@ -32,7 +32,7 @@ import { customerDetails } from "../../Action/CustomerAction";
 
 
 
-const CustomerProfile = () => {
+const CustomerProfile = (route) => {
 
   const context=useContext(UsersContext)
 
@@ -105,7 +105,7 @@ const handleDownload = async () => {
   };
 
   const handleEditProfile = () => {
-    navigation.navigate("EditProfile");
+    navigation.navigate("EditProfile", {customer:customer});
 
   }
 
@@ -162,7 +162,7 @@ const handleDownload = async () => {
     style={{ height: 16, width: 16, marginRight: 4 }}
     resizeMode="contain"
   />
-  <Text>101</Text>
+  <Text>{customer?.bookingDetails?.floorName}</Text>
 </View>
 
 <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
@@ -171,7 +171,7 @@ const handleDownload = async () => {
     style={{ height: 16, width: 16, marginRight: 4 }}
     resizeMode="contain"
   />
-  <Text>1</Text>
+  <Text>{customer?.bookingDetails?.bedName}</Text>
 </View>
 
           

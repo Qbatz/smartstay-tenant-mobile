@@ -9,6 +9,16 @@ export const customerDetails=async(token)=>{
     })
     console.log(response)
     return response
+}
 
+export const editProfile=async(token,formData)=>{
+
+    const response=await AxiosConfig.put('/v2/customer/', formData, {
+        headers: {
+            Authorization: 'Bearer ' + token
+        }
+    })
+    console.log(response)
+    return response;
 
 }
