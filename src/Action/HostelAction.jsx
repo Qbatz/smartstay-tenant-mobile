@@ -90,3 +90,22 @@ export const getAmenties=async(hostelId,amenityId,token)=>{
     })
     return response;
 }
+
+export const deleteComplaint=async(hostelId,complaintId,token)=>{
+    const response=await AxiosConfig.delete('/v2/complaints/' + hostelId + "/" + complaintId, {
+        headers: {
+            Authorization: 'Bearer ' + token
+        }
+    }) 
+    return response;
+}
+
+export const addComment=async(complaintId,token,data)=>{
+    const response=await AxiosConfig.post('/v2/complaints/comment/' + complaintId, data, {
+        headers: {
+            Authorization: 'Bearer ' + token
+        }
+    })
+    console.log(response)
+    return response;
+}

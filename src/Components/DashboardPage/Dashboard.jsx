@@ -30,7 +30,7 @@ import { launchImageLibrary } from "react-native-image-picker";
 import Exclamation from '../../assets/Images/exclamation.png'
 import DeleteIcon from '../../assets/Images/deleteIcon.png'
 import HostelProfile from "../../assets/Images/Group 1.png"
-import { addComplaints, getAmenties, getComplaints, hostelDetails } from "../../Action/HostelAction";
+import { addComment, addComplaints, deleteComplaint, getAmenties, getComplaints, hostelDetails } from "../../Action/HostelAction";
 import { UsersContext } from "../../Context/UserContext";
 import Room from '../../assets/Images/Room.png'
 import Bed from '../../assets/Images/Bed_Icon.png'
@@ -64,6 +64,7 @@ function Dashboard(props) {
   const [changeBed, setChangeBed] = useState(null);
   const [bedType, setBedType] = useState(null)
   const [urgencyType, setUrgencyType] = useState(null)
+  const [complaintId,setComplaintId]=useState()
  
 
   const complainttype = [{ label: 'Plumbing', value: '1' }, { label: 'Electricity', value: '2' }, { label: 'Room Maintanence', value: '3' }, { label: 'Canteen food', value: '4' }, { label: 'Canteen food', value: '4' }]
@@ -119,14 +120,21 @@ function Dashboard(props) {
   //   sheetRef.current?.close();
   // }, []);
 
-  const textmessage = (value) => {
-    setCommentmessage(value)
-  }
+  // const textmessage = (value) => {
+  //   setCommentmessage(value)
+  // }
   const sendclick = () => {
+
+    console.log(complaintId)
     const data = {
-      id: 4, person: 'you', comment: commentMessage, date: '24 Jan -12.35pm'
+      message:commentMessage,
+      hostelId:props.route.params.hostel[0].hostelId
     }
-    setCommentNote(data)
+
+    
+    addComment(selectedComplaint.complaintId,context.getToken,data).then(r=>{
+      console.log(r)
+    })
   }
 
   const renderBackdrop = useCallback(
@@ -141,7 +149,6 @@ function Dashboard(props) {
         style={{ ...StyleSheet.absoluteFillObject }}
         onPress={() => {
           setComment(false)
-          setSelectComplaint()
           setDespriction()
           setSelectedValue()
           setImageuri([])
@@ -211,8 +218,6 @@ function Dashboard(props) {
         })
 
       })
-
-
     }
 
     addComplaints(props.route.params.hostel[0].hostelId, context.getToken, formData).then(r => {
@@ -261,10 +266,12 @@ function Dashboard(props) {
 
   }
   // -----
-  const deleteClick = () => {
-    setShowPopUp(true)
+  const deleteClick = (complaintId) => {
+    setShowPopUp(true) 
+    setComplaintId(complaintId)
   }
   const deleteClose = () => {
+
     setShowPopUp(false)
     setSelectedReason(null)
   }
@@ -281,7 +288,11 @@ function Dashboard(props) {
     setShowPopUp(false)
     setSelectedReason(null)
   }
-  const deleteItem = () => {
+  const deleteItem = (complaintiId) => {
+
+    deleteComplaint(props.route.params.hostel[0].hostelId,complaintiId,context.getToken).then(r=>{
+      console.log(r)
+    })
     setShowPopUp(false)
     setSelectedReason(null)
   }
@@ -411,7 +422,7 @@ function Dashboard(props) {
 
             <View style={{ paddingBottom: 20 }}>
               <View style={{ paddingTop: 3, paddingBottom: 4, borderWidth: 1, borderRadius: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                <TextInput value={commentMessage} placeholder="Post your Reply here" onChangeText={textmessage} />
+                <TextInput value={commentMessage} placeholder="Post your Reply here" onChangeText={setCommentmessage} />
                 <TouchableOpacity onPress={sendclick} style={{ paddingRight: 10 }}>
                   <Image source={SendButton} style={{ width: 34, height: 34 }} />
                 </TouchableOpacity>
@@ -442,7 +453,7 @@ function Dashboard(props) {
                       <TouchableOpacity onPress={() => editClick(0)} style={{ paddingRight: 10 }}>
                         <Image source={Edit} style={{ width: 17.72, height: 17.72 }} />
                       </TouchableOpacity>
-                      <TouchableOpacity onPress={deleteClick} style={{ paddingLeft: 10 }}>
+                      <TouchableOpacity onPress={()=>deleteClick(selectedComplaint.complaintId)} style={{ paddingLeft: 10 }}>
                         <Image source={Delete} style={{ width: 17.72, height: 17.72 }} />
                       </TouchableOpacity>
                     </View>
@@ -925,7 +936,7 @@ function Dashboard(props) {
             <Text style={{ fontSize: 14, fontWeight: 400, color: '#4B4B4B' }}>Cancel</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={deleteItem}
+          <TouchableOpacity onPress={()=>deleteItem(complaintId)}
             disabled={selectedReason == null ? true : false} style={{
               backgroundColor: selectedReason != null ? '#1E45E1' : '#788fed',
               borderWidth: 2, borderRadius: 8, paddingVertical: 8, paddingHorizontal: 15, borderColor: '#C3DDFD'

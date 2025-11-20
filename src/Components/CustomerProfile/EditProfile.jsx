@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   View,
   Text,
@@ -16,19 +16,64 @@ import CustomerImage from "../../assets/Images/Customer_Icon.png";
 import LeftArrow from "../../assets/Images/LeftArrow.png";
 import CameraIcon from "../../assets/Images/camera_Icon.png"
 import { pickSingleFile } from "../UploadFileScreen/uploadFilePage"; 
+import { editProfile } from "../../Action/CustomerAction";
+import { UsersContext } from "../../Context/UserContext";
 
-const EditProfile = () => {
+const EditProfile = (route) => {
+
+  const context=useContext(UsersContext)
   const navigation = useNavigation();
-  const [name, setName] = useState("Rajkumar M");
-  const [gender, setGender] = useState("Male");
-  const [dob, setDob] = useState(new Date(2000, 8, 10));
+  const [name, setName] = useState(route.route.params.customer.firstName);
+  const [gender, setGender] = useState(route.route.params.customer.gender);
+  const [dob, setDob] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [profileImage, setProfileImage] = useState(CustomerImage);
+  const [profileImage, setProfileImage] = useState(null);
   const [showCameraIcon, setShowCameraIcon] = useState(false);
 
+  console.log(gender)
+  console.log(dob)
+  console.log(profileImage)
+
   const handleSave = () => {
+
+    console.log(dob)
+
+    const payloads= {
+        firstName: name,
+        dob:dob.toLocaleDateString('en-GB').replaceAll("/","-"),
+        gender:gender,
+    } 
+
+    console.log("Payloads:", payloads);
+
+    const formDate=new FormData();
+
+    const jsonBase64=btoa(JSON.stringify(payloads))
+
+    formDate.append("payloads", {
+       uri: "data:application/json;base64," + jsonBase64,
+       type: "application/json",
+       name: "payload.json",
+    })
+
+    console.log(profileImage)
+
+    if(profileImage){
+
+      formDate.append("profilePic", {
+          uri: profileImage.uri,
+          type: profileImage.type || "image/jpeg",
+          name: profileImage.fileName || "profile.jpg"
+      })
+
+    }
+
+    editProfile(context.getToken,formDate).then(r=>{
+      console.log(r)
+      navigation.goBack();
+    })
     console.log("Saved profile:", { name, gender, dob, profileImage });
-    navigation.goBack();
+    
   };
  const handleImagePick = async () => {
     try {
@@ -36,7 +81,7 @@ const EditProfile = () => {
       
       if (image) {
         console.log("Selected image:", image);
-        setProfileImage({ uri: image.uri });
+        setProfileImage({ uri: image });
       } else {
         console.log("User cancelled image selection");
       }
@@ -83,7 +128,7 @@ const EditProfile = () => {
             onPressOut={() => setShowCameraIcon(false)}
           >
             <View style={styles.imageWrapper}>
-              <Image source={profileImage} style={styles.profileImage} />
+              <Image source={profileImage!=null?profileImage.uri:null} style={styles.profileImage} />
               {showCameraIcon && (
                 <View style={styles.cameraOverlay}>
                   <Image
