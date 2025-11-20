@@ -6,6 +6,7 @@ import { verifyOtp } from "../../Action/LoginAction";
 import { UsersContext } from "../../Context/UserContext";
 import { storeData } from "../../Utils/Storage";
 import { ACCESS_TOKEN,PHONE_NO,LOGGEDIN } from "../../Utils/Constant";
+import SuccessModal from "../ToastFile/TostFilePage";
 
 const OtpDesign =({ route }) => {
   console.log(route.params.phone)
@@ -13,6 +14,10 @@ const OtpDesign =({ route }) => {
   const { phone } = route.params;
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const inputs = useRef([]);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showModelMessage, setShowModelMessage]=useState()
+  const [modelType,setModelType]=useState();
+
 
   const context=useContext(UsersContext)
   console.log(context.SerialNo)
@@ -41,8 +46,25 @@ const OtpDesign =({ route }) => {
         context.phoneNo(route.params.phone)
         context.updateToken(data.data)
           //  navigation.navigate("HostelList");
-           context.loggedin("true")
+          
+          setShowSuccessModal(true)
+          setShowModelMessage("Login Successfully")
+          setModelType('success')
+
+          setTimeout(() => {
+            setShowSuccessModal(false);
+            context.loggedin("true")
+            }, 2000);        
       }      
+      else{
+        setShowSuccessModal(true)
+        setShowModelMessage("Incorrect OTP")
+        setModelType('error')
+
+        setTimeout(() => {
+            setShowSuccessModal(false);
+            }, 2000);  
+      }
     }
   };
 
@@ -54,6 +76,12 @@ const OtpDesign =({ route }) => {
 
   return (
     <View style={styles.container}>
+       <SuccessModal
+        visible={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        message={showModelMessage}
+        type={modelType}
+      />
       <Image source={require("../../assets/Images/Sm_logo.png")} />
       <Text style={styles.title}>Otp Validation</Text>
       <Text style={styles.subtitle}>

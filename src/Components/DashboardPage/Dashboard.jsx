@@ -34,6 +34,7 @@ import { addComment, addComplaints, deleteComplaint, getAmenties, getComplaints,
 import { UsersContext } from "../../Context/UserContext";
 import Room from '../../assets/Images/Room.png'
 import Bed from '../../assets/Images/Bed_Icon.png'
+import SuccessModal from "../ToastFile/TostFilePage";
 
 
 function Dashboard(props) {
@@ -65,6 +66,7 @@ function Dashboard(props) {
   const [bedType, setBedType] = useState(null)
   const [urgencyType, setUrgencyType] = useState(null)
   const [complaintId,setComplaintId]=useState()
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
  
 
   const complainttype = [{ label: 'Plumbing', value: '1' }, { label: 'Electricity', value: '2' }, { label: 'Room Maintanence', value: '3' }, { label: 'Canteen food', value: '4' }, { label: 'Canteen food', value: '4' }]
@@ -170,7 +172,6 @@ function Dashboard(props) {
   const handle = (value) => {
 
     shetRef.current?.snapToIndex(value);
-
   }
 
   const uploadimage = async () => {
@@ -221,7 +222,18 @@ function Dashboard(props) {
     }
 
     addComplaints(props.route.params.hostel[0].hostelId, context.getToken, formData).then(r => {
-      console.log(r)
+      console.log(r.status)
+
+      if(r.status==201){
+        setShowSuccessModal(true)
+
+        setTimeout(() => {
+      setShowSuccessModal(false);
+      shetRef.current?.close();
+      
+    }, 2000);
+
+      }
     })
   }
   // -------Amenities click------
@@ -292,9 +304,18 @@ function Dashboard(props) {
 
     deleteComplaint(props.route.params.hostel[0].hostelId,complaintiId,context.getToken).then(r=>{
       console.log(r)
+       if(r.status==200){
+        setShowSuccessModal(true);
+
+        setTimeout(() => {
+        setShowSuccessModal(false);
+        setShowPopUp(false)
+        setSelectedReason(null)  
+        sheetRef.current?.close();
+    }, 2000);
+    
+       }
     })
-    setShowPopUp(false)
-    setSelectedReason(null)
   }
 
   //-----------Requestbed
@@ -567,6 +588,12 @@ function Dashboard(props) {
         backgroundColor: "#fff", borderRadius: 20, borderWidth: 1,
         borderColor: '#ccc'
       }} handleIndicatorStyle={{ backgroundColor: '#aaa' }}>
+        <SuccessModal
+        visible={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        message="Complaint Added Successfully!"
+        type="sucess"
+      />
       <View style={{ paddingTop: 10, paddingLeft: 20, paddingRight: 20, justifyContent: 'space-between', flex: 1 }}>
         <View>
           <Text style={{ fontSize: 20, fontWeight: 600 }}>Add complaint</Text>
@@ -868,6 +895,12 @@ function Dashboard(props) {
     </BottomSheet>
 
     {showPopUp && <View style={{ position: 'absolute', backgroundColor: '#rgba(0, 0, 0, 0.1)', width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center' }}>
+      <SuccessModal
+        visible={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        message="Complaint Deleted Successfully!"
+        type="sucess"
+      />
       <View style={{ width: '90%', backgroundColor: '#ffffff', borderWidth: 1, borderRadius: 8, borderColor: '#E5E7EB', paddingBottom: 15 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 18, paddingVertical: 13, }}>
           <View style={{ flexDirection: 'row' }}>
