@@ -12,13 +12,19 @@ export const customerDetails=async(token)=>{
 }
 
 export const editProfile=async(token,formData)=>{
-
-    const response=await AxiosConfig.put('/v2/customer/', formData, {
+    try{
+        const response=await AxiosConfig.put('/v2/customer/', formData, {
         headers: {
-            Authorization: 'Bearer ' + token
+            Authorization: 'Bearer ' + token,
+            "Content-Type": "multipart/form-data",
         }
-    })
-    console.log(response)
-    return response;
+    })   
+    return response;    
+
+    }catch(error){
+        console.log(error.response)
+    }
+
+    
 
 }

@@ -27,13 +27,12 @@ const EditProfile = (route) => {
   const [gender, setGender] = useState(route.route.params.customer.gender);
   const [dob, setDob] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [profileImage, setProfileImage] = useState(CustomerImage);
+  const [profileImage, setProfileImage] = useState(null);
   const [showCameraIcon, setShowCameraIcon] = useState(false);
 
   console.log(gender)
   console.log(dob)
-
-  console.log(profileImage.uri)
+  console.log(profileImage)
 
   const handleSave = () => {
 
@@ -41,9 +40,9 @@ const EditProfile = (route) => {
 
     const payloads= {
         firstName: name,
-        dob:dob.toLocaleDateString('en-GB'),
+        dob:dob.toLocaleDateString('en-GB').replaceAll("/","-"),
         gender:gender,
-    }
+    } 
 
     console.log("Payloads:", payloads);
 
@@ -57,6 +56,8 @@ const EditProfile = (route) => {
        name: "payload.json",
     })
 
+    console.log(profileImage)
+
     if(profileImage){
 
       formDate.append("profilePic", {
@@ -69,9 +70,10 @@ const EditProfile = (route) => {
 
     editProfile(context.getToken,formDate).then(r=>{
       console.log(r)
+      navigation.goBack();
     })
     console.log("Saved profile:", { name, gender, dob, profileImage });
-    navigation.goBack();
+    
   };
  const handleImagePick = async () => {
     try {
@@ -126,7 +128,7 @@ const EditProfile = (route) => {
             onPressOut={() => setShowCameraIcon(false)}
           >
             <View style={styles.imageWrapper}>
-              <Image source={profileImage.uri} style={styles.profileImage} />
+              <Image source={profileImage!=null?profileImage.uri:null} style={styles.profileImage} />
               {showCameraIcon && (
                 <View style={styles.cameraOverlay}>
                   <Image
