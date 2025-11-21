@@ -9,12 +9,15 @@ import {
 } from "react-native";
 import { LoginContext } from "../../Context/LoginContext";
 import { verifyPhoneNo } from "../../Action/LoginAction";
+import SuccessModal from "../ToastFile/TostFilePage";
 
 const CreateAccount = ({ navigation }) => {
 
   const { sendOtp } = useContext(LoginContext);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const[otp,setOtp]=useState();
 
  const handlePhoneChange = (text) => { 
   const numericText = text.replace(/[^0-9]/g, '');
@@ -29,9 +32,18 @@ const handleGetOtp = async () => {
 
     const dat= await verifyPhoneNo(phoneNumber)
     console.log(dat)
+    setOtp(dat.data)
 
     if(dat.status==200){
-      navigation.navigate("OtpDesign", { phone: phoneNumber });
+
+      
+
+      setShowSuccessModal(true)
+      setTimeout(() => {
+            setShowSuccessModal(false);
+              navigation.navigate("OtpDesign", { phone: phoneNumber });
+            
+            }, 4000);       
     }
   }
 };
@@ -40,6 +52,10 @@ const handleGetOtp = async () => {
 
   return (
     <View style={styles.container}>
+      <SuccessModal visible={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        message={otp}
+        type="success"/>
       <View style={styles.topContent}>
         <Image
           source={require("../../assets/Images/Sm_logo.png")}

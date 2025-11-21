@@ -39,6 +39,7 @@
     "react-native-screens": "^4.18.0",
     "react-native-share": "^12.2.0",
     "react-native-signature-canvas": "^5.0.1",
+    "react-native-swipe-list-view": "^3.2.9",
     "react-native-swiper": "^1.6.0",
     "react-native-tab-view": "^4.2.0",
     "react-native-vector-icons": "^10.3.0",

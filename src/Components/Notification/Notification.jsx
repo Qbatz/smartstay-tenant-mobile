@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -10,6 +10,9 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import NotificationItem from "./NotificationItem";
+import { SwipeListView } from "react-native-swipe-list-view";
+import Delete from '../../assets/Images/trash.png'
+
 
 const notifications = [
   {
@@ -70,6 +73,14 @@ const Notification = () => {
   const renderItem = ({ item }) => <NotificationItem item={item} />;
   const handleBack = () => navigation.goBack();
 
+  const [listData, setListData] = useState(notifications);
+
+
+  const deleteRow = (rowMap, rowKey) => {
+    const newData = listData.filter(item => item.id !== rowKey);
+    setListData(newData);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
         <View style={{ flexDirection: "row", alignItems: "center" , marginBottom:10}}>
@@ -83,12 +94,25 @@ const Notification = () => {
        <Text style={styles.header}>Notifications</Text>
       </View>
 
-      <FlatList
-        data={notifications}
+      <SwipeListView
+        data={listData}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.listContainer}
-        showsVerticalScrollIndicator={false}
+        // showsVerticalScrollIndicator={false}
+
+        renderHiddenItem={(data,rowMap)=>(
+          <View style={styles.rowBack}>
+
+            <TouchableOpacity style={[styles.backRightBtn, styles.backRightBtnRight]}
+            onPress={() => deleteRow(rowMap, data.item.id)}>
+                <Image source={Delete} style={{ width: 24, height: 24,tintColor:'#ffffff' }}/>
+
+            </TouchableOpacity>
+          </View>
+  )}
+        rightOpenValue={-75}
+        disableRightSwipe
       />
     </SafeAreaView>
   );
@@ -116,5 +140,27 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     paddingBottom: 20,
+  },
+  rowBack: {
+    alignItems: 'center',
+    backgroundColor: '#d11a2a',
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    paddingRight: 15,
+    borderRadius: 10,
+    marginBottom: 11,
+    overflow:"hidden"
+  },
+  backRightBtn: {
+    alignItems: "center",
+    justifyContent: "center",
+    width: 75,
+    height: "100%",
+    borderRadius: 5
+  },
+  backRightBtnRight: {
+    backgroundColor: "red",
+    right: 0,
   },
 });
