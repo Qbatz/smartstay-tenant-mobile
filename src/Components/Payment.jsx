@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useRef,useEffect} from "react";
 import {
   View,
   Text,
@@ -8,7 +8,8 @@ import {
   TouchableOpacity,
   Modal,
   Pressable,
-  TouchableWithoutFeedback,  Linking, Alert
+  TouchableWithoutFeedback,  Linking, Alert, Animated,
+    PanResponder,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import SideArrow from "../assets/Images/arrow-up.png";
@@ -25,11 +26,47 @@ import ArrowRightIcon from "../assets/Images/arrow-right.png";
 
 
 
-const Payment = () => {
+const Payment = (props) => {
 
      const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState(null);
+  const sheetY = useRef(new Animated.Value(0)).current;
+
+useEffect(() => {
+  if (modalVisible) sheetY.setValue(0);
+}, [modalVisible]);
+
+const panResponder = useRef(
+  PanResponder.create({
+    onMoveShouldSetPanResponder: (_, g) => g.dy > 5,
+    onPanResponderMove: (_, g) => {
+      if (g.dy > 0) sheetY.setValue(g.dy);
+    },
+    onPanResponderRelease: (_, g) => {
+      if (g.dy > 120) {
+        Animated.timing(sheetY, {
+          toValue: 700,
+          duration: 200,
+          useNativeDriver: true,
+        }).start(() => {
+          onClose();
+        });
+      } else {
+        Animated.spring(sheetY, {
+          toValue: 0,
+          useNativeDriver: true,
+        }).start();
+      }
+    },
+  })
+).current;
+
+const onClose = () => {
+  setModalVisible(false);
+  setSelectedPayment(null);
+};
+
 
   const payments = [
     {
@@ -237,7 +274,7 @@ const handleReceiptPdfDownload =  () => {
     <>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {payments.map((item, index) => (
-          <TouchableOpacity key={index} onPress={() => handleOpenModal(item)}>
+          <TouchableOpacity key={index} onPress={() => props.onPayment(item)}>
             <View style={styles.card}>
               <View style={styles.iconContainer}>
                 {item?.title === "July EB Bill" ? (
@@ -300,198 +337,216 @@ const handleReceiptPdfDownload =  () => {
       </ScrollView>
 
       {/* ---------- MODAL ---------- */}
-      <Modal
-        visible={modalVisible}
-        transparent
-        animationType="slide"
-        onRequestClose={handleCloseModal}
-      >
-        <TouchableWithoutFeedback onPress={handleCloseModal}>
-          <View style={styles.modalBackground}>
-            <TouchableWithoutFeedback>
-              <View style={styles.modalContainer}>
-                <View style={styles.dragIndicator} />
-                {selectedPayment && (
-                  <>
-                    
-                    <Text style={styles.modalTitle}>
-                      {selectedPayment.title}
-                    </Text>
-                    <View style={{display:'flex', flexDirection:'row'}}>
-                    <Text style={styles.invoiceId}>#INV001</Text>
-                    <TouchableOpacity
-                 onPress={() => handleReceiptPdfDownload(staticReceiptData)}>
-                    <Image  source={ViewIcon} resizeMode="contain" style={{ width: 15, height: 15, marginLeft:5 , marginTop:2}}/>
-                    </TouchableOpacity>
-                    </View>
+     {modalVisible && (
+  <View style={styles.sheetOverlay}>
 
-                    <View style={styles.amountSection}>
-                        <View style={{display:'flex', flexDirection:'row', justifyContent:'space-between'}}>
-                       <Text style={styles.label}>Total Amount</Text>
-                      </View>
+    {/* Tap outside to close */}
+    <TouchableWithoutFeedback onPress={onClose}>
+      <View style={StyleSheet.absoluteFill} />
+    </TouchableWithoutFeedback>
 
-                      <View>
-                       
-                      <Text style={styles.totalAmount}>
-                        ₹{selectedPayment.amount.toFixed(2)}
-                      </Text>
+    <Animated.View
+      style={[styles.bottomSheet, { transform: [{ translateY: sheetY }] }]}
+      {...panResponder.panHandlers}
+    >
+      <View style={styles.dragIndicator} />
 
- {selectedPayment.status === "Pay Now"  && (
- <View
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {selectedPayment && (
+          <>
+            <Text style={styles.modalTitle}>{selectedPayment.title}</Text>
+
+            <View style={{ flexDirection: "row" }}>
+              <Text style={styles.invoiceId}>#INV001</Text>
+              <TouchableOpacity
+                onPress={() => handleReceiptPdfDownload(staticReceiptData)}
+              >
+                <Image
+                  source={ViewIcon}
+                  style={{ width: 15, height: 15, marginLeft: 5, marginTop: 2 }}
+                />
+              </TouchableOpacity>
+            </View>
+
+            {/* Amount Section */}
+            <View style={styles.amountSection}>
+              <Text style={styles.label}>Total Amount</Text>
+
+              <View>
+                <Text style={styles.totalAmount}>
+                  ₹{selectedPayment.amount.toFixed(2)}
+                </Text>
+
+                {selectedPayment.status === "Pay Now" && (
+                  <View
                     style={[
                       styles.statusBadge,
-                      {
-                        backgroundColor:
-                             "rgba(254, 243, 198, 1)",
-                      },
+                      { backgroundColor: "rgba(254,243,198,1)" },
                     ]}
                   >
-                    <View style={{ flexDirection: "row" , justifyContent:'center'}}>
-                      <Text
-                        style={[styles.statusText, { color: "rgba(187, 77, 0, 1)"}]}
-                      >
+                    <Text
+                      style={[
+                        styles.statusText,
+                        { color: "rgba(187,77,0,1)" },
+                      ]}
+                    >
                       Pending
-                      </Text>
-                    
+                    </Text>
+                  </View>
+                )}
+
+                {(selectedPayment.status === "Partially Paid to" ||
+                  selectedPayment.status === "Paid to") && (
+                  <View style={{ flexDirection: "row", marginTop: 6 }}>
+                    <Image
+                      source={PaidIcon}
+                      style={{ width: 20, height: 20 }}
+                    />
+                    <Text style={{ fontSize: 14, marginLeft: 6 }}>
+                      {selectedPayment.status === "Partially Paid to"
+                        ? "Partially Paid"
+                        : "Full Paid"}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </View>
+
+            {/* Details */}
+            <View style={styles.detailsSection}>
+              <View style={styles.row}>
+                <Text style={styles.detailLabel}>Actual Rent</Text>
+                <Text style={styles.detailValue}>₹5512.00</Text>
+              </View>
+
+              <View style={styles.row}>
+                <Text style={styles.detailLabel}>Taxes GST 10%</Text>
+                <Text style={styles.detailValue}>₹488.00</Text>
+              </View>
+
+              {selectedPayment.paid === "partial" && (
+                <>
+                  <View style={styles.row}>
+                    <Text style={styles.detailLabel}>Paid Amount</Text>
+                    <Text style={styles.detailValue}>₹3500.00</Text>
+                  </View>
+
+                  <View style={styles.row}>
+                    <Text style={styles.detailLabel}>Remain</Text>
+                    <View>
+                      <Text style={styles.detailValue}>₹2500.00</Text>
+                      <Text style={styles.payBillText}>Pay Bill</Text>
                     </View>
                   </View>
- )
-}
-                      
+                </>
+              )}
+            </View>
 
-                   {(selectedPayment.status === "Partially Paid to" || selectedPayment.status === "Paid to") && (
-  <View style={{ display: "flex", flexDirection: "row" }}>
-    <Image
-      source={PaidIcon}
-      resizeMode="contain"
-      style={{ width: 20, height: 20 }}
-    />
-    <Text style={{ fontSize: 14 }}>
-      {selectedPayment.status === "Partially Paid to" ? "Partially Paid" : "Full Paid"}
-    </Text>
+            <View
+              style={{
+                borderBottomWidth: 0.4,
+                borderBottomColor: "grey",
+                opacity: 0.4,
+                marginVertical: 10,
+              }}
+            />
+
+            {/* Paid / Due Date */}
+            <View style={styles.Billbottom}>
+              <Text style={styles.paiddetailLabel}>
+                {selectedPayment.status === "Pay Now" ? "Due Date" : "Paid Date"}
+              </Text>
+              <Text style={styles.paiddetailValue}>25 Sep 2025</Text>
+            </View>
+
+            {/* Notes */}
+            {selectedPayment.status === "Pay Now" && (
+              <View style={{ marginTop: 10 }}>
+                <Text style={{ fontSize: 13, color: "rgba(60,60,67,0.6)" }}>
+                  Notes & Instructions
+                </Text>
+                <Text style={styles.noteText}>
+                  Kindly pay on or before the due date
+                </Text>
+                <Text style={styles.noteText}>
+                  Late fee may apply after 3 days of due date
+                </Text>
+                <Text style={styles.noteText}>
+                  For any billing errors, contact hostel admin
+                </Text>
+              </View>
+            )}
+
+            {/* Payment mode section */}
+            {selectedPayment.status !== "Pay Now" && (
+              <View style={{ marginTop: 10 }}>
+                <View style={styles.Billbottom}>
+                  <Text style={styles.paiddetailLabel}>Payment Mode</Text>
+                  <Text style={styles.paiddetailValue}>UPI</Text>
+                </View>
+
+                <View style={styles.Billbottom}>
+                  <Text style={styles.paiddetailLabel}>Reference number</Text>
+                  <Text style={styles.paiddetailValue}>#RSIN001</Text>
+                </View>
+              </View>
+            )}
+
+            {/* Buttons */}
+            <View style={styles.buttonRow}>
+              {selectedPayment.status === "Pay Now" ? (
+                <>
+                  <TouchableOpacity
+                    style={styles.shareBtn}
+                    onPress={handleDownload}
+                  >
+                    <Text style={{ fontWeight: "600", color: "#071C70" }}>
+                      Download Bill
+                    </Text>
+                    <Image
+                      source={DownloadBlueIcon}
+                      style={{ width: 17, height: 17, marginLeft: 8 }}
+                    />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity style={styles.downloadBtn}>
+                    <Text style={styles.downloadText}>Pay Now</Text>
+                    <Image
+                      source={ArrowRightIcon}
+                      style={{ width: 20, height: 20, marginLeft: 8 }}
+                    />
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <>
+                  <TouchableOpacity style={styles.shareBtn}>
+                    <Text style={styles.shareText}>Share</Text>
+                    <Image
+                      source={ShareIcon}
+                      style={{ width: 17, height: 17, marginLeft: 8 }}
+                    />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.downloadBtn}
+                    onPress={handleDownload}
+                  >
+                    <Text style={styles.downloadText}>Download</Text>
+                    <Image
+                      source={DownloadIcon}
+                      style={{ width: 20, height: 20, marginLeft: 8 }}
+                    />
+                  </TouchableOpacity>
+                </>
+              )}
+            </View>
+          </>
+        )}
+      </ScrollView>
+    </Animated.View>
   </View>
 )}
 
-                    
-
-
-                      </View>
-                    </View>
-
-                    <View style={styles.detailsSection}>
-                      <View style={styles.row}>
-                        <Text style={styles.detailLabel}>Actual Rent</Text>
-                        <Text style={styles.detailValue}>₹5512.00</Text>
-                      </View>
-                      <View style={styles.row}>
-                        <Text style={styles.detailLabel}>Taxes GST 10%</Text>
-                        <Text style={styles.detailValue}>₹488.00</Text>
-                      </View>
-
-                      {selectedPayment.paid === "partial" && (
-                        <>
-                          <View style={styles.row}>
-                            <Text style={styles.detailLabel}>Paid Amount</Text>
-                            <Text style={styles.detailValue}>₹3500.00</Text>
-                          </View>
-                          <View style={styles.row}>
-                            <Text style={styles.detailLabel}>Remain</Text>
-                            <View>
-                            <Text style={[styles.detailValue]}>₹2500.00</Text>
-                            <Text style={styles.payBillText}>Pay Bill</Text>
-                            </View>
-                          </View>
-                        </>
-                      )}
-                    </View>
-
-                <View
-  style={{
-    borderBottomColor: 'grey',
-    borderBottomWidth: 0.4,
-    marginVertical: 8,
-    opacity:0.4
-  }}
-/>
-
-
-                      <View style={styles.Billbottom}>
-                      <Text style={styles.paiddetailLabel}>{selectedPayment.status === "Pay Now" ? "Due Date": "Paid Date"} </Text>
-                      <Text style={styles.paiddetailValue}>25 Sep 2025</Text>
-                      </View>
-      {selectedPayment.status === "Pay Now" && (
-         <View style={{marginTop:5}}>
-          <Text style={{fontSize:13 , color:'rgba(60, 60, 67, 0.6)'}}>Notes & Instructions</Text>
-           <Text style={{fontSize:13 , color:'rgba(34, 34, 34, 1)', fontWeight:600}}>Kindly pay on or before the due date  </Text>
-            <Text style={{fontSize:13 , color:'rgba(34, 34, 34, 1)', fontWeight:600}}>Late fee may apply after 3 days of due date</Text>
-             <Text style={{fontSize:13 , color:'rgba(34, 34, 34, 1)', fontWeight:600}}>For any billing errors, contact hostel admin</Text>
-         </View>
-      )}
-
-
-
-{selectedPayment.status !== "Pay Now" && (
-  <View style={{ marginTop: 10 }}>
-                      
-
-                       <View style={styles.Billbottom}>
-                      <Text style={[styles.paiddetailLabel, { marginTop: 6 }]}>
-                        Payment Mode
-                      </Text>
-                      <Text style={styles.paiddetailValue}>UPI</Text>
-                      </View>
-
-                       <View style={styles.Billbottom}>
-                      <Text style={[styles.paiddetailLabel, { marginTop: 6 }]}>
-                        Reference number
-                      </Text>
-                      <Text style={styles.paiddetailValue}>#RSIN001</Text>
-                      </View>
-                    </View>
-)}
-                  
-
-                    {/* Buttons */}
-
-                    {selectedPayment.status === "Pay Now" ?
-                    (
-              <View style={styles.buttonRow}>
-                      <TouchableOpacity style={styles.shareBtn} onPress={handleDownload}>
-                        <Text style={{fontWeight:600 , color:'rgba(7, 28, 112, 1)'}}>Dowload Bill </Text>
-                      <Image  source={DownloadBlueIcon} resizeMode="contain" style={{ width: 17, height: 17 , marginLeft:8 ,marginBottom:4 }}/>
-                      </TouchableOpacity>
-                      <TouchableOpacity style={styles.downloadBtn} >
-                        <Text style={styles.downloadText}>Pay Now </Text>
-                   <Image  source={ArrowRightIcon} resizeMode="contain" style={{ width: 20, height: 20 , marginLeft:8 }}/>
-                      </TouchableOpacity>
-              </View>
-                    )
-
-                    : (
-
-              <View style={styles.buttonRow}>
-                      <TouchableOpacity style={styles.shareBtn}>
-                        <Text style={styles.shareText}>Share </Text>
-                        <Image  source={ShareIcon} resizeMode="contain" style={{ width: 17, height: 17 , marginLeft:8 }}/>
-                      </TouchableOpacity>
-                      <TouchableOpacity style={styles.downloadBtn} onPress={handleDownload}>
-                        <Text style={styles.downloadText}>Download </Text>
-                      <Image  source={DownloadIcon} resizeMode="contain" style={{ width: 20, height: 20 , marginLeft:8 }}/>
-                      </TouchableOpacity>
-                    </View>
-                    )
-
-                    }
-                   
-
-                    
-                  </>
-                )}
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
 
       <TouchableOpacity style={styles.filterFab} >
  <Image 
@@ -643,4 +698,22 @@ const styles = StyleSheet.create({
    width: 60,
    height: 60,
  },
+ sheetOverlay: {
+  position: "absolute",
+  top: 0,
+  bottom: 0,
+  left: 0,
+  right: 0,
+  backgroundColor: "rgba(0,0,0,0.4)",
+  justifyContent: "flex-end",
+},
+
+bottomSheet: {
+  backgroundColor: "#fff",
+  borderTopLeftRadius: 20,
+  borderTopRightRadius: 20,
+  padding: 20,
+  height: "75%",
+},
+
 });

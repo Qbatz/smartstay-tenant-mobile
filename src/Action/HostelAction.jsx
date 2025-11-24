@@ -33,7 +33,7 @@ export const complaints=async(hostelId,token)=>{
 
 }
 
-export const addComplaints=async(hostelId,token,formData)=>{
+export const postComplaint=async(hostelId,token,formData)=>{
 
     console.log(formData)
     try{
@@ -48,8 +48,7 @@ export const addComplaints=async(hostelId,token,formData)=>{
     }catch(error){
         console.log(error.response)
     }
-         
-    
+       
       
 }
 

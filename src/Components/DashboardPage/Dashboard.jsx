@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback, useRef, useEffect, useContext } from "react";
-import { View, Text, Dimensions, Image, TouchableOpacity, Button, FlatList, TextInput, StyleSheet, Pressable } from "react-native";
+import { View, Text, Dimensions, Image, TouchableOpacity, Button, FlatList, TextInput, StyleSheet, BackHandler, TouchableWithoutFeedback, Platform, PanResponder, Animated, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import MyStay from '../DashboardPage/MyStay';
@@ -30,11 +30,20 @@ import { launchImageLibrary } from "react-native-image-picker";
 import Exclamation from '../../assets/Images/exclamation.png'
 import DeleteIcon from '../../assets/Images/deleteIcon.png'
 import HostelProfile from "../../assets/Images/Group 1.png"
-import { addComment, addComplaints, deleteComplaint, getAmenties, getComplaints, hostelDetails } from "../../Action/HostelAction";
+import { addComment, deleteComplaint, getAmenties, getComplaints, hostelDetails, postComplaint } from "../../Action/HostelAction";
 import { UsersContext } from "../../Context/UserContext";
 import Room from '../../assets/Images/Room.png'
 import Bed from '../../assets/Images/Bed_Icon.png'
 import SuccessModal from "../ToastFile/TostFilePage";
+import { add } from "react-native/types_generated/Libraries/Animated/AnimatedExports";
+import AppLoader from "../ToastFile/LoaderPage";
+
+import DownloadIcon from "../../assets/Images/download.png"
+import DownloadBlueIcon from "../../assets/Images/download_Blue.png";
+import ShareIcon from "../../assets/Images/Union.png";
+import PaidIcon from "../../assets/Images/Checkboxes.png";
+import ViewIcon from "../../assets/Images/view.png";
+import ArrowRightIcon from "../../assets/Images/arrow-right.png";
 
 
 function Dashboard(props) {
@@ -54,6 +63,7 @@ function Dashboard(props) {
   const [isFocus, setIsFocus] = useState(false);
   const [mediaimage, setmediaImage] = useState([])
   const [tag, setTag] = useState(null);
+  const [showAmenities, setShowAmenities] = useState(false)
   const [myAmenitis, setmyAminites] = useState(null)
   const [available, setAvailable] = useState(null)
   const [showPopUp, setShowPopUp] = useState(false)
@@ -65,20 +75,109 @@ function Dashboard(props) {
   const [changeBed, setChangeBed] = useState(null);
   const [bedType, setBedType] = useState(null)
   const [urgencyType, setUrgencyType] = useState(null)
-  const [complaintId,setComplaintId]=useState()
+  const [complaintId, setComplaintId] = useState()
   const [showSuccessModal, setShowSuccessModal] = useState(false);
- 
+  const [showSheet, setShowSheet] = useState(false)
+  const [addComplaints, setAddComplaint] = useState(false)
+  const [showBedChange, setShowBedChange] = useState(false)
+  const [editCompliant, setShowEditComplaint] = useState(false)
+  const [loading, setLoading] = useState(false)
+   const [modalVisible, setModalVisible] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState(null);
+
+
+
+  const sheetY = useRef(new Animated.Value(700)).current;
+
+  console.log(mediaimage)
 
   const complainttype = [{ label: 'Plumbing', value: '1' }, { label: 'Electricity', value: '2' }, { label: 'Room Maintanence', value: '3' }, { label: 'Canteen food', value: '4' }, { label: 'Canteen food', value: '4' }]
 
   const images = [{ id: 1, source: Damage1 }, { id: 2, source: Damage2 }, { id: 3, source: Damage3 }]
 
-   const bed = [{ label: 'Disturbance in current room', value: '1' }, { label: 'Roommate issues', value: '2' }, { label: 'Need more privacy/space', value: '3' },
+  const bed = [{ label: 'Disturbance in current room', value: '1' }, { label: 'Roommate issues', value: '2' }, { label: 'Need more privacy/space', value: '3' },
   { label: 'Maintanence issues', value: '4' }, { label: 'Prefer other sharing type', value: '5' }, { label: 'Others', value: '6' }]
 
   const selectBed = [{ label: 'Single Sharing', value: '1' }, { label: 'Double Sharing', value: '2' }, { label: 'Triple Sharing', value: '3' }]
 
   const urgency = [{ label: 'Within 2-3 days', value: '1' }, { label: 'Within 1 Week', value: '2' }, { label: 'Next Month Start', value: '3' }]
+
+    const staticReceiptData = {
+  configurations: {
+    hostelLogo: "https://example.com/logo.png",
+    receiptType: "Rent",
+    address: "123, Main Road, Chennai",
+    signatureUrl: "https://example.com/signature.png",
+  },
+  stayInfo: {
+    hostelName: "Smart Stay Hostel",
+    floorName: "2nd Floor",
+    roomName: "Room 202",
+    bedName: "B2",
+  },
+  customerInfo: {
+    fullName: "Pon Allwin",
+    customerMobileNo: "9876543210",
+    countryCode: "91",
+    fullAddress: "No. 45, Anna Nagar, Chennai",
+  },
+  receiptInfo: {
+    paidAmount: 5500,
+    receiptNumber: "RCP-1023",
+    transactionDate: "03/11/2025",
+    transactionTime: "10:45 AM",
+  },
+  accountDetails: { bankName: "Cash" },
+};
+
+  useEffect(() => {
+    if (showSheet || addComplaints || showBedChange || editCompliant || showAmenities || modalVisible) {
+      setTimeout(() => {
+        sheetY.setValue(700)
+        Animated.timing(sheetY, {
+          toValue: 0,
+          duration: 250,
+          useNativeDriver: true,
+        }).start();
+      }, 10);
+    }
+  }, [showSheet, addComplaints, showBedChange, editCompliant, showAmenities,modalVisible]);
+
+  function onClose() {
+    Animated.timing(sheetY, {
+      toValue: 700,
+      duration: 230,
+      useNativeDriver: true,
+    }).start(() => {
+      setShowSheet(false);        setSelectComplaint(null);
+      setComment(false);          setAddComplaint(false);
+      setmediaImage([]);          setSelectedValue(null);
+      setDespriction(null);       setImageuri([]);
+      setShowBedChange(false);    setShowEditComplaint(false);
+      setShowAmenities(false);    setAvailable(null);
+      setmyAminites(null);        setModalVisible(false)
+    });
+  }
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dy) > 6,
+      onPanResponderMove: (_, g) => {
+        if (g.dy > 0) sheetY.setValue(g.dy);
+      },
+      onPanResponderRelease: (_, g) => {
+        if (g.dy > 120) {
+          onClose();
+        } else {
+          Animated.spring(sheetY, {
+            toValue: 0,
+            useNativeDriver: true,
+          }).start();
+        }
+      },
+    })
+  ).current;
+
 
 
   useEffect(() => {
@@ -96,17 +195,16 @@ function Dashboard(props) {
     navigation.navigate("CustomerProfile");
   };
 
-  const sheetRef = useRef(null)
-  const snapPoints = useMemo(() => ['25%', '60%'], [])
 
-  const handleOpen = (complaint, value) => {
 
-    sheetRef.current?.snapToIndex(value);
+
+  const handle = (complaint) => {
+
+    setShowSheet(true)
 
     getComplaints(props.route.params.hostel[0].hostelId, complaint.complaintId, context.getToken).then(r => {
       setSelectComplaint(r.data)
     })
-
   }
 
   const commentclick = () => {
@@ -118,60 +216,29 @@ function Dashboard(props) {
     setimageid(id)
   }
 
-  // const handleClose = useCallback(() => {
-  //   sheetRef.current?.close();
-  // }, []);
 
-  // const textmessage = (value) => {
-  //   setCommentmessage(value)
-  // }
+  const textmessage = (value) => {
+    setCommentmessage(value)
+  }
   const sendclick = () => {
 
     console.log(complaintId)
     const data = {
-      message:commentMessage,
-      hostelId:props.route.params.hostel[0].hostelId
+      message: commentMessage,
+      hostelId: props.route.params.hostel[0].hostelId
     }
 
-    
-    addComment(selectedComplaint.complaintId,context.getToken,data).then(r=>{
+
+    addComment(selectedComplaint.complaintId, context.getToken, data).then(r => {
       console.log(r)
     })
   }
 
-  const renderBackdrop = useCallback(
-    (props) => (
-      <BottomSheetBackdrop
-        {...props}
-        appearsOnIndex={0}
-        disappearsOnIndex={-1}
-        pressBehavior='close'
-        opacity={0.4} // optional if you want darker tint
-        enableTouchThrough={false}
-        style={{ ...StyleSheet.absoluteFillObject }}
-        onPress={() => {
-          setComment(false)
-          setDespriction()
-          setSelectedValue()
-          setImageuri([])
-          setmediaImage([])
-          setChangeBed(null)
-          setBedType(null)
-          setUrgencyType(null)
-        }}
+  // ------Add complaint
 
-      />
-    ),
-    []
-  );
-  // ---------Add compalint-----
-  const shetRef = useRef(null)
+  const addComplaint = () => {
+    setAddComplaint(true)
 
-  const snappoint = useMemo(() => ['90%'], [])
-
-  const handle = (value) => {
-
-    shetRef.current?.snapToIndex(value);
   }
 
   const uploadimage = async () => {
@@ -189,7 +256,6 @@ function Dashboard(props) {
 
     }
   }
-
 
   const submitClick = () => {
     const payloads = {
@@ -221,65 +287,33 @@ function Dashboard(props) {
       })
     }
 
-    addComplaints(props.route.params.hostel[0].hostelId, context.getToken, formData).then(r => {
-      console.log(r.status)
+    postComplaint(props.route.params.hostel[0].hostelId, context.getToken, formData).then(r => {
+      console.log(r)
+      setLoading(true)
 
-      if(r.status==201){
-        setShowSuccessModal(true)
+      setTimeout(() => {
+        setLoading(false)
+        if (r.status == 201) {
+          setShowSuccessModal(true)
 
-        setTimeout(() => {
-      setShowSuccessModal(false);
-      shetRef.current?.close();
-      
-    }, 2000);
+          setTimeout(() => {
+            setShowSuccessModal(false);
+            setShowSheet(false)
+            setAddComplaint(false)
+          }, 2000);
 
-      }
+        }
+
+      }, 2000);
+
+
     })
   }
-  // -------Amenities click------
-  const ref = useRef(null)
 
-  const snap = useMemo(() => ['50%'], [])
+  // ----Delete complaint click-----
 
-  const handleAmenity = (item, value, tag) => {
-    console.log(item.amenityId)
-    if (tag == 'My-Amenities') {
-      ref.current?.snapToIndex(value);
-      setTag(tag)
-
-      getAmenties(props.route.params.hostel[0].hostelId, item.amenityId, context.getToken).then(r => {
-        console.log(r)
-        setmyAminites(r.data)
-      })
-
-    }
-    else {
-      ref.current?.snapToIndex(value)
-      setTag(null)
-      getAmenties(props.route.params.hostel[0].hostelId, item.amenityId, context.getToken).then(r => {
-        console.log(r)
-        setAvailable(r.data)
-      })
-
-    }
-  }
-
-  const plan = (id) => {
-    setPlan(id)
-  }
-
-  // -----Editclick Bottom sheet-----
-
-  const shtRef = useRef(null)
-  const snappint = useMemo(() => ['90%'], [])
-
-  const editClick = (value) => {
-    shtRef.current?.snapToIndex(value)
-
-  }
-  // -----
   const deleteClick = (complaintId) => {
-    setShowPopUp(true) 
+    setShowPopUp(true)
     setComplaintId(complaintId)
   }
   const deleteClose = () => {
@@ -302,33 +336,104 @@ function Dashboard(props) {
   }
   const deleteItem = (complaintiId) => {
 
-    deleteComplaint(props.route.params.hostel[0].hostelId,complaintiId,context.getToken).then(r=>{
+    deleteComplaint(props.route.params.hostel[0].hostelId, complaintiId, context.getToken).then(r => {
       console.log(r)
-       if(r.status==200){
+      if (r.status == 200) {
         setShowSuccessModal(true);
 
         setTimeout(() => {
-        setShowSuccessModal(false);
-        setShowPopUp(false)
-        setSelectedReason(null)  
-        sheetRef.current?.close();
-    }, 2000);
-    
-       }
+          setShowSuccessModal(false);
+          setShowPopUp(false)
+          setSelectedReason(null)
+          setShowSheet(false)
+        }, 2000);
+
+      }
     })
   }
 
-  //-----------Requestbed
+  // -------Request bed change-----
 
-  const sheetRf = useRef(null); 
-  const snapPnt = useMemo(() => ['90%'], [])
-
-  const requestBed = (value) => {
-    sheetRf.current?.expand(value)
-
+  const bedfn = () => {
+    setShowBedChange(true)
   }
 
+  // ---------Amenities----------
 
+  const handleAmenity = (item, tag) => {
+    console.log(item.amenityId)
+    if (tag == 'My-Amenities') {
+      setShowAmenities(true)
+      setTag(tag)
+
+      getAmenties(props.route.params.hostel[0].hostelId, item.amenityId, context.getToken).then(r => {
+        console.log(r)
+        setmyAminites(r.data)
+      })
+
+    }
+    else {
+      setShowAmenities(true)
+      setTag(null)
+      getAmenties(props.route.params.hostel[0].hostelId, item.amenityId, context.getToken).then(r => {
+        console.log(r)
+        setAvailable(r.data)
+      })
+
+    }
+  }
+  const plan = (id) => {
+    setPlan(id)
+  }
+
+  // ------Payment---------
+
+   const viewPay = (item) => {
+    console.log("item", item);
+    
+    setSelectedPayment(item);
+    setModalVisible(true);
+  };
+
+  const handleDownload = async () => {
+    try {
+      const response = await fetch("https://smartstaytestingapi.s3remotica.com/invoice/invoice-list-pdf", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTkzLCJzdWIiOjE5MywidXNlcl90eXBlIjoiYWRtaW4iLCJyb2xlX2lkIjowLCJwbGFuX2NvZGUiOiJvbmVfZGF5IiwicGxhbl9zdGF0dXMiOjEsImlhdCI6MTc2MjQxMDIzOSwiZXhwIjoxNzYyNDEyMDM5fQ.BNCXjNx4B9AH0UV9Yy_dXnnBLzjfDUY7qOJOzuxlS2E`,
+        },
+        body: JSON.stringify({
+          Date: "2025-11-01",
+          User_Id: "NOTI1629",
+          id: 2148,
+        }),
+      });
+
+      const data = await response.json();
+
+      const pdfUrl = data?.pdf_url;
+
+      if (pdfUrl) {
+        const supported = await Linking.canOpenURL(pdfUrl);
+        if (supported) {
+          await Linking.openURL(pdfUrl);
+        } else {
+          Alert.alert("Error", "Cannot open this PDF link");
+        }
+      } else {
+        Alert.alert("No PDF found in response");
+      }
+    } catch (error) {
+      console.error("PDF open error:", error);
+      Alert.alert("Error", "Failed to open PDF");
+    }
+  };
+
+  const handleReceiptPdfDownload = () => {
+    setModalVisible(false);
+    navigation.navigate("ReceiptPdfView");
+  };
   // ---------------------------
   const routes = [{ key: 'mystay', title: 'MyStay', icon: Building }, { key: 'services', title: 'Services', icon: Flash }, { key: 'payment', title: 'Payment', icon: MobilePayment }]
   const renderTabBar = props => (<TabBar {...props}
@@ -342,11 +447,11 @@ function Dashboard(props) {
   const renderScene = ({ route, jumpTo }) => {
     switch (route.key) {
       case 'mystay':
-        return <MyStay hostel={props.route.params.hostel} onRequestBed={requestBed} jumpTo={jumpTo} />;
+        return <MyStay onRequestBedChange={bedfn} hostel={props.route.params.hostel} jumpTo={jumpTo} />;
       case 'services':
-        return <Services onOpen={handleOpen} onSheet={handle} onAmenities={handleAmenity} jumpTo={jumpTo} hostel={props.route.params.hostel} />;
+        return <Services onOpen={handle} onSheet={addComplaint} onAmenities={handleAmenity} jumpTo={jumpTo} hostel={props.route.params.hostel} />;
       case 'payment':
-        return <Payment jumpTo={jumpTo} />;
+        return <Payment onPayment={viewPay} jumpTo={jumpTo} />;
       default:
         return null;
     }
@@ -406,493 +511,297 @@ function Dashboard(props) {
 
     </View>
 
-    {/* -------BOTTOMSHEET--------- */}
+    {showSheet && (
+      <View style={style.sheetOverlay}>
+        <TouchableWithoutFeedback onPress={onClose}>
+          <View style={StyleSheet.absoluteFill} />
+        </TouchableWithoutFeedback>
 
-    <BottomSheet ref={sheetRef} index={-1} snapPoints={snapPoints} enableDynamicSizing={false} enablePanDownToClose={true}
-      backgroundStyle={{
-        backgroundColor: "#fff", borderTopLeftRadius: 20, borderTopRightRadius: 20, borderWidth: 1,
-        borderColor: '#ccc'
-      }} handleIndicatorStyle={{ backgroundColor: '#aaa' }} backdropComponent={renderBackdrop}>
+        <Animated.View style={[style.bottomSheet, { transform: [{ translateY: sheetY }] }]}
+          {...panResponder.panHandlers}>
 
-      <View style={{ flex: 1, paddingLeft: 20, paddingRight: 20 }}>
-        {comment ? (
-          <View style={{ flex: 1, justifyContent: 'space-between' }}>
-            <View>
-              <Text style={{ fontSize: 18, fontWeight: 400 }}>Comments</Text>
-              {/* Divider */}
-              <View style={{ height: 1, backgroundColor: "#eee", marginVertical: 10 }} />
-
-              <FlatList keyExtractor={(item) => item.id}
-                data={commentnote}
-                renderItem={({ item }) => {
-                  return <View style={{ paddingTop: 15, flexDirection: 'row', flex: 1 }}>
-                    <View>
-                      <Image source={Customer} style={{ width: 35, height: 35 }} />
-                    </View>
-                    <View style={{ paddingLeft: 10, flex: 1 }}>
-                      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                        <Text style={{ fontSize: 12, color: '#4B4B4B', fontWeight: 400 }}>{item.person}</Text>
-                        <Text style={{ fontSize: 10, fontWeight: 400, color: '#6E6E6E' }}>{item.date}</Text>
-                      </View>
-                      <Text style={{ fontSize: 14, fontWeight: 400, marginTop: 5 }}>{item.comment}</Text>
-                    </View>
-                  </View>
-                }} />
-            </View>
-
-
-            <View style={{ paddingBottom: 20 }}>
-              <View style={{ paddingTop: 3, paddingBottom: 4, borderWidth: 1, borderRadius: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                <TextInput value={commentMessage} placeholder="Post your Reply here" onChangeText={setCommentmessage} />
-                <TouchableOpacity onPress={sendclick} style={{ paddingRight: 10 }}>
-                  <Image source={SendButton} style={{ width: 34, height: 34 }} />
-                </TouchableOpacity>
-
-              </View>
-
-            </View>
-
-
-
-          </View>
-        ) : (
           <View style={{ flex: 1 }}>
-            {selectedComplaint && (
-              <View style={{ justifyContent: 'space-between', flex: 1 }} >
+            <View {...panResponder.panHandlers}>
+              <View style={style.dragindictor} />
+            </View>
+
+            {comment ? (
+              <View style={{ flex: 1, justifyContent: 'space-between' }}>
                 <View>
-                  <View style={{ flexDirection: "row", justifyContent: "space-between", paddingLeft: 5, paddingRight: 8, marginBottom: 10, paddingTop: 10, }}>
-                    <View>
-                      <Text style={{ fontSize: 18, fontWeight: "500", fontFamily: "gilroy-semibold", }} >
-                        {selectedComplaint.complaintTypeName}
-                      </Text>
-                      <Text style={{ fontSize: 12.8, fontWeight: "400", color: "#424242", marginTop: 6 }}>
-                        {selectedComplaint.complaintDate}
-                      </Text>
-                    </View>
-
-                    <View style={{ flexDirection: "row", alignItems: "center" }}>
-                      <TouchableOpacity onPress={() => editClick(0)} style={{ paddingRight: 10 }}>
-                        <Image source={Edit} style={{ width: 17.72, height: 17.72 }} />
-                      </TouchableOpacity>
-                      <TouchableOpacity onPress={()=>deleteClick(selectedComplaint.complaintId)} style={{ paddingLeft: 10 }}>
-                        <Image source={Delete} style={{ width: 17.72, height: 17.72 }} />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-
-                  {/* -----Divider */}
+                  <Text style={{ fontSize: 18, fontWeight: 400 }}>Comments</Text>
+                  {/* Divider */}
                   <View style={{ height: 1, backgroundColor: "#eee", marginVertical: 10 }} />
 
-                  {/* DESCRIPTION */}
-                  <View style={{ paddingTop: 5 }}>
-                    <Text style={{ fontSize: 12, fontWeight: "400", color: "#4B4B4B" }}>Description </Text>
-                    <Text style={{ fontSize: 16, fontWeight: "400", marginTop: 9 }}>
-                      {selectedComplaint.description}
-                    </Text>
+                  <FlatList keyExtractor={(item) => item.id}
+                    data={commentnote}
+                    renderItem={({ item }) => {
+                      return <View style={{ paddingTop: 15, flexDirection: 'row', flex: 1 }}>
+                        <View>
+                          <Image source={Customer} style={{ width: 35, height: 35 }} />
+                        </View>
+                        <View style={{ paddingLeft: 10, flex: 1 }}>
+                          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <Text style={{ fontSize: 12, color: '#4B4B4B', fontWeight: 400 }}>{item.person}</Text>
+                            <Text style={{ fontSize: 10, fontWeight: 400, color: '#6E6E6E' }}>{item.date}</Text>
+                          </View>
+                          <Text style={{ fontSize: 14, fontWeight: 400, marginTop: 5 }}>{item.comment}</Text>
+                        </View>
+                      </View>
+                    }} />
+                </View>
+
+
+                <View style={{ paddingBottom: 20 }}>
+                  <View style={{ paddingTop: 3, paddingBottom: 4, borderWidth: 1, borderRadius: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <TextInput value={commentMessage} placeholder="Post your Reply here" onChangeText={setCommentmessage} />
+                    <TouchableOpacity onPress={sendclick} style={{ paddingRight: 10 }}>
+                      <Image source={SendButton} style={{ width: 34, height: 34 }} />
+                    </TouchableOpacity>
                   </View>
 
-                  {/* ASSIGNED TO */}
-                  <View style={{ paddingTop: 10 }}>
-                    <Text style={{ fontSize: 12, fontWeight: "400", color: "#4B4B4B" }}> Assigned to</Text>
+                </View>
 
-                    <View style={{ flexDirection: "row", justifyContent: "space-between", paddingTop: 8, }}>
-                      {selectedComplaint.assigneeName != null ? <Text style={{ fontSize: 15, fontWeight: "500" }}>
-                        {selectedComplaint.assigneeName}</Text>
-                        : <Text style={{ fontSize: 14, fontWeight: "500", color: "#FF3B30", }}>
-                          Not Assigned Yet
-                        </Text>
-                      }
+              </View>
+            ) : (
+              <View style={{ flex: 1 }}>
+                {selectedComplaint && (
+                  <View style={{ justifyContent: 'space-between', flex: 1 }} >
+                    <View>
+                      <View style={{ flexDirection: "row", justifyContent: "space-between", paddingLeft: 5, paddingRight: 8, marginBottom: 10, paddingTop: 10, }}>
+                        <View>
+                          <Text style={{ fontSize: 18, fontWeight: "500", fontFamily: "gilroy-semibold", }} >
+                            {selectedComplaint.complaintTypeName}
+                          </Text>
+                          <Text style={{ fontSize: 12.8, fontWeight: "400", color: "#424242", marginTop: 6 }}>
+                            {selectedComplaint.complaintDate}
+                          </Text>
+                        </View>
 
-                      {selectedComplaint.PhoneNO != null ?
-                        <Text style={{ fontSize: 12, color: "#1E45E1", fontWeight: "400" }}>
-                          {selectedComplaint.PhoneNO}
-                        </Text> : null}
-                    </View>
-                  </View>
-
-                  {/* ATTACHED IMAGES */}
-                  <View style={{ paddingTop: 15 }}>
-                    <Text style={{ fontSize: 12, fontWeight: "400", color: "#4B4B4B" }}> Attached images</Text>
-
-                    <FlatList horizontal
-                      style={{ paddingTop: 15 }}
-                      keyExtractor={(item) => item.id.toString()}
-                      data={images}
-                      renderItem={({ item }) => (
-                        <View key={item.id}
-                          style={{ paddingLeft: 10, position: "relative" }}>
-                          <TouchableOpacity onPress={() => imageclick(item.id)}>
-                            <Image source={item.source} style={{ width: 90, height: 70, borderRadius: 5 }} />
-                            {imageid === item.id && deletevisible && (
-                              <TouchableOpacity style={{ position: "absolute", bottom: 25, right: 35, }} >
-                                <Image source={Trash} style={{ width: 21.09, height: 21.09, }} />
-                              </TouchableOpacity>
-                            )}
+                        <View style={{ flexDirection: "row", alignItems: "center" }}>
+                          <TouchableOpacity onPress={() => { setShowEditComplaint(true) }} style={{ paddingRight: 10 }}>
+                            <Image source={Edit} style={{ width: 17.72, height: 17.72 }} />
+                          </TouchableOpacity>
+                          <TouchableOpacity onPress={() => deleteClick(selectedComplaint.complaintId)} style={{ paddingLeft: 10 }}>
+                            <Image source={Delete} style={{ width: 17.72, height: 17.72 }} />
                           </TouchableOpacity>
                         </View>
-                      )}
-                    />
-                  </View>
-                </View>
+                      </View>
 
-                <View>
-                  {/* COMMENT INPUT */}
-                  <View style={{ paddingTop: 22 }}>
-                    <View style={{ padding: 4, borderRadius: 10, borderWidth: 1, justifyContent: "space-between", flexDirection: "row", alignItems: "center", }} >
-                      <TextInput placeholder="Add your Comment" />
-                      <TouchableOpacity onPress={commentclick}>
-                        <Image
-                          source={CommentMesg}
-                          style={{ width: 23, height: 23, marginRight: 15, }} />
+                      {/* -----Divider */}
+                      <View style={{ height: 1, backgroundColor: "#eee", marginVertical: 10 }} />
+
+                      {/* DESCRIPTION */}
+                      <View style={{ paddingTop: 5 }}>
+                        <Text style={{ fontSize: 12, fontWeight: "400", color: "#4B4B4B" }}>Description </Text>
+                        <Text style={{ fontSize: 16, fontWeight: "400", marginTop: 9 }}>
+                          {selectedComplaint.description}
+                        </Text>
+                      </View>
+
+                      {/* ASSIGNED TO */}
+                      <View style={{ paddingTop: 10 }}>
+                        <Text style={{ fontSize: 12, fontWeight: "400", color: "#4B4B4B" }}> Assigned to</Text>
+
+                        <View style={{ flexDirection: "row", justifyContent: "space-between", paddingTop: 8, }}>
+                          {selectedComplaint.assigneeName != null ? <Text style={{ fontSize: 15, fontWeight: "500" }}>
+                            {selectedComplaint.assigneeName}</Text>
+                            : <Text style={{ fontSize: 14, fontWeight: "500", color: "#FF3B30", }}>
+                              Not Assigned Yet
+                            </Text>
+                          }
+
+                          {selectedComplaint.PhoneNO != null ?
+                            <Text style={{ fontSize: 12, color: "#1E45E1", fontWeight: "400" }}>
+                              {selectedComplaint.PhoneNO}
+                            </Text> : null}
+                        </View>
+                      </View>
+
+                      {/* ATTACHED IMAGES */}
+                      <View style={{ paddingTop: 15 }}>
+                        <Text style={{ fontSize: 12, fontWeight: "400", color: "#4B4B4B" }}> Attached images</Text>
+
+                        <FlatList horizontal
+                          style={{ paddingTop: 15 }}
+                          keyExtractor={(item) => item.id.toString()}
+                          data={images}
+                          renderItem={({ item }) => (
+                            <View key={item.id}
+                              style={{ paddingLeft: 10, position: "relative" }}>
+                              <TouchableOpacity onPress={() => imageclick(item.id)}>
+                                <Image source={item.source} style={{ width: 90, height: 70, borderRadius: 5 }} />
+                                {imageid === item.id && deletevisible && (
+                                  <TouchableOpacity style={{ position: "absolute", bottom: 25, right: 35, }} >
+                                    <Image source={Trash} style={{ width: 21.09, height: 21.09, }} />
+                                  </TouchableOpacity>
+                                )}
+                              </TouchableOpacity>
+                            </View>
+                          )}
+                        />
+                      </View>
+                    </View>
+
+                    <View>
+                      {/* COMMENT INPUT */}
+                      <View style={{ paddingTop: 22 }}>
+                        <View style={{ padding: 4, borderRadius: 10, borderWidth: 1, justifyContent: "space-between", flexDirection: "row", alignItems: "center", }} >
+                          <TextInput placeholder="Add your Comment" />
+                          <TouchableOpacity onPress={commentclick}>
+                            <Image
+                              source={CommentMesg}
+                              style={{ width: 23, height: 23, marginRight: 15, }} />
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+
+                      {/* STATUS BUTTON */}
+                      <TouchableOpacity>
+                        <View
+                          style={{
+                            padding: 13, borderRadius: 10, borderWidth: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: 15, marginBottom: 20,
+                            backgroundColor: selectedComplaint.status === "Pending" ? "#FFEEEEA3" : selectedComplaint.status === "Inpogress" ? "#FFF6E7" : "lightgreen",
+                            borderColor: selectedComplaint.status === "Pending" ? "#FFD5D5" : selectedComplaint.status === "Inpogress" ? "#FFE7C6" : "lightgreen",
+                          }}>
+                          <Image source={Group}
+                            style={{
+                              width: 17.93, height: 18, marginTop: 4,
+                              tintColor: selectedComplaint.status === "Pending" ? "#FF3B30" : selectedComplaint.status === "Inpogress" ? "#FF9500" : "green",
+                            }} />
+                          <Text
+                            style={{
+                              color: selectedComplaint.status === "Pending" ? "#FF3B30" : selectedComplaint.status === "Inpogress" ? "#FF9500" : "green",
+                              fontSize: 14.11, fontWeight: "600", marginLeft: 10,
+                            }}>
+                            {selectedComplaint.status}
+                          </Text>
+                        </View>
                       </TouchableOpacity>
+
                     </View>
+
                   </View>
-
-                  {/* STATUS BUTTON */}
-                  <TouchableOpacity>
-                    <View
-                      style={{
-                        padding: 13, borderRadius: 10, borderWidth: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: 15, marginBottom: 20,
-                        backgroundColor: selectedComplaint.status === "Pending" ? "#FFEEEEA3" : selectedComplaint.status === "Inpogress" ? "#FFF6E7" : "lightgreen",
-                        borderColor: selectedComplaint.status === "Pending" ? "#FFD5D5" : selectedComplaint.status === "Inpogress" ? "#FFE7C6" : "lightgreen",
-                      }}>
-                      <Image source={Group}
-                        style={{
-                          width: 17.93, height: 18, marginTop: 4,
-                          tintColor: selectedComplaint.status === "Pending" ? "#FF3B30" : selectedComplaint.status === "Inpogress" ? "#FF9500" : "green",
-                        }} />
-                      <Text
-                        style={{
-                          color: selectedComplaint.status === "Pending" ? "#FF3B30" : selectedComplaint.status === "Inpogress" ? "#FF9500" : "green",
-                          fontSize: 14.11, fontWeight: "600", marginLeft: 10,
-                        }}>
-                        {selectedComplaint.status}
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-
-                </View>
-
+                )}
               </View>
             )}
           </View>
-        )}
+
+        </Animated.View>
       </View>
+    )}
 
-    </BottomSheet>
+    {/* -----Edit complaint-------- */}
 
-    {/* ---------Add complain sheet------ */}
+    {editCompliant && (
+      <View style={style.sheetOverlay}>
+        <TouchableWithoutFeedback onPress={onClose}>
+          <View style={StyleSheet.absoluteFill} />
+        </TouchableWithoutFeedback>
 
-    <BottomSheet ref={shetRef} index={-1} snapPoints={snappoint} enableDynamicSizing={false} enablePanDownToClose={true}
-      backdropComponent={renderBackdrop} backgroundStyle={{
-        backgroundColor: "#fff", borderRadius: 20, borderWidth: 1,
-        borderColor: '#ccc'
-      }} handleIndicatorStyle={{ backgroundColor: '#aaa' }}>
-        <SuccessModal
-        visible={showSuccessModal}
-        onClose={() => setShowSuccessModal(false)}
-        message="Complaint Added Successfully!"
-        type="sucess"
-      />
-      <View style={{ paddingTop: 10, paddingLeft: 20, paddingRight: 20, justifyContent: 'space-between', flex: 1 }}>
-        <View>
-          <Text style={{ fontSize: 20, fontWeight: 600 }}>Add complaint</Text>
+        <Animated.View style={[style.bottomsheets, { transform: [{ translateY: sheetY }] }]}
+          {...panResponder.panHandlers}>
 
-          <View style={{ paddingTop: 20 }}>
-            <Text>Complaint type</Text>
+          <View style={{ flex: 1 }}>
 
-            <Dropdown style={{ borderWidth: 1, borderRadius: 10, paddingVertical: 10, marginTop: 10, borderColor: '#e5e5e5', paddingLeft: 15 }}
-              onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
-              data={complainttype}
-              containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
-              placeholderStyle={{ fontSize: 14 }}
-              placeholder="Select a type"
-              labelField="label"
-              valueField="value"
-              value={selectedValue}
-
-              onChange={item => {
-                setSelectedValue(item.value)
-              }}
-              renderRightIcon={() => (
-                <Ionicons name={isFocus ? "chevron-up" : "chevron-down"}
-                  size={22}
-                  color="#000"
-                  style={{ paddingRight: 10 }}
-                />
-              )} />
-          </View>
-
-          <View style={{ paddingTop: 16 }}>
-            <Text style={{ fontSize: 14, fontWeight: 400 }}>Complaint message</Text>
-            <View style={{ borderWidth: 1, borderRadius: 10, marginTop: 8, paddingTop: 7, paddingLeft: 10, borderColor: '#e5e5e5', height: 80 }}>
-              <TextInput value={complaintDescription} placeholder="Enter message" onChangeText={(value) => setDespriction(value)} />
+            <View {...panResponder.panHandlers}>
+              <View style={style.dragindictor} />
             </View>
-          </View>
 
-          <View style={{ paddingTop: 16 }}>
-            <Text>Add Proof</Text>
-            <View >
-              <TouchableOpacity onPress={uploadimage} style={{
-                borderWidth: 1, borderRadius: 9, paddingTop: 22, paddingBottom: 22,
-                paddingLeft: 24, paddingRight: 24, borderColor: '#e5e5e5', marginTop: 8, flexDirection: 'row', alignItems: 'center'
-              }}>
-                <View>
-                  <Image source={CameraPic} style={{ width: 32.77, height: 32.77 }} />
-                </View>
-                <View style={{ paddingLeft: 22 }}>
-                  <View style={{ flexDirection: 'row' }}>
-                    <Text style={{ color: '#1E45E1', fontSize: 12, fontWeight: 500 }}>Choose file</Text>
-                    <Text style={{ fontSize: 12, fontWeight: 500 }}> to Upload</Text>
-                  </View>
-                  <Text style={{ fontSize: 11, fontWeight: 400, marginTop: 5 }}>Must be in PNG, JPG Format </Text>
-                </View>
-              </TouchableOpacity>
+            <SuccessModal
+              visible={showSuccessModal}
+              onClose={() => setShowSuccessModal(false)}
+              message="Complaint Added Successfully!"
+              type="sucess"
+            />
 
-            </View>
-          </View>
-
-
-          <View>
-            {mediaimage.length > 0 ? <FlatList horizontal showsHorizontalScrollIndicator={true} style={{ paddingTop: 20 }} key={(item) => item.id}
-              data={mediaimage}
-              // keyExtractor={(item, index) => index.toString()}
-              renderItem={({ item }) => {
-                console.log(item)
-                return <View style={{ padding: 5 }}>
-                  <Image source={{ uri: item }} style={{ width: 80, height: 70, borderRadius: 5 }} />
-                </View>
-              }} /> : null}
-          </View>
-
-        </View>
-
-        <View style={{ paddingBottom: 20 }}>
-          <TouchableOpacity onPress={submitClick} style={{ paddingTop: 12, paddingBottom: 12, borderWidth: 1, borderRadius: 22, justifyContent: 'center', alignItems: 'center', backgroundColor: '#1E45E1', borderColor: '#1E45E1' }}>
-            <Text style={{ fontSize: 14, fontWeight: 600, color: '#ffffff' }}>Submit</Text>
-          </TouchableOpacity>
-        </View>
-
-      </View>
-    </BottomSheet>
-
-    {/* --------Amenities------- */}
-
-    <BottomSheet ref={ref} index={-1} snapPoints={snap} enableDynamicSizing={false} enablePanDownToClose={true}
-      backdropComponent={renderBackdrop} backgroundStyle={{
-        backgroundColor: "#fff", borderRadius: 20, borderWidth: 1,
-        borderColor: '#ccc'
-      }} handleIndicatorStyle={{ backgroundColor: '#aaa' }}>
-      <View style={{ paddingLeft: 25, paddingRight: 30, flex: 1 }}>
-        {tag == 'My-Amenities' ? (<View>
-          <View style={{ paddingTop: 12 }}>
-            {myAmenitis && <View>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <Text style={{ fontSize: 23, fontWeight: 500, fontStyle: 'Gilroy-Semibold' }}>{myAmenitis.amenityName}</Text>
-                <View style={{ justifyContent: 'center', paddingTop: 7 }}>
-                  <Image source={Dot} style={{ width: 30.85, height: 30.85 }} />
-
-                </View>
-
-              </View>
-
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 5 }}>
-                <View style={{ width: '58%', height: 1, backgroundColor: "#eee", marginTop: 10 }} />
-                <View >
-                  <TouchableOpacity style={{
-                    borderWidth: 1, borderColor: '#eee', paddingTop: 9, paddingBottom: 14, paddingHorizontal: 20,
-                    borderRadius: 5, flexDirection: 'row', justifyContent: 'center'
-                  }}>
-                    <Image source={calenderTick} style={{ width: 16, height: 16, marginTop: 3 }} />
-                    <Text style={{ marginLeft: 5, fontSize: 14, fontWeight: 400 }}>Make Deactive</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-
+            <View style={{ paddingLeft: 5, paddingRight: 5, paddingTop: 20, justifyContent: 'space-between', flex: 1 }}>
               <View>
-                <Text style={{ fontSize: 12, fontWeight: 40, color: '#4B4B4B' }}>Description</Text>
-                <Text style={{ marginTop: 13, fontSize: 16, fontWeight: 400 }}>
-                  Airtel Fiber 5G/100mpb
-                </Text>
-              </View>
-
-              <View style={{ paddingTop: 18 }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <Text style={{ fontSize: 12, fontWeight: 400, color: '#4B4B4B' }}>Price plans</Text>
-                  <TouchableOpacity>
-                    <Text style={{ fontSize: 12, color: '#1E45E1' }}>Change Plan</Text>
-                  </TouchableOpacity>
-                </View>
-                <Text style={{ fontSize: 16, fontWeight: 600, marginTop: 9 }}>{'\u20B9'}{myAmenitis.amenityAmount} /month</Text>
-              </View>
-
-              <View style={{ paddingTop: 15 }}>
-                <Text style={{ fontSize: 12, fontWeight: 400, color: '#4B4B4B' }}>Next Bill</Text>
-                <Text style={{ fontSize: 16, fontWeight: 600, marginTop: 9 }}>10 sept Bill</Text>
-              </View>
-
-              <TouchableOpacity style={{ paddingVertical: 13, borderWidth: 1, borderRadius: 10, alignItems: 'center', backgroundColor: '#F5FFF8', borderColor: '#77D391', marginTop: 30 }}>
-                <Text style={{ fontSize: 14.11, fontWeight: 600, color: '#00A32E' }}>Active</Text>
-              </TouchableOpacity>
-
-
-            </View>}
-
-
-          </View>
-        </View>) : tag == null ? (<View style={{ flex: 1 }}>
-
-          {available && <View style={{ paddingTop: 10, flex: 1, paddingBottom: 20 }}>
-            <Text style={{ fontSize: 23, fontWeight: 500 }}>{available.amenityName}</Text>
-            <View style={{ width: '100%', height: 1, backgroundColor: "#eee", marginTop: 18 }} />
-            <View style={{ justifyContent: 'space-between', flex: 1 }}>
-              <View style={{ paddingTop: 10 }}>
-                <Text style={{ fontSize: 12, fontWeight: 400, color: '#4B4B4B' }}>Description</Text>
-
-                <View style={{ paddingTop: 14 }}>
-                  <Text style={{ fontSize: 16, fontWeight: 400, marginBottom: 2 }}>Gear,Non Gear</Text>
-                  <Text style={{ fontSize: 16, fontWeight: 400, marginTop: 2 }}>24/7 Access, pickup lopp from lobby</Text>
-                </View>
+                <Text style={{ fontSize: 20, fontWeight: 600 }}>Edit complaint</Text>
 
                 <View style={{ paddingTop: 20 }}>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <Text style={{ fontSize: 12, fontWeight: 400, color: '#4B4B4B' }}>Price Plans</Text>
-                    <TouchableOpacity>
-                      <Text style={{ fontSize: 12, fontWeight: 400, color: '#1E45E1', textDecorationLine: 'underline' }}>Select plan</Text>
-                    </TouchableOpacity>
+                  <Text>Complaint type</Text>
+
+                  <Dropdown style={{ borderWidth: 1, borderRadius: 10, paddingVertical: 10, marginTop: 10, borderColor: '#e5e5e5' }}
+                    onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
+                    data={complainttype}
+                    containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
+                    placeholderStyle={{ fontSize: 14, paddingLeft: 10 }}
+                    placeholder="Select a type"
+                    labelField="label"
+                    valueField="value"
+                    value={selectedValue}
+
+                    onChange={item => {
+                      setSelectedValue(item.value)
+                    }}
+                    renderRightIcon={() => (
+                      <Ionicons name={isFocus ? "chevron-up" : "chevron-down"}
+                        size={22}
+                        color="#000"
+                        style={{ paddingRight: 10 }}
+                      />
+                    )} />
+                </View>
+
+                <View style={{ paddingTop: 16 }}>
+                  <Text style={{ fontSize: 14, fontWeight: 400 }}>Complaint message</Text>
+                  <View style={{ borderWidth: 1, borderRadius: 10, marginTop: 8, paddingTop: 7, paddingLeft: 10, borderColor: '#e5e5e5' }}>
+                    <TextInput placeholder="Enter message" />
                   </View>
+                </View>
 
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <View style={{ paddingTop: 10, flexDirection: 'row' }}>
-                      <Text style={{ fontSize: 16, fontWeight: 600 }}>{'\u20B9'}{available.amenityAmount}</Text>
-                      <Text style={{ fontSize: 16, fontWeight: 400, color: '#4B4B4B' }}>/month</Text>
-                    </View>
-
-                    <TouchableOpacity onPress={() => plan('plan')} style={{
-                      borderWidth: 2, width: 20, height: 20, borderRadius: 10,
-                      borderColor: plan == 'plan' ? borderColor : monthlyplan == 'plan' ? "#1E45E1" : "#ccc", justifyContent: 'center', marginTop: 12
+                <View style={{ paddingTop: 16 }}>
+                  <Text>Add Proof</Text>
+                  <View >
+                    <TouchableOpacity onPress={uploadimage} style={{
+                      borderWidth: 1, borderRadius: 9, paddingTop: 22, paddingBottom: 22,
+                      paddingLeft: 24, paddingRight: 24, borderColor: '#e5e5e5', marginTop: 8, flexDirection: 'row', alignItems: 'center'
                     }}>
-
-                      <View style={{ justifyContent: 'center', alignItems: 'center' }}  >
-
-                        {monthlyplan === 'plan' && (
-                          <View style={{ height: 10, width: 10, borderRadius: 5, backgroundColor: "#1E45E1" }} />
-                        )}
+                      <View>
+                        <Image source={CameraPic} style={{ width: 32.77, height: 32.77 }} />
+                      </View>
+                      <View style={{ paddingLeft: 22 }}>
+                        <View style={{ flexDirection: 'row' }}>
+                          <Text style={{ color: '#1E45E1', fontSize: 12, fontWeight: 500 }}>Choose file</Text>
+                          <Text style={{ fontSize: 12, fontWeight: 500 }}> to Upload</Text>
+                        </View>
+                        <Text style={{ fontSize: 11, fontWeight: 400, marginTop: 5 }}>Must be in PNG, JPG Format </Text>
                       </View>
                     </TouchableOpacity>
 
                   </View>
-
                 </View>
+
+                <View>
+                  {mediaimage.length > 0 ? <FlatList horizontal showsHorizontalScrollIndicator={true} style={{ paddingTop: 20 }} key={(item) => item.id}
+                    data={mediaimage}
+                    renderItem={({ item }) => {
+                      console.log(item)
+                      return <View style={{ padding: 5 }}>
+                        <Image source={{ uri: item }} style={{ width: 80, height: 70, borderRadius: 5 }} />
+                      </View>
+                    }} /> : null}
+                </View>
+
               </View>
-              <View >
-                <TouchableOpacity style={{ backgroundColor: '#1d41d5', paddingVertical: 12, alignItems: 'center', borderRadius: 20 }}>
-                  <Text style={{ fontSize: 14.11, fontWeight: 600, color: '#ffffff' }}>Request Amenity</Text>
+
+
+              <View style={{ paddingBottom: 20 }}>
+                <TouchableOpacity style={{ paddingTop: 12, paddingBottom: 12, borderWidth: 1, borderRadius: 22, justifyContent: 'center', alignItems: 'center', backgroundColor: '#1E45E1', borderColor: '#1E45E1' }}>
+                  <Text style={{ fontSize: 14, fontWeight: 600, color: '#ffffff' }}>Submit</Text>
                 </TouchableOpacity>
               </View>
+
             </View>
 
-          </View>}
-        </View>) : null}
+          </View>
 
-
+        </Animated.View>
       </View>
-
-    </BottomSheet>
-
-    {/* -------editclick bottomsheet---------- */}
-
-    <BottomSheet ref={shtRef} index={-1} snapPoints={snappint} enableDynamicSizing={false} enablePanDownToClose={true}
-      backdropComponent={renderBackdrop} backgroundStyle={{
-        backgroundColor: "#fff", borderRadius: 20, borderWidth: 1,
-        borderColor: '#ccc'
-      }} handleIndicatorStyle={{ backgroundColor: '#aaa' }}>
-
-      <View style={{ paddingLeft: 25, paddingRight: 30, paddingTop: 20, justifyContent: 'space-between', flex: 1 }}>
-        <View>
-          <Text style={{ fontSize: 20, fontWeight: 600 }}>Edit complaint</Text>
-
-          <View style={{ paddingTop: 20 }}>
-            <Text>Complaint type</Text>
-
-            <Dropdown style={{ borderWidth: 1, borderRadius: 10, paddingVertical: 10, marginTop: 10, borderColor: '#e5e5e5' }}
-              onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
-              data={complainttype}
-              containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
-              placeholderStyle={{ fontSize: 14, paddingLeft: 10 }}
-              placeholder="Select a type"
-              labelField="label"
-              valueField="value"
-              value={selectedValue}
-
-              onChange={item => {
-                setSelectedValue(item.value)
-              }}
-              renderRightIcon={() => (
-                <Ionicons name={isFocus ? "chevron-up" : "chevron-down"}
-                  size={22}
-                  color="#000"
-                  style={{ paddingRight: 10 }}
-                />
-              )} />
-          </View>
-
-          <View style={{ paddingTop: 16 }}>
-            <Text style={{ fontSize: 14, fontWeight: 400 }}>Complaint message</Text>
-            <View style={{ borderWidth: 1, borderRadius: 10, marginTop: 8, paddingTop: 7, paddingLeft: 10, borderColor: '#e5e5e5' }}>
-              <TextInput placeholder="Enter message" />
-            </View>
-          </View>
-
-          <View style={{ paddingTop: 16 }}>
-            <Text>Add Proof</Text>
-            <View >
-              <TouchableOpacity onPress={uploadimage} style={{
-                borderWidth: 1, borderRadius: 9, paddingTop: 22, paddingBottom: 22,
-                paddingLeft: 24, paddingRight: 24, borderColor: '#e5e5e5', marginTop: 8, flexDirection: 'row', alignItems: 'center'
-              }}>
-                <View>
-                  <Image source={CameraPic} style={{ width: 32.77, height: 32.77 }} />
-                </View>
-                <View style={{ paddingLeft: 22 }}>
-                  <View style={{ flexDirection: 'row' }}>
-                    <Text style={{ color: '#1E45E1', fontSize: 12, fontWeight: 500 }}>Choose file</Text>
-                    <Text style={{ fontSize: 12, fontWeight: 500 }}> to Upload</Text>
-                  </View>
-                  <Text style={{ fontSize: 11, fontWeight: 400, marginTop: 5 }}>Must be in PNG, JPG Format </Text>
-                </View>
-              </TouchableOpacity>
-
-            </View>
-          </View>
-
-          <View>
-            {mediaimage.length > 0 ? <FlatList horizontal showsHorizontalScrollIndicator={true} style={{ paddingTop: 20 }} key={(item) => item.id}
-              data={mediaimage}
-              renderItem={({ item }) => {
-                console.log(item)
-                return <View style={{ padding: 5 }}>
-                  <Image source={{ uri: item }} style={{ width: 80, height: 70, borderRadius: 5 }} />
-                </View>
-              }} /> : null}
-          </View>
-
-        </View>
+    )}
 
 
-
-
-
-
-        <View style={{ paddingBottom: 20 }}>
-          <TouchableOpacity style={{ paddingTop: 12, paddingBottom: 12, borderWidth: 1, borderRadius: 22, justifyContent: 'center', alignItems: 'center', backgroundColor: '#1E45E1', borderColor: '#1E45E1' }}>
-            <Text style={{ fontSize: 14, fontWeight: 600, color: '#ffffff' }}>Submit</Text>
-          </TouchableOpacity>
-        </View>
-
-      </View>
-
-    </BottomSheet>
+    {/* -----Delete complaint----- */}
 
     {showPopUp && <View style={{ position: 'absolute', backgroundColor: '#rgba(0, 0, 0, 0.1)', width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center' }}>
       <SuccessModal
@@ -969,7 +878,7 @@ function Dashboard(props) {
             <Text style={{ fontSize: 14, fontWeight: 400, color: '#4B4B4B' }}>Cancel</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={()=>deleteItem(complaintId)}
+          <TouchableOpacity onPress={() => deleteItem(complaintId)}
             disabled={selectedReason == null ? true : false} style={{
               backgroundColor: selectedReason != null ? '#1E45E1' : '#788fed',
               borderWidth: 2, borderRadius: 8, paddingVertical: 8, paddingHorizontal: 15, borderColor: '#C3DDFD'
@@ -982,211 +891,690 @@ function Dashboard(props) {
 
       </View>
     </View>}
+    {/* -------Add complaint----- */}
 
-{/* ------Request bed change------- */}
+    {addComplaints && (
+      <View style={style.sheetOverlay}>
+        <TouchableWithoutFeedback onPress={onClose}>
+          <View style={StyleSheet.absoluteFill} />
+        </TouchableWithoutFeedback>
 
-          <BottomSheet ref={sheetRf} snapPoints={snapPnt} index={-1} enableDynamicSizing={false} enablePanDownToClose={true}
-      backdropComponent={renderBackdrop} backgroundStyle={{
-        backgroundColor: "#fff", borderRadius: 20, borderWidth: 1, borderColor: '#ccc'
-      }}
-      handleIndicatorStyle={{ backgroundColor: '#aaa' }}>
+        <Animated.View style={[style.bottomsheets, { transform: [{ translateY: sheetY }] }]}
+          {...panResponder.panHandlers}>
 
-      <View style={{ paddingTop: 15, paddingHorizontal: 25, justifyContent: 'space-between', flex: 1 }}>
-        <View>
-          <Text style={{ fontSize: 20, fontWeight: 600 }}>Request Bed Change</Text>
+          <View style={{ flex: 1 }}>
 
-          <View style={{ paddingTop: 20 }}>
-            <Text style={{ fontSize: 12, fontWeight: 400 }}>Current Bed</Text>
+            <View {...panResponder.panHandlers}>
+              <View style={style.dragindictor} />
+            </View>
 
-            <View style={{
-              backgroundColor: '#F6F8FF', borderRadius: 10, paddingVertical: 17,
-              paddingHorizontal: 8, marginTop: 10, flexDirection: 'row'
-            }}>
-              <View style={{ backgroundColor: '#F9D796', paddingVertical: 4.64, paddingHorizontal: 9.28, alignSelf: 'flex-start', borderRadius: 46.38 }}>
-                <Text style={{ color: '#642B00', fontSize: 10.82, fontWeight: 400 }}>
-                  Ground Floor</Text>
+            <AppLoader visible={loading} />
+            <SuccessModal
+              visible={showSuccessModal}
+              onClose={() => setShowSuccessModal(false)}
+              message="Complaint Added Successfully!"
+              type="sucess"
+            />
+            <View style={{ paddingTop: 10, justifyContent: 'space-between', flex: 1 }}>
+              <View>
+                <Text style={{ fontSize: 20, fontWeight: 600 }}>Add complaint</Text>
+
+                <View style={{ paddingTop: 20 }}>
+                  <Text>Complaint type</Text>
+
+                  <Dropdown style={{ borderWidth: 1, borderRadius: 10, paddingVertical: 10, marginTop: 10, borderColor: '#e5e5e5', paddingLeft: 15 }}
+                    onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
+                    data={complainttype}
+                    containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
+                    placeholderStyle={{ fontSize: 14 }}
+                    placeholder="Select a type"
+                    labelField="label"
+                    valueField="value"
+                    value={selectedValue}
+
+                    onChange={item => {
+                      setSelectedValue(item.value)
+                    }}
+                    renderRightIcon={() => (
+                      <Ionicons name={isFocus ? "chevron-up" : "chevron-down"}
+                        size={22}
+                        color="#000"
+                        style={{ paddingRight: 10 }}
+                      />
+                    )} />
+                </View>
+
+                <View style={{ paddingTop: 16 }}>
+                  <Text style={{ fontSize: 14, fontWeight: 400 }}>Complaint message</Text>
+                  <View style={{ borderWidth: 1, borderRadius: 10, marginTop: 8, paddingTop: 7, paddingLeft: 10, borderColor: '#e5e5e5', height: 80 }}>
+                    <TextInput value={complaintDescription} placeholder="Enter message" onChangeText={(value) => setDespriction(value)} />
+                  </View>
+                </View>
+
+                <View style={{ paddingTop: 16 }}>
+                  <Text>Add Proof</Text>
+                  <View >
+                    <TouchableOpacity onPress={uploadimage} style={{
+                      borderWidth: 1, borderRadius: 9, paddingTop: 22, paddingBottom: 22,
+                      paddingLeft: 24, paddingRight: 24, borderColor: '#e5e5e5', marginTop: 8, flexDirection: 'row', alignItems: 'center'
+                    }}>
+                      <View>
+                        <Image source={CameraPic} style={{ width: 32.77, height: 32.77 }} />
+                      </View>
+                      <View style={{ paddingLeft: 22 }}>
+                        <View style={{ flexDirection: 'row' }}>
+                          <Text style={{ color: '#1E45E1', fontSize: 12, fontWeight: 500 }}>Choose file</Text>
+                          <Text style={{ fontSize: 12, fontWeight: 500 }}> to Upload</Text>
+                        </View>
+                        <Text style={{ fontSize: 11, fontWeight: 400, marginTop: 5 }}>Must be in PNG, JPG Format </Text>
+                      </View>
+                    </TouchableOpacity>
+
+                  </View>
+                </View>
+
+
+                <View>
+                  {mediaimage.length > 0 ? <FlatList horizontal showsHorizontalScrollIndicator={true} style={{ paddingTop: 20 }} key={(item) => item.id}
+                    data={mediaimage}
+                    // keyExtractor={(item, index) => index.toString()}
+                    renderItem={({ item }) => {
+                      console.log(item)
+                      return <View style={{ padding: 5 }}>
+                        <Image source={{ uri: item }} style={{ width: 80, height: 70, borderRadius: 5 }} />
+                      </View>
+                    }} /> : null}
+                </View>
+
               </View>
 
-              <View style={{flexDirection: 'row', paddingLeft: 20, alignItems: 'center'}}>
-                <Image source={Room} style={{ width: 21.17, height: 21.17 }} />
-                <Text style={{ marginLeft: 10, fontSize: 15.97, fontWeight: 400 }}>203</Text>
+              <View style={{ paddingBottom: 20 }}>
+                <TouchableOpacity onPress={submitClick} style={{ paddingTop: 12, paddingBottom: 12, borderWidth: 1, borderRadius: 22, justifyContent: 'center', alignItems: 'center', backgroundColor: '#1E45E1', borderColor: '#1E45E1' }}>
+                  <Text style={{ fontSize: 14, fontWeight: 600, color: '#ffffff' }}>Submit</Text>
+                </TouchableOpacity>
               </View>
 
-              <View style={{ flexDirection: 'row', paddingLeft: 10, alignItems: 'center' }}>
-                <Image source={Bed} style={{ width: 21.17, height: 21.17 }} />
-                <Text style={{ marginLeft: 10, fontSize: 15.97, fontWeight: 400 }}>300</Text>
+            </View>
+
+          </View>
+
+        </Animated.View>
+      </View>
+    )}
+
+    {/* ------show Amenities-------- */}
+
+    {showAmenities && (
+      <View style={style.sheetOverlay}>
+        <TouchableWithoutFeedback onPress={onClose}>
+          <View style={StyleSheet.absoluteFill} />
+        </TouchableWithoutFeedback>
+
+        <Animated.View style={[style.amenitiesBottomSheet, { transform: [{ translateY: sheetY }] }]}
+          {...panResponder.panHandlers}>
+
+          <View style={{ flex: 1 }}>
+
+            <View {...panResponder.panHandlers}>
+              <View style={style.dragindictor} />
+            </View>
+
+            <SuccessModal
+              visible={showSuccessModal}
+              onClose={() => setShowSuccessModal(false)}
+              message="Complaint Added Successfully!"
+              type="sucess"
+            />
+
+            <View style={{ paddingLeft: 10, paddingRight: 15, flex: 1 }}>
+              {tag == 'My-Amenities' ? (<View>
+                <View style={{ paddingTop: 12 }}>
+                  {myAmenitis && <View>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                      <Text style={{ fontSize: 23, fontWeight: 500, fontStyle: 'Gilroy-Semibold' }}>{myAmenitis.amenityName}</Text>
+                      <View style={{ justifyContent: 'center', paddingTop: 7 }}>
+                        <Image source={Dot} style={{ width: 30.85, height: 30.85 }} />
+
+                      </View>
+
+                    </View>
+
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 5 }}>
+                      <View style={{ width: '58%', height: 1, backgroundColor: "#eee", marginTop: 10 }} />
+                      <View >
+                        <TouchableOpacity style={{
+                          borderWidth: 1, borderColor: '#eee', paddingTop: 9, paddingBottom: 14, paddingHorizontal: 20,
+                          borderRadius: 5, flexDirection: 'row', justifyContent: 'center'
+                        }}>
+                          <Image source={calenderTick} style={{ width: 16, height: 16, marginTop: 3 }} />
+                          <Text style={{ marginLeft: 5, fontSize: 14, fontWeight: 400 }}>Make Deactive</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+
+                    <View>
+                      <Text style={{ fontSize: 12, fontWeight: 40, color: '#4B4B4B' }}>Description</Text>
+                      <Text style={{ marginTop: 13, fontSize: 16, fontWeight: 400 }}>
+                        Airtel Fiber 5G/100mpb
+                      </Text>
+                    </View>
+
+                    <View style={{ paddingTop: 18 }}>
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <Text style={{ fontSize: 12, fontWeight: 400, color: '#4B4B4B' }}>Price plans</Text>
+                        <TouchableOpacity>
+                          <Text style={{ fontSize: 12, color: '#1E45E1' }}>Change Plan</Text>
+                        </TouchableOpacity>
+                      </View>
+                      <Text style={{ fontSize: 16, fontWeight: 600, marginTop: 9 }}>{'\u20B9'}{myAmenitis.amenityAmount} /month</Text>
+                    </View>
+
+                    <View style={{ paddingTop: 15 }}>
+                      <Text style={{ fontSize: 12, fontWeight: 400, color: '#4B4B4B' }}>Next Bill</Text>
+                      <Text style={{ fontSize: 16, fontWeight: 600, marginTop: 9 }}>10 sept Bill</Text>
+                    </View>
+
+                    <TouchableOpacity style={{ paddingVertical: 13, borderWidth: 1, borderRadius: 10, alignItems: 'center', backgroundColor: '#F5FFF8', borderColor: '#77D391', marginTop: 30 }}>
+                      <Text style={{ fontSize: 14.11, fontWeight: 600, color: '#00A32E' }}>Active</Text>
+                    </TouchableOpacity>
+
+
+                  </View>}
+
+
+                </View>
+              </View>) : tag == null ? (<View style={{ flex: 1 }}>
+
+                {available && <View style={{ paddingTop: 10, flex: 1, paddingBottom: 20 }}>
+                  <Text style={{ fontSize: 23, fontWeight: 500 }}>{available.amenityName}</Text>
+                  <View style={{ width: '100%', height: 1, backgroundColor: "#eee", marginTop: 18 }} />
+                  <View style={{ justifyContent: 'space-between', flex: 1 }}>
+                    <View style={{ paddingTop: 10 }}>
+                      <Text style={{ fontSize: 12, fontWeight: 400, color: '#4B4B4B' }}>Description</Text>
+
+                      <View style={{ paddingTop: 14 }}>
+                        <Text style={{ fontSize: 16, fontWeight: 400, marginBottom: 2 }}>Gear,Non Gear</Text>
+                        <Text style={{ fontSize: 16, fontWeight: 400, marginTop: 2 }}>24/7 Access, pickup lopp from lobby</Text>
+                      </View>
+
+                      <View style={{ paddingTop: 20 }}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                          <Text style={{ fontSize: 12, fontWeight: 400, color: '#4B4B4B' }}>Price Plans</Text>
+                          <TouchableOpacity>
+                            <Text style={{ fontSize: 12, fontWeight: 400, color: '#1E45E1', textDecorationLine: 'underline' }}>Select plan</Text>
+                          </TouchableOpacity>
+                        </View>
+
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                          <View style={{ paddingTop: 10, flexDirection: 'row' }}>
+                            <Text style={{ fontSize: 16, fontWeight: 600 }}>{'\u20B9'}{available.amenityAmount}</Text>
+                            <Text style={{ fontSize: 16, fontWeight: 400, color: '#4B4B4B' }}>/month</Text>
+                          </View>
+
+                          <TouchableOpacity onPress={() => plan('plan')} style={{
+                            borderWidth: 2, width: 20, height: 20, borderRadius: 10,
+                            borderColor: plan == 'plan' ? borderColor : monthlyplan == 'plan' ? "#1E45E1" : "#ccc", justifyContent: 'center', marginTop: 12
+                          }}>
+
+                            <View style={{ justifyContent: 'center', alignItems: 'center' }}  >
+
+                              {monthlyplan === 'plan' && (
+                                <View style={{ height: 10, width: 10, borderRadius: 5, backgroundColor: "#1E45E1" }} />
+                              )}
+                            </View>
+                          </TouchableOpacity>
+
+                        </View>
+
+                      </View>
+                    </View>
+                    <View >
+                      <TouchableOpacity style={{ backgroundColor: '#1d41d5', paddingVertical: 12, alignItems: 'center', borderRadius: 20 }}>
+                        <Text style={{ fontSize: 14.11, fontWeight: 600, color: '#ffffff' }}>Request Amenity</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+
+                </View>}
+              </View>) : null}
+
+
+            </View>
+
+          </View>
+
+        </Animated.View>
+      </View>
+    )}
+
+    {/* -----Request bed change--------- */}
+
+    {showBedChange && (
+      <View style={style.sheetOverlay}>
+        <TouchableWithoutFeedback onPress={onClose}>
+          <View style={StyleSheet.absoluteFill} />
+        </TouchableWithoutFeedback>
+
+        <Animated.View style={[style.bottomsheets, { transform: [{ translateY: sheetY }] }]}
+          {...panResponder.panHandlers}>
+
+          <View style={{ flex: 1 }}>
+
+            <View {...panResponder.panHandlers}>
+              <View style={style.dragindictor} />
+            </View>
+
+            <View style={{ paddingTop: 15, justifyContent: 'space-between', flex: 1 }}>
+              <View>
+                <Text style={{ fontSize: 20, fontWeight: 600 }}>Request Bed Change</Text>
+
+                <View style={{ paddingTop: 20 }}>
+                  <Text style={{ fontSize: 12, fontWeight: 400 }}>Current Bed</Text>
+
+                  <View style={{
+                    backgroundColor: '#F6F8FF', borderRadius: 10, paddingVertical: 17,
+                    paddingHorizontal: 8, marginTop: 10, flexDirection: 'row'
+                  }}>
+                    <View style={{ backgroundColor: '#F9D796', paddingVertical: 4.64, paddingHorizontal: 9.28, alignSelf: 'flex-start', borderRadius: 46.38 }}>
+                      <Text style={{ color: '#642B00', fontSize: 10.82, fontWeight: 400 }}>
+                        Ground Floor</Text>
+                    </View>
+
+                    <View style={{ flexDirection: 'row', paddingLeft: 20, alignItems: 'center' }}>
+                      <Image source={Room} style={{ width: 21.17, height: 21.17 }} />
+                      <Text style={{ marginLeft: 10, fontSize: 15.97, fontWeight: 400 }}>203</Text>
+                    </View>
+
+                    <View style={{ flexDirection: 'row', paddingLeft: 10, alignItems: 'center' }}>
+                      <Image source={Bed} style={{ width: 21.17, height: 21.17 }} />
+                      <Text style={{ marginLeft: 10, fontSize: 15.97, fontWeight: 400 }}>300</Text>
+                    </View>
+                  </View>
+                </View>
+
+                <View style={{ paddingTop: 15 }}>
+                  <Text style={{ fontSize: 14, fontWeight: 400 }}>Reason for Bed change</Text>
+
+                  <Dropdown style={{ borderWidth: 1, borderRadius: 10, paddingVertical: 15, marginTop: 10, borderColor: '#e5e5e5', paddingLeft: 10 }}
+                    onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
+                    data={bed}
+                    containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
+                    placeholderStyle={{ fontSize: 14, paddingRight: 10 }}
+                    selectedTextStyle={{ fontSize: 15, fontWeight: 400 }}
+                    placeholder="Select Reason"
+                    labelField="label"
+                    valueField="value"
+                    value={changeBed}
+
+                    onChange={item => {
+                      console.log(item.value)
+                      setChangeBed(item.value)
+                    }}
+
+                    renderRightIcon={() => (
+                      <Ionicons name={isFocus ? "chevron-up" : "chevron-down"} size={22} color="#000"
+                        style={{ paddingRight: 10 }} />
+                    )}
+                    renderItem={(item, index) => {
+                      const isSelected = item.value === changeBed;
+
+                      return (
+                        <TouchableOpacity onPress={() => {
+                          setChangeBed(item.value)
+                        }}
+                          style={{
+                            paddingVertical: 14,
+                            paddingHorizontal: 14,
+                            borderRadius: 10,
+                            marginVertical: 5,
+                            marginRight: 10,
+                            marginTop: 10,
+                            backgroundColor: isSelected ? "#1D4ED8" : "#F5F5F5",
+
+                          }}
+                        >
+                          <Text
+                            style={{ color: isSelected ? "#fff" : "#000", fontSize: 15, }}>
+                            {item.label}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    }}
+                  />
+
+                </View>
+
+                <View style={{ paddingTop: 15 }}>
+                  <Text style={{ fontSize: 14, fontWeight: 400 }}>Preffered Bed Type</Text>
+
+                  <Dropdown style={{ borderWidth: 1, borderRadius: 10, paddingVertical: 15, marginTop: 10, borderColor: '#e5e5e5', paddingLeft: 10 }}
+                    onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
+                    data={selectBed}
+                    containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
+                    placeholderStyle={{ fontSize: 14, paddingRight: 10 }}
+                    selectedTextStyle={{ fontSize: 15, fontWeight: 400 }}
+                    placeholder="Select Reason"
+                    labelField='label'
+                    valueField='value'
+                    value={bedType}
+
+                    onChange={item => {
+                      setBedType(item.value)
+                    }}
+
+                    renderRightIcon={() => (
+                      <Ionicons name={isFocus ? "chevron-up" : "chevron-down"} size={22} color="#000"
+                        style={{ paddingRight: 10 }} />
+                    )}
+
+                    renderItem={(item, index) => {
+                      const isSelected = item.value === bedType;
+
+                      return (
+                        <TouchableOpacity onPress={() => {
+                          setBedType(item.value)
+                        }}
+                          style={{
+                            paddingVertical: 14,
+                            paddingHorizontal: 14,
+                            borderRadius: 10,
+                            marginVertical: 5,
+                            marginRight: 10,
+                            marginTop: 10,
+                            backgroundColor: isSelected ? "#1D4ED8" : "#F5F5F5",
+                          }}
+                        >
+                          <Text
+                            style={{ color: isSelected ? "#fff" : "#000", fontSize: 15, }}>
+                            {item.label}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    }}
+
+                  />
+                </View>
+
+                <View style={{ paddingTop: 15 }}>
+                  <Text>Bed Change Urgency</Text>
+
+                  <Dropdown style={{ borderWidth: 1, borderRadius: 10, paddingVertical: 15, borderColor: '#e5e5e5', marginTop: 10, paddingLeft: 10 }}
+                    onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
+                    data={urgency}
+                    containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
+                    placeholderStyle={{ fontSize: 14, paddingRight: 10 }}
+                    selectedTextStyle={{ fontSize: 15, fontWeight: 400 }}
+                    placeholder="Select Reason"
+                    labelField="label"
+                    valueField="value"
+                    value={urgencyType}
+
+                    onChange={item => {
+                      setUrgencyType(item.value)
+                    }}
+
+                    renderRightIcon={() => (
+                      <Ionicons name={isFocus ? "chevron-up" : "chevron-down"} size={22} color="#000"
+                        style={{ paddingRight: 10 }} />
+                    )}
+
+                    renderItem={(item, index) => {
+                      const isSelected = item.value === urgencyType;
+
+                      return (
+                        <TouchableOpacity onPress={() => {
+                          setUrgencyType(item.value)
+                        }}
+                          style={{
+                            paddingVertical: 14,
+                            paddingHorizontal: 14,
+                            borderRadius: 10,
+                            marginVertical: 5,
+                            marginRight: 10,
+                            marginTop: 10,
+                            backgroundColor: isSelected ? "#1D4ED8" : "#F5F5F5",
+                          }}
+                        >
+                          <Text
+                            style={{ color: isSelected ? "#fff" : "#000", fontSize: 15, fontWeight: 400 }}>
+                            {item.label}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    }}
+                  />
+                </View>
+
               </View>
+
+              <TouchableOpacity style={{
+                paddingVertical: 16, paddingHorizontal: 32, borderRadius: 50,
+                backgroundColor: changeBed != null && bedType != null && urgencyType != null ? '#1E45E1' : '#788fed',
+                alignItems: 'center', marginBottom: 15
+              }} disabled={changeBed == null && bedType == null && urgencyType == null ? true : false}>
+                <Text style={{ fontSize: 14, fontWeight: 600, color: '#FFFFFF' }}>Submit Request</Text>
+              </TouchableOpacity>
+
             </View>
           </View>
-
-          <View style={{ paddingTop: 15 }}>
-            <Text style={{ fontSize: 14, fontWeight: 400 }}>Reason for Bed change</Text>
-
-            <Dropdown style={{ borderWidth: 1, borderRadius: 10, paddingVertical: 15, marginTop: 10, borderColor: '#e5e5e5',paddingLeft:10 }}
-              onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
-              data={bed}
-              containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
-              placeholderStyle={{ fontSize: 14, paddingRight: 10 }}
-              selectedTextStyle={{fontSize:15,fontWeight:400}}
-              placeholder="Select Reason"
-              labelField="label"
-              valueField="value"
-              value={changeBed}
-
-              onChange={item => {
-                console.log(item.value)
-                setChangeBed(item.value)
-              }}
-
-              renderRightIcon={() => (
-                <Ionicons name={isFocus ? "chevron-up" : "chevron-down"} size={22} color="#000"
-                  style={{ paddingRight: 10 }} />
-              )}
-              renderItem={(item, index) => {
-                const isSelected = item.value === changeBed;
-
-                return (
-                  <TouchableOpacity onPress={() => {
-                    setChangeBed(item.value)
-                  }}
-                    style={{
-                      paddingVertical: 14,
-                      paddingHorizontal: 14,
-                      borderRadius: 10,
-                      marginVertical: 5,
-                      marginRight:10,
-                      marginTop:10,
-                      backgroundColor: isSelected ? "#1D4ED8" : "#F5F5F5",
-
-                    }}
-                  >
-                    <Text
-                      style={{color: isSelected ? "#fff" : "#000",fontSize: 15, }}>
-                      {item.label}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              }}
-            />
-
-          </View>
-
-          <View style={{ paddingTop: 15 }}>
-            <Text style={{ fontSize: 14, fontWeight: 400 }}>Preffered Bed Type</Text>
-
-            <Dropdown style={{ borderWidth: 1, borderRadius: 10, paddingVertical: 15, marginTop: 10, borderColor: '#e5e5e5',paddingLeft:10 }}
-              onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
-              data={selectBed}
-              containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
-              placeholderStyle={{ fontSize: 14, paddingRight: 10 }}
-              selectedTextStyle={{fontSize:15,fontWeight:400}}
-              placeholder="Select Reason"
-              labelField='label'
-              valueField='value'
-              value={bedType}
-
-              onChange={item => {
-                setBedType(item.value)
-              }}
-
-              renderRightIcon={() => (
-                <Ionicons name={isFocus ? "chevron-up" : "chevron-down"} size={22} color="#000"
-                  style={{ paddingRight: 10 }} />
-              )} 
-
-                renderItem={(item, index) => {
-                const isSelected = item.value === bedType;
-
-                return (
-                  <TouchableOpacity onPress={() => {
-                    setBedType(item.value)
-                  }}
-                    style={{
-                      paddingVertical: 14,
-                      paddingHorizontal: 14,
-                      borderRadius: 10,
-                      marginVertical: 5,
-                      marginRight:10,
-                      marginTop:10,
-                      backgroundColor: isSelected ? "#1D4ED8" : "#F5F5F5",
-                    }}
-                  >
-                    <Text
-                      style={{color: isSelected ? "#fff" : "#000",fontSize: 15, }}>
-                      {item.label}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              }}
-              
-              />
-          </View>
-
-          <View style={{ paddingTop: 15 }}>
-            <Text>Bed Change Urgency</Text>
-
-            <Dropdown style={{ borderWidth: 1, borderRadius: 10, paddingVertical: 15, borderColor: '#e5e5e5', marginTop: 10,paddingLeft:10 }}
-              onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
-              data={urgency}
-              containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
-              placeholderStyle={{ fontSize: 14, paddingRight: 10 }}
-              selectedTextStyle={{fontSize:15,fontWeight:400}}
-              placeholder="Select Reason"
-              labelField="label"
-              valueField="value"
-              value={urgencyType}
-
-              onChange={item => {
-                setUrgencyType(item.value)
-              }}
-
-              renderRightIcon={() => (
-                <Ionicons name={isFocus ? "chevron-up" : "chevron-down"} size={22} color="#000"
-                  style={{ paddingRight: 10 }} />
-              )}
-
-               renderItem={(item, index) => {
-                const isSelected = item.value === urgencyType;
-
-                return (
-                  <TouchableOpacity onPress={() => {
-                    setUrgencyType(item.value)
-                  }}
-                    style={{
-                      paddingVertical: 14,
-                      paddingHorizontal: 14,
-                      borderRadius: 10,
-                      marginVertical: 5,
-                      marginRight:10,
-                      marginTop:10,
-                      backgroundColor: isSelected ? "#1D4ED8" : "#F5F5F5",
-                    }}
-                  >
-                    <Text
-                      style={{color: isSelected ? "#fff" : "#000",fontSize: 15,fontWeight:400 }}>
-                      {item.label}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              }}
-            />
-          </View>
-
-        </View>
-
-
-        
-        <TouchableOpacity style={{
-          paddingVertical: 16, paddingHorizontal: 32, borderRadius: 50,
-          backgroundColor: changeBed!=null&&bedType!=null&&urgencyType!=null?'#1E45E1':'#788fed',
-           alignItems: 'center',marginBottom:15
-        }} disabled={changeBed==null&&bedType==null&&urgencyType==null?true:false}>
-          <Text style={{fontSize: 14, fontWeight: 600, color: '#FFFFFF'}}>Submit Request</Text>
-        </TouchableOpacity>
+        </Animated.View>
 
       </View>
+    )}
 
-    </BottomSheet>
+    {/* ----------Payment------ */}
+
+    {modalVisible && (
+      <View style={style.sheetOverlay}>
+
+        {/* Tap outside to close */}
+        <TouchableWithoutFeedback onPress={onClose}>
+          <View style={StyleSheet.absoluteFill} />
+        </TouchableWithoutFeedback>
+
+        <Animated.View
+          style={[style.bottomSheetPay, { transform: [{ translateY: sheetY }] }]}
+          {...panResponder.panHandlers}
+        >
+           <View {...panResponder.panHandlers}>
+              <View style={style.dragindictor} />
+            </View>
+
+          <ScrollView showsVerticalScrollIndicator={false}>
+            {selectedPayment && (
+              <>
+                <Text style={style.modalTitle}>{selectedPayment.title}</Text>
+
+                <View style={{ flexDirection: "row" }}>
+                  <Text style={style.invoiceId}>#INV001</Text>
+                  <TouchableOpacity
+                    onPress={() => handleReceiptPdfDownload(staticReceiptData)}
+                  >
+                    <Image
+                      source={ViewIcon}
+                      style={{ width: 15, height: 15, marginLeft: 5, marginTop: 2 }}
+                    />
+                  </TouchableOpacity>
+                </View>
+
+                {/* Amount Section */}
+                <View style={style.amountSection}>
+                  <Text style={style.label}>Total Amount</Text>
+
+                  <View>
+                    <Text style={style.totalAmount}>
+                      ₹{selectedPayment.amount.toFixed(2)}
+                    </Text>
+
+                    {selectedPayment.status === "Pay Now" && (
+                      <View
+                        style={[
+                          style.statusBadge,
+                          { backgroundColor: "rgba(254,243,198,1)" },
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            style.statusText,
+                            { color: "rgba(187,77,0,1)" },
+                          ]}
+                        >
+                          Pending
+                        </Text>
+                      </View>
+                    )}
+
+                    {(selectedPayment.status === "Partially Paid to" ||
+                      selectedPayment.status === "Paid to") && (
+                        <View style={{ flexDirection: "row", marginTop: 6 }}>
+                          <Image
+                            source={PaidIcon}
+                            style={{ width: 20, height: 20 }}
+                          />
+                          <Text style={{ fontSize: 14, marginLeft: 6 }}>
+                            {selectedPayment.status === "Partially Paid to"
+                              ? "Partially Paid"
+                              : "Full Paid"}
+                          </Text>
+                        </View>
+                      )}
+                  </View>
+                </View>
+
+                {/* Details */}
+                <View style={style.detailsSection}>
+                  <View style={style.row}>
+                    <Text style={style.detailLabel}>Actual Rent</Text>
+                    <Text style={style.detailValue}>₹5512.00</Text>
+                  </View>
+
+                  <View style={style.row}>
+                    <Text style={style.detailLabel}>Taxes GST 10%</Text>
+                    <Text style={style.detailValue}>₹488.00</Text>
+                  </View>
+
+                  {selectedPayment.paid === "partial" && (
+                    <>
+                      <View style={style.row}>
+                        <Text style={style.detailLabel}>Paid Amount</Text>
+                        <Text style={style.detailValue}>₹3500.00</Text>
+                      </View>
+
+                      <View style={style.row}>
+                        <Text style={style.detailLabel}>Remain</Text>
+                        <View>
+                          <Text style={style.detailValue}>₹2500.00</Text>
+                          <Text style={style.payBillText}>Pay Bill</Text>
+                        </View>
+                      </View>
+                    </>
+                  )}
+                </View>
+
+                <View
+                  style={{
+                    borderBottomWidth: 0.4,
+                    borderBottomColor: "grey",
+                    opacity: 0.4,
+                    marginVertical: 10,
+                  }}
+                />
+
+                {/* Paid / Due Date */}
+                <View style={style.Billbottom}>
+                  <Text style={style.paiddetailLabel}>
+                    {selectedPayment.status === "Pay Now" ? "Due Date" : "Paid Date"}
+                  </Text>
+                  <Text style={style.paiddetailValue}>25 Sep 2025</Text>
+                </View>
+
+                {/* Notes */}
+                {selectedPayment.status === "Pay Now" && (
+                  <View style={{ marginTop: 10 }}>
+                    <Text style={{ fontSize: 13, color: "rgba(60,60,67,0.6)" }}>
+                      Notes & Instructions
+                    </Text>
+                    <Text style={style.noteText}>
+                      Kindly pay on or before the due date
+                    </Text>
+                    <Text style={style.noteText}>
+                      Late fee may apply after 3 days of due date
+                    </Text>
+                    <Text style={style.noteText}>
+                      For any billing errors, contact hostel admin
+                    </Text>
+                  </View>
+                )}
+
+                {/* Payment mode section */}
+                {selectedPayment.status !== "Pay Now" && (
+                  <View style={{ marginTop: 10 }}>
+                    <View style={style.Billbottom}>
+                      <Text style={style.paiddetailLabel}>Payment Mode</Text>
+                      <Text style={style.paiddetailValue}>UPI</Text>
+                    </View>
+
+                    <View style={style.Billbottom}>
+                      <Text style={style.paiddetailLabel}>Reference number</Text>
+                      <Text style={style.paiddetailValue}>#RSIN001</Text>
+                    </View>
+                  </View>
+                )}
+
+                {/* Buttons */}
+                <View style={style.buttonRow}>
+                  {selectedPayment.status === "Pay Now" ? (
+                    <>
+                      <TouchableOpacity
+                        style={style.shareBtn}
+                        onPress={handleDownload}
+                      >
+                        <Text style={{ fontWeight: "600", color: "#071C70" }}>
+                          Download Bill
+                        </Text>
+                        <Image
+                          source={DownloadBlueIcon}
+                          style={{ width: 17, height: 17, marginLeft: 8 }}
+                        />
+                      </TouchableOpacity>
+
+                      <TouchableOpacity style={style.downloadBtn}>
+                        <Text style={style.downloadText}>Pay Now</Text>
+                        <Image
+                          source={ArrowRightIcon}
+                          style={{ width: 20, height: 20, marginLeft: 8 }}
+                        />
+                      </TouchableOpacity>
+                    </>
+                  ) : (
+                    <>
+                      <TouchableOpacity style={style.shareBtn}>
+                        <Text style={style.shareText}>Share</Text>
+                        <Image
+                          source={ShareIcon}
+                          style={{ width: 17, height: 17, marginLeft: 8 }}
+                        />
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={style.downloadBtn}
+                        onPress={handleDownload}
+                      >
+                        <Text style={style.downloadText}>Download</Text>
+                        <Image
+                          source={DownloadIcon}
+                          style={{ width: 20, height: 20, marginLeft: 8 }}
+                        />
+                      </TouchableOpacity>
+                    </>
+                  )}
+                </View>
+              </>
+            )}
+          </ScrollView>
+        </Animated.View>
+      </View>
+    )}
 
   </View>
 
@@ -1194,6 +1582,131 @@ function Dashboard(props) {
 
 const style = StyleSheet.create({
   mainDashb: { flex: 1, backgroundColor: '#ffffff', paddingTop: 10, position: 'relative' },
-  container: { flexDirection: 'row', paddingTop: 10, paddingLeft: 16, paddingRight: 16, justifyContent: 'space-between', paddingLeft: 10, alignItems: 'center' }
+  container: { flexDirection: 'row', paddingTop: 10, paddingLeft: 16, paddingRight: 16, justifyContent: 'space-between', paddingLeft: 10, alignItems: 'center' },
+  sheetOverlay: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "flex-end",
+
+  },
+  bottomSheet: {
+    height: '55%',
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 10
+  },
+  bottomsheets: {
+    height: '90%', backgroundColor: '#fff', borderTopLeftRadius: 30, borderTopRightRadius: 30, paddingHorizontal: 20,
+    paddingTop: 20, paddingBottom: 10
+  },
+  dragindictor: { width: 50, height: 4, backgroundColor: "#ccc", borderRadius: 2, alignSelf: "center", marginBottom: 10 },
+  amenitiesBottomSheet: {
+    height: '50%', backgroundColor: '#fff', borderTopLeftRadius: 30, borderTopRightRadius: 30, paddingHorizontal: 20,
+    paddingTop: 20, paddingBottom: 10
+  },
+  modalBackground: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "flex-end",
+  },
+  modalContainer: {
+    width: "100%",
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+  },
+  dragIndicator: {
+    width: 50,
+    height: 4,
+    backgroundColor: "#ccc",
+    borderRadius: 2,
+    alignSelf: "center",
+    marginBottom: 10,
+  },
+  modalTitle: { fontSize: 20, fontWeight: "600", color: "#000" },
+  invoiceId: {
+    fontSize: 13,
+    color: "#0057FF",
+    fontWeight: "600",
+    marginBottom: 6,
+  },
+  amountSection: {
+    marginTop: 10,
+    marginBottom: 10,
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  label: { fontSize: 20, color: "rgba(31, 38, 51, 1)" , fontWeight: "600" },
+  totalAmount: { fontSize: 16, fontWeight: "700", color: "#000" },
+  detailsSection: { marginVertical: 10 },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginVertical: 3,
+  },
+  detailLabel: { fontSize: 13, color: "rgba(31, 38, 51, 1)" },
+  detailValue: { fontSize: 15, fontWeight: "600", color: "rgba(31, 38, 51, 1)" },
+  payBillText: { fontSize: 13, color: "#0057FF", fontWeight: "600" , marginLeft:10 , marginTop:5},
+  paiddetailLabel: { fontSize: 13, color: "rgba(60, 60, 67, 0.6)" },
+  paiddetailValue: { fontSize: 13, color: "black" ,  fontWeight: "600" ,},
+  Billbottom : {display:'flex', flexDirection:'row',   justifyContent: "space-between",},
+  buttonRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 20,
+  },
+  shareBtn: {
+    flex: 1,
+    backgroundColor: "#F3F5FF",
+    paddingVertical: 10,
+    borderRadius: 10,
+    alignItems: "center",
+     display:'flex',
+    flexDirection:'row',
+    marginRight: 10,
+    justifyContent:'center'
+  },
+  shareText: { color: "#000", fontWeight: "600" },
+  downloadBtn: {
+    flex: 1,
+    backgroundColor: "#0057FF",
+    paddingVertical: 10,
+    borderRadius: 10,
+    display:'flex',
+    flexDirection:'row',
+    alignItems: "center",
+    justifyContent:'center'
+  },
+  downloadText: { color: "#fff", fontWeight: "600" },
+  filterFab: {
+ position: 'absolute', 
+ bottom: 40,
+ right: 10, 
+ borderRadius: 30,
+ width: 60,
+ height: 60,
+ justifyContent: 'center',
+ alignItems: 'center',
+ },
+ filterIcon: {
+   width: 60,
+   height: 60,
+ },
+
+bottomSheetPay: {
+  backgroundColor: "#fff",
+  borderTopLeftRadius: 20,
+  borderTopRightRadius: 20,
+  padding: 20,
+  height: "50%",
+},
 })
 export default Dashboard;

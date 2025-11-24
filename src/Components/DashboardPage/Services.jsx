@@ -21,7 +21,7 @@ import File from '../../assets/Images/files.png'
 import { launchImageLibrary } from "react-native-image-picker";
 import AmenitiesPic from '../../assets/Images/amenities.png'
 import { UsersContext } from "../../Context/UserContext";
-import BottomSheet,{BottomSheetView} from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { assignAmenities, complaints, unassignAmeties } from "../../Action/HostelAction";
 
 function Services(props) {
@@ -31,7 +31,7 @@ function Services(props) {
 
     console.log(commonContext.Complaint)
     console.log(props)
-    const [complaintsList,setComplaintsList]=useState([])
+    const [complaintsList, setComplaintsList] = useState([])
     const [selectedfield, setselectfield] = useState(0);
     const [modulevisible, setModalVisible] = useState(false)
     const [comment, setComment] = useState(false)
@@ -41,8 +41,8 @@ function Services(props) {
     const [selectedValue, setSelectedValue] = useState(null);
     const [isFocus, setIsFocus] = useState(false);
 
-    const[assignedAmenities,setAssignedAmenity]=useState([])
-    const[unassignedAmenities,setUnasignedAmenities]=useState([])
+    const [assignedAmenities, setAssignedAmenity] = useState([])
+    const [unassignedAmenities, setUnasignedAmenities] = useState([])
 
     console.log(selectedfield)
 
@@ -85,22 +85,22 @@ function Services(props) {
         }
     };
 
-    useEffect(()=>{
-        complaints(props.hostel[0].hostelId,commonContext.getToken).then(r=>{
+    useEffect(() => {
+        complaints(props.hostel[0].hostelId, commonContext.getToken).then(r => {
             setComplaintsList(r?.data?.content)
             console.log(r)
         })
 
-        assignAmenities(props.hostel[0].hostelId,commonContext.getToken).then(r=>{
+        assignAmenities(props.hostel[0].hostelId, commonContext.getToken).then(r => {
             setAssignedAmenity(r.data)
             console.log(r)
         })
 
-        unassignAmeties(props.hostel[0].hostelId,commonContext.getToken).then(r=>{
+        unassignAmeties(props.hostel[0].hostelId, commonContext.getToken).then(r => {
             setUnasignedAmenities(r.data)
             console.log(r)
         })
-    },[])
+    }, [])
 
     useEffect(() => {
         console.log(commonContext.Complaint)
@@ -137,7 +137,7 @@ function Services(props) {
         setModalVisible(false)
         setComment(false)
     }
-   
+
 
     const sendclick = () => {
         const data = {
@@ -205,48 +205,77 @@ function Services(props) {
             </TouchableOpacity>
         </View>
 
-        {selectedfield ==  'Complaint'  ? complaintsList.length>0? <FlatList showsVerticalScrollIndicator={false}
+        {selectedfield == 'Complaint' ? complaintsList.length > 0 ? <FlatList showsVerticalScrollIndicator={false}
             style={{ marginTop: 10, position: 'relative' }}
             keyExtractor={(item) => item.complaintId}
             data={complaintsList}
             renderItem={({ item }) => {
                 const { backgroundColor, textColor } = getStatusColor(item.status);
-                return <View key={item.complaintId}  >
-                <TouchableOpacity onPress={() => props.onOpen(item,1)}>
-                        <View style={{
-                            borderWidth: 1, borderRadius: 8, marginTop: 10, flexDirection: 'row',
-                            justifyContent: 'space-between', borderColor: '#f4f4f4',
-                        }}>
-                            <View style={{ paddingLeft: 20, paddingTop: 20, paddingBottom: 20, flex: 1 }}>
-                                <Text numberOfLines={1} ellipsizeMode="tail"
-                                    style={{ fontSize: 16, fontWeight: '600', maxWidth: '90%' }}>
+                return <View key={item.complaintId}>
+                    <TouchableOpacity  onPress={() => props.onOpen(item)}>
+                        <View
+                            style={style.complaintStyle}
+                        >
+                            {/* LEFT SIDE */}
+                            <View style={{ flex: 1, paddingRight: 10 }}>
+                                <Text
+                                    numbe   rOfLines={1}
+                                    ellipsizeMode="tail"
+                                    style={{
+                                        fontSize: 16,fontWeight: '600',color: '#1C1C1C',marginBottom: 10 }}
+                                >
                                     {item.description}
                                 </Text>
 
-                                <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 10 }}>
-                                    <Image source={require('../../assets/Images/bill.png')}
-                                        style={{ width: 16, height: 16 }} />
-                                    <Text style={{ marginLeft: 8, fontSize: 14, fontWeight: '400' }}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <Image
+                                        source={require('../../assets/Images/bill.png')}
+                                        style={{ width: 18, height: 18, tintColor: '#1E45E1' }}
+                                    />
+                                    <Text
+                                        style={{
+                                            marginLeft: 8,fontSize: 14,fontWeight: '400',color: '#505050',}}
+                                    >
                                         {item.complaintTypeName}
                                     </Text>
                                 </View>
                             </View>
 
-                            <View style={{ justifyContent: 'flex-end', paddingRight: 10, paddingTop: 20, paddingBottom: 16 }}>
-                                <Text style={{ bottom: 10, color: '#9C9C9C', fontSize: 12, fontWeight: '400' }}>
+                            {/* RIGHT SIDE */}
+                            <View style={{ alignItems: 'flex-end' }}>
+                                <Text
+                                    style={{
+                                        fontSize: 12,color: '#A4A4A4',marginBottom: 8,fontWeight: '400',                                                                           
+                                    }}
+                                >
                                     {item.complaintDate}
                                 </Text>
+
                                 <View
-                                    style={{ borderRadius: 15, paddingHorizontal: 10, paddingVertical: 3, backgroundColor: backgroundColor, marginTop: 2 }}>
-                                    <Text style={{ color: textColor }}>{item.status}</Text>
+                                    style={{
+                                        backgroundColor: backgroundColor,
+                                        paddingVertical: 4,
+                                        paddingHorizontal: 12,
+                                        borderRadius: 20,
+                                    }}
+                                >
+                                    <Text
+                                        style={{
+                                            fontSize: 12,
+                                            fontWeight: '500',
+                                            color: textColor,
+                                        }}
+                                    >
+                                        {item.status}
+                                    </Text>
                                 </View>
                             </View>
                         </View>
                     </TouchableOpacity>
-
                 </View>
 
-            }} /> : <Text>No Complaints Found</Text>  : 
+
+            }} /> : <Text>No Complaints Found</Text> :
             <ScrollView
                 style={{ marginTop: 10 }}
                 showsVerticalScrollIndicator={false}
@@ -263,31 +292,31 @@ function Services(props) {
                     scrollEnabled={false} // important! to avoid conflict with parent ScrollView
                     renderItem={({ item }) => (
                         <View style={{ paddingTop: 10 }}>
-                            <TouchableOpacity onPress={()=>props.onAmenities(item,0,'My-Amenities')}>
-                                 <View
-                                style={{
-                                    paddingTop: 10,
-                                    paddingBottom: 12,
-                                    borderWidth: 1,
-                                    borderRadius: 10,
-                                    flexDirection: 'row',
-                                    justifyContent: 'space-between',
-                                    paddingHorizontal: 14,
-                                    alignItems: 'center',
-                                    borderColor: '#edf3ff',
-                                }}
-                            >
-                                <View>
-                                    <Text style={{ fontSize: 16, fontWeight: '600' }}>{item.amenityName}</Text>
-                                    <View style={{ paddingTop: 7 }}>
-                                        <Text style={{ fontSize: 14, color: '#4B4B4B' }}>{'\u20B9'}{item.amenityAmount}/month</Text>
+                            <TouchableOpacity onPress={() => props.onAmenities(item, 'My-Amenities')}>
+                                <View
+                                    style={{
+                                        paddingTop: 10,
+                                        paddingBottom: 12,
+                                        borderWidth: 1,
+                                        borderRadius: 10,
+                                        flexDirection: 'row',
+                                        justifyContent: 'space-between',
+                                        paddingHorizontal: 14,
+                                        alignItems: 'center',
+                                        borderColor: '#edf3ff',
+                                    }}
+                                >
+                                    <View>
+                                        <Text style={{ fontSize: 16, fontWeight: '600' }}>{item.amenityName}</Text>
+                                        <View style={{ paddingTop: 7 }}>
+                                            <Text style={{ fontSize: 14, color: '#4B4B4B' }}>{'\u20B9'}{item.amenityAmount}/month</Text>
+                                        </View>
                                     </View>
+                                    <Image source={RightDirection} style={{ width: 26, height: 26 }} />
                                 </View>
-                                <Image source={RightDirection} style={{ width: 26, height: 26 }} />
-                            </View>
 
                             </TouchableOpacity>
-                           
+
                         </View>
                     )}
                 />
@@ -303,26 +332,26 @@ function Services(props) {
                     scrollEnabled={false} // disable inner scrolling
                     renderItem={({ item }) => (
                         <View style={{ paddingTop: 10 }}>
-                            <TouchableOpacity onPress={()=>props.onAmenities(item,0,'available')}>
-                                 <View
-                                style={{
-                                    paddingTop: 11,
-                                    paddingBottom: 13,
-                                    borderWidth: 1,
-                                    borderRadius: 10,
-                                    flexDirection: 'row',
-                                    justifyContent: 'space-between',
-                                    paddingHorizontal: 14,
-                                    alignItems: 'center',
-                                    borderColor: '#edf3ff',
-                                }}
-                            >
-                                <Text style={{ fontSize: 16, fontWeight: '500' }}>{item.amenityName}</Text>
-                                <Image source={AddSquare} style={{ width: 22, height: 22 }} />
-                            </View>
+                            <TouchableOpacity onPress={() => props.onAmenities(item, 'available')}>
+                                <View
+                                    style={{
+                                        paddingTop: 11,
+                                        paddingBottom: 13,
+                                        borderWidth: 1,
+                                        borderRadius: 10,
+                                        flexDirection: 'row',
+                                        justifyContent: 'space-between',
+                                        paddingHorizontal: 14,
+                                        alignItems: 'center',
+                                        borderColor: '#edf3ff',
+                                    }}
+                                >
+                                    <Text style={{ fontSize: 16, fontWeight: '500' }}>{item.amenityName}</Text>
+                                    <Image source={AddSquare} style={{ width: 22, height: 22 }} />
+                                </View>
 
                             </TouchableOpacity>
-                           
+
                         </View>
                     )}
                 />
@@ -337,15 +366,15 @@ function Services(props) {
 
 
         {selectedfield == 'Complaint' && <View style={{ position: 'absolute', bottom: 35, right: -3 }}>
-            <TouchableOpacity onPress={()=>props.onSheet(0)}>
+            <TouchableOpacity onPress={() => props.onSheet()}>
                 <Image source={AddComplaint} style={{ width: 48, height: 47 }} />
             </TouchableOpacity>
         </View>}
 
         {/* // ----Modal----- */}
-      
 
-        
+
+
 
 
     </View>
@@ -356,21 +385,12 @@ function Services(props) {
 
 }
 const style = StyleSheet.create({
-    modalBackground: {
-        flex: 1,
-        backgroundColor: "rgba(0,0,0,0.4)",
-        justifyContent: "flex-end",
-    },
-    dropdown: {
-        height: 50,
-        borderColor: 'gray',
-        borderWidth: 0.5,
-        borderRadius: 8,
-        borderColor: '#e5e5e5',
-        paddingHorizontal: 8,
-        marginTop: 10
-    },
+    
+    complaintStyle: {
+                     borderWidth: 1,borderColor: '#E8E8E8',  borderRadius: 12,marginTop: 12,paddingVertical: 16,
+                     paddingHorizontal: 18, backgroundColor: '#FFFFFF',shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
+                     shadowOpacity: 0.08, shadowRadius: 4,elevation: 2,flexDirection: 'row', justifyContent: 'space-between',
+                     }                                             
+                                  
 })
-
-
 export default Services;
