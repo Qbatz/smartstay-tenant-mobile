@@ -32,7 +32,7 @@ const EditProfile = (route) => {
 
   console.log(gender)
   console.log(dob)
-  console.log(profileImage)
+  console.log(profileImage.uri.uri)
 
   const handleSave = () => {
 
@@ -56,12 +56,12 @@ const EditProfile = (route) => {
        name: "payload.json",
     })
 
-    console.log(profileImage)
+    console.log(profileImage.uri.uri)
 
     if(profileImage){
 
       formDate.append("profilePic", {
-          uri: profileImage.uri,
+          uri: profileImage.uri.uri,
           type: profileImage.type || "image/jpeg",
           name: profileImage.fileName || "profile.jpg"
       })
