@@ -45,7 +45,7 @@ import NOCBillPdf from './src/Components/NocBillPdf';
 import NOCReceiptPdf from './src/Components/NocReceipt';
 import InvoiceDesign from './src/Components/Payments/BillPDF';
 import { retriveData } from './src/Utils/Storage';
-import { ACCESS_TOKEN, LOGGEDIN } from './src/Utils/Constant';
+import { ACCESS_TOKEN, LOGGEDIN, PHONE_NO } from './src/Utils/Constant';
 
 
 
@@ -145,6 +145,7 @@ function AppContent(props) {
         setIsLoggedIn('true')
       }
     })
+
   }, [])
 
   useEffect(() => {
@@ -154,6 +155,9 @@ function AppContent(props) {
 
     retriveData(ACCESS_TOKEN).then(r=>{
       context.updateToken(r)
+    })
+    retriveData(PHONE_NO).then(r=>{
+      context.phoneNo(r)
     })
     console.log(context)
   }, [context.LoggedIn])

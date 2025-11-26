@@ -10,6 +10,7 @@ import {
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { hostelList } from "../Action/HostelAction";
 import { UsersContext } from "../Context/UserContext";
+import { generateToken } from "../Action/LoginAction";
 
 
 const HostelList = ({ navigation }) => {
@@ -17,19 +18,44 @@ const HostelList = ({ navigation }) => {
   const context=useContext(UsersContext)
   const [hostels,setHostelList]=useState([]);
   const [selectedHostel, setSelectedHostel] = useState();
+  const [requestedNewToken, setRequestedNewToken] = useState(false);
+
+  const refreshToken = async () => {
+
+      const response = await generateToken(context.phoneNumber, context.SerialNo);
+      if (response.success) {
+        setRequestedNewToken(false);
+        context.updateToken(response.data);
+      }
+    
+  }
 
     useEffect(()=>{
       if(context.getToken != null){
          hostelList(context.getToken).then(r=>{
           console.log(r)
-          setHostelList(r)
+          if (r.status === 500) {
+            //probably token expired
+            //generate new token logic here
+            setRequestedNewToken(true);
+          }
+          else {
+            setHostelList(r)
+          }
+          
         }).catch(error=>{
           console.log(error)
         })
 
       }
        
-  },[context.getToken])
+  },[context?.getToken])
+
+  useEffect(() => {
+    if (requestedNewToken) {
+      refreshToken()
+    }
+  }, [context.SerialNo, requestedNewToken]) 
 
   const handleSelect = (id) => {
     setSelectedHostel(id);
