@@ -22,9 +22,7 @@ export const editProfile=async(token,formData)=>{
     return response;    
 
     }catch(error){
-        console.log(error.response)
+        return {status: error.response.status, message: error.response.data}
+        
     }
-
-    
-
 }

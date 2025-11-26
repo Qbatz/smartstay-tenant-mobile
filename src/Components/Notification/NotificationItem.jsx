@@ -18,9 +18,9 @@ const NotificationItem = ({ item }) => {
       </View>
 
       <View style={styles.contentContainer}>
-        <Text style={styles.title}>{item.title}</Text>
+        <Text style={styles.title}>{item.notificationType}</Text>
         <Text style={styles.description}>{item.description}</Text>
-        <Text style={styles.time}>{item.time}</Text>
+        <Text style={styles.time}>{item.createdDate}</Text>
       </View>
     </View>
   );

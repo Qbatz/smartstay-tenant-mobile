@@ -142,7 +142,7 @@ const handleDownload = async () => {
         <View style={styles.profileCard}>
           <View style={styles.profileRow}>
             <Image
-              source={CustomerImage}
+              source={{uri:customer?.profilePic}}
               style={styles.profileImage} resizeMode="contain"
             />
             <View style={{ flex: 1, marginLeft: 10 }}>

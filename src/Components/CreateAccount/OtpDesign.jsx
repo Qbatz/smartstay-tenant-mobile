@@ -9,7 +9,6 @@ import { ACCESS_TOKEN,PHONE_NO,LOGGEDIN } from "../../Utils/Constant";
 import SuccessModal from "../ToastFile/TostFilePage";
 
 const OtpDesign =({ route }) => {
-  console.log(route.params.phone)
   const navigation = useNavigation();
   const { phone } = route.params;
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -45,7 +44,6 @@ const OtpDesign =({ route }) => {
         storeData(LOGGEDIN,"true")
         context.phoneNo(route.params.phone)
         context.updateToken(data.data)
-          //  navigation.navigate("HostelList");
           
           setShowSuccessModal(true)
           setShowModelMessage("Login Successfully")
@@ -56,9 +54,9 @@ const OtpDesign =({ route }) => {
             context.loggedin("true")
             }, 2000);        
       }      
-      else{
+      else if(data.status==401){
         setShowSuccessModal(true)
-        setShowModelMessage("Incorrect OTP")
+        setShowModelMessage("Invalid OTP")
         setModelType('error')
 
         setTimeout(() => {

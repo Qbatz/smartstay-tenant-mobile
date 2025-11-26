@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback, useRef, useEffect, useContext } from "react";
-import { View, Text, Dimensions, Image, TouchableOpacity, Button, FlatList, TextInput, StyleSheet, BackHandler, TouchableWithoutFeedback, Platform, PanResponder, Animated, ScrollView } from "react-native";
+import { View, Text, Dimensions, Image, TouchableOpacity, Button, FlatList, TextInput, StyleSheet, BackHandler, TouchableWithoutFeedback, Platform, PanResponder, Animated, ScrollView, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import MyStay from '../DashboardPage/MyStay';
@@ -30,7 +30,7 @@ import { launchImageLibrary } from "react-native-image-picker";
 import Exclamation from '../../assets/Images/exclamation.png'
 import DeleteIcon from '../../assets/Images/deleteIcon.png'
 import HostelProfile from "../../assets/Images/Group 1.png"
-import { addComment, deleteComplaint, getAmenties, getComplaints, hostelDetails, postComplaint } from "../../Action/HostelAction";
+import { addComment, deleteComplaint, getAmenties, getComplaints, hostelDetails, postComplaint, postRequestBedChange, postRquestAmenties } from "../../Action/HostelAction";
 import { UsersContext } from "../../Context/UserContext";
 import Room from '../../assets/Images/Room.png'
 import Bed from '../../assets/Images/Bed_Icon.png'
@@ -44,6 +44,7 @@ import ShareIcon from "../../assets/Images/Union.png";
 import PaidIcon from "../../assets/Images/Checkboxes.png";
 import ViewIcon from "../../assets/Images/view.png";
 import ArrowRightIcon from "../../assets/Images/arrow-right.png";
+import LinearGradient from "react-native-linear-gradient";
 
 
 function Dashboard(props) {
@@ -82,53 +83,53 @@ function Dashboard(props) {
   const [showBedChange, setShowBedChange] = useState(false)
   const [editCompliant, setShowEditComplaint] = useState(false)
   const [loading, setLoading] = useState(false)
-   const [modalVisible, setModalVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState(null);
 
 
 
   const sheetY = useRef(new Animated.Value(700)).current;
 
-  console.log(mediaimage)
+  console.log(selectedComplaint)
 
   const complainttype = [{ label: 'Plumbing', value: '1' }, { label: 'Electricity', value: '2' }, { label: 'Room Maintanence', value: '3' }, { label: 'Canteen food', value: '4' }, { label: 'Canteen food', value: '4' }]
 
   const images = [{ id: 1, source: Damage1 }, { id: 2, source: Damage2 }, { id: 3, source: Damage3 }]
 
-  const bed = [{ label: 'Disturbance in current room', value: '1' }, { label: 'Roommate issues', value: '2' }, { label: 'Need more privacy/space', value: '3' },
-  { label: 'Maintanence issues', value: '4' }, { label: 'Prefer other sharing type', value: '5' }, { label: 'Others', value: '6' }]
+  const bed = [{ label: 'Disturbance in current room', value: 'Disturbance in current room' }, { label: 'Roommate issues', value: 'Roommate issues' }, { label: 'Need more privacy/space', value: 'Need more privacy/space' },
+  { label: 'Maintanence issues', value: 'Maintanence issues' }, { label: 'Prefer other sharing type', value: 'Prefer other sharing type' }, { label: 'Others', value: 'Others' }]
 
-  const selectBed = [{ label: 'Single Sharing', value: '1' }, { label: 'Double Sharing', value: '2' }, { label: 'Triple Sharing', value: '3' }]
+  const selectBed = [{ label: 'Single Sharing', value: 'Single Sharing' }, { label: 'Double Sharing', value: '2' }, { label: 'Triple Sharing', value: '3' }]
 
   const urgency = [{ label: 'Within 2-3 days', value: '1' }, { label: 'Within 1 Week', value: '2' }, { label: 'Next Month Start', value: '3' }]
 
-    const staticReceiptData = {
-  configurations: {
-    hostelLogo: "https://example.com/logo.png",
-    receiptType: "Rent",
-    address: "123, Main Road, Chennai",
-    signatureUrl: "https://example.com/signature.png",
-  },
-  stayInfo: {
-    hostelName: "Smart Stay Hostel",
-    floorName: "2nd Floor",
-    roomName: "Room 202",
-    bedName: "B2",
-  },
-  customerInfo: {
-    fullName: "Pon Allwin",
-    customerMobileNo: "9876543210",
-    countryCode: "91",
-    fullAddress: "No. 45, Anna Nagar, Chennai",
-  },
-  receiptInfo: {
-    paidAmount: 5500,
-    receiptNumber: "RCP-1023",
-    transactionDate: "03/11/2025",
-    transactionTime: "10:45 AM",
-  },
-  accountDetails: { bankName: "Cash" },
-};
+  const staticReceiptData = {
+    configurations: {
+      hostelLogo: "https://example.com/logo.png",
+      receiptType: "Rent",
+      address: "123, Main Road, Chennai",
+      signatureUrl: "https://example.com/signature.png",
+    },
+    stayInfo: {
+      hostelName: "Smart Stay Hostel",
+      floorName: "2nd Floor",
+      roomName: "Room 202",
+      bedName: "B2",
+    },
+    customerInfo: {
+      fullName: "Pon Allwin",
+      customerMobileNo: "9876543210",
+      countryCode: "91",
+      fullAddress: "No. 45, Anna Nagar, Chennai",
+    },
+    receiptInfo: {
+      paidAmount: 5500,
+      receiptNumber: "RCP-1023",
+      transactionDate: "03/11/2025",
+      transactionTime: "10:45 AM",
+    },
+    accountDetails: { bankName: "Cash" },
+  };
 
   useEffect(() => {
     if (showSheet || addComplaints || showBedChange || editCompliant || showAmenities || modalVisible) {
@@ -141,7 +142,7 @@ function Dashboard(props) {
         }).start();
       }, 10);
     }
-  }, [showSheet, addComplaints, showBedChange, editCompliant, showAmenities,modalVisible]);
+  }, [showSheet, addComplaints, showBedChange, editCompliant, showAmenities, modalVisible]);
 
   function onClose() {
     Animated.timing(sheetY, {
@@ -149,13 +150,13 @@ function Dashboard(props) {
       duration: 230,
       useNativeDriver: true,
     }).start(() => {
-      setShowSheet(false);        setSelectComplaint(null);
-      setComment(false);          setAddComplaint(false);
-      setmediaImage([]);          setSelectedValue(null);
-      setDespriction(null);       setImageuri([]);
-      setShowBedChange(false);    setShowEditComplaint(false);
-      setShowAmenities(false);    setAvailable(null);
-      setmyAminites(null);        setModalVisible(false)
+      setShowSheet(false); setSelectComplaint(null);
+      setComment(false); setAddComplaint(false);
+      setmediaImage([]); setSelectedValue(null);
+      setDespriction(null); setImageuri([]);
+      setShowBedChange(false); setShowEditComplaint(false);
+      setShowAmenities(false); setAvailable(null);
+      setmyAminites(null); setModalVisible(false)
     });
   }
 
@@ -188,7 +189,7 @@ function Dashboard(props) {
 
 
   const handleNotificationShow = () => {
-    navigation.navigate("Notification");
+    navigation.navigate("Notification", {hostel:props.route.params.hostel});
   };
 
   const handleProfile = () => {
@@ -277,14 +278,25 @@ function Dashboard(props) {
 
     if (imageuri) {
 
-      imageuri.forEach((img, index) => {
-        formData.append("complaintImage", {
+      let complaitImages = []
+      imageuri.forEach(img => {
+        complaitImages.push({
           uri: img.uri,
-          type: img.type || "image/jpeg",
-          name: img.fileName || "profile.jpg"
+          type: img.type,
+          name: img.fileName
         })
-
       })
+
+      formData.append("complaintImage", complaitImages)
+
+      // imageuri.forEach((img, index) => {
+      //   formData.append("complaintImage", {
+      //     uri: img.uri,
+      //     type: img.type || "image/jpeg",
+      //     name: img.fileName || "profile.jpg"
+      //   })
+
+      // })
     }
 
     postComplaint(props.route.params.hostel[0].hostelId, context.getToken, formData).then(r => {
@@ -358,6 +370,39 @@ function Dashboard(props) {
     setShowBedChange(true)
   }
 
+  const bedRequestSubmit = () => {
+
+    const data = {
+      title: changeBed,
+      description: bedType,
+    }
+
+    postRequestBedChange(props.route.params.hostel[0].hostelId, data, context.getToken).then(r => {
+      console.log(r)
+
+      setLoading(true)
+
+      setTimeout(() => {
+        setLoading(false)
+
+        if (r.status == 200) {
+          setShowSuccessModal(true)
+
+          setTimeout(() => {
+            setShowBedChange(false)
+            setBedType(null)
+            setChangeBed(null)
+            setUrgencyType(null)
+          }, 2000);
+        }
+        else if (r.status == 400) {
+          setShowSuccessModal(true)
+        }
+
+      }, 2000);
+    })
+  }
+
   // ---------Amenities----------
 
   const handleAmenity = (item, tag) => {
@@ -386,11 +431,18 @@ function Dashboard(props) {
     setPlan(id)
   }
 
+  const onRequestAmenities=(amenityId)=>{
+
+      postRquestAmenties(props.route.params.hostel[0].hostelId,context.getToken,amenityId).then(r=>{
+        console.log(r)
+      })
+  }
+
   // ------Payment---------
 
-   const viewPay = (item) => {
+  const viewPay = (item) => {
     console.log("item", item);
-    
+
     setSelectedPayment(item);
     setModalVisible(true);
   };
@@ -434,6 +486,7 @@ function Dashboard(props) {
     setModalVisible(false);
     navigation.navigate("ReceiptPdfView");
   };
+
   // ---------------------------
   const routes = [{ key: 'mystay', title: 'MyStay', icon: Building }, { key: 'services', title: 'Services', icon: Flash }, { key: 'payment', title: 'Payment', icon: MobilePayment }]
   const renderTabBar = props => (<TabBar {...props}
@@ -451,7 +504,7 @@ function Dashboard(props) {
       case 'services':
         return <Services onOpen={handle} onSheet={addComplaint} onAmenities={handleAmenity} jumpTo={jumpTo} hostel={props.route.params.hostel} />;
       case 'payment':
-        return <Payment onPayment={viewPay} jumpTo={jumpTo} />;
+        return <Payment onPayment={viewPay} hostel={props.route.params.hostel} jumpTo={jumpTo} />;
       default:
         return null;
     }
@@ -460,43 +513,42 @@ function Dashboard(props) {
   // ----------
 
   return <View style={style.mainDashb}>
-    <View style={style.container}>
-      <View style={{ display: 'flex', flexDirection: 'row' }}>
+    <LinearGradient
+      colors={["#DAEEFF", "#FFFFFF"]}
+      start={{ x: 0.5, y: 0 }}
+      end={{ x: 0.5, y: 1 }}
+      style={{ paddingTop: 25, paddingBottom: 15, width: "100%", }}
+    >
 
-        <View >
-          <Image source={HostelProfile} resizeMode="contain" style={{ marginTop: 2, marginLeft: 4, height: 44, width: 44 }} />
-        </View>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16 }}>
 
-        <View style={{ paddingLeft: 7 }}>
-          <Text style={{ fontSize: 18, fontWeight: '600', paddingBottom: 5, fontFamily: 'gilroy-semibold', color: '#1B1D21' }}>
-            {props.route.params.hostel[0].hostelName}
-          </Text>
-
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-
-            <Image source={Location} style={{ width: 12.75, height: 14.17 }} />
-
-            <Text style={{ marginLeft: 7, fontSize: 14, alignItems: 'center', color: '#4B4B4B' }}>
-              {props.route.params.hostel[0].city}
+        <View style={{ flexDirection: 'row' }}>
+          <Image source={HostelProfile} resizeMode="contain" style={{ height: 44, width: 44 }} />
+          <View style={{ marginLeft: 7 }}>
+            <Text style={{ fontSize: 18, fontWeight: '600', fontFamily: 'gilroy-semibold', color: '#1B1D21' }}>
+              {props.route.params.hostel[0].hostelName}
             </Text>
+
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Image source={Location} style={{ width: 12.75, height: 14.17 }} />
+              <Text style={{ marginLeft: 7, fontSize: 14, color: '#4B4B4B' }}>
+                {props.route.params.hostel[0].city}
+              </Text>
+            </View>
           </View>
-
         </View>
-      </View>
-      <View style={{ flexDirection: 'row' }}>
-        <View >
+
+        <View style={{ flexDirection: 'row' }}>
           <TouchableOpacity onPress={handleNotificationShow}>
-            <Image source={require("../../assets/Images/notification.png")} resizeMode="contain" style={{ height: 44, width: 44 }} />
+            <Image source={require("../../assets/Images/notification.png")} style={{ height: 44, width: 44 }} />
           </TouchableOpacity>
-        </View>
-
-        <View style={{ paddingLeft: 10 }}>
-          <TouchableOpacity onPress={handleProfile}>
-            <Image source={require("../../assets/Images/Customer_Icon.png")} resizeMode="contain" style={{ width: 44, height: 44, borderRadius: 22 }} />
+          <TouchableOpacity onPress={handleProfile} style={{ marginLeft: 10 }}>
+            <Image source={require("../../assets/Images/Customer_Icon.png")} style={{ width: 44, height: 44, borderRadius: 22 }} />
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+
+    </LinearGradient>
 
     <View style={{ flex: 1, paddingLeft: 20, paddingRight: 20 }}>
       <TabView navigationState={{ index, routes }}
@@ -624,12 +676,12 @@ function Dashboard(props) {
                         <FlatList horizontal
                           style={{ paddingTop: 15 }}
                           keyExtractor={(item) => item.id.toString()}
-                          data={images}
+                          data={selectedComplaint.images}
                           renderItem={({ item }) => (
                             <View key={item.id}
                               style={{ paddingLeft: 10, position: "relative" }}>
                               <TouchableOpacity onPress={() => imageclick(item.id)}>
-                                <Image source={item.source} style={{ width: 90, height: 70, borderRadius: 5 }} />
+                                <Image source={{uri: item.imageUrl}} style={{ width: 90, height: 70, borderRadius: 5 }} />
                                 {imageid === item.id && deletevisible && (
                                   <TouchableOpacity style={{ position: "absolute", bottom: 25, right: 35, }} >
                                     <Image source={Trash} style={{ width: 21.09, height: 21.09, }} />
@@ -660,17 +712,17 @@ function Dashboard(props) {
                         <View
                           style={{
                             padding: 13, borderRadius: 10, borderWidth: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: 15, marginBottom: 20,
-                            backgroundColor: selectedComplaint.status === "Pending" ? "#FFEEEEA3" : selectedComplaint.status === "Inpogress" ? "#FFF6E7" : "lightgreen",
-                            borderColor: selectedComplaint.status === "Pending" ? "#FFD5D5" : selectedComplaint.status === "Inpogress" ? "#FFE7C6" : "lightgreen",
+                            backgroundColor: selectedComplaint.status === "PENDING" ? "#FFEEEEA3" : selectedComplaint.status === "Inpogress" ? "#FFF6E7" : "lightgreen",
+                            borderColor: selectedComplaint.status === "PENDING" ? "#FFD5D5" : selectedComplaint.status === "Inpogress" ? "#FFE7C6" : "lightgreen",
                           }}>
                           <Image source={Group}
                             style={{
                               width: 17.93, height: 18, marginTop: 4,
-                              tintColor: selectedComplaint.status === "Pending" ? "#FF3B30" : selectedComplaint.status === "Inpogress" ? "#FF9500" : "green",
+                              tintColor: selectedComplaint.status === "PENDING" ? "#FF3B30" : selectedComplaint.status === "Inpogress" ? "#FF9500" : "green",
                             }} />
                           <Text
                             style={{
-                              color: selectedComplaint.status === "Pending" ? "#FF3B30" : selectedComplaint.status === "Inpogress" ? "#FF9500" : "green",
+                              color: selectedComplaint.status === "PENDING" ? "#FF3B30" : selectedComplaint.status === "Inpogress" ? "#FF9500" : "green",
                               fontSize: 14.11, fontWeight: "600", marginLeft: 10,
                             }}>
                             {selectedComplaint.status}
@@ -707,6 +759,7 @@ function Dashboard(props) {
               <View style={style.dragindictor} />
             </View>
 
+            <AppLoader visible={loading} />
             <SuccessModal
               visible={showSuccessModal}
               onClose={() => setShowSuccessModal(false)}
@@ -1129,7 +1182,8 @@ function Dashboard(props) {
                       </View>
                     </View>
                     <View >
-                      <TouchableOpacity style={{ backgroundColor: '#1d41d5', paddingVertical: 12, alignItems: 'center', borderRadius: 20 }}>
+                      <TouchableOpacity onPress={()=>onRequestAmenities(available.amenityId)}
+                        style={{ backgroundColor: '#1d41d5', paddingVertical: 12, alignItems: 'center', borderRadius: 20 }}>
                         <Text style={{ fontSize: 14.11, fontWeight: 600, color: '#ffffff' }}>Request Amenity</Text>
                       </TouchableOpacity>
                     </View>
@@ -1163,6 +1217,14 @@ function Dashboard(props) {
             <View {...panResponder.panHandlers}>
               <View style={style.dragindictor} />
             </View>
+
+            <AppLoader visible={loading} />
+            <SuccessModal
+              visible={showSuccessModal}
+              onClose={() => setShowSuccessModal(false)}
+              message="Request Raised"
+              type="success"
+            />
 
             <View style={{ paddingTop: 15, justifyContent: 'space-between', flex: 1 }}>
               <View>
@@ -1326,12 +1388,8 @@ function Dashboard(props) {
                           setUrgencyType(item.value)
                         }}
                           style={{
-                            paddingVertical: 14,
-                            paddingHorizontal: 14,
-                            borderRadius: 10,
-                            marginVertical: 5,
-                            marginRight: 10,
-                            marginTop: 10,
+                            paddingVertical: 14, paddingHorizontal: 14, borderRadius: 10,
+                            marginVertical: 5, marginRight: 10, marginTop: 10,
                             backgroundColor: isSelected ? "#1D4ED8" : "#F5F5F5",
                           }}
                         >
@@ -1347,11 +1405,12 @@ function Dashboard(props) {
 
               </View>
 
-              <TouchableOpacity style={{
-                paddingVertical: 16, paddingHorizontal: 32, borderRadius: 50,
-                backgroundColor: changeBed != null && bedType != null && urgencyType != null ? '#1E45E1' : '#788fed',
-                alignItems: 'center', marginBottom: 15
-              }} disabled={changeBed == null && bedType == null && urgencyType == null ? true : false}>
+              <TouchableOpacity onPress={bedRequestSubmit}
+                style={{
+                  paddingVertical: 16, paddingHorizontal: 32, borderRadius: 50,
+                  backgroundColor: changeBed != null && bedType != null && urgencyType != null ? '#1E45E1' : '#788fed',
+                  alignItems: 'center', marginBottom: 15
+                }} disabled={changeBed == null && bedType == null && urgencyType == null ? true : false}>
                 <Text style={{ fontSize: 14, fontWeight: 600, color: '#FFFFFF' }}>Submit Request</Text>
               </TouchableOpacity>
 
@@ -1376,9 +1435,9 @@ function Dashboard(props) {
           style={[style.bottomSheetPay, { transform: [{ translateY: sheetY }] }]}
           {...panResponder.panHandlers}
         >
-           <View {...panResponder.panHandlers}>
-              <View style={style.dragindictor} />
-            </View>
+          <View {...panResponder.panHandlers}>
+            <View style={style.dragindictor} />
+          </View>
 
           <ScrollView showsVerticalScrollIndicator={false}>
             {selectedPayment && (
@@ -1581,7 +1640,7 @@ function Dashboard(props) {
 }
 
 const style = StyleSheet.create({
-  mainDashb: { flex: 1, backgroundColor: '#ffffff', paddingTop: 10, position: 'relative' },
+  mainDashb: { flex: 1, backgroundColor: '#ffffff', position: 'relative' },
   container: { flexDirection: 'row', paddingTop: 10, paddingLeft: 16, paddingRight: 16, justifyContent: 'space-between', paddingLeft: 10, alignItems: 'center' },
   sheetOverlay: {
     position: "absolute",
@@ -1594,7 +1653,7 @@ const style = StyleSheet.create({
 
   },
   bottomSheet: {
-    height: '55%',
+    height: '60%',
     backgroundColor: '#fff',
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
@@ -1644,7 +1703,7 @@ const style = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  label: { fontSize: 20, color: "rgba(31, 38, 51, 1)" , fontWeight: "600" },
+  label: { fontSize: 20, color: "rgba(31, 38, 51, 1)", fontWeight: "600" },
   totalAmount: { fontSize: 16, fontWeight: "700", color: "#000" },
   detailsSection: { marginVertical: 10 },
   row: {
@@ -1654,10 +1713,10 @@ const style = StyleSheet.create({
   },
   detailLabel: { fontSize: 13, color: "rgba(31, 38, 51, 1)" },
   detailValue: { fontSize: 15, fontWeight: "600", color: "rgba(31, 38, 51, 1)" },
-  payBillText: { fontSize: 13, color: "#0057FF", fontWeight: "600" , marginLeft:10 , marginTop:5},
+  payBillText: { fontSize: 13, color: "#0057FF", fontWeight: "600", marginLeft: 10, marginTop: 5 },
   paiddetailLabel: { fontSize: 13, color: "rgba(60, 60, 67, 0.6)" },
-  paiddetailValue: { fontSize: 13, color: "black" ,  fontWeight: "600" ,},
-  Billbottom : {display:'flex', flexDirection:'row',   justifyContent: "space-between",},
+  paiddetailValue: { fontSize: 13, color: "black", fontWeight: "600", },
+  Billbottom: { display: 'flex', flexDirection: 'row', justifyContent: "space-between", },
   buttonRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -1669,10 +1728,10 @@ const style = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 10,
     alignItems: "center",
-     display:'flex',
-    flexDirection:'row',
+    display: 'flex',
+    flexDirection: 'row',
     marginRight: 10,
-    justifyContent:'center'
+    justifyContent: 'center'
   },
   shareText: { color: "#000", fontWeight: "600" },
   downloadBtn: {
@@ -1680,33 +1739,33 @@ const style = StyleSheet.create({
     backgroundColor: "#0057FF",
     paddingVertical: 10,
     borderRadius: 10,
-    display:'flex',
-    flexDirection:'row',
+    display: 'flex',
+    flexDirection: 'row',
     alignItems: "center",
-    justifyContent:'center'
+    justifyContent: 'center'
   },
   downloadText: { color: "#fff", fontWeight: "600" },
   filterFab: {
- position: 'absolute', 
- bottom: 40,
- right: 10, 
- borderRadius: 30,
- width: 60,
- height: 60,
- justifyContent: 'center',
- alignItems: 'center',
- },
- filterIcon: {
-   width: 60,
-   height: 60,
- },
+    position: 'absolute',
+    bottom: 40,
+    right: 10,
+    borderRadius: 30,
+    width: 60,
+    height: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  filterIcon: {
+    width: 60,
+    height: 60,
+  },
 
-bottomSheetPay: {
-  backgroundColor: "#fff",
-  borderTopLeftRadius: 20,
-  borderTopRightRadius: 20,
-  padding: 20,
-  height: "50%",
-},
+  bottomSheetPay: {
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    height: "50%",
+  },
 })
 export default Dashboard;

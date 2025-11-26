@@ -23,13 +23,18 @@ export const hostelDetails=async(hostelId,token)=>{
 }
 
 export const complaints=async(hostelId,token)=>{
-    const response=await AxiosConfig.get('/v2/complaints/' + hostelId, {
+    try{
+        const response=await AxiosConfig.get('/v2/complaints/' + hostelId, {
         headers: {
             Authorization: 'Bearer ' + token
         }
     })
     console.log(response)
     return response
+    } catch (error){
+        console.log(error.response)
+    }
+    
 
 }
 
@@ -47,6 +52,7 @@ export const postComplaint=async(hostelId,token,formData)=>{
         return response;
     }catch(error){
         console.log(error.response)
+        return{status: 400, message: error.response.data}
     }
        
       
@@ -107,4 +113,59 @@ export const addComment=async(complaintId,token,data)=>{
     })
     console.log(response)
     return response;
+}
+
+export const postRequestBedChange=async(hostelId,data,token)=>{
+    try{
+        const response=await AxiosConfig.post('/v2/bed/request-bedChange/' + hostelId, data, {
+        headers: {
+            Authorization: 'Bearer ' + token
+        }
+    })
+    return response;
+    } catch(error){
+        return{status: 400, message: error.response.data}
+    }  
+}
+
+export const postRquestAmenties=async(hostelId,token,amenityId)=>{
+    console.log(hostelId,token,amenityId)
+    try{
+        const response=await AxiosConfig.post('/v2/amenities/request-amenity/' + hostelId + "/" + amenityId, {}, {
+        headers: {
+            Authorization: 'Bearer ' + token
+        }
+    })
+    return response;
+    }catch(error){
+        console.log(error.response)
+        return{status: error.response.status, message: error.response.data}
+    }   
+}
+
+export const getNotification=async(hostelId,token)=>{
+    try{
+        const response=await AxiosConfig.get('/v2/notifications/all-notifications/' + hostelId, {
+            headers: {
+                Authorization: 'Bearer ' + token
+            }
+        })
+        return response;
+    }catch(error){
+            return{status: error.response.status, message: error.response.data}
+    }
+}
+
+export const getPaymentList=async(hostelId,token)=>{
+
+    try{
+        const response=await AxiosConfig.get('/v2/invoices/' + hostelId, {
+            headers: {
+                Authorization: 'Bearer ' + token
+            }
+        })
+        return response;
+    }catch(error){
+        return {status: error.response.status, message: error.response.data}
+    }
 }
