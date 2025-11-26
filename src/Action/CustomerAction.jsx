@@ -1,14 +1,16 @@
 import AxiosConfig from "../Config/AxiosConfig";
 
 export const customerDetails=async(token)=>{
-
-    const response=await AxiosConfig.get("/v2/customer/details", {
+    try{
+        const response=await AxiosConfig.get("/v2/customer/details", {
         headers: {
             Authorization: 'Bearer ' + token
         }
     })
-    console.log(response)
     return response
+    }catch(error){
+            return {status: error.response.status, message: error.response.data}
+    } 
 }
 
 export const editProfile=async(token,formData)=>{

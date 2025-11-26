@@ -72,7 +72,6 @@ function App() {
     })
 
     retriveData(ACCESS_TOKEN).then(r => {
-      console.log(r)
       setToken(r)
     })
   }, [])
@@ -154,10 +153,8 @@ function AppContent(props) {
     }
 
     retriveData(ACCESS_TOKEN).then(r=>{
-      console.log(r)
       context.updateToken(r)
     })
-
     console.log(context)
   }, [context.LoggedIn])
 
