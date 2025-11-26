@@ -35,7 +35,7 @@ export const pickSingleFile = async () => {
   try {
     const result = await launchImageLibrary({
       mediaType: 'mixed',
-      quality: 1,
+      quality: 0.5,
       includeExtra: true,
     });
 

@@ -18,6 +18,9 @@ import CameraIcon from "../../assets/Images/camera_Icon.png"
 import { pickSingleFile } from "../UploadFileScreen/uploadFilePage"; 
 import { editProfile } from "../../Action/CustomerAction";
 import { UsersContext } from "../../Context/UserContext";
+import SuccessModal from "../ToastFile/TostFilePage";
+import AppLoader from "../ToastFile/LoaderPage";
+import { launchImageLibrary } from "react-native-image-picker";
 
 const EditProfile = (route) => {
 
@@ -29,10 +32,27 @@ const EditProfile = (route) => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
   const [showCameraIcon, setShowCameraIcon] = useState(false);
+  const [loading, setLoading] = useState(false)
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   console.log(gender)
   console.log(dob)
-  console.log(profileImage.uri.uri)
+  console.log(profileImage)
+
+  const handleImagePick = async () => {
+    try {
+      const image = await pickSingleFile();
+      
+      if (image) {
+        console.log("Selected image:", image);
+        setProfileImage({ uri: image });
+      } else {
+        console.log("User cancelled image selection");
+      }
+    } catch (error) {
+      console.log("Image pick error:", error);
+    }
+  };
 
   const handleSave = () => {
 
@@ -56,39 +76,53 @@ const EditProfile = (route) => {
        name: "payload.json",
     })
 
-    console.log(profileImage.uri.uri)
-
     if(profileImage){
+      console.log(profileImage)
 
       formDate.append("profilePic", {
           uri: profileImage.uri.uri,
           type: profileImage.type || "image/jpeg",
-          name: profileImage.fileName || "profile.jpg"
+          name: profileImage.name,
       })
 
     }
 
     editProfile(context.getToken,formDate).then(r=>{
       console.log(r)
-      navigation.goBack();
+      setLoading(true)
+
+      setTimeout(() => {
+          setLoading(false)
+
+          if(r.status==200){
+            setShowSuccessModal(true)
+
+            setTimeout(() => {
+              navigation.goBack();
+            }, 2000);
+          }
+      }, 2000);
+      
     })
     console.log("Saved profile:", { name, gender, dob, profileImage });
     
   };
- const handleImagePick = async () => {
-    try {
-      const image = await pickSingleFile();
-      
-      if (image) {
-        console.log("Selected image:", image);
-        setProfileImage({ uri: image });
-      } else {
-        console.log("User cancelled image selection");
-      }
-    } catch (error) {
-      console.log("Image pick error:", error);
-    }
-  };
+  
+  // const handleImagePick = async () => {
+  //     try {
+  //       const result = await launchImageLibrary({
+  //         mediaTypes: 'photo',
+  //         allowsEditing: true,
+  //         aspect: [1, 1],
+  //         quality: 0.5,
+  //       });
+  //       setProfileImage({uri:result.assets[0]})
+  //     } catch (error) {
+  //       console.log(error)
+  //     }
+  //   }
+
+ 
   // const handleImagePick = () => {
   //   const options = {
   //     mediaType: "photo",
@@ -108,8 +142,16 @@ const EditProfile = (route) => {
 
   return (
     <View style={styles.container}>
+      
       {/* Header */}
       <View style={styles.header}>
+        <AppLoader visible={loading}/> 
+      <SuccessModal
+        visible={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        message="Updated Successfully"
+        type="sucess"
+      />
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Image source={LeftArrow} style={{ width: 22, height: 22 }} />
         </TouchableOpacity>

@@ -1,4 +1,4 @@
-import React, { useState,useRef,useEffect} from "react";
+import React, { useState,useRef,useEffect, useContext} from "react";
 import {
   View,
   Text,
@@ -23,49 +23,19 @@ import PaYBillIcon from "../assets/Images/direction-right.png";
 import ViewIcon from "../assets/Images/view.png";
 import FilterIcon from "../assets/Images/Filter_Icon.png"
 import ArrowRightIcon from "../assets/Images/arrow-right.png";
+import { getPaymentList } from "../Action/HostelAction";
+import { UsersContext } from "../Context/UserContext";
 
 
 
 const Payment = (props) => {
+  console.log(props)
 
      const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState(null);
-  const sheetY = useRef(new Animated.Value(0)).current;
-
-useEffect(() => {
-  if (modalVisible) sheetY.setValue(0);
-}, [modalVisible]);
-
-const panResponder = useRef(
-  PanResponder.create({
-    onMoveShouldSetPanResponder: (_, g) => g.dy > 5,
-    onPanResponderMove: (_, g) => {
-      if (g.dy > 0) sheetY.setValue(g.dy);
-    },
-    onPanResponderRelease: (_, g) => {
-      if (g.dy > 120) {
-        Animated.timing(sheetY, {
-          toValue: 700,
-          duration: 200,
-          useNativeDriver: true,
-        }).start(() => {
-          onClose();
-        });
-      } else {
-        Animated.spring(sheetY, {
-          toValue: 0,
-          useNativeDriver: true,
-        }).start();
-      }
-    },
-  })
-).current;
-
-const onClose = () => {
-  setModalVisible(false);
-  setSelectedPayment(null);
-};
+  const [payment,setPayment]=useState([])
+  const context=useContext(UsersContext)
 
 
   const payments = [
@@ -135,6 +105,13 @@ const onClose = () => {
     },
   ];
 
+  useEffect(()=>{
+      getPaymentList(props.hostel[0].hostelId,context.getToken).then(r=>{
+        console.log(r)
+        setPayment(r.data)
+      })
+  },[])
+
 
 
 
@@ -181,49 +158,7 @@ const onClose = () => {
     setSelectedPayment(null);
   };
 
-// const handleDownload = async () => {
-//   try {
-//     const response = await fetch('https://yourapi.com/get-invoice'); 
-//     const data = await response.json();
 
-//     const fileUrl = data?.invoice_url; 
-//     if (!fileUrl) {
-//       Alert.alert('Error', 'No file URL found.');
-//       return;
-//     }
-
-//     const { config, fs } = ReactNativeBlobUtil;
-//     const downloads = fs.dirs.DownloadDir;
-//     const filePath = `${downloads}/invoice_${Date.now()}.pdf`;
-
-//     await config({
-//       fileCache: true,
-//       appendExt: 'pdf',
-//       path: filePath,
-//       addAndroidDownloads: {
-//         useDownloadManager: true,
-//         notification: true,
-//         path: filePath,
-//         description: 'Downloading invoice...',
-//       },
-//     }).fetch('GET', fileUrl);
-
-//     Alert.alert('Success', 'PDF downloaded successfully.');
-
-    
-//     FileViewer.open(filePath)
-//       .then(() => console.log('File opened successfully'))
-//       .catch((error) => {
-//         console.log('Error opening file:', error);
-//         Alert.alert('Error', 'File downloaded but could not be opened.');
-//       });
-    
-
-//   } catch (error) {
-//     console.log('Download error:', error);
-//     Alert.alert('Error', 'Something went wrong while downloading.');
-//   }
-// };
 
 
 
@@ -273,7 +208,7 @@ const handleReceiptPdfDownload =  () => {
   return (
     <>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        {payments.map((item, index) => (
+        {payment.map((item, index) => (
           <TouchableOpacity key={index} onPress={() => props.onPayment(item)}>
             <View style={styles.card}>
               <View style={styles.iconContainer}>
@@ -294,8 +229,8 @@ const handleReceiptPdfDownload =  () => {
 
               <View style={styles.infoContainer}>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.title}>{item.title}</Text>
-                  <Text style={styles.date}>{item.date}</Text>
+                  <Text style={styles.title}>{item.invoiceType}</Text>
+                  <Text style={styles.date}>{item.invoiceGeneratedDate}</Text>
                 </View>
 
                 <View style={styles.amountContainer}>

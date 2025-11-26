@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect, useContext } from "react";
 import {
   View,
   Text,
@@ -12,7 +12,8 @@ import { useNavigation } from "@react-navigation/native";
 import NotificationItem from "./NotificationItem";
 import { SwipeListView } from "react-native-swipe-list-view";
 import Delete from '../../assets/Images/trash.png'
-
+import { UsersContext } from "../../Context/UserContext";
+import { getNotification } from "../../Action/HostelAction";
 
 const notifications = [
   {
@@ -68,12 +69,21 @@ const notifications = [
   },
 ];
 
-const Notification = () => {
+const Notification = (props) => {
+  console.log(props)
+  const context=useContext(UsersContext)
   const navigation = useNavigation();
   const renderItem = ({ item }) => <NotificationItem item={item} />;
   const handleBack = () => navigation.goBack();
 
-  const [listData, setListData] = useState(notifications);
+  const [listData, setListData] = useState([]);
+
+  useEffect(()=>{
+    getNotification(props.route.params.hostel[0].hostelId,context.getToken).then(r=>{
+      console.log(r)
+      setListData(r.data)
+    })
+  },[])
 
 
   const deleteRow = (rowMap, rowKey) => {

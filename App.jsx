@@ -136,7 +136,8 @@ function AppContent(props) {
       console.log(error)
     })
 
-    if(props.token==null){
+    if(props.token!=null){
+      console.log(props.token)
       context.updateToken(props.token)
     }
 
