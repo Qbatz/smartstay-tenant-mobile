@@ -17,18 +17,13 @@ function MyStay(props) {
 
     const [complaints, setComplaints] = useState([])
     const [rentBill, setRentBill] = useState([])
-    const [showSheet, setShowSheet] = useState(false)
 
     console.log(rentBill)
 
     useEffect(() => {
         hostelDetails(props.hostel[0].hostelId, context.getToken).then(r => {
-            console.log(r)
             setComplaints(r.data.complaints)
-
-            const dat = r.data.currentMonthBills.filter(i => i.invoiceItem === "RENT")
-            setRentBill(dat)
-            console.log(dat)
+            setRentBill(r.data.currentMonthBills)
         })
     }, [])
 
@@ -64,18 +59,20 @@ function MyStay(props) {
 
         <View style={{ height: 140, marginTop: 5 }}>
             <Swiper loop showsPagination paginationStyle={{ bottom: 10 }} removeClippedSubviews index={0}
-                dotStyle={{width: 10, height: 10, borderRadius: 5, backgroundColor: 'transparent', borderWidth: 1.5, borderColor: '#CFCFCF',
+                dotStyle={{
+                    width: 10, height: 10, borderRadius: 5, backgroundColor: 'transparent', borderWidth: 1.5, borderColor: '#CFCFCF',
                     marginHorizontal: 5
                 }} activeDotColor="#1E45E1"
                 style={{ height: 110, borderRadius: 10, overflow: 'hidden', alignSelf: 'center' }} >
-                <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} colors={['#10267B', '#0227B5']} style={{ paddingTop: 20, paddingBottom: 40, paddingLeft: 12, borderRadius: 10, height: "70%" }}>
-                    <Text style={{ color: '#ffffff', fontSize: 16 }}>Hello water matainence on 5th June</Text>
+                <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} colors={['#10267B', '#0227B5']} style={{ paddingTop: 12, paddingLeft: 20, borderRadius: 10, height: "70%" }}>
+                    <Text style={{ color: '#ffffff', fontSize: 17,flexShrink:1,flexWrap: 'wrap',lineHeight:24 }}>
+                            Hello water matainence on 5th June </Text>
                 </LinearGradient>
-                <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} colors={['#10267B', '#0227B5']} style={{ paddingTop: 20, paddingBottom: 40, paddingLeft: 12, borderRadius: 10, height: "70%" }}>
-                    <Text style={{ color: '#ffffff', fontSize: 16 }}>field2</Text>
+                <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} colors={['#10267B', '#0227B5']} style={{ paddingTop: 12, paddingBottom: 40, paddingLeft: 15, borderRadius: 10, height: "70%" }}>
+                    <Text style={{ color: '#ffffff', fontSize: 17 }}>field2</Text>
                 </LinearGradient>
-                <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} colors={['#10267B', '#0227B5']} style={{ paddingTop: 20, paddingBottom: 40, paddingLeft: 12, borderRadius: 10, height: "70%" }}>
-                    <Text style={{ color: '#ffffff', fontSize: 16 }}> field3</Text>
+                <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} colors={['#10267B', '#0227B5']} style={{ paddingTop: 12, paddingBottom: 40, paddingLeft: 20, borderRadius: 10, height: "70%" }}>
+                    <Text style={{ color: '#ffffff', fontSize: 17 }}> field3</Text>
                 </LinearGradient>
             </Swiper>
         </View>
@@ -111,7 +108,7 @@ function MyStay(props) {
                 <View style={style.container}>
                     <View>
                         <Text style={{ fontSize: 22, fontWeight: '700', color: '#1C1C1E' }}>
-                            {'\u20B9'} {rentBill[0]?.amount}
+                            {'\u20B9'} {rentBill.rent}
                         </Text>
 
                         <Text style={{ fontSize: 13, fontWeight: '400', color: '#AEAEB2', marginTop: 5 }}>
@@ -222,69 +219,70 @@ function MyStay(props) {
 
         <ScrollView showsVerticalScrollIndicator={false}>
 
-    {complaints.map(i => {
-        const { backgroundColor, textColor } = getStatusColor(i.status)
+            {complaints.map(i => {
+                const { backgroundColor, textColor } = getStatusColor(i.status)
 
-        return (
-            <View key={i.complaintId}>
-
-                <View style={{
-                    borderWidth: 1,borderRadius: 12,marginTop: 12,flexDirection: 'row',justifyContent: 'space-between',
-                    borderColor: '#E5E5EA',backgroundColor: '#FFFFFF',
-                }}>
-
-                    {/* LEFT SECTION */}
-                    <View style={{
-                        paddingLeft: 20,paddingTop: 18,paddingBottom: 20,flex: 1
-                    }}>
-                        <Text
-                            numberOfLines={1}
-                            ellipsizeMode="tail"
-                            style={{
-                                fontSize: 17,fontWeight: '600',color: '#1C1C1E', maxWidth: '90%'}}
-                        >
-                            {i.description}
-                        </Text>
-
-                        <View style={{flexDirection: 'row', alignItems: 'center', paddingTop: 10}}>
-                            <Image
-                                source={require('../../assets/Images/bill.png')}
-                                style={{ width: 18, height: 18 }}
-                            />
-                            <Text style={{
-                                marginLeft: 8,fontSize: 14,fontWeight: '400',color: '#6C6C70'
-                            }}>
-                                {i.complaintTypeName}
-                            </Text>
-                        </View>
-                    </View>
-
-                    {/* RIGHT SECTION */}
-                    <View style={{
-                        justifyContent: 'center',alignItems: 'flex-end',paddingRight: 18,paddingTop: 18,paddingBottom: 20
-                    }}>
-                        <Text style={{
-                            color: '#9C9C9C',fontSize: 12,fontWeight: '400',marginBottom: 18
-                        }}>
-                            {i.complaintDate}
-                        </Text>
+                return (
+                    <View key={i.complaintId}>
 
                         <View style={{
-                            borderRadius: 20,paddingHorizontal: 12,paddingVertical: 4,backgroundColor: backgroundColor
+                            borderWidth: 1, borderRadius: 12, marginTop: 12, flexDirection: 'row', justifyContent: 'space-between',
+                            borderColor: '#E5E5EA', backgroundColor: '#FFFFFF',
                         }}>
-                            <Text style={{fontSize: 12,fontWeight: '500',color: textColor}}>
-                                {i.status}
-                            </Text>
+
+                            {/* LEFT SECTION */}
+                            <View style={{
+                                paddingLeft: 20, paddingTop: 18, paddingBottom: 20, flex: 1
+                            }}>
+                                <Text
+                                    numberOfLines={1}
+                                    ellipsizeMode="tail"
+                                    style={{
+                                        fontSize: 17, fontWeight: '600', color: '#1C1C1E', maxWidth: '90%'
+                                    }}
+                                >
+                                    {i.description}
+                                </Text>
+
+                                <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 10 }}>
+                                    <Image
+                                        source={require('../../assets/Images/bill.png')}
+                                        style={{ width: 18, height: 18 }}
+                                    />
+                                    <Text style={{
+                                        marginLeft: 8, fontSize: 14, fontWeight: '400', color: '#6C6C70'
+                                    }}>
+                                        {i.complaintTypeName}
+                                    </Text>
+                                </View>
+                            </View>
+
+                            {/* RIGHT SECTION */}
+                            <View style={{
+                                justifyContent: 'center', alignItems: 'flex-end', paddingRight: 18, paddingTop: 18, paddingBottom: 20
+                            }}>
+                                <Text style={{
+                                    color: '#9C9C9C', fontSize: 12, fontWeight: '400', marginBottom: 18
+                                }}>
+                                    {i.complaintDate}
+                                </Text>
+
+                                <View style={{
+                                    borderRadius: 20, paddingHorizontal: 12, paddingVertical: 4, backgroundColor: backgroundColor
+                                }}>
+                                    <Text style={{ fontSize: 12, fontWeight: '500', color: textColor }}>
+                                        {i.status}
+                                    </Text>
+                                </View>
+                            </View>
+
                         </View>
+
                     </View>
+                )
+            })}
 
-                </View>
-
-            </View>
-        )
-    })}
-
-</ScrollView>
+        </ScrollView>
 
 
 
@@ -294,18 +292,20 @@ function MyStay(props) {
 }
 
 const style = StyleSheet.create({
-    EbContainer: {borderWidth: 1,
-            flex: 1,
-            paddingTop: 14,
-            paddingLeft: 15,
-            paddingBottom: 16,
-            borderRadius: 12,
-            marginRight: 7,
-            borderColor: '#E5E5EA',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            backgroundColor: '#FFFFFF'},
+    EbContainer: {
+        borderWidth: 1,
+        flex: 1,
+        paddingTop: 14,
+        paddingLeft: 15,
+        paddingBottom: 16,
+        borderRadius: 12,
+        marginRight: 7,
+        borderColor: '#E5E5EA',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        backgroundColor: '#FFFFFF'
+    },
     container: {
         borderWidth: 1, flex: 1, paddingTop: 14, paddingLeft: 15, paddingBottom: 16, borderRadius: 12, marginLeft: 7,
         borderColor: '#E5E5EA', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#FFFFFF'

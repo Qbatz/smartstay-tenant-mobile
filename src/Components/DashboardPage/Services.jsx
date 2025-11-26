@@ -22,10 +22,9 @@ import { launchImageLibrary } from "react-native-image-picker";
 import AmenitiesPic from '../../assets/Images/amenities.png'
 import { UsersContext } from "../../Context/UserContext";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
-import { assignAmenities, complaints, unassignAmeties } from "../../Action/HostelAction";
+import { assignAmenities, complaints, getAmenitiesList, unassignAmeties } from "../../Action/HostelAction";
 
 function Services(props) {
-    console.log(props)
 
     const commonContext = useContext(UsersContext)
 
@@ -36,32 +35,15 @@ function Services(props) {
     const [modulevisible, setModalVisible] = useState(false)
     const [comment, setComment] = useState(false)
 
-    const [commentnote, setCommentNote] = useState(null)
-    const [commentMessage, setCommentmessage] = useState();
-    const [selectedValue, setSelectedValue] = useState(null);
-    const [isFocus, setIsFocus] = useState(false);
-
     const [assignedAmenities, setAssignedAmenity] = useState([])
     const [unassignedAmenities, setUnasignedAmenities] = useState([])
 
-    console.log(selectedfield)
 
-
-    useEffect(() => {
-        const data = [{ id: 1, person: 'You', comment: 'When will solve', date: '20 Jan -12.35pm' }, { id: 2, person: 'Priya', comment: 'Complaint assigned and rectify soon', date: '21 Jan -11.35pm' }, { id: 3, person: 'You', comment: 'Thank you', date: '21 Jan -2.35pm' }]
-        setCommentNote(data)
-    }, [])
+    
 
     useEffect(() => {
         firstclick('Complaint')
     }, [])
-
-
-    const list2 = [{ id: 1, Amenities: 'wifi', Amount: '339/Month' }, { id: 2, Amenities: 'Laundry', Amount: '299/month' }, { id: 3, Amenities: 'Food', Amount: '1500/month' }]
-
-    const list3 = [{ id: 1, Available: 'Parking' }, { id: 2, Available: 'Gym Access' }, { id: 3, Available: 'Cycle Rentals' }, { id: 4, Available: 'Cleaning' }]
-
-    const complainttype = [{ label: 'Plumbing', value: '1' }, { label: 'Electricity', value: '2' }, { label: 'Room Maintanence', value: '3' }, { label: 'Canteen food', value: '4' }, { label: 'Canteen food', value: '4' }]
 
 
     const getStatusColor = (status) => {
@@ -88,17 +70,11 @@ function Services(props) {
     useEffect(() => {
         complaints(props.hostel[0].hostelId, commonContext.getToken).then(r => {
             setComplaintsList(r?.data?.content)
-            console.log(r)
         })
 
-        assignAmenities(props.hostel[0].hostelId, commonContext.getToken).then(r => {
-            setAssignedAmenity(r.data)
-            console.log(r)
-        })
-
-        unassignAmeties(props.hostel[0].hostelId, commonContext.getToken).then(r => {
-            setUnasignedAmenities(r.data)
-            console.log(r)
+        getAmenitiesList(props.hostel[0].hostelId, commonContext.getToken).then(r => {
+            setAssignedAmenity(r.data.assignedAmenities)
+            setUnasignedAmenities(r.data.unassignedAmenities)
         })
     }, [])
 
@@ -111,56 +87,19 @@ function Services(props) {
     }, [commonContext.Complaint])
 
     function firstclick(value) {
-        console.log(value)
         setselectfield(value)
     }
     function secondclick(value) {
-        console.log(value)
         setselectfield(value)
         commonContext.Amenities('amenities')
     }
 
-    // const handleOpen = useCallback((complaint) => {
-    //     sheetRef.current?.snapToIndex();
-    //     console.log('nothing happing')
-    //     console.log(sheetRef)
-    //     setselectComplaint(complaint)
-    // }, []);
-
-    // const bottomOpen = (complaint) => {
-    //     console.log(complaint)
-    //     setModalVisible(true)
-    //     setselectComplaint(complaint)
-
-    // }
     const bottomClose = () => {
         setModalVisible(false)
         setComment(false)
     }
 
 
-    const sendclick = () => {
-        const data = {
-            id: 4, person: 'you', comment: commentMessage, date: '24 Jan -12.35pm'
-        }
-        setCommentNote(data)
-    }
-    const uploadimage = async () => {
-        try {
-            result = await launchImageLibrary({
-                mediaTypes: 'photo',
-                allowsEditing: true,
-                aspect: [1, 1],
-                quality: 1,
-            });
-            console.log(result)
-        } catch (error) {
-            console.log(error)
-
-        }
-
-
-    }
     return <View style={{ flex: 1, position: 'relative' }}>
         <View style={{ flexDirection: 'row', marginTop: 20, justifyContent: 'center', alignItems: 'center' }}>
             <TouchableOpacity onPress={() => firstclick("Complaint")} style={{

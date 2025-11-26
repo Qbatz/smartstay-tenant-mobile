@@ -1,25 +1,29 @@
 import AxiosConfig from "../Config/AxiosConfig";
 
 export const hostelList=async(token)=>{
-     
-    const response= await AxiosConfig.get("/v2/tenant/hostels", {
+    try{
+         const response= await AxiosConfig.get("/v2/tenant/hostels", {
         headers: {
             Authorization: 'Bearer ' + token
         }
     })
-    return response.data;   
+    return response.data;  
+    }catch(error){
+        return{status: error.response.status, message: error.response.data}
+    }  
 }
 
 export const hostelDetails=async(hostelId,token)=>{
-
-    console.log(hostelId)
-    const response=await AxiosConfig.get("/v2/tenant/hostels/" + hostelId, {
+    try{
+        const response=await AxiosConfig.get("/v2/tenant/hostels/my-stay-view/" + hostelId, {
         headers: {
             Authorization: 'Bearer ' + token
         }
     })
     return response;
-
+    }catch(error){
+        return{status: error.response.status, message: error.response.data}
+    }
 }
 
 export const complaints=async(hostelId,token)=>{
@@ -32,7 +36,7 @@ export const complaints=async(hostelId,token)=>{
     console.log(response)
     return response
     } catch (error){
-        console.log(error.response)
+        return{status: error.response.status, message: error.response.data}
     }
     
 
@@ -51,41 +55,46 @@ export const postComplaint=async(hostelId,token,formData)=>{
         console.log(response)
         return response;
     }catch(error){
-        console.log(error.response)
-        return{status: 400, message: error.response.data}
-    }
-       
-      
+        return{status: error.response.status, message: error.response.data}
+    }     
 }
 
 export const getComplaints=async(hostelId,complaintId,token)=>{
-    const response=await AxiosConfig.get('/v2/complaints/' + hostelId + "/" + complaintId, {
+    try{
+        const response=await AxiosConfig.get('/v2/complaints/' + hostelId + "/" + complaintId, {
         headers: {
             Authorization: 'Bearer ' + token
         }
     })
     return response;
+    }catch(error){
+        return{status: error.response.status, message: error.response.data}
+    }   
 }
 
-export const assignAmenities=async(hostelId,token)=>{
-
-    const response =await AxiosConfig.get('/v2/amenities/assigned/' + hostelId, {
+export const getAmenitiesList=async(hostelId,token)=>{
+    try{
+        const response =await AxiosConfig.get('/v2/amenities/' + hostelId, {
         headers: {
             Authorization: 'Bearer ' + token
         }
     })
-    console.log(response)
-    return response;
-}
+       return response;
+    }catch(error){
+        return{status: error.response.status, message: error.response.data}
+    }
 
-export const unassignAmeties=async(hostelId, token)=>{
-    const response=await AxiosConfig.get('/v2/amenities/unassigned/' + hostelId, {
-        headers: {
-            Authorization: 'Bearer ' + token
-        }
-    })
-    return response;
 }
+    
+
+// export const unassignAmeties=async(hostelId, token)=>{
+//     const response=await AxiosConfig.get('/v2/amenities/unassigned/' + hostelId, {
+//         headers: {
+//             Authorization: 'Bearer ' + token
+//         }
+//     })
+//     return response;
+// }
 
 export const getAmenties=async(hostelId,amenityId,token)=>{
     const response=await AxiosConfig.get('/v2/amenities/' + hostelId + "/" +amenityId, {
@@ -124,7 +133,7 @@ export const postRequestBedChange=async(hostelId,data,token)=>{
     })
     return response;
     } catch(error){
-        return{status: 400, message: error.response.data}
+        return{status: error.response.status, message: error.response.data}
     }  
 }
 
