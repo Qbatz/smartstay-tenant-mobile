@@ -1,4 +1,4 @@
-import React , {useContext, useEffect, useState} from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -34,25 +34,25 @@ import { customerDetails } from "../../Action/CustomerAction";
 
 const CustomerProfile = (route) => {
 
-  const context=useContext(UsersContext)
+  const context = useContext(UsersContext)
 
-         const navigation = useNavigation();
+  const navigation = useNavigation();
   const [selectedHostel, setSelectedHostel] = useState("Smartstay Hostel");
   const [dropdownVisible, setDropdownVisible] = useState(false);
-  const [customer,setCustomers]=useState()
+  const [customer, setCustomers] = useState()
 
   console.log(customer)
 
 
 
-  useEffect(()=>{
-    customerDetails(context.getToken).then(r=>{
+  useEffect(() => {
+    customerDetails(context.getToken).then(r => {
       console.log(r.data)
       setCustomers(r.data)
-    }).catch(error=>{
+    }).catch(error => {
       console.log(error)
     })
-  },[])
+  }, [])
 
 
   const hostels = [
@@ -60,42 +60,42 @@ const CustomerProfile = (route) => {
     { id: 2, name: "StayEasy Hostel", location: "Velachery" },
     { id: 3, name: "ComfortNest", location: "Thoraipakkam" },
   ];
- 
 
-const handleDownload = async () => {
-  try {
-    const response = await fetch("https://smartstaytestingapi.s3remotica.com/invoice/invoice-list-pdf", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTkzLCJzdWIiOjE5MywidXNlcl90eXBlIjoiYWRtaW4iLCJyb2xlX2lkIjowLCJwbGFuX2NvZGUiOiJvbmVfZGF5IiwicGxhbl9zdGF0dXMiOjEsImlhdCI6MTc2MjQxMDIzOSwiZXhwIjoxNzYyNDEyMDM5fQ.BNCXjNx4B9AH0UV9Yy_dXnnBLzjfDUY7qOJOzuxlS2E`,
-      },
-      body: JSON.stringify({
-        Date: "2025-11-01",
-        User_Id: "NOTI1629",
-        id: 2148,
-      }),
-    });
 
-    const data = await response.json();
+  const handleDownload = async () => {
+    try {
+      const response = await fetch("https://smartstaytestingapi.s3remotica.com/invoice/invoice-list-pdf", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTkzLCJzdWIiOjE5MywidXNlcl90eXBlIjoiYWRtaW4iLCJyb2xlX2lkIjowLCJwbGFuX2NvZGUiOiJvbmVfZGF5IiwicGxhbl9zdGF0dXMiOjEsImlhdCI6MTc2MjQxMDIzOSwiZXhwIjoxNzYyNDEyMDM5fQ.BNCXjNx4B9AH0UV9Yy_dXnnBLzjfDUY7qOJOzuxlS2E`,
+        },
+        body: JSON.stringify({
+          Date: "2025-11-01",
+          User_Id: "NOTI1629",
+          id: 2148,
+        }),
+      });
 
-    const pdfUrl = data?.pdf_url;
+      const data = await response.json();
 
-    if (pdfUrl) {
-      const supported = await Linking.canOpenURL(pdfUrl);
-      if (supported) {
-        await Linking.openURL(pdfUrl);
+      const pdfUrl = data?.pdf_url;
+
+      if (pdfUrl) {
+        const supported = await Linking.canOpenURL(pdfUrl);
+        if (supported) {
+          await Linking.openURL(pdfUrl);
+        } else {
+          Alert.alert("Error", "Cannot open this PDF link");
+        }
       } else {
-        Alert.alert("Error", "Cannot open this PDF link");
+        Alert.alert("No PDF found in response");
       }
-    } else {
-      Alert.alert("No PDF found in response");
+    } catch (error) {
+      console.error("PDF open error:", error);
+      Alert.alert("Error", "Failed to open PDF");
     }
-  } catch (error) {
-    console.error("PDF open error:", error);
-    Alert.alert("Error", "Failed to open PDF");
-  }
-};
+  };
 
 
 
@@ -105,7 +105,7 @@ const handleDownload = async () => {
   };
 
   const handleEditProfile = () => {
-    navigation.navigate("EditProfile", {customer:customer});
+    navigation.navigate("EditProfile", { customer: customer });
 
   }
 
@@ -113,73 +113,73 @@ const handleDownload = async () => {
     context.logout('false')
     remoteData(ACCESS_TOKEN)
     remoteData(PHONE_NO)
-    storeData(LOGGEDIN,"false")
+    storeData(LOGGEDIN, "false")
     context.updateToken(null)
 
 
-    
+
     // navigation.navigate("SplashScreen");
   }
 
-  
 
-   const handleBack = () => navigation.goBack();
+
+  const handleBack = () => navigation.goBack();
 
 
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer} onPress={handleBack}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-  <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-    <Image
-      source={LeftArrow}
-      style={{ height: 25, width: 25 }}
-    />
-  </TouchableOpacity>
-  <Text style={styles.header}>Customer Profile</Text>
-</View>
+          <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+            <Image
+              source={LeftArrow}
+              style={{ height: 25, width: 25 }}
+            />
+          </TouchableOpacity>
+          <Text style={styles.header}>Customer Profile</Text>
+        </View>
 
         <View style={styles.profileCard}>
           <View style={styles.profileRow}>
             <Image
-              source={{uri:customer?.profilePic}}
+              source={{ uri: customer?.profilePic }}
               style={styles.profileImage} resizeMode="contain"
             />
             <View style={{ flex: 1, marginLeft: 10 }}>
-                <View style={{display:'flex', flexDirection:'row'}}>
+              <View style={{ display: 'flex', flexDirection: 'row' }}>
                 <Text style={styles.profileName}>{customer?.firstName}</Text>
-                <Image  source={VerifyIcon} resizeMode="contain" style={{marginTop:2 , marginLeft:4 , height:20 , width:20}}/>
-                </View>
+                <Image source={VerifyIcon} resizeMode="contain" style={{ marginTop: 2, marginLeft: 4, height: 20, width: 20 }} />
+              </View>
 
               <View style={styles.infoRow}>
                 <View style={styles.FloorBadgePending}>
-              <Text style={{color:'black'}}>Ground Floor</Text>
-            </View>
+                  <Text style={{ color: 'black' }}>Ground Floor</Text>
+                </View>
 
-  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-  <Image
-    source={RoomIcon}
-    style={{ height: 16, width: 16, marginRight: 4 }}
-    resizeMode="contain"
-  />
-  <Text>{customer?.bookingDetails?.floorName}</Text>
-</View>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Image
+                    source={RoomIcon}
+                    style={{ height: 16, width: 16, marginRight: 4 }}
+                    resizeMode="contain"
+                  />
+                  <Text>{customer?.bookingDetails?.floorName}</Text>
+                </View>
 
-<View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
-  <Image
-    source={BedIcon}
-    style={{ height: 16, width: 16, marginRight: 4 }}
-    resizeMode="contain"
-  />
-  <Text>{customer?.bookingDetails?.bedName}</Text>
-</View>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
+                  <Image
+                    source={BedIcon}
+                    style={{ height: 16, width: 16, marginRight: 4 }}
+                    resizeMode="contain"
+                  />
+                  <Text>{customer?.bookingDetails?.bedName}</Text>
+                </View>
 
-          
+
               </View>
             </View>
             <TouchableOpacity onPress={handleEditProfile}>
-              <Image  source={EditIcon} resizeMode="contain"
-              style={{height:20 , width:20}}/>
+              <Image source={EditIcon} resizeMode="contain"
+                style={{ height: 20, width: 20 }} />
             </TouchableOpacity>
           </View>
         </View>
@@ -188,7 +188,7 @@ const handleDownload = async () => {
           <View style={styles.cardRow}>
             <Text style={styles.cardTitle}>KYC Status</Text>
             <View style={styles.statusBadgePending}>
-                   <Image  source={PendingIcon} resizeMode="contain" style={{marginRight:3 , marginTop:4 , height:14 , width:14}}/>
+              <Image source={PendingIcon} resizeMode="contain" style={{ marginRight: 3, marginTop: 4, height: 14, width: 14 }} />
               <Text style={styles.statusText}>Pending</Text>
             </View>
           </View>
@@ -197,106 +197,106 @@ const handleDownload = async () => {
           </Text>
         </View>
 
-    
 
-         <View style={styles.card}>
-      <TouchableOpacity
-        style={styles.hostelHeader}
-        onPress={() => setDropdownVisible(!dropdownVisible)}
-        activeOpacity={0.8}
-      >  
-        <Image
-          source={HostelImage}
-          style={styles.hostelImage}
-        />
-        <View style={{ flex: 1 }}>
-          <Text style={styles.hostelTitle}>{selectedHostel}</Text>
-          <View style={styles.locationRow}>
-             <Image
-          source={LocationIcon}
-          resizeMode="contain" style={{ width: 20, height: 20 }}
-        />
-            <Text style={styles.locationText}>Kandanchavadi</Text>
+
+        <View style={styles.card}>
+          <TouchableOpacity
+            style={styles.hostelHeader}
+            onPress={() => setDropdownVisible(!dropdownVisible)}
+            activeOpacity={0.8}
+          >
+            <Image
+              source={HostelImage}
+              style={styles.hostelImage}
+            />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.hostelTitle}>{selectedHostel}</Text>
+              <View style={styles.locationRow}>
+                <Image
+                  source={LocationIcon}
+                  resizeMode="contain" style={{ width: 20, height: 20 }}
+                />
+                <Text style={styles.locationText}>Kandanchavadi</Text>
+              </View>
+            </View>
+
+            <Ionicons
+              name={dropdownVisible ? "chevron-up" : "chevron-down"}
+              size={22}
+              color="#000"
+            />
+          </TouchableOpacity>
+
+          {dropdownVisible && (
+            <View style={styles.dropdown}>
+              <ScrollView>
+                {hostels.map((item) => (
+                  <TouchableOpacity
+                    key={item.id}
+                    style={styles.dropdownItem}
+                    onPress={() => handleSelectHostel(item)}
+                  >
+                    <Text style={styles.dropdownText}>{item.name}</Text>
+                    <Text style={styles.dropdownSub}>{item.location}</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+          )}
+
+
+          <View style={styles.divider} />
+
+          <Text style={styles.sectionTitle}>Rental Details</Text>
+
+          <View style={styles.detailRow}>
+
+            <Text style={styles.detailLabel}>Joined Date</Text>
+            <View style={{ display: 'flex', flexDirection: 'row' }}>
+              <Image
+                source={DateIcon}
+                resizeMode="contain" style={{ width: 20, height: 20 }}
+              />
+              <Text style={styles.detailValue}>02 May 2024</Text>
+            </View>
+          </View>
+
+          <View style={styles.detailRow}>
+
+            <Text style={styles.detailLabel}>Advance Paid</Text>
+            <View style={{ display: 'flex', flexDirection: 'row' }}>
+              <Image
+                source={MoneyIcon}
+                resizeMode="contain" style={{ width: 20, height: 20 }}
+              />
+              <Text style={styles.detailValue}>₹4,000.00</Text>
+            </View>
+          </View>
+
+          <View style={styles.detailRow}>
+
+            <Text style={styles.detailLabel}>Monthly Rent</Text>
+            <View style={{ display: 'flex', flexDirection: 'row' }}>
+              <Image
+                source={RentAmountIcon}
+                resizeMode="contain" style={{ width: 20, height: 20 }}
+              />
+              <Text style={styles.detailValue}>₹8,000.00</Text>
+            </View>
+          </View>
+
+          <View style={styles.detailRow}>
+
+            <Text style={styles.detailLabel}>Due Date</Text>
+            <View style={{ display: 'flex', flexDirection: 'row' }}>
+              <Image
+                source={DateIcon}
+                resizeMode="contain" style={{ width: 20, height: 20 }}
+              />
+              <Text style={styles.detailValue}>5th of Every Month</Text>
+            </View>
           </View>
         </View>
-
-        <Ionicons
-          name={dropdownVisible ? "chevron-up" : "chevron-down"}
-          size={22}
-          color="#000"
-        />
-      </TouchableOpacity>
-
-     {dropdownVisible && (
-  <View style={styles.dropdown}>
-    <ScrollView>
-      {hostels.map((item) => (
-        <TouchableOpacity
-          key={item.id}
-          style={styles.dropdownItem}
-          onPress={() => handleSelectHostel(item)}
-        >
-          <Text style={styles.dropdownText}>{item.name}</Text>
-          <Text style={styles.dropdownSub}>{item.location}</Text>
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
-  </View>
-)}
-
-
-      <View style={styles.divider} />
-
-      <Text style={styles.sectionTitle}>Rental Details</Text>
-
-      <View style={styles.detailRow}>
-       
-        <Text style={styles.detailLabel}>Joined Date</Text>
-        <View style={{display:'flex', flexDirection:'row'}}>
-         <Image
-          source={DateIcon}
-          resizeMode="contain" style={{ width: 20, height: 20 }}
-        />
-        <Text style={styles.detailValue}>02 May 2024</Text>
-        </View>
-      </View>
-
-      <View style={styles.detailRow}>
-      
-        <Text style={styles.detailLabel}>Advance Paid</Text>
-         <View style={{display:'flex', flexDirection:'row'}}>
-         <Image
-          source={MoneyIcon}
-          resizeMode="contain" style={{ width: 20, height: 20 }}
-        />
-        <Text style={styles.detailValue}>₹4,000.00</Text>
-        </View>
-      </View>
-
-      <View style={styles.detailRow}>
-    
-        <Text style={styles.detailLabel}>Monthly Rent</Text>
-         <View style={{display:'flex', flexDirection:'row'}}>
-        <Image
-          source={RentAmountIcon}
-          resizeMode="contain" style={{ width: 20, height: 20 }}
-        />
-        <Text style={styles.detailValue}>₹8,000.00</Text>
-        </View>
-      </View>
-
-      <View style={styles.detailRow}>
-  
-        <Text style={styles.detailLabel}>Due Date</Text>
-           <View style={{display:'flex', flexDirection:'row'}}>
-       <Image
-          source={DateIcon}
-          resizeMode="contain" style={{ width: 20, height: 20 }}
-        />
-        <Text style={styles.detailValue}>5th of Every Month</Text>
-        </View>
-      </View>
-    </View>
 
 
         <View style={styles.card}>
@@ -315,37 +315,37 @@ const handleDownload = async () => {
             View your Rental Agreement Details as PDF
           </Text>
           <View style={styles.buttonRow}>
-            <TouchableOpacity style={styles.outlineButton}  onPress={() => navigation.navigate("AgreementViewScreen")}>
+            <TouchableOpacity style={styles.outlineButton} onPress={() => navigation.navigate("AgreementViewScreen")}>
               <Text style={styles.outlineButtonText}>View</Text>
-                 <Image  source={ViewIcon} resizeMode="contain" style={{ width: 20, height: 20 , marginLeft:8}}/>
+              <Image source={ViewIcon} resizeMode="contain" style={{ width: 20, height: 20, marginLeft: 8 }} />
             </TouchableOpacity>
             {/* <TouchableOpacity style={styles.primaryButtonSmall}>
               <Text style={styles.primaryButtonText}>Download</Text>
                  <Image  source={DownloadIcon} resizeMode="contain" style={{ width: 20, height: 20 , marginLeft:8 }}/>
             </TouchableOpacity> */}
-         <TouchableOpacity style={styles.primaryButtonSmall} onPress={handleDownload}>
-  <Text style={styles.primaryButtonText}>Download</Text>
-  <Image source={DownloadIcon} resizeMode="contain" style={{ width: 20, height: 20 , marginLeft:8 }}/>
-</TouchableOpacity>
+            <TouchableOpacity style={styles.primaryButtonSmall} onPress={handleDownload}>
+              <Text style={styles.primaryButtonText}>Download</Text>
+              <Image source={DownloadIcon} resizeMode="contain" style={{ width: 20, height: 20, marginLeft: 8 }} />
+            </TouchableOpacity>
 
 
           </View>
         </View>
 
         <View style={styles.helpRow}>
-          <Image  source={InfoIcon} resizeMode="contain" style={{ width: 20, height: 20 }}/>
+          <Image source={InfoIcon} resizeMode="contain" style={{ width: 20, height: 20 }} />
           <Text style={styles.helpText}>Help & Information</Text>
         </View>
 
-<View style={{ marginTop: 20, }}>
+        <View style={{ marginTop: 20, }}>
           <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Image  source={LogoutIcon} resizeMode="contain" style={{ width: 20, height: 20 }}/>
-        <Text style={styles.logoutText}>Logout</Text>
-      </TouchableOpacity>
-      </View>
+            <Image source={LogoutIcon} resizeMode="contain" style={{ width: 20, height: 20 }} />
+            <Text style={styles.logoutText}>Logout</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
 
-    
+
     </View>
   );
 };
@@ -356,13 +356,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    paddingTop:30,
+    paddingTop: 30,
   },
   scrollContainer: {
     padding: 20,
-    paddingBottom: 100, 
+    paddingBottom: 100,
   },
-    backButton: {
+  backButton: {
     flexDirection: "row",
     alignItems: "center",
     marginTop: 7,
@@ -421,7 +421,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   statusBadgePending: {
-    display:'flex', flexDirection:'row',
+    display: 'flex', flexDirection: 'row',
     backgroundColor: "rgba(236, 155, 41, 1)",
     paddingVertical: 4,
     paddingHorizontal: 10,
@@ -443,7 +443,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
 
- card: {
+  card: {
     backgroundColor: "#fff",
     padding: 15,
     borderRadius: 12,
@@ -492,7 +492,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   detailLabel: {
-    marginBottom:5,
+    marginBottom: 5,
     color: "#555",
     fontWeight: "500",
     flex: 1,
@@ -500,7 +500,7 @@ const styles = StyleSheet.create({
   detailValue: {
     color: "#000",
     fontWeight: "600",
-    marginLeft:8
+    marginLeft: 8
   },
   dropdown: {
     marginTop: 10,
@@ -525,11 +525,11 @@ const styles = StyleSheet.create({
   },
 
   warningText: {
-    backgroundColor:'rgba(255, 246, 244, 1)',
+    backgroundColor: 'rgba(255, 246, 244, 1)',
     color: "rgba(255, 0, 0, 1)",
     fontSize: 13,
     marginBottom: 10,
-    padding:5
+    padding: 5
   },
   primaryButton: {
     backgroundColor: "#0057FF",
@@ -542,10 +542,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#0057FF",
     paddingVertical: 10,
     borderRadius: 8,
-    display:'flex',
-    flexDirection:'row',
+    display: 'flex',
+    flexDirection: 'row',
     alignItems: "center",
-    justifyContent:'center'
+    justifyContent: 'center'
   },
   primaryButtonText: {
     color: "#fff",
@@ -563,10 +563,10 @@ const styles = StyleSheet.create({
     borderColor: "#0057FF",
     paddingVertical: 10,
     borderRadius: 8,
-    display:'flex',
-    flexDirection:'row',
+    display: 'flex',
+    flexDirection: 'row',
     alignItems: "center",
-    justifyContent:'center'
+    justifyContent: 'center'
   },
   outlineButtonText: {
     color: "#0057FF",
@@ -587,14 +587,14 @@ const styles = StyleSheet.create({
     color: "#555",
   },
   logoutButton: {
-    width:"100%",
+    width: "100%",
     flexDirection: "row",
     paddingVertical: 15,
     borderTopWidth: 1,
     borderColor: "#eee",
     backgroundColor: "#FFF0F0",
-    paddingLeft:5,
-    borderRadius:7
+    paddingLeft: 5,
+    borderRadius: 7
   },
   logoutText: {
     color: "#ff3b30",

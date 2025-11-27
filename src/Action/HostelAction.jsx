@@ -15,7 +15,7 @@ export const hostelList=async(token)=>{
 
 export const hostelDetails=async(hostelId,token)=>{
     try{
-        const response=await AxiosConfig.get("/v2/tenant/hostels/my-stay-view/" + hostelId, {
+        const response=await AxiosConfig.get("/v2/tenant/hostels/" + hostelId, {
         headers: {
             Authorization: 'Bearer ' + token
         }
@@ -85,16 +85,6 @@ export const getAmenitiesList=async(hostelId,token)=>{
     }
 
 }
-    
-
-// export const unassignAmeties=async(hostelId, token)=>{
-//     const response=await AxiosConfig.get('/v2/amenities/unassigned/' + hostelId, {
-//         headers: {
-//             Authorization: 'Bearer ' + token
-//         }
-//     })
-//     return response;
-// }
 
 export const getAmenties=async(hostelId,amenityId,token)=>{
     const response=await AxiosConfig.get('/v2/amenities/' + hostelId + "/" +amenityId, {
@@ -138,7 +128,6 @@ export const postRequestBedChange=async(hostelId,data,token)=>{
 }
 
 export const postRquestAmenties=async(hostelId,token,amenityId)=>{
-    console.log(hostelId,token,amenityId)
     try{
         const response=await AxiosConfig.post('/v2/amenities/request-amenity/' + hostelId + "/" + amenityId, {}, {
         headers: {
@@ -147,7 +136,6 @@ export const postRquestAmenties=async(hostelId,token,amenityId)=>{
     })
     return response;
     }catch(error){
-        console.log(error.response)
         return{status: error.response.status, message: error.response.data}
     }   
 }

@@ -4,25 +4,10 @@ import AddComplaint from '../../assets/Images/addComplaint.png'
 import RightDirection from '../../assets/Images/direction-right.png'
 import AddSquare from '../../assets/Images/add-square.png'
 import MessagePic from '../../assets/Images/Group (1).png'
-import Edit from '../../assets/Images/edit.png'
-import Delete from '../../assets/Images/trash.png'
-import Damage1 from '../../assets/Images/damage1.png'
-import Damage2 from '../../assets/Images/damage2.png'
-import Damage3 from '../../assets/Images/damage3.png'
-import Trash from '../../assets/Images/trash 01.png'
-import CommentMesg from '../../assets/Images/commentMessage.png'
-import Group from '../../assets/Images/Group.png'
-import Customer from "../../assets/Images/Customer_Icon.png"
-import SendButton from '../../assets/Images/Send.png'
-import { Dropdown } from "react-native-element-dropdown";
-import Ionicons from 'react-native-vector-icons/Ionicons'
-import CameraPic from '../../assets/Images/cameraPic.png'
-import File from '../../assets/Images/files.png'
-import { launchImageLibrary } from "react-native-image-picker";
 import AmenitiesPic from '../../assets/Images/amenities.png'
 import { UsersContext } from "../../Context/UserContext";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
-import { assignAmenities, complaints, getAmenitiesList, unassignAmeties } from "../../Action/HostelAction";
+import { complaints, getAmenitiesList } from "../../Action/HostelAction";
+import NoResultPic from '../../assets/Images/NoResultPic.png'
 
 function Services(props) {
 
@@ -39,7 +24,7 @@ function Services(props) {
     const [unassignedAmenities, setUnasignedAmenities] = useState([])
 
 
-    
+
 
     useEffect(() => {
         firstclick('Complaint')
@@ -144,24 +129,25 @@ function Services(props) {
             </TouchableOpacity>
         </View>
 
-        {selectedfield == 'Complaint' ? complaintsList.length > 0 ? <FlatList showsVerticalScrollIndicator={false}
+        {selectedfield == 'Complaint' ? complaintsList?.length > 0 ? <FlatList showsVerticalScrollIndicator={false}
             style={{ marginTop: 10, position: 'relative' }}
             keyExtractor={(item) => item.complaintId}
             data={complaintsList}
             renderItem={({ item }) => {
                 const { backgroundColor, textColor } = getStatusColor(item.status);
                 return <View key={item.complaintId}>
-                    <TouchableOpacity  onPress={() => props.onOpen(item)}>
+                    <TouchableOpacity onPress={() => props.onOpen(item)}>
                         <View
                             style={style.complaintStyle}
                         >
                             {/* LEFT SIDE */}
                             <View style={{ flex: 1, paddingRight: 10 }}>
                                 <Text
-                                    numbe   rOfLines={1}
+                                    numbe rOfLines={1}
                                     ellipsizeMode="tail"
                                     style={{
-                                        fontSize: 16,fontWeight: '600',color: '#1C1C1C',marginBottom: 10 }}
+                                        fontSize: 16, fontWeight: '600', color: '#1C1C1C', marginBottom: 10
+                                    }}
                                 >
                                     {item.description}
                                 </Text>
@@ -173,7 +159,8 @@ function Services(props) {
                                     />
                                     <Text
                                         style={{
-                                            marginLeft: 8,fontSize: 14,fontWeight: '400',color: '#505050',}}
+                                            marginLeft: 8, fontSize: 14, fontWeight: '400', color: '#505050',
+                                        }}
                                     >
                                         {item.complaintTypeName}
                                     </Text>
@@ -184,7 +171,7 @@ function Services(props) {
                             <View style={{ alignItems: 'flex-end' }}>
                                 <Text
                                     style={{
-                                        fontSize: 12,color: '#A4A4A4',marginBottom: 8,fontWeight: '400',                                                                           
+                                        fontSize: 12, color: '#A4A4A4', marginBottom: 8, fontWeight: '400',
                                     }}
                                 >
                                     {item.complaintDate}
@@ -214,7 +201,22 @@ function Services(props) {
                 </View>
 
 
-            }} /> : <Text>No Complaints Found</Text> :
+            }} /> : <View style={style.noResult}>
+            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                <Image
+                    source={NoResultPic}
+                    style={{ width: 324, height: 221, resizeMode: 'contain', marginBottom: 20,}}
+                />
+                <Text style={{fontSize: 22,fontWeight: '700',color: '#000',marginBottom: 8,}}>
+                    No Results Found!
+                </Text>
+                <Text style={{ fontSize: 15, color: '#555', textAlign: 'center', width: 260, lineHeight: 18, }}>
+                    Try adjusting your search or filters to see more options.
+                </Text>
+            </View>
+        </View>
+
+            :
             <ScrollView
                 style={{ marginTop: 10 }}
                 showsVerticalScrollIndicator={false}
@@ -228,7 +230,7 @@ function Services(props) {
                 <FlatList
                     data={assignedAmenities}
                     keyExtractor={(item) => item.amenityId}
-                    scrollEnabled={false} // important! to avoid conflict with parent ScrollView
+                    scrollEnabled={false} 
                     renderItem={({ item }) => (
                         <View style={{ paddingTop: 10 }}>
                             <TouchableOpacity onPress={() => props.onAmenities(item, 'My-Amenities')}>
@@ -297,39 +299,22 @@ function Services(props) {
             </ScrollView>}
 
 
-        {/* {selectedfield === list2.length ? (
-            
-        ) : null} */}
-
-
-
 
         {selectedfield == 'Complaint' && <View style={{ position: 'absolute', bottom: 35, right: -3 }}>
             <TouchableOpacity onPress={() => props.onSheet()}>
                 <Image source={AddComplaint} style={{ width: 48, height: 47 }} />
             </TouchableOpacity>
         </View>}
-
-        {/* // ----Modal----- */}
-
-
-
-
-
     </View>
-
-
-
-
-
 }
 const style = StyleSheet.create({
-    
+
     complaintStyle: {
-                     borderWidth: 1,borderColor: '#E8E8E8',  borderRadius: 12,marginTop: 12,paddingVertical: 16,
-                     paddingHorizontal: 18, backgroundColor: '#FFFFFF',shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
-                     shadowOpacity: 0.08, shadowRadius: 4,elevation: 2,flexDirection: 'row', justifyContent: 'space-between',
-                     }                                             
-                                  
+        borderWidth: 1, borderColor: '#E8E8E8', borderRadius: 12, marginTop: 12, paddingVertical: 16,
+        paddingHorizontal: 18, backgroundColor: '#FFFFFF', shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.08, shadowRadius: 4, elevation: 2, flexDirection: 'row', justifyContent: 'space-between',
+    },
+    noResult:{flex: 1,justifyContent: 'center',alignItems: 'center',paddingBottom:20}
+
 })
 export default Services;
