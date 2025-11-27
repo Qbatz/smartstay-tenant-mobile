@@ -58,7 +58,7 @@ function MyStay(props) {
     return <View style={{ backgroundColor: '#ffffff', flex: 1, width: '100%' }}>
 
         <View style={{ height: 140, marginTop: 5 }}>
-            <Swiper loop showsPagination paginationStyle={{ bottom: 10 }} removeClippedSubviews index={0}
+            <Swiper loop showsPagination paginationStyle={{ bottom: 10 }} removeClippedSubviews 
                 dotStyle={{
                     width: 10, height: 10, borderRadius: 5, backgroundColor: 'transparent', borderWidth: 1.5, borderColor: '#CFCFCF',
                     marginHorizontal: 5

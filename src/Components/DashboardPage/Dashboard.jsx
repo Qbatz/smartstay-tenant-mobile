@@ -85,8 +85,10 @@ function Dashboard(props) {
   const [loading, setLoading] = useState(false)
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState(null);
+  const [sendComment,setSendComment]=useState(null)
 
 
+  console.log(sendComment)
 
   const sheetY = useRef(new Animated.Value(700)).current;
 
@@ -189,15 +191,12 @@ function Dashboard(props) {
 
 
   const handleNotificationShow = () => {
-    navigation.navigate("Notification", {hostel:props.route.params.hostel});
+    navigation.navigate("Notification", { hostel: props.route.params.hostel });
   };
 
   const handleProfile = () => {
     navigation.navigate("CustomerProfile");
   };
-
-
-
 
   const handle = (complaint) => {
 
@@ -234,6 +233,8 @@ function Dashboard(props) {
       console.log(r)
     })
   }
+
+
 
   // ------Add complaint
 
@@ -431,11 +432,11 @@ function Dashboard(props) {
     setPlan(id)
   }
 
-  const onRequestAmenities=(amenityId)=>{
+  const onRequestAmenities = (amenityId) => {
 
-      postRquestAmenties(props.route.params.hostel[0].hostelId,context.getToken,amenityId).then(r=>{
-        console.log(r)
-      })
+    postRquestAmenties(props.route.params.hostel[0].hostelId, context.getToken, amenityId).then(r => {
+      console.log(r)
+    })
   }
 
   // ------Payment---------
@@ -681,7 +682,7 @@ function Dashboard(props) {
                             <View key={item.id}
                               style={{ paddingLeft: 10, position: "relative" }}>
                               <TouchableOpacity onPress={() => imageclick(item.id)}>
-                                <Image source={{uri: item.imageUrl}} style={{ width: 90, height: 70, borderRadius: 5 }} />
+                                <Image source={{ uri: item.imageUrl }} style={{ width: 90, height: 70, borderRadius: 5 }} />
                                 {imageid === item.id && deletevisible && (
                                   <TouchableOpacity style={{ position: "absolute", bottom: 25, right: 35, }} >
                                     <Image source={Trash} style={{ width: 21.09, height: 21.09, }} />
@@ -698,10 +699,10 @@ function Dashboard(props) {
                       {/* COMMENT INPUT */}
                       <View style={{ paddingTop: 22 }}>
                         <View style={{ padding: 4, borderRadius: 10, borderWidth: 1, justifyContent: "space-between", flexDirection: "row", alignItems: "center", }} >
-                          <TextInput placeholder="Add your Comment" />
-                          <TouchableOpacity onPress={commentclick}>
+                          <TextInput value={sendComment} placeholder="Add your Comment"  onChangeText={setSendComment}/>
+                          <TouchableOpacity onPress={sendComment?sendclick:commentclick}>
                             <Image
-                              source={CommentMesg}
+                              source={sendComment?SendButton:CommentMesg}
                               style={{ width: 23, height: 23, marginRight: 15, }} />
                           </TouchableOpacity>
                         </View>
@@ -1182,7 +1183,7 @@ function Dashboard(props) {
                       </View>
                     </View>
                     <View >
-                      <TouchableOpacity onPress={()=>onRequestAmenities(available.amenityId)}
+                      <TouchableOpacity onPress={() => onRequestAmenities(available.amenityId)}
                         style={{ backgroundColor: '#1d41d5', paddingVertical: 12, alignItems: 'center', borderRadius: 20 }}>
                         <Text style={{ fontSize: 14.11, fontWeight: 600, color: '#ffffff' }}>Request Amenity</Text>
                       </TouchableOpacity>
@@ -1655,19 +1656,19 @@ const style = StyleSheet.create({
   bottomSheet: {
     height: '60%',
     backgroundColor: '#fff',
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 10
   },
   bottomsheets: {
-    height: '90%', backgroundColor: '#fff', borderTopLeftRadius: 30, borderTopRightRadius: 30, paddingHorizontal: 20,
+    height: '90%', backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingHorizontal: 20,
     paddingTop: 20, paddingBottom: 10
   },
   dragindictor: { width: 50, height: 4, backgroundColor: "#ccc", borderRadius: 2, alignSelf: "center", marginBottom: 10 },
   amenitiesBottomSheet: {
-    height: '50%', backgroundColor: '#fff', borderTopLeftRadius: 30, borderTopRightRadius: 30, paddingHorizontal: 20,
+    height: '50%', backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingHorizontal: 20,
     paddingTop: 20, paddingBottom: 10
   },
   modalBackground: {
