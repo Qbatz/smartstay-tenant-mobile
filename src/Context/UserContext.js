@@ -1,4 +1,5 @@
 import React,{createContext, useState} from "react";
+import { hostelDetails } from "../Action/HostelAction";
 
  export const UsersContext=createContext();
 
@@ -9,7 +10,10 @@ const UserContext=(props)=> {
     const [SerialNo, setSerialNo]=useState();
     const [phoneNumber, setPhoneNo]=useState();
     const [LoggedIn,setLoggedIn]=useState()
+    const [UserId,setUserId]=useState();
+    const [HostelDetail,setHostelDetail]=useState();
 
+    console.log(HostelDetail)
 
 
     function accessTokenfn(value){
@@ -35,8 +39,9 @@ const UserContext=(props)=> {
         setLoggedIn(value)
     }
 
-    return<UsersContext.Provider value={{updateToken:accessTokenfn, getToken:AccessToken, jumpComplain:jumpcomplainfn, Complaint:complaint,Amenities:amenitiesfn, serialNo:serialNofn, SerialNo:SerialNo,
-        phoneNo:PhoneNofn,phoneNumber:phoneNumber,loggedin:loggedinfn,LoggedIn:LoggedIn,logout:logoutfn
+    return<UsersContext.Provider value={{updateToken:accessTokenfn, getToken:AccessToken, jumpComplain:jumpcomplainfn,
+         Complaint:complaint,Amenities:amenitiesfn, serialNo:serialNofn, SerialNo:SerialNo, phoneNo:PhoneNofn,phoneNumber:phoneNumber,
+         loggedin:loggedinfn,LoggedIn:LoggedIn,logout:logoutfn,userId:setUserId,getUserId:UserId,updateHostelDetail:setHostelDetail,getHostelDetail:HostelDetail
     }} >
         {props.children}
     </UsersContext.Provider>

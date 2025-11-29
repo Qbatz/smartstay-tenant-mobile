@@ -29,6 +29,9 @@ import { UsersContext } from "../../Context/UserContext";
 import { remoteData, storeData } from "../../Utils/Storage";
 import { ACCESS_TOKEN, LOGGEDIN, PHONE_NO } from "../../Utils/Constant";
 import { customerDetails } from "../../Action/CustomerAction";
+import buildings from '../../assets/Images/buildings.png'
+import paperclip from '../../assets/Images/paperclip.png'
+import sideframe from '../../assets/Images/sideframe.png'
 
 
 
@@ -115,10 +118,11 @@ const CustomerProfile = (route) => {
     remoteData(PHONE_NO)
     storeData(LOGGEDIN, "false")
     context.updateToken(null)
-
-
-
     // navigation.navigate("SplashScreen");
+  }
+
+  const HostelClick=()=>{
+    navigation.navigate('ProfileHostels')
   }
 
 
@@ -153,7 +157,7 @@ const CustomerProfile = (route) => {
 
               <View style={styles.infoRow}>
                 <View style={styles.FloorBadgePending}>
-                  <Text style={{ color: 'black' }}>Ground Floor</Text>
+                  <Text style={{ color: 'black' }}>{customer?.bookingDetails?.floorName}</Text>
                 </View>
 
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -162,7 +166,7 @@ const CustomerProfile = (route) => {
                     style={{ height: 16, width: 16, marginRight: 4 }}
                     resizeMode="contain"
                   />
-                  <Text>{customer?.bookingDetails?.floorName}</Text>
+                  <Text>{customer?.bookingDetails?.roomName}</Text>
                 </View>
 
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
@@ -184,7 +188,19 @@ const CustomerProfile = (route) => {
           </View>
         </View>
 
+        {/* ----KYC------ */}
+        
         <View style={styles.card}>
+          <Text style={styles.sectionTitle}>Complete your KYC verification</Text>
+          <Text style={styles.warningText}>
+            Enter your Aadhar/PAN card documents and Complete the status
+          </Text>
+          <TouchableOpacity style={styles.primaryButton} onPress={() => navigation.navigate("VerifyKYC")}>
+            <Text style={styles.primaryButtonText}>Verify Now</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* <View style={styles.card}>
           <View style={styles.cardRow}>
             <Text style={styles.cardTitle}>KYC Status</Text>
             <View style={styles.statusBadgePending}>
@@ -195,108 +211,35 @@ const CustomerProfile = (route) => {
           <Text style={styles.lastAttempt}>
             Last Attempt: 06 Sep, 2025 – 04:22 PM
           </Text>
-        </View>
+        </View> */}
 
 
+        <View style={styles.cards}>
 
-        <View style={styles.card}>
-          <TouchableOpacity
-            style={styles.hostelHeader}
-            onPress={() => setDropdownVisible(!dropdownVisible)}
-            activeOpacity={0.8}
-          >
-            <Image
-              source={HostelImage}
-              style={styles.hostelImage}
-            />
-            <View style={{ flex: 1 }}>
-              <Text style={styles.hostelTitle}>{selectedHostel}</Text>
-              <View style={styles.locationRow}>
-                <Image
-                  source={LocationIcon}
-                  resizeMode="contain" style={{ width: 20, height: 20 }}
-                />
-                <Text style={styles.locationText}>Kandanchavadi</Text>
-              </View>
+          <TouchableOpacity onPress={HostelClick} style={styles.row}>
+            <View style={{ flexDirection: 'row' }}>
+              <Image source={buildings} style={{ width: 20, height: 20 }} />
+              <Text style={{fontSize:14,fontWeight:400,marginLeft:5}}>
+                Hostels</Text>
             </View>
 
-            <Ionicons
-              name={dropdownVisible ? "chevron-up" : "chevron-down"}
-              size={22}
-              color="#000"
-            />
+            <Image source={sideframe} style={{ width: 23, height: 23 }} />
           </TouchableOpacity>
-
-          {dropdownVisible && (
-            <View style={styles.dropdown}>
-              <ScrollView>
-                {hostels.map((item) => (
-                  <TouchableOpacity
-                    key={item.id}
-                    style={styles.dropdownItem}
-                    onPress={() => handleSelectHostel(item)}
-                  >
-                    <Text style={styles.dropdownText}>{item.name}</Text>
-                    <Text style={styles.dropdownSub}>{item.location}</Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </View>
-          )}
-
 
           <View style={styles.divider} />
 
-          <Text style={styles.sectionTitle}>Rental Details</Text>
-
-          <View style={styles.detailRow}>
-
-            <Text style={styles.detailLabel}>Joined Date</Text>
-            <View style={{ display: 'flex', flexDirection: 'row' }}>
-              <Image
-                source={DateIcon}
-                resizeMode="contain" style={{ width: 20, height: 20 }}
-              />
-              <Text style={styles.detailValue}>02 May 2024</Text>
+          <TouchableOpacity style={styles.row}>
+            <View style={{ flexDirection: 'row' }}>
+              <Image source={paperclip} style={{ width: 20, height: 20 }} />
+              <Text style={{fontSize:14,fontWeight:400,marginLeft:5}}>Rental Agreement</Text>
             </View>
-          </View>
 
-          <View style={styles.detailRow}>
+            <Image source={sideframe} style={{ width: 23, height: 23 }} />
+          </TouchableOpacity>
 
-            <Text style={styles.detailLabel}>Advance Paid</Text>
-            <View style={{ display: 'flex', flexDirection: 'row' }}>
-              <Image
-                source={MoneyIcon}
-                resizeMode="contain" style={{ width: 20, height: 20 }}
-              />
-              <Text style={styles.detailValue}>₹4,000.00</Text>
-            </View>
-          </View>
-
-          <View style={styles.detailRow}>
-
-            <Text style={styles.detailLabel}>Monthly Rent</Text>
-            <View style={{ display: 'flex', flexDirection: 'row' }}>
-              <Image
-                source={RentAmountIcon}
-                resizeMode="contain" style={{ width: 20, height: 20 }}
-              />
-              <Text style={styles.detailValue}>₹8,000.00</Text>
-            </View>
-          </View>
-
-          <View style={styles.detailRow}>
-
-            <Text style={styles.detailLabel}>Due Date</Text>
-            <View style={{ display: 'flex', flexDirection: 'row' }}>
-              <Image
-                source={DateIcon}
-                resizeMode="contain" style={{ width: 20, height: 20 }}
-              />
-              <Text style={styles.detailValue}>5th of Every Month</Text>
-            </View>
-          </View>
         </View>
+
+
 
 
         <View style={styles.card}>
@@ -455,6 +398,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
+  cards:{
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#eee",
+    marginBottom: 12,
+  },
   hostelImage: {
     width: 45,
     height: 45,
@@ -479,7 +430,8 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: "#eee",
-    marginVertical: 10,
+    marginVertical:20
+
   },
   sectionTitle: {
     fontSize: 15,
@@ -601,4 +553,5 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginLeft: 6,
   },
+  row: { flexDirection: 'row', justifyContent: 'space-between' }
 });

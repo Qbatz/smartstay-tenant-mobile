@@ -3,13 +3,15 @@ import AxiosConfig from "../Config/AxiosConfig"
  
 
 export const verifyPhoneNo= async(phoneNo)=>{
-
-    const data={
+    try{
+        const data={
         mobile:phoneNo
     }
-
    const response=await AxiosConfig.post("/v2/tenant/user/verify-mobile", data)
    return response;
+    }catch(error){
+            return{status: error.response.status, message: error.response.data}
+    }   
 }
 
 export const verifyOtp =async(phoneNo,otp,serialNo)=>{
@@ -54,4 +56,22 @@ export const generateToken = async (phone, serialNo) => {
         return { success: false, message: error.message };
     }
 };
+
+export const verifyMPin=async(data)=>{
+    try{
+        const response=await AxiosConfig.post('/v2/tenant/login/verify-Mpin', data)
+        return response;
+    }catch(error){
+        return{status: error.response.status, message: error.response.data}
+    }
+}
+
+export const postMPin=async(data)=>{
+    try{
+        const response=await AxiosConfig.post('/v2/tenant/login/set-Mpin', data)
+        return response;
+    }catch(error){
+        return{status: error.response.status, message: error.response.data}
+    }
+}
 

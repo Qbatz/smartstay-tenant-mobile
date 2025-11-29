@@ -46,6 +46,14 @@ import NOCReceiptPdf from './src/Components/NocReceipt';
 import InvoiceDesign from './src/Components/Payments/BillPDF';
 import { retriveData } from './src/Utils/Storage';
 import { ACCESS_TOKEN, LOGGEDIN, PHONE_NO } from './src/Utils/Constant';
+import CreateMpin from './src/Components/CreateAccount/CreateMpin';
+import ConfirmMPin from './src/Components/CreateAccount/ConfirmMPin';
+import LoginPage from './src/Components/CreateAccount/LoginPage';
+import LoginMobileScreen from './src/Components/CreateAccount/LoginPage';
+import MotorRoom from './src/Components/WelcomeLogin';
+import LoginScreen from './src/Components/WelcomeLogin';
+import ProfileHostels from './src/Components/CustomerProfile/ProfileHostels';
+import EnterMPin from './src/Components/CreateAccount/EnterMPin';
 
 
 
@@ -194,6 +202,7 @@ function AppContent(props) {
           <Navigation.Screen name="KycSuccess" component={KycSuccessDesign} />
           <Navigation.Screen name='Dashboard' component={Dashboard} />
           <Navigation.Screen name="CustomerProfile" component={CustomerProfile} />
+          <Navigation.Screen name='ProfileHostels' component={ProfileHostels}/>
           <Navigation.Screen name="Notification" component={Notification} />
           <Navigation.Screen name="EditProfile" component={EditProfile} />
           <Navigation.Screen name="Agreement" component={Agreement} />
@@ -211,11 +220,16 @@ function AppContent(props) {
       </NavigationContainer> : <NavigationContainer>
 
         <Navigation.Navigator screenOptions={{ headerShown: false }} initialRouteName='SplashScreen'>
+          {/* <Navigation.Screen name='WelcomeBack' component={LoginScreen}/> */}
           <Navigation.Screen name="LogoScreen" component={LogoScreen} />
           <Navigation.Screen name="SplashScreen" component={SplashScreen} />
           <Navigation.Screen name="OnboardingScreen" component={OnboardingScreen} />
           <Navigation.Screen name="CreateAccount" component={CreateAccount} />
           <Navigation.Screen name="OtpDesign" component={OtpDesign} />
+          <Navigation.Screen name='CreateMpin' component={CreateMpin}/>
+          <Navigation.Screen name='ConfirmMPin' component={ConfirmMPin}/>
+          <Navigation.Screen name='LoginPage' component={LoginMobileScreen}/>
+          <Navigation.Screen name='EnterMPin' component={EnterMPin}/>
         </Navigation.Navigator>
       </NavigationContainer>}
 

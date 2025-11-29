@@ -202,7 +202,7 @@ function Dashboard(props) {
 
     setShowSheet(true)
 
-    getComplaints(props.route.params.hostel[0].hostelId, complaint.complaintId, context.getToken).then(r => {
+    getComplaints(context.getHostelDetail.hostelId, complaint.complaintId, context.getToken).then(r => {
       setSelectComplaint(r.data)
     })
   }
@@ -300,7 +300,7 @@ function Dashboard(props) {
       // })
     }
 
-    postComplaint(props.route.params.hostel[0].hostelId, context.getToken, formData).then(r => {
+    postComplaint(context.getHostelDetail.hostelId, context.getToken, formData).then(r => {
       console.log(r)
       setLoading(true)
 
@@ -349,7 +349,7 @@ function Dashboard(props) {
   }
   const deleteItem = (complaintiId) => {
 
-    deleteComplaint(props.route.params.hostel[0].hostelId, complaintiId, context.getToken).then(r => {
+    deleteComplaint(context.getHostelDetail.hostelId, complaintiId, context.getToken).then(r => {
       console.log(r)
       if (r.status == 200) {
         setShowSuccessModal(true);
@@ -378,7 +378,7 @@ function Dashboard(props) {
       description: bedType,
     }
 
-    postRequestBedChange(props.route.params.hostel[0].hostelId, data, context.getToken).then(r => {
+    postRequestBedChange(context.getHostelDetail.hostelId, data, context.getToken).then(r => {
       console.log(r)
 
       setLoading(true)
@@ -412,7 +412,7 @@ function Dashboard(props) {
       setShowAmenities(true)
       setTag(tag)
 
-      getAmenties(props.route.params.hostel[0].hostelId, item.amenityId, context.getToken).then(r => {
+      getAmenties(context.getHostelDetail.hostelId, item.amenityId, context.getToken).then(r => {
         console.log(r)
         setmyAminites(r.data)
       })
@@ -421,7 +421,7 @@ function Dashboard(props) {
     else {
       setShowAmenities(true)
       setTag(null)
-      getAmenties(props.route.params.hostel[0].hostelId, item.amenityId, context.getToken).then(r => {
+      getAmenties(context.getHostelDetail.hostelId, item.amenityId, context.getToken).then(r => {
         console.log(r)
         setAvailable(r.data)
       })
@@ -434,7 +434,7 @@ function Dashboard(props) {
 
   const onRequestAmenities = (amenityId) => {
 
-    postRquestAmenties(props.route.params.hostel[0].hostelId, context.getToken, amenityId).then(r => {
+    postRquestAmenties(context.getHostelDetail.hostelId, context.getToken, amenityId).then(r => {
       console.log(r)
     })
   }
@@ -518,22 +518,23 @@ function Dashboard(props) {
       colors={["#DAEEFF", "#FFFFFF"]}
       start={{ x: 0.5, y: 0 }}
       end={{ x: 0.5, y: 1 }}
-      style={{ paddingTop: 25, paddingBottom: 15, width: "100%", }}
+      style={{ paddingTop: 25, paddingBottom: 15, width: "100%" }}
     >
 
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16 }}>
 
-        <View style={{ flexDirection: 'row' }}>
+        <View style={{ flexDirection: 'row',width:'75%'}}>
           <Image source={HostelProfile} resizeMode="contain" style={{ height: 44, width: 44 }} />
           <View style={{ marginLeft: 7 }}>
-            <Text style={{ fontSize: 18, fontWeight: '600', fontFamily: 'gilroy-semibold', color: '#1B1D21' }}>
-              {props.route.params.hostel[0].hostelName}
+            <Text numberOfLines={1} ellipsizeMode="tail"
+            style={{ fontSize: 18,fontWeight: '600',fontFamily: 'gilroy-semibold',color: '#1B1D21',flexShrink: 1,maxWidth: '90%' }}>
+              {context.getHostelDetail.hostelName}
             </Text>
 
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Image source={Location} style={{ width: 12.75, height: 14.17 }} />
               <Text style={{ marginLeft: 7, fontSize: 14, color: '#4B4B4B' }}>
-                {props.route.params.hostel[0].city}
+                {context.getHostelDetail.city}
               </Text>
             </View>
           </View>
@@ -543,7 +544,7 @@ function Dashboard(props) {
           <TouchableOpacity onPress={handleNotificationShow}>
             <Image source={require("../../assets/Images/notification.png")} style={{ height: 44, width: 44 }} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleProfile} style={{ marginLeft: 10 }}>
+          <TouchableOpacity onPress={handleProfile} style={{marginLeft:10,marginRight:10 }}>
             <Image source={require("../../assets/Images/Customer_Icon.png")} style={{ width: 44, height: 44, borderRadius: 22 }} />
           </TouchableOpacity>
         </View>

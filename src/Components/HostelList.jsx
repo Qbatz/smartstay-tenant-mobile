@@ -20,6 +20,8 @@ const HostelList = ({ navigation }) => {
   const [selectedHostel, setSelectedHostel] = useState();
   const [requestedNewToken, setRequestedNewToken] = useState(false);
 
+  
+
   const refreshToken = async () => {
 
       const response = await generateToken(context.phoneNumber, context.SerialNo);
@@ -57,24 +59,26 @@ const HostelList = ({ navigation }) => {
     }
   }, [context.SerialNo, requestedNewToken]) 
 
-  const handleSelect = (id) => {
-    setSelectedHostel(id);
+  const handleSelect = (hosteldetail) => {
+    setSelectedHostel(hosteldetail);
   };
 
   const handleGo = () => {
     if (selectedHostel) {
-      console.log(hostels)
+      console.log(selectedHostel)
+      context.updateHostelDetail(selectedHostel)
       navigation.navigate("VerifyKYC", { hostel: hostels });
     }
   };
 
-  const renderHostel = ({ item }) => (
-    <TouchableOpacity
+  const renderHostel = ({ item }) => {
+    console.log(item)
+    return <TouchableOpacity
       style={[
         styles.hostelCard,
-        selectedHostel === item.hostelId&& styles.selectedCard,
+        selectedHostel?.hostelId === item.hostelId&& styles.selectedCard,
       ]}
-      onPress={() => handleSelect(item.hostelId)}
+      onPress={() => handleSelect(item)}
     >
       <View style={styles.cardLeft}>
         <Image source={item.hostelPic} style={styles.hostelImage} />
@@ -87,13 +91,13 @@ const HostelList = ({ navigation }) => {
         </View>
       </View>
 
-      {selectedHostel === item.hostelId ? (
+      {selectedHostel?.hostelId === item.hostelId ? (
         <Ionicons name="radio-button-on" size={22} color="#0057FF" />
       ) : (
         <Ionicons name="radio-button-off" size={22} color="#aaa" />
       )}
     </TouchableOpacity>
-  );
+  }
 
   return (
     <View style={styles.container}>
