@@ -7,7 +7,7 @@ export const customerDetails=async(token)=>{
             Authorization: 'Bearer ' + token
         }
     })
-    return response
+    return response;
     }catch(error){
             return {status: error.response.status, message: error.response.data}
     } 

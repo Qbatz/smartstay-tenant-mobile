@@ -21,7 +21,7 @@ function MyStay(props) {
     console.log(rentBill)
 
     useEffect(() => {
-        hostelDetails(props.hostel[0].hostelId, context.getToken).then(r => {
+        hostelDetails(context.getHostelDetail.hostelId, context.getToken).then(r => {
             setComplaints(r.data.complaints)
             setRentBill(r.data.currentMonthBills)
         })
@@ -108,7 +108,7 @@ function MyStay(props) {
                 <View style={style.container}>
                     <View>
                         <Text style={{ fontSize: 22, fontWeight: '700', color: '#1C1C1E' }}>
-                            {'\u20B9'} {rentBill.rent}
+                            {'\u20B9'} {rentBill?.rent}
                         </Text>
 
                         <Text style={{ fontSize: 13, fontWeight: '400', color: '#AEAEB2', marginTop: 5 }}>

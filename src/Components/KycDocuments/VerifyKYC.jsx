@@ -13,7 +13,7 @@ export default function VerifyKYC({ navigation, route }) {
       <TouchableOpacity
         style={styles.skipButton}
         onPress={() => {
-      navigation.navigate('Dashboard', {hostel: route.params.hostel})
+      navigation.navigate('Dashboard', {hostel: route?.params?.hostel})
   } }
       >
         <Text style={styles.skipText}>Skip</Text>

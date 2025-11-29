@@ -30,6 +30,10 @@ function Services(props) {
         firstclick('Complaint')
     }, [])
 
+    const noAmenities =
+    (!assignedAmenities || assignedAmenities.length === 0) &&
+    (!unassignedAmenities || unassignedAmenities.length === 0);
+
 
     const getStatusColor = (status) => {
         switch (status.toLowerCase()) {
@@ -53,11 +57,11 @@ function Services(props) {
     };
 
     useEffect(() => {
-        complaints(props.hostel[0].hostelId, commonContext.getToken).then(r => {
+        complaints(commonContext.getHostelDetail.hostelId, commonContext.getToken).then(r => {
             setComplaintsList(r?.data?.content)
         })
 
-        getAmenitiesList(props.hostel[0].hostelId, commonContext.getToken).then(r => {
+        getAmenitiesList(commonContext.getHostelDetail.hostelId, commonContext.getToken).then(r => {
             setAssignedAmenity(r.data.assignedAmenities)
             setUnasignedAmenities(r.data.unassignedAmenities)
         })
@@ -217,86 +221,116 @@ function Services(props) {
         </View>
 
             :
-            <ScrollView
-                style={{ marginTop: 10 }}
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={{ paddingBottom: 80 }}
-            >
-                {/* MY AMENITIES */}
-                <View style={{ paddingTop: 10 }}>
-                    <Text style={{ fontSize: 14, fontWeight: '400' }}>My Amenities</Text>
-                </View>
+    noAmenities ? (
+        <View style={style.noResult}>
+            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                <Image
+                    source={NoResultPic}
+                    style={{ width: 324, height: 221, resizeMode: 'contain', marginBottom: 20 }}
+                />
+                <Text style={{fontSize: 22,fontWeight: '700',color: '#000',marginBottom: 8}}>
+                    No Results Found!
+                </Text>
+                <Text style={{ fontSize: 15, color: '#555', textAlign: 'center', width: 260, lineHeight: 18 }}>
+                    Try adjusting your search or filters to see more options.
+                </Text>
+            </View>
+        </View>
+    ) : (
+        <ScrollView
+            style={{ marginTop: 10 }}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 80 }}
+        >
+            {/* MY AMENITIES */}
+            {assignedAmenities?.length > 0 && (
+                <>
+                    <View style={{ paddingTop: 10 }}>
+                        <Text style={{ fontSize: 14, fontWeight: '400' }}>My Amenities</Text>
+                    </View>
 
-                <FlatList
-                    data={assignedAmenities}
-                    keyExtractor={(item) => item.amenityId}
-                    scrollEnabled={false} 
-                    renderItem={({ item }) => (
-                        <View style={{ paddingTop: 10 }}>
-                            <TouchableOpacity onPress={() => props.onAmenities(item, 'My-Amenities')}>
-                                <View
-                                    style={{
-                                        paddingTop: 10,
-                                        paddingBottom: 12,
-                                        borderWidth: 1,
-                                        borderRadius: 10,
-                                        flexDirection: 'row',
-                                        justifyContent: 'space-between',
-                                        paddingHorizontal: 14,
-                                        alignItems: 'center',
-                                        borderColor: '#edf3ff',
-                                    }}
-                                >
-                                    <View>
-                                        <Text style={{ fontSize: 16, fontWeight: '600' }}>{item.amenityName}</Text>
-                                        <View style={{ paddingTop: 7 }}>
-                                            <Text style={{ fontSize: 14, color: '#4B4B4B' }}>{'\u20B9'}{item.amenityAmount}/month</Text>
+                    <FlatList
+                        data={assignedAmenities}
+                        keyExtractor={(item) => item.amenityId}
+                        scrollEnabled={false}
+                        renderItem={({ item }) => (
+                            <View style={{ paddingTop: 10 }}>
+                                <TouchableOpacity onPress={() => props.onAmenities(item, 'My-Amenities')}>
+                                    <View
+                                        style={{
+                                            paddingTop: 10,
+                                            paddingBottom: 12,
+                                            borderWidth: 1,
+                                            borderRadius: 10,
+                                            flexDirection: 'row',
+                                            justifyContent: 'space-between',
+                                            paddingHorizontal: 14,
+                                            alignItems: 'center',
+                                            borderColor: '#edf3ff',
+                                        }}
+                                    >
+                                        <View>
+                                            <Text style={{ fontSize: 16, fontWeight: '600' }}>
+                                                {item.amenityName}
+                                            </Text>
+                                            <View style={{ paddingTop: 7 }}>
+                                                <Text style={{ fontSize: 14, color: '#4B4B4B' }}>
+                                                    {'\u20B9'}{item.amenityAmount}/month
+                                                </Text>
+                                            </View>
                                         </View>
+                                        <Image source={RightDirection} style={{ width: 26, height: 26 }} />
                                     </View>
-                                    <Image source={RightDirection} style={{ width: 26, height: 26 }} />
-                                </View>
+                                </TouchableOpacity>
+                            </View>
+                        )}
+                    />
+                </>
+            )}
 
-                            </TouchableOpacity>
+            {/* AVAILABLE AMENITIES */}
+            {unassignedAmenities?.length > 0 && (
+                <>
+                    <View style={{ paddingTop: 12 }}>
+                        <Text style={{ fontSize: 14, fontWeight: '400' }}>Available Amenities</Text>
+                    </View>
 
-                        </View>
-                    )}
-                />
+                    <FlatList
+                        data={unassignedAmenities}
+                        keyExtractor={(item) => item.amenityId}
+                        scrollEnabled={false}
+                        renderItem={({ item }) => (
+                            <View style={{ paddingTop: 10 }}>
+                                <TouchableOpacity onPress={() => props.onAmenities(item, 'available')}>
+                                    <View
+                                        style={{
+                                            paddingTop: 11,
+                                            paddingBottom: 13,
+                                            borderWidth: 1,
+                                            borderRadius: 10,
+                                            flexDirection: 'row',
+                                            justifyContent: 'space-between',
+                                            paddingHorizontal: 14,
+                                            alignItems: 'center',
+                                            borderColor: '#edf3ff',
+                                        }}
+                                    >
+                                        <Text style={{ fontSize: 16, fontWeight: '500' }}>{item.amenityName}</Text>
+                                        <Image source={AddSquare} style={{ width: 22, height: 22 }} />
+                                    </View>
+                                </TouchableOpacity>
+                            </View>
+                        )}
+                    />
+                </>
+            )}
+        </ScrollView>
+    )
+}
 
-                {/* AVAILABLE AMENITIES */}
-                <View style={{ paddingTop: 12 }}>
-                    <Text style={{ fontSize: 14, fontWeight: '400' }}>Available Amenities</Text>
-                </View>
+        
 
-                <FlatList
-                    data={unassignedAmenities}
-                    keyExtractor={(item) => item.amenityId}
-                    scrollEnabled={false} // disable inner scrolling
-                    renderItem={({ item }) => (
-                        <View style={{ paddingTop: 10 }}>
-                            <TouchableOpacity onPress={() => props.onAmenities(item, 'available')}>
-                                <View
-                                    style={{
-                                        paddingTop: 11,
-                                        paddingBottom: 13,
-                                        borderWidth: 1,
-                                        borderRadius: 10,
-                                        flexDirection: 'row',
-                                        justifyContent: 'space-between',
-                                        paddingHorizontal: 14,
-                                        alignItems: 'center',
-                                        borderColor: '#edf3ff',
-                                    }}
-                                >
-                                    <Text style={{ fontSize: 16, fontWeight: '500' }}>{item.amenityName}</Text>
-                                    <Image source={AddSquare} style={{ width: 22, height: 22 }} />
-                                </View>
-
-                            </TouchableOpacity>
-
-                        </View>
-                    )}
-                />
-            </ScrollView>}
+           
 
 
 

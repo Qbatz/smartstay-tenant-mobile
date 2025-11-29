@@ -39,20 +39,34 @@ const OtpDesign =({ route }) => {
       const data= await verifyOtp(route.params.phone,otpValue,context.SerialNo)
       console.log(data)
       if(data.status==200){
-        storeData(ACCESS_TOKEN,data.data)
-        storeData(PHONE_NO,route.params.phone)
-        storeData(LOGGEDIN,"true")
+        console.log(data.data)
+        context.userId(data.data.userId)
         context.phoneNo(route.params.phone)
-        context.updateToken(data.data)
-          
-          setShowSuccessModal(true)
-          setShowModelMessage("Login Successfully")
-          setModelType('success')
 
-          setTimeout(() => {
-            setShowSuccessModal(false);
-            context.loggedin("true")
-            }, 2000);        
+        if(data.data.isMpinVerified==true){
+          navigation.navigate('EnterMPin')
+        }
+        else{
+          navigation.navigate('CreateMpin')
+        }
+
+
+        // storeData(ACCESS_TOKEN,data.data)
+        // storeData(PHONE_NO,route.params.phone)
+        // storeData(LOGGEDIN,"fa")
+        
+        // context.updateToken(data.data)
+          
+          // setShowSuccessModal(true)
+          // setShowModelMessage("Login Successfully") 
+          // setModelType('success')
+
+          // setTimeout(() => {
+          //   setShowSuccessModal(false);
+            
+          // navigation.navigate('EnterMPin')
+          //   context?.loggedin('false')        
+          //   }, 2000);        
       }      
       else if(data.status==401){
         setShowSuccessModal(true)

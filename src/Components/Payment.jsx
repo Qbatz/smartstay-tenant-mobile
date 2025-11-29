@@ -106,7 +106,7 @@ const Payment = (props) => {
   ];
 
   useEffect(()=>{
-      getPaymentList(props.hostel[0].hostelId,context.getToken).then(r=>{
+      getPaymentList(context.getHostelDetail.hostelId,context.getToken).then(r=>{
         console.log(r)
         setPayment(r.data)
       })
@@ -208,7 +208,7 @@ const handleReceiptPdfDownload =  () => {
   return (
     <>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        {payment.map((item, index) => (
+        {payment?.map((item, index) => (
           <TouchableOpacity key={index} onPress={() => props.onPayment(item)}>
             <View style={styles.card}>
               <View style={styles.iconContainer}>
