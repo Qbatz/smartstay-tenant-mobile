@@ -5,7 +5,7 @@ import { LoginContext } from "../../Context/LoginContext";
 import { verifyOtp } from "../../Action/LoginAction";
 import { UsersContext } from "../../Context/UserContext";
 import { storeData } from "../../Utils/Storage";
-import { ACCESS_TOKEN,PHONE_NO,LOGGEDIN } from "../../Utils/Constant";
+import { ACCESS_TOKEN,PHONE_NO,LOGGEDIN, USERID } from "../../Utils/Constant";
 import SuccessModal from "../ToastFile/TostFilePage";
 
 const OtpDesign =({ route }) => {
@@ -42,9 +42,11 @@ const OtpDesign =({ route }) => {
         console.log(data.data)
         context.userId(data.data.userId)
         context.phoneNo(route.params.phone)
+        storeData(PHONE_NO,route.params.phone)
+        storeData(USERID,data.data.userId)
 
         if(data.data.isMpinVerified==true){
-          navigation.navigate('EnterMPin')
+          context.loggedin('true')
         }
         else{
           navigation.navigate('CreateMpin')

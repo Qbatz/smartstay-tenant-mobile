@@ -45,7 +45,7 @@ import NOCBillPdf from './src/Components/NocBillPdf';
 import NOCReceiptPdf from './src/Components/NocReceipt';
 import InvoiceDesign from './src/Components/Payments/BillPDF';
 import { retriveData } from './src/Utils/Storage';
-import { ACCESS_TOKEN, LOGGEDIN, PHONE_NO } from './src/Utils/Constant';
+import { ACCESS_TOKEN, LOGGEDIN, PHONE_NO, USERID } from './src/Utils/Constant';
 import CreateMpin from './src/Components/CreateAccount/CreateMpin';
 import ConfirmMPin from './src/Components/CreateAccount/ConfirmMPin';
 import LoginPage from './src/Components/CreateAccount/LoginPage';
@@ -168,6 +168,11 @@ function AppContent(props) {
       context.phoneNo(r)
     })
     console.log(context)
+
+    retriveData(USERID).then(r=>{
+      console.log('userid:',r)
+      context.userId(r)
+    })
   }, [context.LoggedIn])
 
 
@@ -196,6 +201,7 @@ function AppContent(props) {
 
       {isLoggedIn === "true" ? <NavigationContainer>
         <Navigation.Navigator screenOptions={{ headerShown: false }}>
+          <Navigation.Screen name='EnterMPin' component={EnterMPin}/>
           <Navigation.Screen name='HostelList' component={HostelList} />
           <Navigation.Screen name="VerifyKYC" component={VerifyKYC} />
           <Navigation.Screen name="KYCUpload" component={KYCUpload} />
@@ -229,7 +235,7 @@ function AppContent(props) {
           <Navigation.Screen name='CreateMpin' component={CreateMpin}/>
           <Navigation.Screen name='ConfirmMPin' component={ConfirmMPin}/>
           <Navigation.Screen name='LoginPage' component={LoginMobileScreen}/>
-          <Navigation.Screen name='EnterMPin' component={EnterMPin}/>
+          
         </Navigation.Navigator>
       </NavigationContainer>}
 

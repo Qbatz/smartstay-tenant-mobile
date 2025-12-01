@@ -14,6 +14,7 @@ const UserContext=(props)=> {
     const [HostelDetail,setHostelDetail]=useState();
 
     console.log(HostelDetail)
+    console.log(UserId)
 
 
     function accessTokenfn(value){

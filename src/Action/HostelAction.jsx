@@ -166,3 +166,16 @@ export const getPaymentList=async(hostelId,token)=>{
         return {status: error.response.status, message: error.response.data}
     }
 }
+
+export const getComplaintTypes=async(hostelId,token)=>{
+    try{
+        const response=await AxiosConfig('/v2/ComplaintType/all-complaintTypes/' + hostelId, {
+            headers: {
+                Authorization: 'Bearer ' + token
+            }
+        })
+        return response;
+    }catch(error){
+        return {status: error.response.status, message: error.response.data}
+    }
+}

@@ -140,10 +140,8 @@ function Services(props) {
             renderItem={({ item }) => {
                 const { backgroundColor, textColor } = getStatusColor(item.status);
                 return <View key={item.complaintId}>
-                    <TouchableOpacity onPress={() => props.onOpen(item)}>
-                        <View
-                            style={style.complaintStyle}
-                        >
+                    <TouchableOpacity onPress={() => props.onOpen(item)}
+                         style={style.complaintStyle}>
                             {/* LEFT SIDE */}
                             <View style={{ flex: 1, paddingRight: 10 }}>
                                 <Text
@@ -200,7 +198,6 @@ function Services(props) {
                                     </Text>
                                 </View>
                             </View>
-                        </View>
                     </TouchableOpacity>
                 </View>
 
@@ -329,9 +326,6 @@ function Services(props) {
 }
 
         
-
-           
-
 
 
         {selectedfield == 'Complaint' && <View style={{ position: 'absolute', bottom: 35, right: -3 }}>

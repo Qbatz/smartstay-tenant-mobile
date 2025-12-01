@@ -55,23 +55,33 @@ function MyStay(props) {
 
     }
 
-    return <View style={{ backgroundColor: '#ffffff', flex: 1, width: '100%' }}>
+    function complaintsClick(){
+        props.jumpTo('services')
+        context.jumpComplain('complaint')
+    }
+
+    return <ScrollView style={{ backgroundColor: '#ffffff', flex: 1, width: '100%' }} 
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 20 }}>
 
         <View style={{ height: 140, marginTop: 5 }}>
-            <Swiper loop showsPagination paginationStyle={{ bottom: 10 }} removeClippedSubviews 
+            <Swiper loop showsPagination index={0}
+             paginationStyle={{ bottom: 10 }} 
+             removeClippedSubviews 
                 dotStyle={{
-                    width: 10, height: 10, borderRadius: 5, backgroundColor: 'transparent', borderWidth: 1.5, borderColor: '#CFCFCF',
-                    marginHorizontal: 5
-                }} activeDotColor="#1E45E1"
-                style={{ height: 110, borderRadius: 10, overflow: 'hidden', alignSelf: 'center' }} >
-                <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} colors={['#10267B', '#0227B5']} style={{ paddingTop: 12, paddingLeft: 20, borderRadius: 10, height: "70%" }}>
+                    width: 10, height: 10, borderRadius: 5, backgroundColor: 'transparent', borderWidth: 1.5, 
+                    borderColor: '#CFCFCF', marginHorizontal: 5       
+                }} 
+                activeDotColor="#1E45E1"
+                style={{ borderRadius: 10, overflow: 'hidden', alignSelf: 'center' }} >
+                <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} colors={['#10267B', '#0227B5']} style={style.card}>
                     <Text style={{ color: '#ffffff', fontSize: 17,flexShrink:1,flexWrap: 'wrap',lineHeight:24 }}>
                             Hello water matainence on 5th June </Text>
                 </LinearGradient>
-                <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} colors={['#10267B', '#0227B5']} style={{ paddingTop: 12, paddingBottom: 40, paddingLeft: 15, borderRadius: 10, height: "70%" }}>
+                <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} colors={['#10267B', '#0227B5']} style={style.card}>
                     <Text style={{ color: '#ffffff', fontSize: 17 }}>field2</Text>
                 </LinearGradient>
-                <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} colors={['#10267B', '#0227B5']} style={{ paddingTop: 12, paddingBottom: 40, paddingLeft: 20, borderRadius: 10, height: "70%" }}>
+                <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} colors={['#10267B', '#0227B5']} style={style.card}>
                     <Text style={{ color: '#ffffff', fontSize: 17 }}> field3</Text>
                 </LinearGradient>
             </Swiper>
@@ -182,7 +192,8 @@ function MyStay(props) {
                 <Text style={{ fontSize: 14, fontWeight: '600' }}>Quick Links</Text>
             </View>
             <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'space-between' }}>
-                <TouchableOpacity style={{
+                <TouchableOpacity onPress={complaintsClick}
+                style={{
                     borderWidth: 1, borderRadius: 10, flex: 1, justifyContent: 'center',
                     alignItems: 'center', marginRight: 10, padding: 10, borderColor: '#EFF2FF'
                 }}>
@@ -287,7 +298,7 @@ function MyStay(props) {
 
 
 
-    </View>
+    </ScrollView>
 
 }
 
@@ -309,7 +320,8 @@ const style = StyleSheet.create({
     container: {
         borderWidth: 1, flex: 1, paddingTop: 14, paddingLeft: 15, paddingBottom: 16, borderRadius: 12, marginLeft: 7,
         borderColor: '#E5E5EA', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#FFFFFF'
-    }
+    },
+    card:{marginTop:10, paddingTop: 12, paddingLeft: 20, borderRadius: 10, height: "70%" }
 })
 
 

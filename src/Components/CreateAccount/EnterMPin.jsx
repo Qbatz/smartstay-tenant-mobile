@@ -11,6 +11,7 @@ import { ACCESS_TOKEN,LOGGEDIN } from "../../Utils/Constant";
 const EnterMPin = () => {
 
     const context = useContext(UsersContext)
+    const navigation=useNavigation()
     const [createMpin, setCreateMpin] = useState(["", "", "", ""])
     const [mPinNumber, setmPinNumber] = useState(null)
     const inputs = useRef([])
@@ -61,7 +62,7 @@ const EnterMPin = () => {
 
                 setTimeout(() => {
                     setShowSuccessModal(false);
-                    context.loggedin('true')
+                    navigation.navigate('HostelList')
                 }, 2000);
             }
             else if (r.status == 401) {

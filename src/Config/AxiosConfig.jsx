@@ -2,7 +2,7 @@ import axios from "axios";
 import { retriveData } from "../Utils/Storage"
 
 const AxiosConfig = axios.create({
-  baseURL: "https://tenentdevapi.qbatz.com",
+  baseURL: "http://10.0.2.2:8082/",
   headers: {
     "Content-Type": "application/json",
   },

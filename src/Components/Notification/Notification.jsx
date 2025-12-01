@@ -79,7 +79,7 @@ const Notification = (props) => {
   const [listData, setListData] = useState([]);
 
   useEffect(()=>{
-    getNotification(props.route.params.hostel[0].hostelId,context.getToken).then(r=>{
+    getNotification(context.getHostelDetail.hostelId,context.getToken).then(r=>{
       console.log(r)
       setListData(r.data)
     })
