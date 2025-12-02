@@ -25,7 +25,7 @@ const HostelList = (route) => {
   const [selectedHostel, setSelectedHostel] = useState();
   const navigation=useNavigation()
 
-  console.log(selectedHostel)
+  console.log("selectedHostel")
 
 
 

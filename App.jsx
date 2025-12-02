@@ -64,7 +64,6 @@ import { LoginContexts } from './src/Context/LoginContext';
 
 
 function App() {
-  // console.log(props)
 
   const isDarkMode = useColorScheme() === 'dark';
 
@@ -72,11 +71,8 @@ function App() {
   const [loggedIn, setloggein] = useState()
   const [token, setToken] = useState();
 
-  console.log(NativeModules)
-
   useEffect(() => {
     retriveData(LOGGEDIN).then(r => {
-      console.log(r)
       setloggein(r)
     })
 
@@ -118,24 +114,21 @@ function App() {
 }
 
 function AppContent(props) {
-  console.log(props.isLoggedIn)
+  
   const Navigation = createStackNavigator();
   const { NotificationModule, CommonModule } = NativeModules;
 
   const context = useContext(UsersContext);
   const loginContext=useContext(LoginContexts)
-  const [isLoggedIn, setIsLoggedIn] = useState(props.isLoggedIn)
+  const [isLoggedIn, setIsLoggedIn] = useState()
   const [initialRoute,setInitialRoute]=useState()
 
   //  const initialRoute = loginContext.getRoute === "confirmMPin" ? "HostelList": "EnterMPin";
-
-console.log(isLoggedIn)
 
 
 
   useEffect(() => {
     NotificationModule.fetchFcmToken().then(r => {
-      console.log(r)
     }).catch(error => {
       console.log(error)
     })
@@ -148,20 +141,18 @@ console.log(isLoggedIn)
 
     CommonModule.checkInternet().then(r=>{
     loginContext.internet(r)
-      console.log(r)
     }).catch(error=>{
       console.log(error)
     })
 
     if(props.token!=null){
-      console.log(props.token)
       loginContext.updateToken(props.token)
     }
 
     retriveData(LOGGEDIN).then(r=>{
-      console.log(r)
       if(r=="true"){
         setIsLoggedIn('true')
+        loginContext.updateRoute("confirmMPin")
       }
     })
 
@@ -180,7 +171,6 @@ console.log(isLoggedIn)
     })
 
     retriveData(USERID).then(r=>{
-      console.log('userid:',r)
       loginContext.userId(r)
     })
   }, [loginContext.LoggedIn])
@@ -192,48 +182,18 @@ console.log(isLoggedIn)
       console.log(error)
     })
   }
-
- 
-
-
-  console.log("*********")
-  console.log(loginContext.getRoute)
-  console.log(isLoggedIn === "true" || loginContext.LoggedIn=="true")
-  console.log(initialRoute)
-
-
   return (
 
     <View style={styles.container}>
-
-
-    {/* {isLoggedIn!=true?loginContext.getRoute==='confirmMPin':
-
-    } */}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      {isLoggedIn === "true" ? loginContext.getRoute==='confirmMPin'?<NavigationContainer>
-        <Navigation.Screen name='HostelList' component={HostelList} />
+      {isLoggedIn === "true" ? loginContext.getRoute==='confirmMPin'? <NavigationContainer>
+        <Navigation.Navigator>
+          <Navigation.Screen name='HostelList' component={HostelList} />
+        </Navigation.Navigator>
+        
        </NavigationContainer> 
           :
         <NavigationContainer>
-        <Navigation.Navigator screenOptions={{ headerShown: false }} initialRouteName= 'EnterMPin'>
+        <Navigation.Navigator screenOptions={{ headerShown: false }} initialRouteName= 'Dashboard'>
           <Navigation.Screen name='EnterMPin' component={EnterMPin}/>
           <Navigation.Screen name='HostelList' component={HostelList} />
           <Navigation.Screen name="KYCUpload" component={KYCUpload} />

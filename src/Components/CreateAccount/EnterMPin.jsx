@@ -22,7 +22,6 @@ const EnterMPin = (route) => {
     const [modelType, setModelType] = useState();
     const [hostelList,setHostelList] =useState([]);
 
-console.log('balslthpslfnlskdfsdfkkdfldfldk')
     const handlePinChange = async (text, index) => {
         const newPin = [...createMpin];
         newPin[index] = text;
@@ -67,7 +66,7 @@ console.log('balslthpslfnlskdfsdfkkdfldfldk')
 
                 setTimeout(() => {
                     setShowSuccessModal(false);
-                    navigation.navigate('HostelList')
+                    // navigation.navigate('HostelList')
                 }, 2000);
             }
             else if (r.status == 401) {

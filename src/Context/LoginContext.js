@@ -13,7 +13,6 @@ export const LoginProvider = (props) => {
       const [phoneNumber, setPhoneNo]=useState();
       const [route,setRoute]=useState()
 
-      console.log(LoggedIn)
 
   const accessToken=(value)=>{
       settoken(value)
