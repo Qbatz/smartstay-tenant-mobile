@@ -21,10 +21,14 @@ import { UsersContext } from "../../Context/UserContext";
 import SuccessModal from "../ToastFile/TostFilePage";
 import AppLoader from "../ToastFile/LoaderPage";
 import { launchImageLibrary } from "react-native-image-picker";
+import { LoginContexts } from "../../Context/LoginContext";
+
+
 
 const EditProfile = (route) => {
 
   const context=useContext(UsersContext)
+  const loginContext=useContext(LoginContexts)
   const navigation = useNavigation();
   const [name, setName] = useState(route.route.params.customer.firstName);
   const [gender, setGender] = useState(route.route.params.customer.gender);
@@ -87,7 +91,7 @@ const EditProfile = (route) => {
 
     }
 
-    editProfile(context.getToken,formDate).then(r=>{
+    editProfile(loginContext.getToken,formDate).then(r=>{
       console.log(r)
       setLoading(true)
 

@@ -10,10 +10,11 @@ import { TabActions, useNavigation } from "@react-navigation/native";
 import { Screen } from "react-native-screens";
 import { UsersContext } from "../../Context/UserContext";
 import { hostelDetails } from "../../Action/HostelAction";
-import BottomSheet from "@gorhom/bottom-sheet";
+import { LoginContexts } from "../../Context/LoginContext";
 function MyStay(props) {
 
     const context = useContext(UsersContext);
+    const loginContext=useContext(LoginContexts)
 
     const [complaints, setComplaints] = useState([])
     const [rentBill, setRentBill] = useState([])
@@ -21,7 +22,7 @@ function MyStay(props) {
     console.log(rentBill)
 
     useEffect(() => {
-        hostelDetails(context.getHostelDetail.hostelId, context.getToken).then(r => {
+        hostelDetails(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
             setComplaints(r.data.complaints)
             setRentBill(r.data.currentMonthBills)
         })

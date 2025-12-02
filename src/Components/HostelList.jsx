@@ -10,69 +10,52 @@ import {
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { hostelList } from "../Action/HostelAction";
 import { UsersContext } from "../Context/UserContext";
-import { generateToken } from "../Action/LoginAction";
+import { LoginContexts } from "../Context/LoginContext";
+import { generateToken, getToken } from "../Action/LoginAction";
+import { storeData } from "../Utils/Storage";
+import { ACCESS_TOKEN } from "../Utils/Constant";
+import { useNavigation } from "@react-navigation/native";
 
 
-const HostelList = ({ navigation }) => {
+const HostelList = (route) => {
 
   const context=useContext(UsersContext)
+  const loginContext=useContext(LoginContexts)
   const [hostels,setHostelList]=useState([]);
   const [selectedHostel, setSelectedHostel] = useState();
-  const [requestedNewToken, setRequestedNewToken] = useState(false);
+  const navigation=useNavigation()
 
-  
+  console.log(selectedHostel)
 
-  const refreshToken = async () => {
 
-      const response = await generateToken(context.phoneNumber, context.SerialNo);
-      if (response.success) {
-        setRequestedNewToken(false);
-        context.updateToken(response.data);
-      }
-    
-  }
 
-    useEffect(()=>{
-      if(context.getToken != null){
-         hostelList(context.getToken).then(r=>{
-          console.log(r)
-          if (r.status === 500) {
-            //probably token expired
-            //generate new token logic here
-            setRequestedNewToken(true);
-          }
-          else {
-            setHostelList(r)
-          }
-          
-        }).catch(error=>{
-          console.log(error)
-        })
-
-      }
-       
-  },[context?.getToken])
-
-  useEffect(() => {
-    if (requestedNewToken) {
-      refreshToken()
-    }
-  }, [context.SerialNo, requestedNewToken]) 
 
   const handleSelect = (hosteldetail) => {
+    console.log("hostellist lall",hosteldetail)
     setSelectedHostel(hosteldetail);
   };
 
   const handleGo = () => {
-    if (selectedHostel) {
-      console.log(selectedHostel)
-      context.updateHostelDetail(selectedHostel)
-      navigation.navigate("VerifyKYC", { hostel: hostels });
+
+    const data= {
+      xuid:loginContext.getUserId,
+      hostelId:selectedHostel?.hostelId,
     }
+    console.log(data)
+
+    getToken(data).then(r=>{
+      if (r?.status==200) {
+      console.log(selectedHostel)
+      storeData(ACCESS_TOKEN,r.data)
+      loginContext.updateToken(r.data)
+      context.updateHostelDetail(selectedHostel)
+      navigation.navigate("VerifyKYC");
+    }
+    })
+    
   };
 
   const renderHostel = ({ item }) => {
-    console.log(item)
     return <TouchableOpacity
       style={[
         styles.hostelCard,
@@ -106,7 +89,7 @@ const HostelList = ({ navigation }) => {
         <Text style={styles.subtitle}>Select Your Current Staying Hostel</Text>
 
         <FlatList
-          data={hostels}
+          data={context.getHostelList}
           keyExtractor={(item) => item.hostelId}
           renderItem={renderHostel}
           style={{ marginTop: 20 }}

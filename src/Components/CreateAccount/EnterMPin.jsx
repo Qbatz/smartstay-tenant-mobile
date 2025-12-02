@@ -7,10 +7,12 @@ import { verifyMPin } from "../../Action/LoginAction";
 import SuccessModal from "../ToastFile/TostFilePage";
 import { storeData } from "../../Utils/Storage";
 import { ACCESS_TOKEN,LOGGEDIN } from "../../Utils/Constant";
+import { LoginContexts } from "../../Context/LoginContext";
 
-const EnterMPin = () => {
+const EnterMPin = (route) => {
 
     const context = useContext(UsersContext)
+    const loginContext=useContext(LoginContexts)
     const navigation=useNavigation()
     const [createMpin, setCreateMpin] = useState(["", "", "", ""])
     const [mPinNumber, setmPinNumber] = useState(null)
@@ -18,8 +20,9 @@ const EnterMPin = () => {
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [showModelMessage, setShowModelMessage] = useState()
     const [modelType, setModelType] = useState();
+    const [hostelList,setHostelList] =useState([]);
 
-
+console.log('balslthpslfnlskdfsdfkkdfldfldk')
     const handlePinChange = async (text, index) => {
         const newPin = [...createMpin];
         newPin[index] = text;
@@ -45,16 +48,18 @@ const EnterMPin = () => {
     const enterPinClick = () => {
 
         const data = {
-            userId: context.getUserId,
-            newMpin: mPinNumber,
+            xuid: loginContext.getUserId,
+            mPin: mPinNumber,
         }
 
         verifyMPin(data).then(r => {
             console.log(r)
             if (r.status == 200) {
-                storeData(ACCESS_TOKEN, r.data)
+                console.log(r.data)
+                setHostelList(r.data)
                 storeData(LOGGEDIN, "true")
-                context.updateToken(r.data)
+                loginContext.loggedin('true')
+                context.updateHostelList(r.data)
 
                 setShowSuccessModal(true)
                 setShowModelMessage("Login Successfully")

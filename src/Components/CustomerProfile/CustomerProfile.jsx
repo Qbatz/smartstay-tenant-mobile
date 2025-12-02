@@ -32,12 +32,14 @@ import { customerDetails } from "../../Action/CustomerAction";
 import buildings from '../../assets/Images/buildings.png'
 import paperclip from '../../assets/Images/paperclip.png'
 import sideframe from '../../assets/Images/sideframe.png'
+import { LoginContexts } from "../../Context/LoginContext";
 
 
 
 const CustomerProfile = (route) => {
 
   const context = useContext(UsersContext)
+  const loginContext=useContext(LoginContexts)
 
   const navigation = useNavigation();
   const [selectedHostel, setSelectedHostel] = useState("Smartstay Hostel");
@@ -49,7 +51,7 @@ const CustomerProfile = (route) => {
 
 
   useEffect(() => {
-    customerDetails(context.getToken).then(r => {
+    customerDetails(loginContext.getToken).then(r => {
       console.log(r.data)
       setCustomers(r.data)
     }).catch(error => {
@@ -113,11 +115,11 @@ const CustomerProfile = (route) => {
   }
 
   const handleLogout = () => {
-    context.logout('false')
+    loginContext.logout('false')
     remoteData(ACCESS_TOKEN)
     remoteData(PHONE_NO)
     storeData(LOGGEDIN, "false")
-    context.updateToken(null)
+    loginContext.updateToken(null)
     // navigation.navigate("SplashScreen");
   }
 

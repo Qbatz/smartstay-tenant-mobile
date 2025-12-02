@@ -6,7 +6,7 @@
  */
 
 import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
+import { StatusBar, StyleSheet, useColorScheme, View,Text,Image, TouchableOpacity,Dimensions } from 'react-native';
 import {
   SafeAreaProvider,
 } from 'react-native-safe-area-context';
@@ -54,7 +54,11 @@ import MotorRoom from './src/Components/WelcomeLogin';
 import LoginScreen from './src/Components/WelcomeLogin';
 import ProfileHostels from './src/Components/CustomerProfile/ProfileHostels';
 import EnterMPin from './src/Components/CreateAccount/EnterMPin';
+import NoInternet from './src/assets/Images/noInternet.png'
+import { LoginContexts } from './src/Context/LoginContext';
 
+
+  const { width, height } = Dimensions.get("window");
 
 
 
@@ -69,9 +73,6 @@ function App() {
   const [token, setToken] = useState();
 
   console.log(NativeModules)
-
-  const { NotificationModule } = NativeModules;
-  const { CommonModule } = NativeModules;
 
   useEffect(() => {
     retriveData(LOGGEDIN).then(r => {
@@ -89,11 +90,7 @@ function App() {
 
 
   return (
-    //   <SafeAreaProvider>
-    //     <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-    //      <UserContext>
-    //   <AppContent />
-    // </UserContext>
+    // 
 
 
     //   </SafeAreaProvider>
@@ -108,11 +105,11 @@ function App() {
 
       <SafeAreaProvider>
         <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
-        <LoginProvider>
-          <UserContext>
-            <AppContent isLoggedIn={loggedIn} token={token} />
-          </UserContext>
-        </LoginProvider>
+           <LoginProvider>
+              <UserContext>
+                  <AppContent isLoggedIn={loggedIn} token={token} />
+              </UserContext>
+            </LoginProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
 
@@ -121,14 +118,20 @@ function App() {
 }
 
 function AppContent(props) {
-  console.log(props)
+  console.log(props.isLoggedIn)
   const Navigation = createStackNavigator();
   const { NotificationModule, CommonModule } = NativeModules;
 
   const context = useContext(UsersContext);
+  const loginContext=useContext(LoginContexts)
   const [isLoggedIn, setIsLoggedIn] = useState(props.isLoggedIn)
+  const [initialRoute,setInitialRoute]=useState()
 
-  console.log(isLoggedIn)
+  //  const initialRoute = loginContext.getRoute === "confirmMPin" ? "HostelList": "EnterMPin";
+
+console.log(isLoggedIn)
+
+
 
   useEffect(() => {
     NotificationModule.fetchFcmToken().then(r => {
@@ -138,73 +141,103 @@ function AppContent(props) {
     })
 
     CommonModule.fetchSerialNumber().then(r => {
-      context.serialNo(r)
+      loginContext.serialNo(r)
     }).catch(error => {
+      console.log(error)
+    })
+
+    CommonModule.checkInternet().then(r=>{
+    loginContext.internet(r)
+      console.log(r)
+    }).catch(error=>{
       console.log(error)
     })
 
     if(props.token!=null){
       console.log(props.token)
-      context.updateToken(props.token)
+      loginContext.updateToken(props.token)
     }
 
     retriveData(LOGGEDIN).then(r=>{
-      if(LOGGEDIN=="true"){
+      console.log(r)
+      if(r=="true"){
         setIsLoggedIn('true')
       }
     })
 
-  }, [])
+  }, [loginContext.loggedIn])
 
   useEffect(() => {
-    if (context.LoggedIn) {
-      setIsLoggedIn(context.LoggedIn)
+    if (loginContext.LoggedIn) {
+      setIsLoggedIn(loginContext.LoggedIn)
     }
 
     retriveData(ACCESS_TOKEN).then(r=>{
-      context.updateToken(r)
+      loginContext.updateToken(r)
     })
     retriveData(PHONE_NO).then(r=>{
-      context.phoneNo(r)
+      loginContext.phoneNo(r)
     })
-    console.log(context)
 
     retriveData(USERID).then(r=>{
       console.log('userid:',r)
-      context.userId(r)
+      loginContext.userId(r)
     })
-  }, [context.LoggedIn])
+  }, [loginContext.LoggedIn])
+
+  const checkInternet=()=>{
+    CommonModule.checkInternet().then(r=>{
+      loginContext.internet(r)
+    }).catch((error)=>{
+      console.log(error)
+    })
+  }
+
+ 
 
 
+  console.log("*********")
+  console.log(loginContext.getRoute)
+  console.log(isLoggedIn === "true" || loginContext.LoggedIn=="true")
+  console.log(initialRoute)
 
-
-
-
-
-
-
-
-
-  // // enable this when ontime login is setup
-
-  // <NavigationContainer>
-  //       <Navigation.Navigator>
-  //         <Navigation.Screen name='Login' component={Login}/>
-  //         <Navigation.Screen name='EmailAddresspage' component={EmailAddressPage}/>
-  //         <Navigation.Screen name='ForgotPassword' component={ForgotPassword}/>         
-  //       </Navigation.Navigator>
-  //   </NavigationContainer>
 
   return (
 
     <View style={styles.container}>
 
-      {isLoggedIn === "true" ? <NavigationContainer>
-        <Navigation.Navigator screenOptions={{ headerShown: false }}>
+
+    {/* {isLoggedIn!=true?loginContext.getRoute==='confirmMPin':
+
+    } */}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      {isLoggedIn === "true" ? loginContext.getRoute==='confirmMPin'?<NavigationContainer>
+        <Navigation.Screen name='HostelList' component={HostelList} />
+       </NavigationContainer> 
+          :
+        <NavigationContainer>
+        <Navigation.Navigator screenOptions={{ headerShown: false }} initialRouteName= 'EnterMPin'>
           <Navigation.Screen name='EnterMPin' component={EnterMPin}/>
           <Navigation.Screen name='HostelList' component={HostelList} />
-          <Navigation.Screen name="VerifyKYC" component={VerifyKYC} />
           <Navigation.Screen name="KYCUpload" component={KYCUpload} />
+          <Navigation.Screen name='VerifyKYC' component={VerifyKYC}/>
           <Navigation.Screen name="KycSuccess" component={KycSuccessDesign} />
           <Navigation.Screen name='Dashboard' component={Dashboard} />
           <Navigation.Screen name="CustomerProfile" component={CustomerProfile} />
@@ -221,8 +254,6 @@ function AppContent(props) {
           <Navigation.Screen name="InvoiceDesign" component={InvoiceDesign} />
         </Navigation.Navigator>
 
-
-
       </NavigationContainer> : <NavigationContainer>
 
         <Navigation.Navigator screenOptions={{ headerShown: false }} initialRouteName='SplashScreen'>
@@ -238,6 +269,23 @@ function AppContent(props) {
           
         </Navigation.Navigator>
       </NavigationContainer>}
+
+     {loginContext.getNetworkConnectivity !=true && <View style={styles.noInternetContainer}>
+                  <View style={{ justifyContent: 'center', alignItems: 'center',flex:1 }}>
+                      
+                      <Image source={NoInternet} style={{width:350,height:246}} />
+                      <Text style={{fontSize: 22,fontWeight: '700',color: '#000',marginBottom: 8,marginTop:20}}>
+                          You're Offline
+                      </Text>
+                      <Text style={styles.content}>
+                         No Internet Connection found! Check your Connection or try again
+                      </Text>
+                      
+                      <TouchableOpacity onPress={checkInternet} style={styles.tryagain}>
+                              <Text style={{fontSize:16,fontWeight:400,color:'#ffffff'}}>Try again</Text>
+                      </TouchableOpacity>
+                  </View>
+              </View>} 
 
 
 
@@ -294,6 +342,22 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  noInternetContainer:{
+     position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      justifyContent: "center",
+      flex:1,
+      alignItems: "center",
+      backgroundColor: "#fff", // Optional: removes overlap visibility
+      paddingHorizontal: 16,
+      zIndex: 999, // ensures it appears on top
+  },
+  content: { fontSize: 16, fontWeight:400, color: '#555', textAlign: 'center', width: 270, lineHeight: 18,marginTop:10 },
+  tryagain:{backgroundColor:'#1E45E1',justifyContent:'center',alignItems:'center',paddingVertical:15, marginTop:height*0.1,
+                        width:width*0.8,borderRadius:10}
 });
 
 

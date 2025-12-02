@@ -13,7 +13,6 @@ import SuccessModal from "../ToastFile/TostFilePage";
 
 const CreateAccount = ({ navigation }) => {
 
-  const { sendOtp } = useContext(LoginContext);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
