@@ -25,14 +25,13 @@ const HostelList = (route) => {
   const [selectedHostel, setSelectedHostel] = useState();
   const navigation=useNavigation()
 
-  console.log("selectedHostel")
-
-
+  console.log(context.getHostelList)
 
 
   const handleSelect = (hosteldetail) => {
     console.log("hostellist lall",hosteldetail)
     setSelectedHostel(hosteldetail);
+     loginContext.updateRoute(null)
   };
 
   const handleGo = () => {

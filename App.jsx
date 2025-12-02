@@ -152,7 +152,7 @@ function AppContent(props) {
     retriveData(LOGGEDIN).then(r=>{
       if(r=="true"){
         setIsLoggedIn('true')
-        loginContext.updateRoute("confirmMPin")
+        loginContext.updateRoute("null")
       }
     })
 

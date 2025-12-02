@@ -21,7 +21,6 @@ const EnterMPin = (route) => {
     const [showModelMessage, setShowModelMessage] = useState()
     const [modelType, setModelType] = useState();
     const [hostelList,setHostelList] =useState([]);
-
     const handlePinChange = async (text, index) => {
         const newPin = [...createMpin];
         newPin[index] = text;
@@ -66,7 +65,7 @@ const EnterMPin = (route) => {
 
                 setTimeout(() => {
                     setShowSuccessModal(false);
-                    // navigation.navigate('HostelList')
+                    navigation.navigate('HostelList')
                 }, 2000);
             }
             else if (r.status == 401) {

@@ -59,6 +59,7 @@ const ConfirmMPin = (props) => {
 
                     storeData(LOGGEDIN, "true")
                     loginContext.updateRoute("confirmMPin")
+                    context.updateHostelList(r.data)
 
                     setShowSuccessModal(true)
                     setShowModelMessage("Login Successfully")
