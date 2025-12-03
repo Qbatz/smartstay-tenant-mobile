@@ -30,7 +30,8 @@ import { launchImageLibrary } from "react-native-image-picker";
 import Exclamation from '../../assets/Images/exclamation.png'
 import DeleteIcon from '../../assets/Images/deleteIcon.png'
 import HostelProfile from "../../assets/Images/Group 1.png"
-import { addComment, deleteComplaint, getAmenties, getComplaints, getComplaintTypes, hostelDetails, postComplaint, postRequestBedChange, postRquestAmenties } from "../../Action/HostelAction";
+import { addComment, deleteComplaint, getAmenties, getComplaints, getComplaintTypes, hostelDetails, postRequestBedChange, postRquestAmenties } from "../../Action/HostelAction";
+import { postComplaint } from "../../Action/CustomerAction";
 import { UsersContext } from "../../Context/UserContext";
 import {LoginContexts} from '../../Context/LoginContext'
 import Room from '../../assets/Images/Room.png'
@@ -52,6 +53,7 @@ function Dashboard(props) {
 
   const context = useContext(UsersContext)
   const loginContext=useContext(LoginContexts)
+   const { width } = Dimensions.get('window');
 
   console.log(props)
 
@@ -93,7 +95,7 @@ function Dashboard(props) {
 
   const sheetY = useRef(new Animated.Value(700)).current;
 
-  console.log(selectedComplaint)
+  console.log(selectedReason)
 
   const bed = [{ label: 'Disturbance in current room', value: 'Disturbance in current room' }, { label: 'Roommate issues', value: 'Roommate issues' }, { label: 'Need more privacy/space', value: 'Need more privacy/space' },
   { label: 'Maintanence issues', value: 'Maintanence issues' }, { label: 'Prefer other sharing type', value: 'Prefer other sharing type' }, { label: 'Others', value: 'Others' }]
@@ -281,7 +283,7 @@ function Dashboard(props) {
 
     if (imageuri) {
 
-      // console.log(imageuri)
+      console.log(imageuri)
       // let complaitImages = []
       // imageuri.forEach(img => {
       //   complaitImages.push({
@@ -354,7 +356,7 @@ function Dashboard(props) {
   }
   const deleteItem = (complaintiId) => {
 
-    deleteComplaint(context.getHostelDetail.hostelId, complaintiId, loginContext.getToken).then(r => {
+    deleteComplaint(context.getHostelDetail.hostelId, complaintiId, loginContext.getToken, selectedReason).then(r => {
       console.log(r)
       if (r.status == 200) {
         setShowSuccessModal(true);
@@ -524,7 +526,7 @@ function Dashboard(props) {
       style={{ paddingTop: 25, paddingBottom: 15, width: "100%" }}
     >
 
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16 }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16,width:width }}>
 
         <View style={{ flexDirection: 'row',width:'75%'}}>
           <Image source={HostelProfile} resizeMode="contain" style={{ height: 44, width: 44 }} />

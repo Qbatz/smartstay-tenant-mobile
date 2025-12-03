@@ -230,7 +230,7 @@ const CustomerProfile = (route) => {
 
           <View style={styles.divider} />
 
-          <TouchableOpacity style={styles.row}>
+          <TouchableOpacity onPress={()=>navigation.navigate('RentalAgreement')} style={styles.row}>
             <View style={{ flexDirection: 'row' }}>
               <Image source={paperclip} style={{ width: 20, height: 20 }} />
               <Text style={{fontSize:14,fontWeight:400,marginLeft:5}}>Rental Agreement</Text>
@@ -244,7 +244,7 @@ const CustomerProfile = (route) => {
 
 
 
-        <View style={styles.card}>
+        {/* <View style={styles.card}>
           <Text style={styles.sectionTitle}>Rental Agreement</Text>
           <Text style={styles.warningText}>
             Complete your Rental Agreement E-Sign to fully activate your account.
@@ -252,9 +252,9 @@ const CustomerProfile = (route) => {
           <TouchableOpacity style={styles.primaryButton} onPress={() => navigation.navigate("Agreement")}>
             <Text style={styles.primaryButtonText}>Complete E-Sign Now</Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
 
-        <View style={styles.card}>
+        {/* <View style={styles.card}>
           <Text style={styles.sectionTitle}>Rental Agreement</Text>
           <Text style={styles.subtitle}>
             View your Rental Agreement Details as PDF
@@ -268,14 +268,14 @@ const CustomerProfile = (route) => {
               <Text style={styles.primaryButtonText}>Download</Text>
                  <Image  source={DownloadIcon} resizeMode="contain" style={{ width: 20, height: 20 , marginLeft:8 }}/>
             </TouchableOpacity> */}
-            <TouchableOpacity style={styles.primaryButtonSmall} onPress={handleDownload}>
+            {/* <TouchableOpacity style={styles.primaryButtonSmall} onPress={handleDownload}>
               <Text style={styles.primaryButtonText}>Download</Text>
               <Image source={DownloadIcon} resizeMode="contain" style={{ width: 20, height: 20, marginLeft: 8 }} />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
 
-          </View>
-        </View>
+          {/* </View> */}
+        {/* </View> */} 
 
         <View style={styles.helpRow}>
           <Image source={InfoIcon} resizeMode="contain" style={{ width: 20, height: 20 }} />

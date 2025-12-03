@@ -56,6 +56,7 @@ import ProfileHostels from './src/Components/CustomerProfile/ProfileHostels';
 import EnterMPin from './src/Components/CreateAccount/EnterMPin';
 import NoInternet from './src/assets/Images/noInternet.png'
 import { LoginContexts } from './src/Context/LoginContext';
+import RentalAgreement from './src/Components/CustomerProfile/RentalAgreement';
 
 
   const { width, height } = Dimensions.get("window");
@@ -186,7 +187,7 @@ function AppContent(props) {
 
     <View style={styles.container}>
       {isLoggedIn === "true" ? loginContext.getRoute==='confirmMPin'? <NavigationContainer>
-        <Navigation.Navigator>
+        <Navigation.Navigator screenOptions={{ headerShown: false }}>
           <Navigation.Screen name='HostelList' component={HostelList} />
         </Navigation.Navigator>
         
@@ -202,6 +203,7 @@ function AppContent(props) {
           <Navigation.Screen name='Dashboard' component={Dashboard} />
           <Navigation.Screen name="CustomerProfile" component={CustomerProfile} />
           <Navigation.Screen name='ProfileHostels' component={ProfileHostels}/>
+          <Navigation.Screen name='RentalAgreement' component={RentalAgreement}/>
           <Navigation.Screen name="Notification" component={Notification} />
           <Navigation.Screen name="EditProfile" component={EditProfile} />
           <Navigation.Screen name="Agreement" component={Agreement} />

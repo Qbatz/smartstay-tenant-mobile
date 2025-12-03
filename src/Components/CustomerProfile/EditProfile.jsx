@@ -43,20 +43,20 @@ const EditProfile = (route) => {
   console.log(dob)
   console.log(profileImage)
 
-  const handleImagePick = async () => {
-    try {
-      const image = await pickSingleFile();
+  // const handleImagePick = async () => {
+  //   try {
+  //     const image = await pickSingleFile();
       
-      if (image) {
-        console.log("Selected image:", image);
-        setProfileImage({ uri: image });
-      } else {
-        console.log("User cancelled image selection");
-      }
-    } catch (error) {
-      console.log("Image pick error:", error);
-    }
-  };
+  //     if (image) {
+  //       console.log("Selected image:", image);
+  //       setProfileImage({ uri: image });
+  //     } else {
+  //       console.log("User cancelled image selection");
+  //     }
+  //   } catch (error) {
+  //     console.log("Image pick error:", error);
+  //   }
+  // };
 
   const handleSave = () => {
 
@@ -112,19 +112,19 @@ const EditProfile = (route) => {
     
   };
   
-  // const handleImagePick = async () => {
-  //     try {
-  //       const result = await launchImageLibrary({
-  //         mediaTypes: 'photo',
-  //         allowsEditing: true,
-  //         aspect: [1, 1],
-  //         quality: 0.5,
-  //       });
-  //       setProfileImage({uri:result.assets[0]})
-  //     } catch (error) {
-  //       console.log(error)
-  //     }
-  //   }
+  const handleImagePick = async () => {
+      try {
+        const result = await launchImageLibrary({
+          mediaTypes: 'photo',
+          allowsEditing: true,
+          aspect: [1, 1],
+          quality: 0.5,
+        });
+        setProfileImage({uri:result.assets[0]})
+      } catch (error) {
+        console.log(error)
+      }
+    }
 
  
   // const handleImagePick = () => {

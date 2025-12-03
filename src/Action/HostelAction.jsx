@@ -42,22 +42,6 @@ export const complaints=async(hostelId,token)=>{
 
 }
 
-export const postComplaint=async(hostelId,token,formData)=>{
-
-    console.log(formData)
-    try{
-         const response=await AxiosConfig.post('/v2/complaints/' + hostelId, formData,   {
-            headers: {
-                Authorization: 'Bearer ' + token,
-                 "Content-Type": "multipart/form-data",
-            }
-        })
-        console.log(response)
-        return response;
-    }catch(error){
-        return{status: error.response.status, message: error.response.data}
-    }     
-}
 
 export const getComplaints=async(hostelId,complaintId,token)=>{
     try{
@@ -95,13 +79,28 @@ export const getAmenties=async(hostelId,amenityId,token)=>{
     return response;
 }
 
-export const deleteComplaint=async(hostelId,complaintId,token)=>{
-    const response=await AxiosConfig.delete('/v2/complaints/' + hostelId + "/" + complaintId, {
+export const deleteComplaint=async(hostelId,complaintId,token, reason)=>{
+    console.log(hostelId)
+    console.log(complaintId)
+    console.log(token)
+    console.log(reason)
+
+    const data={
+        message: reason
+    }
+    console.log(data)
+    try{
+        console.log('/v2/complaints/' + hostelId + "/" + complaintId)
+        const response=await AxiosConfig.delete('/v2/complaints/' + hostelId + "/" + complaintId, data, {
         headers: {
             Authorization: 'Bearer ' + token
         }
     }) 
     return response;
+    }catch(error){
+        return{status: error.response.status, message: error.response.data}
+    }
+    
 }
 
 export const addComment=async(complaintId,token,data)=>{

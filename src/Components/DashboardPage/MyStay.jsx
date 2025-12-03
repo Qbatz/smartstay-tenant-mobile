@@ -1,5 +1,5 @@
 import React, { useRef, useContext, useEffect, useState, useMemo } from "react";
-import { View, Text, Image, FlatList, TouchableOpacity, ScrollView, StyleSheet, Button, BackHandler, TouchableWithoutFeedback, Platform, Dimensions, PanResponder, Animated } from "react-native";
+import { View, Text, Image, FlatList, TouchableOpacity, ScrollView, StyleSheet, Button, BackHandler, Platform, Dimensions, PanResponder, Animated } from "react-native";
 import Swiper from "react-native-swiper";
 import LinearGradient from "react-native-linear-gradient";
 import Electricity from '../../assets/Images/electricity.png';
@@ -11,15 +11,24 @@ import { Screen } from "react-native-screens";
 import { UsersContext } from "../../Context/UserContext";
 import { hostelDetails } from "../../Action/HostelAction";
 import { LoginContexts } from "../../Context/LoginContext";
+
 function MyStay(props) {
 
     const context = useContext(UsersContext);
-    const loginContext=useContext(LoginContexts)
+    const loginContext = useContext(LoginContexts)
+    const { width } = Dimensions.get('window');
+
 
     const [complaints, setComplaints] = useState([])
     const [rentBill, setRentBill] = useState([])
 
     console.log(rentBill)
+
+    const announcements = [
+        { id: 1, text: 'Hello water maintenance on 5th June' },
+        { id: 2, text: 'field2' },
+        { id: 3, text: 'field3' }
+    ];
 
     useEffect(() => {
         hostelDetails(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
@@ -56,17 +65,37 @@ function MyStay(props) {
 
     }
 
-    function complaintsClick(){
+    function complaintsClick() {
         props.jumpTo('services')
         context.jumpComplain('complaint')
     }
 
-    return <ScrollView style={{ backgroundColor: '#ffffff', flex: 1, width: '100%' }} 
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 20 }}>
+    return <ScrollView style={{ backgroundColor: '#ffffff', flex: 1, width: '100%' }}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 20 }}>
 
-        <View style={{ height: 140, marginTop: 5 }}>
-            <Swiper loop showsPagination index={0}
+        <View style={{height:130, marginTop: 15,overflow: 'hidden', width: width  }}>
+            <Swiper loop showsPagination
+                index={0} paginationStyle={{ bottom: 10 }}
+                removeClippedSubviews={false}
+                dotStyle={{ width: 10, height: 10, borderRadius: 5, backgroundColor: 'transparent', borderWidth: 1.5, 
+                           borderColor: '#CFCFCF', marginHorizontal: 5, }}
+                activeDotColor="#1E45E1" 
+                style={{ borderRadius: 10 }} >
+
+                {announcements.map((item) =>
+                (<LinearGradient key={item.id} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} colors={['#10267B', '#0227B5']}
+                    style={{ width: width * 0.9, height: '75%', borderRadius: 10, paddingHorizontal: 20, paddingTop: 10 }} >
+                    <Text style={{ color: '#ffffff', fontSize: 17, lineHeight: 24 }}>
+                        {item.text}
+                    </Text>
+                </LinearGradient>))}
+            </Swiper>
+        </View>
+
+
+        {/* <View style={{ height: 140, marginTop: 5 }}>
+            <Swiper loop showsPagination index={0} autoplay autoplayTimeout={2}
              paginationStyle={{ bottom: 10 }} 
              removeClippedSubviews 
                 dotStyle={{
@@ -86,7 +115,7 @@ function MyStay(props) {
                     <Text style={{ color: '#ffffff', fontSize: 17 }}> field3</Text>
                 </LinearGradient>
             </Swiper>
-        </View>
+        </View> */}
 
         <View>
             <View style={{ flexDirection: 'row', width: '100%' }}>
@@ -119,7 +148,7 @@ function MyStay(props) {
                 <View style={style.container}>
                     <View>
                         <Text style={{ fontSize: 22, fontWeight: '700', color: '#1C1C1E' }}>
-                            {'\u20B9'} {rentBill?.rent}
+                            {'\u20B9'} {rentBill?.rent != null ? rentBill?.rent : "N/A"}
                         </Text>
 
                         <Text style={{ fontSize: 13, fontWeight: '400', color: '#AEAEB2', marginTop: 5 }}>
@@ -194,10 +223,10 @@ function MyStay(props) {
             </View>
             <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'space-between' }}>
                 <TouchableOpacity onPress={complaintsClick}
-                style={{
-                    borderWidth: 1, borderRadius: 10, flex: 1, justifyContent: 'center',
-                    alignItems: 'center', marginRight: 10, padding: 10, borderColor: '#EFF2FF'
-                }}>
+                    style={{
+                        borderWidth: 1, borderRadius: 10, flex: 1, justifyContent: 'center',
+                        alignItems: 'center', marginRight: 10, padding: 10, borderColor: '#EFF2FF'
+                    }}>
                     <View style={{ marginBottom: 10 }}>
                         <Image source={Receipt} style={{ width: 26, height: 26 }} />
                     </View>
@@ -322,7 +351,7 @@ const style = StyleSheet.create({
         borderWidth: 1, flex: 1, paddingTop: 14, paddingLeft: 15, paddingBottom: 16, borderRadius: 12, marginLeft: 7,
         borderColor: '#E5E5EA', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#FFFFFF'
     },
-    card:{marginTop:10, paddingTop: 12, paddingLeft: 20, borderRadius: 10, height: "70%" }
+    card: { marginTop: 10, paddingTop: 12, paddingLeft: 20, borderRadius: 10, height: "70%" }
 })
 
 
