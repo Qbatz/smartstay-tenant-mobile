@@ -30,8 +30,10 @@ import { launchImageLibrary } from "react-native-image-picker";
 import Exclamation from '../../assets/Images/exclamation.png'
 import DeleteIcon from '../../assets/Images/deleteIcon.png'
 import HostelProfile from "../../assets/Images/Group 1.png"
-import { addComment, deleteComplaint, getAmenties, getComplaints, hostelDetails, postComplaint, postRequestBedChange, postRquestAmenties } from "../../Action/HostelAction";
+import { addComment, deleteComplaint, getAmenties, getComplaints, getComplaintTypes, hostelDetails, postRequestBedChange, postRquestAmenties } from "../../Action/HostelAction";
+import { postComplaint } from "../../Action/CustomerAction";
 import { UsersContext } from "../../Context/UserContext";
+import {LoginContexts} from '../../Context/LoginContext'
 import Room from '../../assets/Images/Room.png'
 import Bed from '../../assets/Images/Bed_Icon.png'
 import SuccessModal from "../ToastFile/TostFilePage";
@@ -50,6 +52,8 @@ import LinearGradient from "react-native-linear-gradient";
 function Dashboard(props) {
 
   const context = useContext(UsersContext)
+  const loginContext=useContext(LoginContexts)
+   const { width } = Dimensions.get('window');
 
   console.log(props)
 
@@ -86,17 +90,12 @@ function Dashboard(props) {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState(null);
   const [sendComment,setSendComment]=useState(null)
-
-
-  console.log(sendComment)
+  const [complaintType,setComplaintTypes]=useState([])
+  const [selectedComplaintTypeId, setSelectedComplaintTypeId] = useState(0);
 
   const sheetY = useRef(new Animated.Value(700)).current;
 
-  console.log(selectedComplaint)
-
-  const complainttype = [{ label: 'Plumbing', value: '1' }, { label: 'Electricity', value: '2' }, { label: 'Room Maintanence', value: '3' }, { label: 'Canteen food', value: '4' }, { label: 'Canteen food', value: '4' }]
-
-  const images = [{ id: 1, source: Damage1 }, { id: 2, source: Damage2 }, { id: 3, source: Damage3 }]
+  console.log(selectedReason)
 
   const bed = [{ label: 'Disturbance in current room', value: 'Disturbance in current room' }, { label: 'Roommate issues', value: 'Roommate issues' }, { label: 'Need more privacy/space', value: 'Need more privacy/space' },
   { label: 'Maintanence issues', value: 'Maintanence issues' }, { label: 'Prefer other sharing type', value: 'Prefer other sharing type' }, { label: 'Others', value: 'Others' }]
@@ -186,6 +185,11 @@ function Dashboard(props) {
   useEffect(() => {
     const data = [{ id: 1, person: 'You', comment: 'When will solve', date: '20 Jan -12.35pm' }, { id: 2, person: 'Priya', comment: 'Complaint assigned and rectify soon', date: '21 Jan -11.35pm' }, { id: 3, person: 'You', comment: 'Thank you', date: '21 Jan -2.35pm' }]
     setCommentNote(data)
+
+    getComplaintTypes(context.getHostelDetail.hostelId,loginContext.getToken).then(r=>{
+      console.log(r)
+      setComplaintTypes(r.data)
+    })
   }, [])
 
 
@@ -202,7 +206,7 @@ function Dashboard(props) {
 
     setShowSheet(true)
 
-    getComplaints(context.getHostelDetail.hostelId, complaint.complaintId, context.getToken).then(r => {
+    getComplaints(context.getHostelDetail.hostelId, complaint.complaintId, loginContext.getToken).then(r => {
       setSelectComplaint(r.data)
     })
   }
@@ -229,7 +233,7 @@ function Dashboard(props) {
     }
 
 
-    addComment(selectedComplaint.complaintId, context.getToken, data).then(r => {
+    addComment(selectedComplaint.complaintId, loginContext.getToken, data).then(r => {
       console.log(r)
     })
   }
@@ -261,7 +265,7 @@ function Dashboard(props) {
 
   const submitClick = () => {
     const payloads = {
-      complaintTypeId: selectedValue,
+      complaintTypeId: selectedComplaintTypeId,
       description: complaintDescription,
     }
 
@@ -279,28 +283,31 @@ function Dashboard(props) {
 
     if (imageuri) {
 
-      let complaitImages = []
-      imageuri.forEach(img => {
-        complaitImages.push({
+      console.log(imageuri)
+      // let complaitImages = []
+      // imageuri.forEach(img => {
+      //   complaitImages.push({
+      //     uri: img.uri,
+      //     type: img.type,
+      //     name: img.fileName
+      //   })
+      // })
+      // console.log(complaitImages)
+
+
+      formData.append("complaintImage", imageuri)
+
+      imageuri.forEach((img, index) => {
+        formData.append("complaintImage", {
           uri: img.uri,
           type: img.type,
-          name: img.fileName
+          name: img.fileName,
         })
+
       })
-
-      formData.append("complaintImage", complaitImages)
-
-      // imageuri.forEach((img, index) => {
-      //   formData.append("complaintImage", {
-      //     uri: img.uri,
-      //     type: img.type || "image/jpeg",
-      //     name: img.fileName || "profile.jpg"
-      //   })
-
-      // })
     }
 
-    postComplaint(context.getHostelDetail.hostelId, context.getToken, formData).then(r => {
+    postComplaint(context.getHostelDetail.hostelId, loginContext.getToken, formData).then(r => {
       console.log(r)
       setLoading(true)
 
@@ -349,7 +356,7 @@ function Dashboard(props) {
   }
   const deleteItem = (complaintiId) => {
 
-    deleteComplaint(context.getHostelDetail.hostelId, complaintiId, context.getToken).then(r => {
+    deleteComplaint(context.getHostelDetail.hostelId, complaintiId, loginContext.getToken, selectedReason).then(r => {
       console.log(r)
       if (r.status == 200) {
         setShowSuccessModal(true);
@@ -378,9 +385,7 @@ function Dashboard(props) {
       description: bedType,
     }
 
-    postRequestBedChange(context.getHostelDetail.hostelId, data, context.getToken).then(r => {
-      console.log(r)
-
+    postRequestBedChange(context.getHostelDetail.hostelId, data, loginContext.getToken).then(r => {
       setLoading(true)
 
       setTimeout(() => {
@@ -412,7 +417,7 @@ function Dashboard(props) {
       setShowAmenities(true)
       setTag(tag)
 
-      getAmenties(context.getHostelDetail.hostelId, item.amenityId, context.getToken).then(r => {
+      getAmenties(context.getHostelDetail.hostelId, item.amenityId, loginContext.getToken).then(r => {
         console.log(r)
         setmyAminites(r.data)
       })
@@ -421,7 +426,7 @@ function Dashboard(props) {
     else {
       setShowAmenities(true)
       setTag(null)
-      getAmenties(context.getHostelDetail.hostelId, item.amenityId, context.getToken).then(r => {
+      getAmenties(context.getHostelDetail.hostelId, item.amenityId, loginContext.getToken).then(r => {
         console.log(r)
         setAvailable(r.data)
       })
@@ -434,7 +439,7 @@ function Dashboard(props) {
 
   const onRequestAmenities = (amenityId) => {
 
-    postRquestAmenties(context.getHostelDetail.hostelId, context.getToken, amenityId).then(r => {
+    postRquestAmenties(context.getHostelDetail.hostelId, loginContext.getToken, amenityId).then(r => {
       console.log(r)
     })
   }
@@ -521,7 +526,7 @@ function Dashboard(props) {
       style={{ paddingTop: 25, paddingBottom: 15, width: "100%" }}
     >
 
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16 }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16,width:width }}>
 
         <View style={{ flexDirection: 'row',width:'75%'}}>
           <Image source={HostelProfile} resizeMode="contain" style={{ height: 44, width: 44 }} />
@@ -571,16 +576,16 @@ function Dashboard(props) {
           <View style={StyleSheet.absoluteFill} />
         </TouchableWithoutFeedback>
 
-        <Animated.View style={[style.bottomSheet, { transform: [{ translateY: sheetY }] }]}
+        <Animated.View style={[selectedComplaint?.images?.length>0?style.bottomSheet:style.bottomSheetwithimage, { transform: [{ translateY: sheetY }] }]}
           {...panResponder.panHandlers}>
 
-          <View style={{ flex: 1 }}>
+          <View style={{ flex: 1}}>
             <View {...panResponder.panHandlers}>
               <View style={style.dragindictor} />
             </View>
 
             {comment ? (
-              <View style={{ flex: 1, justifyContent: 'space-between' }}>
+              <View style={{ flex: 1}}>
                 <View>
                   <Text style={{ fontSize: 18, fontWeight: 400 }}>Comments</Text>
                   {/* Divider */}
@@ -619,7 +624,9 @@ function Dashboard(props) {
             ) : (
               <View style={{ flex: 1 }}>
                 {selectedComplaint && (
-                  <View style={{ justifyContent: 'space-between', flex: 1 }} >
+                  <ScrollView style={{flex:1}} 
+                  showsVerticalScrollIndicator={false} > 
+                  <View style={{justifyContent:'flex-end',flex:1}}>
                     <View>
                       <View style={{ flexDirection: "row", justifyContent: "space-between", paddingLeft: 5, paddingRight: 8, marginBottom: 10, paddingTop: 10, }}>
                         <View>
@@ -675,15 +682,16 @@ function Dashboard(props) {
                       <View style={{ paddingTop: 15 }}>
                         <Text style={{ fontSize: 12, fontWeight: "400", color: "#4B4B4B" }}> Attached images</Text>
 
-                        <FlatList horizontal
+                       <FlatList horizontal
                           style={{ paddingTop: 15 }}
                           keyExtractor={(item) => item.id.toString()}
                           data={selectedComplaint.images}
-                          renderItem={({ item }) => (
-                            <View key={item.id}
+                          renderItem={({ item }) => { console.log(item)
+                           return <View key={item.id}
                               style={{ paddingLeft: 10, position: "relative" }}>
+                                
                               <TouchableOpacity onPress={() => imageclick(item.id)}>
-                                <Image source={{ uri: item.imageUrl }} style={{ width: 90, height: 70, borderRadius: 5 }} />
+                                <Image source={{uri:item.imageUrl }} style={{ width: 90, height: 70, borderRadius: 5 }} />
                                 {imageid === item.id && deletevisible && (
                                   <TouchableOpacity style={{ position: "absolute", bottom: 25, right: 35, }} >
                                     <Image source={Trash} style={{ width: 21.09, height: 21.09, }} />
@@ -691,12 +699,13 @@ function Dashboard(props) {
                                 )}
                               </TouchableOpacity>
                             </View>
-                          )}
+                          }}
                         />
+                        
                       </View>
                     </View>
 
-                    <View>
+                    <View style={{marginTop:10}} >
                       {/* COMMENT INPUT */}
                       <View style={{ paddingTop: 22 }}>
                         <View style={{ padding: 4, borderRadius: 10, borderWidth: 1, justifyContent: "space-between", flexDirection: "row", alignItems: "center", }} >
@@ -733,8 +742,8 @@ function Dashboard(props) {
                       </TouchableOpacity>
 
                     </View>
-
-                  </View>
+                    </View>
+                  </ScrollView>
                 )}
               </View>
             )}
@@ -778,15 +787,16 @@ function Dashboard(props) {
 
                   <Dropdown style={{ borderWidth: 1, borderRadius: 10, paddingVertical: 10, marginTop: 10, borderColor: '#e5e5e5' }}
                     onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
-                    data={complainttype}
+                    data={complaintType}
                     containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
                     placeholderStyle={{ fontSize: 14, paddingLeft: 10 }}
                     placeholder="Select a type"
-                    labelField="label"
-                    valueField="value"
+                    labelField="complaintTypeName"
+                    valueField="complaintTypeId"
                     value={selectedValue}
 
                     onChange={item => {
+
                       setSelectedValue(item.value)
                     }}
                     renderRightIcon={() => (
@@ -979,15 +989,16 @@ function Dashboard(props) {
 
                   <Dropdown style={{ borderWidth: 1, borderRadius: 10, paddingVertical: 10, marginTop: 10, borderColor: '#e5e5e5', paddingLeft: 15 }}
                     onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
-                    data={complainttype}
+                    data={complaintType}
                     containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
                     placeholderStyle={{ fontSize: 14 }}
                     placeholder="Select a type"
-                    labelField="label"
-                    valueField="value"
+                    labelField="complaintTypeName"
+                    valueField="complaintTypeId"
                     value={selectedValue}
 
                     onChange={item => {
+                      setSelectedComplaintTypeId(item.complaintTypeId)
                       setSelectedValue(item.value)
                     }}
                     renderRightIcon={() => (
@@ -1655,7 +1666,16 @@ const style = StyleSheet.create({
 
   },
   bottomSheet: {
-    height: '60%',
+    height:'60%',
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 5
+  },
+   bottomSheetwithimage: {
+    height:'50%',
     backgroundColor: '#fff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,

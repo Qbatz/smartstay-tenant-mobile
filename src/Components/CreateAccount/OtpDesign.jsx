@@ -5,8 +5,9 @@ import { LoginContext } from "../../Context/LoginContext";
 import { verifyOtp } from "../../Action/LoginAction";
 import { UsersContext } from "../../Context/UserContext";
 import { storeData } from "../../Utils/Storage";
-import { ACCESS_TOKEN,PHONE_NO,LOGGEDIN } from "../../Utils/Constant";
+import { ACCESS_TOKEN,PHONE_NO,LOGGEDIN, USERID } from "../../Utils/Constant";
 import SuccessModal from "../ToastFile/TostFilePage";
+import { LoginContexts } from "../../Context/LoginContext";
 
 const OtpDesign =({ route }) => {
   const navigation = useNavigation();
@@ -19,7 +20,8 @@ const OtpDesign =({ route }) => {
 
 
   const context=useContext(UsersContext)
-  console.log(context.SerialNo)
+  const loginContext=useContext(LoginContexts)
+  console.log(loginContext.SerialNo)
   // const { verifyOtp , resendOtp } = useContext(LoginContext); 
 
   const handleOtpChange = async (text, index) => {
@@ -40,33 +42,18 @@ const OtpDesign =({ route }) => {
       console.log(data)
       if(data.status==200){
         console.log(data.data)
-        context.userId(data.data.userId)
-        context.phoneNo(route.params.phone)
+        loginContext.userId(data.data.xuid)
+        loginContext.phoneNo(route.params.phone)
+        storeData(PHONE_NO,route.params.phone)
+        storeData(LOGGEDIN,'true')
+        storeData(USERID,data.data.xuid)
 
         if(data.data.isMpinVerified==true){
-          navigation.navigate('EnterMPin')
+          loginContext.loggedin('true')
         }
         else{
           navigation.navigate('CreateMpin')
-        }
-
-
-        // storeData(ACCESS_TOKEN,data.data)
-        // storeData(PHONE_NO,route.params.phone)
-        // storeData(LOGGEDIN,"fa")
-        
-        // context.updateToken(data.data)
-          
-          // setShowSuccessModal(true)
-          // setShowModelMessage("Login Successfully") 
-          // setModelType('success')
-
-          // setTimeout(() => {
-          //   setShowSuccessModal(false);
-            
-          // navigation.navigate('EnterMPin')
-          //   context?.loggedin('false')        
-          //   }, 2000);        
+        }      
       }      
       else if(data.status==401){
         setShowSuccessModal(true)

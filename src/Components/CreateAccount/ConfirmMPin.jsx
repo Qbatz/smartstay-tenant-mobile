@@ -7,12 +7,14 @@ import { UsersContext } from "../../Context/UserContext";
 import SuccessModal from "../ToastFile/TostFilePage";
 import { storeData } from "../../Utils/Storage";
 import { ACCESS_TOKEN,LOGGEDIN } from "../../Utils/Constant";
+import { LoginContexts } from "../../Context/LoginContext";
 
 const ConfirmMPin = (props) => {
     console.log(props)
 
     const navigation = useNavigation();
     const context = useContext(UsersContext)
+    const loginContext=useContext(LoginContexts)
     const [createMpin, setCreateMpin] = useState(["", "", "", ""])
     const [mPinNumber, setmPinNumber] = useState(null)
     const inputs = useRef([]);
@@ -48,15 +50,16 @@ const ConfirmMPin = (props) => {
 
         if (props.route.params.mPinNumber == mPinNumber) {
             const data = {
-                userId: context.getUserId,
-                newMpin: mPinNumber,
+                xuid: loginContext.getUserId,
+                mPin: mPinNumber,
             }
             postMPin(data).then(r => {
                 console.log(r)
                 if (r.status == 200) {
-                    storeData(ACCESS_TOKEN, r.data)
+
                     storeData(LOGGEDIN, "true")
-                    context.updateToken(r.data)
+                    loginContext.updateRoute("confirmMPin")
+                    context.updateHostelList(r.data)
 
                     setShowSuccessModal(true)
                     setShowModelMessage("Login Successfully")
@@ -64,7 +67,7 @@ const ConfirmMPin = (props) => {
 
                     setTimeout(() => {
                         setShowSuccessModal(false);
-                        context.loggedin('true')
+                        loginContext.loggedin('true')
                     }, 2000);
                 }
             })

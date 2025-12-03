@@ -29,6 +29,16 @@ export const verifyOtp =async(phoneNo,otp,serialNo)=>{
    
 }
 
+export const getToken=async(data)=>{
+    try{
+        const response=await AxiosConfig.post('/v2/tenant/login/request-token', data)
+        return response;
+    }catch (error){
+        return{status: error.response.status, message: error.response.data}
+    }
+    
+}
+
 export const generateToken = async (phone, serialNo) => {
     const data = {
         mobileNo: phone,

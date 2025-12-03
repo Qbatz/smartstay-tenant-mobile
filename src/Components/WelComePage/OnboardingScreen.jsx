@@ -11,7 +11,7 @@ import Swiper from "react-native-swiper";
 import onboardImg from "../../assets/Images/image 6345209.png";
 import Logo from "../../assets/Images/Logo.png";
 
-const { width } = Dimensions.get("screen");
+const { width, height } = Dimensions.get("window");
 
 export default function OnboardingScreen({ navigation }) {
   const goNext = () => {
@@ -29,13 +29,13 @@ export default function OnboardingScreen({ navigation }) {
         <Text style={styles.tagText}>TENANT APP</Text>
       </View>
 
-      <Swiper
+    <View style={styles.swiperContainer}>
+           <Swiper
         loop
         showsPagination
         autoplay autoplayTimeout={3}
-        dot={<View style={styles.dot} />}
-        activeDot={<View style={styles.activeDot} />}
-        paginationStyle={{ bottom: 200 }}
+        activeDot={<View style={styles.activeDot} />} 
+        paginationStyle={{ bottom: 30 }}
       >
         <View style={styles.card}>
           <Image source={onboardImg} style={styles.image} />
@@ -60,6 +60,8 @@ export default function OnboardingScreen({ navigation }) {
           </Text>
         </View>
       </Swiper>
+    </View>
+     
 
       <TouchableOpacity style={styles.button} onPress={goNext}>
         <Text style={styles.buttonText}>Get Started →</Text>
@@ -107,7 +109,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 10,
     elevation: 5,
-    marginTop:100
+    
   },
 
   image: { width: 280, height: 220, resizeMode: "contain", marginBottom: 25 },
@@ -150,4 +152,9 @@ const styles = StyleSheet.create({
     bottom: 30,
   },
   buttonText: { color: "#fff", fontWeight: "600", fontSize: 16 },
+  swiperContainer: {
+        height: height * 0.6,    
+        width: "100%",
+        marginTop:height*0.1
+    },
 });

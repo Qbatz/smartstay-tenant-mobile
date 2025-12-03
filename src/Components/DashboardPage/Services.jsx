@@ -8,10 +8,12 @@ import AmenitiesPic from '../../assets/Images/amenities.png'
 import { UsersContext } from "../../Context/UserContext";
 import { complaints, getAmenitiesList } from "../../Action/HostelAction";
 import NoResultPic from '../../assets/Images/NoResultPic.png'
+import { LoginContexts } from "../../Context/LoginContext";
 
 function Services(props) {
 
     const commonContext = useContext(UsersContext)
+    const loginContext=useContext(LoginContexts)
 
     console.log(commonContext.Complaint)
     console.log(props)
@@ -57,11 +59,11 @@ function Services(props) {
     };
 
     useEffect(() => {
-        complaints(commonContext.getHostelDetail.hostelId, commonContext.getToken).then(r => {
+        complaints(commonContext.getHostelDetail.hostelId, loginContext.getToken).then(r => {
             setComplaintsList(r?.data?.content)
         })
 
-        getAmenitiesList(commonContext.getHostelDetail.hostelId, commonContext.getToken).then(r => {
+        getAmenitiesList(commonContext.getHostelDetail.hostelId, loginContext.getToken).then(r => {
             setAssignedAmenity(r.data.assignedAmenities)
             setUnasignedAmenities(r.data.unassignedAmenities)
         })
@@ -140,10 +142,8 @@ function Services(props) {
             renderItem={({ item }) => {
                 const { backgroundColor, textColor } = getStatusColor(item.status);
                 return <View key={item.complaintId}>
-                    <TouchableOpacity onPress={() => props.onOpen(item)}>
-                        <View
-                            style={style.complaintStyle}
-                        >
+                    <TouchableOpacity onPress={() => props.onOpen(item)}
+                         style={style.complaintStyle}>
                             {/* LEFT SIDE */}
                             <View style={{ flex: 1, paddingRight: 10 }}>
                                 <Text
@@ -200,7 +200,6 @@ function Services(props) {
                                     </Text>
                                 </View>
                             </View>
-                        </View>
                     </TouchableOpacity>
                 </View>
 
@@ -329,9 +328,6 @@ function Services(props) {
 }
 
         
-
-           
-
 
 
         {selectedfield == 'Complaint' && <View style={{ position: 'absolute', bottom: 35, right: -3 }}>

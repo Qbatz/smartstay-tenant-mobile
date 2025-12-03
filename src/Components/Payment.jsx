@@ -25,6 +25,7 @@ import FilterIcon from "../assets/Images/Filter_Icon.png"
 import ArrowRightIcon from "../assets/Images/arrow-right.png";
 import { getPaymentList } from "../Action/HostelAction";
 import { UsersContext } from "../Context/UserContext";
+import { LoginContexts } from "../Context/LoginContext";
 
 
 
@@ -36,77 +37,11 @@ const Payment = (props) => {
   const [selectedPayment, setSelectedPayment] = useState(null);
   const [payment,setPayment]=useState([])
   const context=useContext(UsersContext)
+  const loginContext=useContext(LoginContexts)
 
-
-  const payments = [
-    {
-      title: "Sep Month Rental",
-      date: "02 Oct 2025",
-      amount: 6000,
-      status: "Pay Now",
-      statusColor: "#0057FF",
-      paid: false,
-    },
-    {
-      title: "July Month Rental",
-      date: "04 Aug 2025",
-      amount: 6000,
-      status: "Paid to",
-      statusColor: "#00C853",
-      paid: true,
-    },
-    {
-      title: "July EB Bill",
-      date: "04 Aug 2025",
-      amount: 650,
-      status: "Partially Paid to",
-      statusColor: "#FFB300",
-      paid: "partial",
-    },
-     {
-      title: "June Month Rental",
-      date: "04 Jun 2025",
-      amount: 4000,
-      status: "Paid to",
-      statusColor: "#00C853",
-      paid: true,
-    },
-     {
-      title: "July Month Rental",
-      date: "04 Aug 2025",
-      amount: 6000,
-      status: "Paid to",
-      statusColor: "#00C853",
-      paid: true,
-    },
-     {
-      title: "January Month Rental",
-      date: "12 Jan 2025",
-      amount: 8000,
-      status: "Paid to",
-      statusColor: "#00C853",
-      paid: true,
-    },
-     {
-      title: "Feb Month Rental",
-      date: "12 Feb 2025",
-      amount: 6000,
-      status: "Paid to",
-      statusColor: "#00C853",
-      paid: true,
-    },
-     {
-      title: "Sep Month Rental",
-      date: "02 Oct 2025",
-      amount: 12000,
-      status: "Pay Now",
-      statusColor: "#0057FF",
-      paid: false,
-    },
-  ];
 
   useEffect(()=>{
-      getPaymentList(context.getHostelDetail.hostelId,context.getToken).then(r=>{
+      getPaymentList(context.getHostelDetail.hostelId,loginContext.getToken).then(r=>{
         console.log(r)
         setPayment(r.data)
       })
