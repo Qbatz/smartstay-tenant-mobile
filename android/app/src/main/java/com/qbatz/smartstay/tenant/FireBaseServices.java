@@ -36,7 +36,7 @@ public class FireBaseServices extends FirebaseMessagingService {
     public void onMessageReceived(@NonNull RemoteMessage message) {
         super.onMessageReceived(message);
 
-        Intent intent=new Intent(FireBaseServices.this, Alert_Details.class);
+        Intent intent=new Intent(FireBaseServices.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent= PendingIntent.getActivity(FireBaseServices.this,0,intent,PendingIntent.FLAG_IMMUTABLE);
 
