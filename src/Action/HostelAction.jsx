@@ -91,9 +91,12 @@ export const deleteComplaint=async(hostelId,complaintId,token, reason)=>{
     console.log(data)
     try{
         console.log('/v2/complaints/' + hostelId + "/" + complaintId)
-        const response=await AxiosConfig.delete('/v2/complaints/' + hostelId + "/" + complaintId, data, {
+        const response=await AxiosConfig.delete('/v2/complaints/' + hostelId + "/" + complaintId, {
         headers: {
             Authorization: 'Bearer ' + token
+        },
+        data: {
+            message: reason
         }
     }) 
     return response;
