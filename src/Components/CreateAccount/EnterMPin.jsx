@@ -68,7 +68,7 @@ const EnterMPin = (route) => {
                     navigation.navigate('HostelList')
                 }, 2000);
             }
-            else if (r.status == 401||400) {
+            else if (r.status == 400) {
                 setShowSuccessModal(true)
                 setShowModelMessage("Incorrect MPIN")
                 setModelType('error')
