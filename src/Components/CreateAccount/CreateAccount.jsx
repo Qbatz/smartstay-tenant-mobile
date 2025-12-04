@@ -7,16 +7,18 @@ import {
   StyleSheet,
   Image,
 } from "react-native";
-import { LoginContext } from "../../Context/LoginContext";
 import { verifyPhoneNo } from "../../Action/LoginAction";
 import SuccessModal from "../ToastFile/TostFilePage";
+import { LoginContexts } from "../../Context/LoginContext";
 
 const CreateAccount = ({ navigation }) => {
 
+  const loginContext=useContext(LoginContexts)
   const [phoneNumber, setPhoneNumber] = useState("");
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const[otp,setOtp]=useState();
+  
 
  const handlePhoneChange = (text) => { 
   const numericText = text.replace(/[^0-9]/g, '');
@@ -31,12 +33,12 @@ const handleGetOtp = async () => {
 
     const dat= await verifyPhoneNo(phoneNumber)
     console.log(dat)
-    setOtp(dat.data)
+    setOtp(dat.data.otp)
+    loginContext.userId(dat.data.xuid)
 
     if(dat.status==200){
 
-      
-
+    
       setShowSuccessModal(true)
       setTimeout(() => {
             setShowSuccessModal(false);
