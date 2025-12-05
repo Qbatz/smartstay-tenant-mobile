@@ -11,6 +11,7 @@ import { Screen } from "react-native-screens";
 import { UsersContext } from "../../Context/UserContext";
 import { hostelDetails } from "../../Action/HostelAction";
 import { LoginContexts } from "../../Context/LoginContext";
+import requestProfile from '../../assets/Images/profile-2user.png'
 
 function MyStay(props) {
 
@@ -21,6 +22,7 @@ function MyStay(props) {
 
     const [complaints, setComplaints] = useState([])
     const [rentBill, setRentBill] = useState([])
+    const [request,setRequest]=useState([])
 
     console.log(rentBill)
 
@@ -76,10 +78,10 @@ function MyStay(props) {
 
         <View style={{height:130, marginTop: 15,overflow: 'hidden', width: width  }}>
             <Swiper loop showsPagination
-                index={0} paginationStyle={{ bottom: 10 }}
+                index={0} paginationStyle={{ bottom: 10,width: "100%",paddingRight:22}}
                 removeClippedSubviews={false}
                 dotStyle={{ width: 10, height: 10, borderRadius: 5, backgroundColor: 'transparent', borderWidth: 1.5, 
-                           borderColor: '#CFCFCF', marginHorizontal: 5, }}
+                           borderColor: '#CFCFCF', marginHorizontal: 5,alignItems:'center',justifyContent:'center' }}
                 activeDotColor="#1E45E1" 
                 style={{ borderRadius: 10 }} >
 
@@ -250,6 +252,41 @@ function MyStay(props) {
 
         </View>
 
+        <View style={{paddingTop:15}}>
+            <Text style={{fontSize:16,fontWeight:600}}>Request</Text>
+
+
+            {request && request.length > 0? <View style={{borderWidth:1,borderRadius:10,flexDirection:'row',paddingVertical:15,borderColor:'#EFF2FF',
+                        justifyContent:'space-between',marginTop:10
+            }}>
+                 <View style={{paddingLeft:12,paddingRight:10}}>
+                    <Text style={{fontSize:16,fontWeight:600,marginBottom:5}}>
+                        No Request yet
+                    </Text>
+                    <Text style={{fontSize:14,fontWeight:400,color:'#4B4B4B',marginTop:5}}>
+                        You have'nt raised any request</Text>
+                </View>
+
+                <View>
+                    <Text>Hi</Text>
+                </View>
+            </View>:
+            <View style={{borderWidth:1,borderRadius:10,flexDirection:'row',paddingVertical:15,borderColor:'#EFF2FF',
+                        justifyContent:'space-between',marginTop:10
+            }}>
+                <View style={{paddingLeft:12,paddingRight:10}}>
+                    <Text style={{fontSize:16,fontWeight:600,marginBottom:5}}>
+                        No Request yet
+                    </Text>
+                    <Text style={{fontSize:14,fontWeight:400,color:'#4B4B4B',marginTop:5}}>
+                        You have'nt raised any request</Text>
+                </View>
+                
+                <Image source={requestProfile} style={{width:44,height:44,marginRight:12,marginTop:5}}/>
+            </View>}
+           
+        </View>
+
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 12 }}>
             <Text style={{ fontSize: 16, fontWeight: 600 }}>Complaints</Text>
             <TouchableOpacity onPress={viewallclick}>
@@ -268,7 +305,7 @@ function MyStay(props) {
 
                         <View style={{
                             borderWidth: 1, borderRadius: 12, marginTop: 12, flexDirection: 'row', justifyContent: 'space-between',
-                            borderColor: '#E5E5EA', backgroundColor: '#FFFFFF',
+                            borderColor: '#EFF2FF', backgroundColor: '#FFFFFF',
                         }}>
 
                             {/* LEFT SECTION */}
