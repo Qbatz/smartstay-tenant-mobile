@@ -42,18 +42,16 @@ const CustomerProfile = (route) => {
   const loginContext=useContext(LoginContexts)
 
   const navigation = useNavigation();
-  const [selectedHostel, setSelectedHostel] = useState("Smartstay Hostel");
-  const [dropdownVisible, setDropdownVisible] = useState(false);
   const [customer, setCustomers] = useState()
 
-  console.log(customer)
+  console.log(context.getCustomerDetail )
 
 
 
   useEffect(() => {
     customerDetails(loginContext.getToken).then(r => {
       console.log(r.data)
-      setCustomers(r.data)
+      context.updateCustomer(r.data)
     }).catch(error => {
       console.log(error)
     })
@@ -110,7 +108,7 @@ const CustomerProfile = (route) => {
   };
 
   const handleEditProfile = () => {
-    navigation.navigate("EditProfile", { customer: customer });
+    navigation.navigate("EditProfile", { customer: context.getCustomerDetail });
 
   }
 
@@ -148,18 +146,18 @@ const CustomerProfile = (route) => {
         <View style={styles.profileCard}>
           <View style={styles.profileRow}>
             <Image
-              source={{ uri: customer?.profilePic }}
+              source={{ uri: context.getCustomerDetail?.profilePic }}
               style={styles.profileImage} resizeMode="contain"
             />
             <View style={{ flex: 1, marginLeft: 10 }}>
               <View style={{ display: 'flex', flexDirection: 'row' }}>
-                <Text style={styles.profileName}>{customer?.firstName}</Text>
+                <Text style={styles.profileName}>{context.getCustomerDetail?.firstName}</Text>
                 <Image source={VerifyIcon} resizeMode="contain" style={{ marginTop: 2, marginLeft: 4, height: 20, width: 20 }} />
               </View>
 
               <View style={styles.infoRow}>
                 <View style={styles.FloorBadgePending}>
-                  <Text style={{ color: 'black' }}>{customer?.bookingDetails?.floorName}</Text>
+                  <Text style={{ color: 'black' }}>{context.getCustomerDetail?.bookingDetails?.floorName}</Text>
                 </View>
 
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -168,7 +166,7 @@ const CustomerProfile = (route) => {
                     style={{ height: 16, width: 16, marginRight: 4 }}
                     resizeMode="contain"
                   />
-                  <Text>{customer?.bookingDetails?.roomName}</Text>
+                  <Text>{context.getCustomerDetail?.bookingDetails?.roomName}</Text>
                 </View>
 
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
@@ -177,7 +175,7 @@ const CustomerProfile = (route) => {
                     style={{ height: 16, width: 16, marginRight: 4 }}
                     resizeMode="contain"
                   />
-                  <Text>{customer?.bookingDetails?.bedName}</Text>
+                  <Text>{context.getCustomerDetail?.bookingDetails?.bedName}</Text>
                 </View>
 
 

@@ -30,7 +30,7 @@ import { launchImageLibrary } from "react-native-image-picker";
 import Exclamation from '../../assets/Images/exclamation.png'
 import DeleteIcon from '../../assets/Images/deleteIcon.png'
 import HostelProfile from "../../assets/Images/Group 1.png"
-import { addComment, deleteComplaint, getAmenties, getComplaints, getComplaintTypes, hostelDetails, postRequestBedChange, postRquestAmenties } from "../../Action/HostelAction";
+import { addComment, complaints, deleteComplaint, getAmenties, getComplaints, getComplaintTypes, hostelDetails, postRequestBedChange, postRquestAmenties } from "../../Action/HostelAction";
 import { postComplaint } from "../../Action/CustomerAction";
 import { UsersContext } from "../../Context/UserContext";
 import {LoginContexts} from '../../Context/LoginContext'
@@ -47,13 +47,16 @@ import PaidIcon from "../../assets/Images/Checkboxes.png";
 import ViewIcon from "../../assets/Images/view.png";
 import ArrowRightIcon from "../../assets/Images/arrow-right.png";
 import LinearGradient from "react-native-linear-gradient";
+import { compliantContexts } from "../../Context/ComplaintContext";
 
 
 function Dashboard(props) {
 
   const context = useContext(UsersContext)
   const loginContext=useContext(LoginContexts)
+  const complaintContext=useContext(compliantContexts)
    const { width } = Dimensions.get('window');
+   
 
   console.log(props)
 
@@ -95,7 +98,8 @@ function Dashboard(props) {
 
   const sheetY = useRef(new Animated.Value(700)).current;
 
-  console.log(selectedReason)
+  console.log(complaintDescription)
+  console.log(selectedComplaintTypeId)
 
   const bed = [{ label: 'Disturbance in current room', value: 'Disturbance in current room' }, { label: 'Roommate issues', value: 'Roommate issues' }, { label: 'Need more privacy/space', value: 'Need more privacy/space' },
   { label: 'Maintanence issues', value: 'Maintanence issues' }, { label: 'Prefer other sharing type', value: 'Prefer other sharing type' }, { label: 'Others', value: 'Others' }]
@@ -308,7 +312,6 @@ function Dashboard(props) {
     }
 
     postComplaint(context.getHostelDetail.hostelId, loginContext.getToken, formData).then(r => {
-      console.log(r)
       setLoading(true)
 
       setTimeout(() => {
@@ -319,7 +322,13 @@ function Dashboard(props) {
           setTimeout(() => {
             setShowSuccessModal(false);
             setShowSheet(false)
+            setSelectedComplaintTypeId(0)
+            setDespriction('')
             setAddComplaint(false)
+
+             complaints(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
+                        complaintContext.updateComplaintList(r?.data?.content)
+                    })
           }, 2000);
 
         }
@@ -366,6 +375,10 @@ function Dashboard(props) {
           setShowPopUp(false)
           setSelectedReason(null)
           setShowSheet(false)
+
+          complaints(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
+                        complaintContext.updateComplaintList(r?.data?.content)
+                    })
         }, 2000);
 
       }
@@ -985,7 +998,9 @@ function Dashboard(props) {
                 <Text style={{ fontSize: 20, fontWeight: 600 }}>Add complaint</Text>
 
                 <View style={{ paddingTop: 20 }}>
-                  <Text>Complaint type</Text>
+                  <Text>Complaint type
+                     <Text style={{ color: 'red' }}> *</Text>
+                  </Text>
 
                   <Dropdown style={{ borderWidth: 1, borderRadius: 10, paddingVertical: 10, marginTop: 10, borderColor: '#e5e5e5', paddingLeft: 15 }}
                     onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
@@ -995,7 +1010,7 @@ function Dashboard(props) {
                     placeholder="Select a type"
                     labelField="complaintTypeName"
                     valueField="complaintTypeId"
-                    value={selectedValue}
+                    value={selectedComplaintTypeId}
 
                     onChange={item => {
                       setSelectedComplaintTypeId(item.complaintTypeId)
@@ -1011,7 +1026,9 @@ function Dashboard(props) {
                 </View>
 
                 <View style={{ paddingTop: 16 }}>
-                  <Text style={{ fontSize: 14, fontWeight: 400 }}>Complaint message</Text>
+                  <Text style={{ fontSize: 14, fontWeight: 400 }}>Complaint message
+                       <Text style={{ color: 'red' }}> *</Text>
+                  </Text>
                   <View style={{ borderWidth: 1, borderRadius: 10, marginTop: 8, paddingTop: 7, paddingLeft: 10, borderColor: '#e5e5e5', height: 80 }}>
                     <TextInput value={complaintDescription} placeholder="Enter message" onChangeText={(value) => setDespriction(value)} />
                   </View>
@@ -1055,7 +1072,13 @@ function Dashboard(props) {
               </View>
 
               <View style={{ paddingBottom: 20 }}>
-                <TouchableOpacity onPress={submitClick} style={{ paddingTop: 12, paddingBottom: 12, borderWidth: 1, borderRadius: 22, justifyContent: 'center', alignItems: 'center', backgroundColor: '#1E45E1', borderColor: '#1E45E1' }}>
+              <TouchableOpacity onPress={submitClick}  
+              disabled={
+                selectedComplaintTypeId ===0||!complaintDescription ||complaintDescription.trim().length < 15
+              }
+                    style={{ paddingTop: 12, paddingBottom: 12, borderRadius: 22, justifyContent: 'center',
+                      backgroundColor: selectedComplaintTypeId ===0||!complaintDescription ||complaintDescription.trim().length < 15?'#9EB3FF':'#1E45E1',
+                     alignItems: 'center' }}>
                   <Text style={{ fontSize: 14, fontWeight: 600, color: '#ffffff' }}>Submit</Text>
                 </TouchableOpacity>
               </View>
@@ -1268,7 +1291,9 @@ function Dashboard(props) {
                 </View>
 
                 <View style={{ paddingTop: 15 }}>
-                  <Text style={{ fontSize: 14, fontWeight: 400 }}>Reason for Bed change</Text>
+                  <Text style={{ fontSize: 14, fontWeight: 400 }}>Reason for Bed change
+                    <Text style={{ color: 'red' }}> *</Text>
+                  </Text>
 
                   <Dropdown style={{ borderWidth: 1, borderRadius: 10, paddingVertical: 15, marginTop: 10, borderColor: '#e5e5e5', paddingLeft: 10 }}
                     onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
@@ -1320,7 +1345,9 @@ function Dashboard(props) {
                 </View>
 
                 <View style={{ paddingTop: 15 }}>
-                  <Text style={{ fontSize: 14, fontWeight: 400 }}>Preffered Bed Type</Text>
+                  <Text style={{ fontSize: 14, fontWeight: 400 }}>Preffered Bed Type
+                    <Text style={{ color: 'red' }}> *</Text>
+                  </Text>
 
                   <Dropdown style={{ borderWidth: 1, borderRadius: 10, paddingVertical: 15, marginTop: 10, borderColor: '#e5e5e5', paddingLeft: 10 }}
                     onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
@@ -1371,7 +1398,9 @@ function Dashboard(props) {
                 </View>
 
                 <View style={{ paddingTop: 15 }}>
-                  <Text>Bed Change Urgency</Text>
+                  <Text>Bed Change Urgency
+                    <Text style={{ color: 'red' }}> *</Text>
+                  </Text>
 
                   <Dropdown style={{ borderWidth: 1, borderRadius: 10, paddingVertical: 15, borderColor: '#e5e5e5', marginTop: 10, paddingLeft: 10 }}
                     onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}

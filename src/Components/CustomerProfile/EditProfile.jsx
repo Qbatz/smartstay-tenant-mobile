@@ -8,6 +8,7 @@ import {
   StyleSheet,
   ScrollView,
   Platform,
+  Alert
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Picker } from "@react-native-picker/picker";
@@ -15,8 +16,8 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import CustomerImage from "../../assets/Images/Customer_Icon.png";
 import LeftArrow from "../../assets/Images/LeftArrow.png";
 import CameraIcon from "../../assets/Images/camera_Icon.png"
-import { pickSingleFile } from "../UploadFileScreen/uploadFilePage"; 
-import { editProfile } from "../../Action/CustomerAction";
+import { pickSingleFile } from "../UploadFileScreen/uploadFilePage";
+import { customerDetails, editProfile } from "../../Action/CustomerAction";
 import { UsersContext } from "../../Context/UserContext";
 import SuccessModal from "../ToastFile/TostFilePage";
 import AppLoader from "../ToastFile/LoaderPage";
@@ -27,8 +28,8 @@ import { LoginContexts } from "../../Context/LoginContext";
 
 const EditProfile = (route) => {
 
-  const context=useContext(UsersContext)
-  const loginContext=useContext(LoginContexts)
+  const context = useContext(UsersContext)
+  const loginContext = useContext(LoginContexts)
   const navigation = useNavigation();
   const [name, setName] = useState(route.route.params.customer.firstName);
   const [gender, setGender] = useState(route.route.params.customer.gender);
@@ -38,6 +39,8 @@ const EditProfile = (route) => {
   const [showCameraIcon, setShowCameraIcon] = useState(false);
   const [loading, setLoading] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [toastMessage,setToastMessage]=useState()
+  const [modelType,setModelType]=useState()
 
   console.log(gender)
   console.log(dob)
@@ -46,7 +49,7 @@ const EditProfile = (route) => {
   // const handleImagePick = async () => {
   //   try {
   //     const image = await pickSingleFile();
-      
+
   //     if (image) {
   //       console.log("Selected image:", image);
   //       setProfileImage({ uri: image });
@@ -60,73 +63,104 @@ const EditProfile = (route) => {
 
   const handleSave = () => {
 
-    console.log(dob)
+    console.log(context.getCustomerDetail)
 
-    const payloads= {
-        firstName: name,
-        dob:dob.toLocaleDateString('en-GB').replaceAll("/","-"),
-        gender:gender,
-    } 
+    const original = context.getCustomerDetail;
+    const formattedDob = dob.toLocaleDateString("en-GB").replaceAll("/", "-");
+
+    const originalDobFormatted = original.dateOfBirth
+    ? new Date(original.dateOfBirth).toLocaleDateString("en-GB").replaceAll("/", "-")
+    : null;
+
+  
+
+    console.log(original.firstName)
+    console.log(original.gender)
+    console.log(originalDobFormatted)
+
+    const noChanges =
+      original.firstName === name && original.gender === gender
+      ;
+
+
+    if (noChanges) {
+      setShowSuccessModal(true)
+      setToastMessage('No changes made')
+      setModelType('error')
+    }
+
+
+    const payloads = {
+      firstName: name,
+      dob: dob.toLocaleDateString('en-GB').replaceAll("/", "-"),
+      gender: gender,
+    }
 
     console.log("Payloads:", payloads);
 
-    const formDate=new FormData();
+    const formDate = new FormData();
 
-    const jsonBase64=btoa(JSON.stringify(payloads))
+    const jsonBase64 = btoa(JSON.stringify(payloads))
 
     formDate.append("payloads", {
-       uri: "data:application/json;base64," + jsonBase64,
-       type: "application/json",
-       name: "payload.json",
+      uri: "data:application/json;base64," + jsonBase64,
+      type: "application/json",
+      name: "payload.json",
     })
 
-    if(profileImage){
+    if (profileImage) {
       console.log(profileImage)
 
       formDate.append("profilePic", {
-          uri: profileImage.uri.uri,
-          type: profileImage.type || "image/jpeg",
-          name: profileImage.name,
+        uri: profileImage.uri.uri,
+        type: profileImage.type || "image/jpeg",
+        name: profileImage.name,
       })
 
     }
 
-    editProfile(loginContext.getToken,formDate).then(r=>{
+    editProfile(loginContext.getToken, formDate).then(r => {
       console.log(r)
       setLoading(true)
 
       setTimeout(() => {
-          setLoading(false)
+        setLoading(false)
 
-          if(r.status==200){
-            setShowSuccessModal(true)
+        if (r.status == 200) {
+          setShowSuccessModal(true)
+          setToastMessage('Updated Successfully')
+          setModelType('success')
 
-            setTimeout(() => {
-              navigation.goBack();
-            }, 2000);
-          }
+          setTimeout(() => {
+            customerDetails(loginContext.getToken).then(r => {
+              console.log(r.data)
+              context.updateCustomer(r.data)
+            })
+            navigation.goBack();
+          }, 2000);
+        }
       }, 2000);
-      
-    })
-    console.log("Saved profile:", { name, gender, dob, profileImage });
-    
-  };
-  
-  const handleImagePick = async () => {
-      try {
-        const result = await launchImageLibrary({
-          mediaTypes: 'photo',
-          allowsEditing: true,
-          aspect: [1, 1],
-          quality: 0.5,
-        });
-        setProfileImage({uri:result.assets[0]})
-      } catch (error) {
-        console.log(error)
-      }
-    }
 
- 
+    })
+
+
+  };
+
+  const handleImagePick = async () => {
+    try {
+      const result = await launchImageLibrary({
+        mediaTypes: 'photo',
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.5,
+      });
+      setProfileImage({ uri: result.assets[0] })
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+
   // const handleImagePick = () => {
   //   const options = {
   //     mediaType: "photo",
@@ -146,16 +180,16 @@ const EditProfile = (route) => {
 
   return (
     <View style={styles.container}>
-      
+
       {/* Header */}
       <View style={styles.header}>
-        <AppLoader visible={loading}/> 
-      <SuccessModal
-        visible={showSuccessModal}
-        onClose={() => setShowSuccessModal(false)}
-        message="Updated Successfully"
-        type="sucess"
-      />
+        <AppLoader visible={loading} />
+        <SuccessModal
+          visible={showSuccessModal}
+          onClose={() => setShowSuccessModal(false)}
+          message={toastMessage}
+          type={modelType}
+        />
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Image source={LeftArrow} style={{ width: 22, height: 22 }} />
         </TouchableOpacity>
@@ -174,7 +208,7 @@ const EditProfile = (route) => {
             onPressOut={() => setShowCameraIcon(false)}
           >
             <View style={styles.imageWrapper}>
-              <Image source={profileImage!=null?profileImage.uri:null} style={styles.profileImage} />
+              <Image source={profileImage != null ? profileImage.uri : null} style={styles.profileImage} />
               {showCameraIcon && (
                 <View style={styles.cameraOverlay}>
                   <Image

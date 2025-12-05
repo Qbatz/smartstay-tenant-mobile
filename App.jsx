@@ -57,6 +57,8 @@ import EnterMPin from './src/Components/CreateAccount/EnterMPin';
 import NoInternet from './src/assets/Images/noInternet.png'
 import { LoginContexts } from './src/Context/LoginContext';
 import RentalAgreement from './src/Components/CustomerProfile/RentalAgreement';
+import ComplaintContext from './src/Context/ComplaintContext';
+import AmenitiesContext from './src/Context/AmenitiesContext';
 
 
   const { width, height } = Dimensions.get("window");
@@ -104,7 +106,11 @@ function App() {
         <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
            <LoginProvider>
               <UserContext>
-                  <AppContent isLoggedIn={loggedIn} token={token} />
+                <ComplaintContext>
+                  <AmenitiesContext>
+                      <AppContent isLoggedIn={loggedIn} token={token} />
+                  </AmenitiesContext>                 
+                </ComplaintContext>
               </UserContext>
             </LoginProvider>
       </SafeAreaProvider>

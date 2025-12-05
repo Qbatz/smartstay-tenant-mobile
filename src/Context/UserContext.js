@@ -1,5 +1,5 @@
 import React,{createContext, useState} from "react";
-import { hostelDetails } from "../Action/HostelAction";
+import { getComplaints, hostelDetails } from "../Action/HostelAction";
 
  export const UsersContext=createContext();
 
@@ -9,8 +9,8 @@ const UserContext=(props)=> {
     const [complaint, setcomplaint]=useState();
     const [HostelDetail,setHostelDetail]=useState();
     const [hostelList,setHostelList]=useState([])
+     const [customer, setCustomers] = useState()
 
-    console.log(HostelDetail)
 
 
    
@@ -27,7 +27,9 @@ const UserContext=(props)=> {
     
 
     return<UsersContext.Provider value={{ jumpComplain:jumpcomplainfn,Complaint:complaint,Amenities:amenitiesfn, 
-         updateHostelDetail:setHostelDetail,getHostelDetail:HostelDetail,updateHostelList:hostelListfn,getHostelList:hostelList
+         updateHostelDetail:setHostelDetail,getHostelDetail:HostelDetail,updateHostelList:hostelListfn,getHostelList:hostelList,
+         updateCustomer:setCustomers,getCustomerDetail:customer
+       
          
     }} >
         {props.children}

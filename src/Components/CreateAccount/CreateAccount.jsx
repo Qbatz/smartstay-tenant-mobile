@@ -18,6 +18,7 @@ const CreateAccount = ({ navigation }) => {
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const[otp,setOtp]=useState();
+  const [modelTpe,setModelType]=useState()
   
 
  const handlePhoneChange = (text) => { 
@@ -33,18 +34,28 @@ const handleGetOtp = async () => {
 
     const dat= await verifyPhoneNo(phoneNumber)
     console.log(dat)
-    setOtp(dat.data.otp)
-    loginContext.userId(dat.data.xuid)
+    
+    
 
     if(dat.status==200){
-
-    
+      loginContext.userId(dat.data.xuid)
+    setOtp(dat.data.otp)
+    setModelType('success')
       setShowSuccessModal(true)
       setTimeout(() => {
             setShowSuccessModal(false);
               navigation.navigate("OtpDesign", { phone: phoneNumber });
             
             }, 4000);       
+    }
+    else if(dat.status==403) {
+      setShowSuccessModal(true)
+      setOtp('Invalid number')
+      setModelType('error')
+
+      setTimeout(() => {
+          setShowSuccessModal(false)
+      }, 2000);
     }
   }
 };
@@ -56,7 +67,7 @@ const handleGetOtp = async () => {
       <SuccessModal visible={showSuccessModal}
         onClose={() => setShowSuccessModal(false)}
         message={otp}
-        type="success"/>
+        type={modelTpe}/>
       <View style={styles.topContent}>
         <Image
           source={require("../../assets/Images/Sm_logo.png")}

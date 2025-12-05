@@ -9,11 +9,15 @@ import { UsersContext } from "../../Context/UserContext";
 import { complaints, getAmenitiesList } from "../../Action/HostelAction";
 import NoResultPic from '../../assets/Images/NoResultPic.png'
 import { LoginContexts } from "../../Context/LoginContext";
+import { compliantContexts } from "../../Context/ComplaintContext";
+import { amenitiesContexts } from "../../Context/AmenitiesContext";
 
 function Services(props) {
 
     const commonContext = useContext(UsersContext)
     const loginContext=useContext(LoginContexts)
+    const complaintContext=useContext(compliantContexts)
+    const amenitiesContext=useContext(amenitiesContexts)
 
     console.log(commonContext.Complaint)
     console.log(props)
@@ -22,8 +26,8 @@ function Services(props) {
     const [modulevisible, setModalVisible] = useState(false)
     const [comment, setComment] = useState(false)
 
-    const [assignedAmenities, setAssignedAmenity] = useState([])
-    const [unassignedAmenities, setUnasignedAmenities] = useState([])
+    // const [assignedAmenities, setAssignedAmenity] = useState([])
+    // const [unassignedAmenities, setUnasignedAmenities] = useState([])
 
 
 
@@ -33,8 +37,8 @@ function Services(props) {
     }, [])
 
     const noAmenities =
-    (!assignedAmenities || assignedAmenities.length === 0) &&
-    (!unassignedAmenities || unassignedAmenities.length === 0);
+    (!amenitiesContext.getAssignedAmenities || amenitiesContext.getAssignedAmenities.length === 0) &&
+    (!amenitiesContext.getUnassignedAmenities || amenitiesContext.getUnassignedAmenities.length === 0);
 
 
     const getStatusColor = (status) => {
@@ -60,12 +64,12 @@ function Services(props) {
 
     useEffect(() => {
         complaints(commonContext.getHostelDetail.hostelId, loginContext.getToken).then(r => {
-            setComplaintsList(r?.data?.content)
+            complaintContext.updateComplaintList(r?.data?.content)
         })
 
         getAmenitiesList(commonContext.getHostelDetail.hostelId, loginContext.getToken).then(r => {
-            setAssignedAmenity(r.data.assignedAmenities)
-            setUnasignedAmenities(r.data.unassignedAmenities)
+            amenitiesContext.updateAssignedAmenities(r.data.assignedAmenities)
+            amenitiesContext.updateUnassginedAmenites(r.data.unassignedAmenities)
         })
     }, [])
 
@@ -135,10 +139,10 @@ function Services(props) {
             </TouchableOpacity>
         </View>
 
-        {selectedfield == 'Complaint' ? complaintsList?.length > 0 ? <FlatList showsVerticalScrollIndicator={false}
+        {selectedfield == 'Complaint' ? complaintContext.getComplaintList?.length > 0 ? <FlatList showsVerticalScrollIndicator={false}
             style={{ marginTop: 10, position: 'relative' }}
             keyExtractor={(item) => item.complaintId}
-            data={complaintsList}
+            data={complaintContext.getComplaintList}
             renderItem={({ item }) => {
                 const { backgroundColor, textColor } = getStatusColor(item.status);
                 return <View key={item.complaintId}>
@@ -147,7 +151,7 @@ function Services(props) {
                             {/* LEFT SIDE */}
                             <View style={{ flex: 1, paddingRight: 10 }}>
                                 <Text
-                                    numbe rOfLines={1}
+                                    numberOfLines={1}
                                     ellipsizeMode="tail"
                                     style={{
                                         fontSize: 16, fontWeight: '600', color: '#1C1C1C', marginBottom: 10
@@ -242,14 +246,14 @@ function Services(props) {
             contentContainerStyle={{ paddingBottom: 80 }}
         >
             {/* MY AMENITIES */}
-            {assignedAmenities?.length > 0 && (
+            {amenitiesContext.getAssignedAmenities?.length > 0 && (
                 <>
                     <View style={{ paddingTop: 10 }}>
                         <Text style={{ fontSize: 14, fontWeight: '400' }}>My Amenities</Text>
                     </View>
 
                     <FlatList
-                        data={assignedAmenities}
+                        data={amenitiesContext.getAssignedAmenities}
                         keyExtractor={(item) => item.amenityId}
                         scrollEnabled={false}
                         renderItem={({ item }) => (
@@ -288,14 +292,14 @@ function Services(props) {
             )}
 
             {/* AVAILABLE AMENITIES */}
-            {unassignedAmenities?.length > 0 && (
+            {amenitiesContext.getUnassignedAmenities?.length > 0 && (
                 <>
                     <View style={{ paddingTop: 12 }}>
                         <Text style={{ fontSize: 14, fontWeight: '400' }}>Available Amenities</Text>
                     </View>
 
                     <FlatList
-                        data={unassignedAmenities}
+                        data={amenitiesContext.getUnassignedAmenities}
                         keyExtractor={(item) => item.amenityId}
                         scrollEnabled={false}
                         renderItem={({ item }) => (
