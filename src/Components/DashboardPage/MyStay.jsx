@@ -12,6 +12,7 @@ import { UsersContext } from "../../Context/UserContext";
 import { hostelDetails } from "../../Action/HostelAction";
 import { LoginContexts } from "../../Context/LoginContext";
 import requestProfile from '../../assets/Images/profile-2user.png'
+import { getRequestRaised } from "../../Action/CustomerAction";
 
 function MyStay(props) {
 
@@ -34,8 +35,13 @@ function MyStay(props) {
 
     useEffect(() => {
         hostelDetails(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
+         console.log(r.data)
             setComplaints(r.data.complaints)
             setRentBill(r.data.currentMonthBills)
+        })
+
+        getRequestRaised(context.getHostelDetail.hostelId, loginContext.getToken).then(r=>{
+            console.log(r)
         })
     }, [])
 

@@ -83,12 +83,12 @@ const HostelList = (route) => {
 
   return (
     <View style={styles.container}>
-      <View>
+      <View style={{height:'50%'}}>
         <Text style={styles.title}>Select Hostel</Text>
         <Text style={styles.subtitle}>Select Your Current Staying Hostel</Text>
 
         <FlatList
-          data={context.getHostelList}
+          data={context.getHostelList} showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item.hostelId}
           renderItem={renderHostel}
           style={{ marginTop: 20 }}

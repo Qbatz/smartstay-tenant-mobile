@@ -1,4 +1,5 @@
 import AxiosConfig from "../Config/AxiosConfig"
+import { LoginContexts } from "../Context/LoginContext";
 
  
 
@@ -83,5 +84,15 @@ export const postMPin=async(data)=>{
     }catch(error){
         return{status: error.response.status, message: error.response.data}
     }
+}
+
+export const postResendOtp=async(userId)=>{
+    try{
+        const response=await AxiosConfig.post('/v2/tenant/user/resend-otp/'+ userId )
+        return response;
+    }catch(error){
+        return{status: error.response.status, message: error.response.data}
+    }
+    
 }
 

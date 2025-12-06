@@ -45,3 +45,17 @@ export const postComplaint=async(hostelId,token,formData)=>{
         return{status: error.response.status, message: error.response.data}
     }     
 }
+
+export const getRequestRaised=async(hostelId, token)=>{
+    console.log(token)
+   try{
+    const response=await AxiosConfig.get('/v2/tenant/hostels/requests/' + hostelId, {
+        headers: {
+            Authorization: 'Bearer ' + token,
+        }
+    })
+    return response;
+   }catch(error){
+        return{status: error.response.status, message: error.response.data}
+   }
+}

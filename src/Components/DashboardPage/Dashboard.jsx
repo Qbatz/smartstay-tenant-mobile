@@ -31,9 +31,9 @@ import Exclamation from '../../assets/Images/exclamation.png'
 import DeleteIcon from '../../assets/Images/deleteIcon.png'
 import HostelProfile from "../../assets/Images/Group 1.png"
 import { addComment, complaints, deleteComplaint, getAmenties, getComplaints, getComplaintTypes, hostelDetails, postRequestBedChange, postRquestAmenties } from "../../Action/HostelAction";
-import { postComplaint } from "../../Action/CustomerAction";
+import { customerDetails, postComplaint } from "../../Action/CustomerAction";
 import { UsersContext } from "../../Context/UserContext";
-import {LoginContexts} from '../../Context/LoginContext'
+import { LoginContexts } from '../../Context/LoginContext'
 import Room from '../../assets/Images/Room.png'
 import Bed from '../../assets/Images/Bed_Icon.png'
 import SuccessModal from "../ToastFile/TostFilePage";
@@ -53,11 +53,12 @@ import { compliantContexts } from "../../Context/ComplaintContext";
 function Dashboard(props) {
 
   const context = useContext(UsersContext)
-  const loginContext=useContext(LoginContexts)
-  const complaintContext=useContext(compliantContexts)
-   const { width } = Dimensions.get('window');
-   
-
+  const loginContext = useContext(LoginContexts)
+  const complaintContext = useContext(compliantContexts)
+  const { width } = Dimensions.get('window');
+  const bedDropdownRef = useRef(null)
+  const bedTypeDropdow = useRef(null)
+  const urgencyDropdown = useRef(null)
   console.log(props)
 
   const navigation = useNavigation();
@@ -81,10 +82,13 @@ function Dashboard(props) {
   const [complaintDescription, setDespriction] = useState()
   const [imageuri, setImageuri] = useState([])
   const [changeBed, setChangeBed] = useState(null);
+  const [focusReason, setFocusReason] = useState(false);
   const [bedType, setBedType] = useState(null)
   const [urgencyType, setUrgencyType] = useState(null)
   const [complaintId, setComplaintId] = useState()
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [toastMessage, setToastMessage] = useState()
+  const [modelType, setModelType] = useState()
   const [showSheet, setShowSheet] = useState(false)
   const [addComplaints, setAddComplaint] = useState(false)
   const [showBedChange, setShowBedChange] = useState(false)
@@ -92,13 +96,13 @@ function Dashboard(props) {
   const [loading, setLoading] = useState(false)
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState(null);
-  const [sendComment,setSendComment]=useState(null)
-  const [complaintType,setComplaintTypes]=useState([])
+  const [sendComment, setSendComment] = useState(null)
+  const [complaintType, setComplaintTypes] = useState([])
   const [selectedComplaintTypeId, setSelectedComplaintTypeId] = useState(0);
 
   const sheetY = useRef(new Animated.Value(700)).current;
 
-  console.log(complaintDescription)
+  console.log(focusReason)
   console.log(selectedComplaintTypeId)
 
   const bed = [{ label: 'Disturbance in current room', value: 'Disturbance in current room' }, { label: 'Roommate issues', value: 'Roommate issues' }, { label: 'Need more privacy/space', value: 'Need more privacy/space' },
@@ -162,6 +166,8 @@ function Dashboard(props) {
       setShowBedChange(false); setShowEditComplaint(false);
       setShowAmenities(false); setAvailable(null);
       setmyAminites(null); setModalVisible(false)
+      setSendComment(null); setChangeBed(null)
+      setBedType(null); setUrgencyType(null)
     });
   }
 
@@ -187,13 +193,18 @@ function Dashboard(props) {
 
 
   useEffect(() => {
-    const data = [{ id: 1, person: 'You', comment: 'When will solve', date: '20 Jan -12.35pm' }, { id: 2, person: 'Priya', comment: 'Complaint assigned and rectify soon', date: '21 Jan -11.35pm' }, { id: 3, person: 'You', comment: 'Thank you', date: '21 Jan -2.35pm' }]
-    setCommentNote(data)
 
-    getComplaintTypes(context.getHostelDetail.hostelId,loginContext.getToken).then(r=>{
+    getComplaintTypes(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
       console.log(r)
       setComplaintTypes(r.data)
     })
+
+     customerDetails(loginContext.getToken).then(r => {
+          console.log(r.data)
+          context.updateCustomer(r.data)
+        }).catch(error => {
+          console.log(error)
+        })
   }, [])
 
 
@@ -212,6 +223,8 @@ function Dashboard(props) {
 
     getComplaints(context.getHostelDetail.hostelId, complaint.complaintId, loginContext.getToken).then(r => {
       setSelectComplaint(r.data)
+      complaintContext.updateComplaint(r.data)
+      complaintContext.updateComments(r.data.comments)
     })
   }
 
@@ -230,15 +243,21 @@ function Dashboard(props) {
   }
   const sendclick = () => {
 
-    console.log(complaintId)
     const data = {
-      message: commentMessage,
-      hostelId: props.route.params.hostel[0].hostelId
+      message: sendComment,
+      hostelId: context.getHostelDetail.hostelId
     }
 
 
+
     addComment(selectedComplaint.complaintId, loginContext.getToken, data).then(r => {
-      console.log(r)
+      setSendComment(null)
+
+      getComplaints(context.getHostelDetail.hostelId, selectedComplaint?.complaintId, loginContext.getToken).then(r => {
+        setSelectComplaint(r.data)
+        complaintContext.updateComments(r.data.comments)
+      })
+
     })
   }
 
@@ -311,32 +330,48 @@ function Dashboard(props) {
       })
     }
 
-    postComplaint(context.getHostelDetail.hostelId, loginContext.getToken, formData).then(r => {
-      setLoading(true)
+    if (complaintDescription.trim().length > 15) {
+      postComplaint(context.getHostelDetail.hostelId, loginContext.getToken, formData).then(r => {
+        setLoading(true)
+
+        setTimeout(() => {
+          setLoading(false)
+          if (r.status == 201) {
+            setShowSuccessModal(true)
+            setToastMessage("Complaint Added Successfully!")
+            setModelType('success')
+
+            setTimeout(() => {
+              setShowSuccessModal(false);
+              setShowSheet(false)
+              setSelectedComplaintTypeId(0)
+              setDespriction('')
+              setAddComplaint(false)
+
+              complaints(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
+                complaintContext.updateComplaintList(r?.data?.content)
+              })
+            }, 2000);
+
+          }
+
+        }, 2000);
+
+
+      })
+
+    }
+    else if (complaintDescription.trim().length < 15) {
+      setShowSuccessModal(true)
+      setToastMessage("Comment should be above 15 letters")
+      setModelType('error')
 
       setTimeout(() => {
-        setLoading(false)
-        if (r.status == 201) {
-          setShowSuccessModal(true)
-
-          setTimeout(() => {
-            setShowSuccessModal(false);
-            setShowSheet(false)
-            setSelectedComplaintTypeId(0)
-            setDespriction('')
-            setAddComplaint(false)
-
-             complaints(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
-                        complaintContext.updateComplaintList(r?.data?.content)
-                    })
-          }, 2000);
-
-        }
-
+        setShowSuccessModal(false)
       }, 2000);
 
+    }
 
-    })
   }
 
   // ----Delete complaint click-----
@@ -377,8 +412,8 @@ function Dashboard(props) {
           setShowSheet(false)
 
           complaints(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
-                        complaintContext.updateComplaintList(r?.data?.content)
-                    })
+            complaintContext.updateComplaintList(r?.data?.content)
+          })
         }, 2000);
 
       }
@@ -398,28 +433,44 @@ function Dashboard(props) {
       description: bedType,
     }
 
-    postRequestBedChange(context.getHostelDetail.hostelId, data, loginContext.getToken).then(r => {
-      setLoading(true)
+    if (changeBed != null && bedType != null && urgencyType != null) {
+      postRequestBedChange(context.getHostelDetail.hostelId, data, loginContext.getToken).then(r => {
+        setLoading(true)
+
+        setTimeout(() => {
+          setLoading(false)
+
+          if (r.status == 200) {
+            setShowSuccessModal(true)
+            setToastMessage('Request raised')
+            setModelType('success')
+
+            setTimeout(() => {
+              setShowBedChange(false)
+              setShowSuccessModal(false)
+              setBedType(null)
+              setChangeBed(null)
+              setUrgencyType(null)
+            }, 2000);
+          }
+          else if (r.status == 400) {
+            setShowSuccessModal(true)
+          }
+
+        }, 2000);
+      })
+
+    }
+    else{
+      setShowSuccessModal(true)
+      setToastMessage('Fill all Fields')
+      setModelType('error')
 
       setTimeout(() => {
-        setLoading(false)
-
-        if (r.status == 200) {
-          setShowSuccessModal(true)
-
-          setTimeout(() => {
-            setShowBedChange(false)
-            setBedType(null)
-            setChangeBed(null)
-            setUrgencyType(null)
-          }, 2000);
-        }
-        else if (r.status == 400) {
-          setShowSuccessModal(true)
-        }
-
+          setShowSuccessModal(false)
       }, 2000);
-    })
+    }
+
   }
 
   // ---------Amenities----------
@@ -539,13 +590,13 @@ function Dashboard(props) {
       style={{ paddingTop: 25, paddingBottom: 15, width: "100%" }}
     >
 
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16,width:width }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16, width: width }}>
 
-        <View style={{ flexDirection: 'row',width:'75%'}}>
+        <View style={{ flexDirection: 'row', width: '75%' }}>
           <Image source={HostelProfile} resizeMode="contain" style={{ height: 44, width: 44 }} />
           <View style={{ marginLeft: 7 }}>
             <Text numberOfLines={1} ellipsizeMode="tail"
-            style={{ fontSize: 18,fontWeight: '600',fontFamily: 'gilroy-semibold',color: '#1B1D21',flexShrink: 1,maxWidth: '90%' }}>
+              style={{ fontSize: 18, fontWeight: '600', fontFamily: 'gilroy-semibold', color: '#1B1D21', flexShrink: 1, maxWidth: '90%' }}>
               {context.getHostelDetail.hostelName}
             </Text>
 
@@ -562,7 +613,7 @@ function Dashboard(props) {
           <TouchableOpacity onPress={handleNotificationShow}>
             <Image source={require("../../assets/Images/notification.png")} style={{ height: 44, width: 44 }} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleProfile} style={{marginLeft:10,marginRight:10 }}>
+          <TouchableOpacity onPress={handleProfile} style={{ marginLeft: 10, marginRight: 10 }}>
             <Image source={require("../../assets/Images/Customer_Icon.png")} style={{ width: 44, height: 44, borderRadius: 22 }} />
           </TouchableOpacity>
         </View>
@@ -589,23 +640,23 @@ function Dashboard(props) {
           <View style={StyleSheet.absoluteFill} />
         </TouchableWithoutFeedback>
 
-        <Animated.View style={[selectedComplaint?.images?.length>0?style.bottomSheet:style.bottomSheetwithimage, { transform: [{ translateY: sheetY }] }]}
+        <Animated.View style={[selectedComplaint?.images?.length > 0 ? style.bottomSheet : style.bottomSheetwithimage, { transform: [{ translateY: sheetY }] }]}
           {...panResponder.panHandlers}>
 
-          <View style={{ flex: 1}}>
+          <View style={{ flex: 1 }}>
             <View {...panResponder.panHandlers}>
               <View style={style.dragindictor} />
             </View>
 
             {comment ? (
-              <View style={{ flex: 1}}>
-                <View>
+              <View style={{ flex: 1, justifyContent: 'space-between' }}>
+                <View style={{ flex: 1 }}>
                   <Text style={{ fontSize: 18, fontWeight: 400 }}>Comments</Text>
                   {/* Divider */}
                   <View style={{ height: 1, backgroundColor: "#eee", marginVertical: 10 }} />
 
-                  <FlatList keyExtractor={(item) => item.id}
-                    data={commentnote}
+                  <FlatList keyExtractor={(item) => item.commentId} showsVerticalScrollIndicator={false}
+                    data={complaintContext.getComplaintComments} style={{ marginBottom: 20 }}
                     renderItem={({ item }) => {
                       return <View style={{ paddingTop: 15, flexDirection: 'row', flex: 1 }}>
                         <View>
@@ -613,8 +664,8 @@ function Dashboard(props) {
                         </View>
                         <View style={{ paddingLeft: 10, flex: 1 }}>
                           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                            <Text style={{ fontSize: 12, color: '#4B4B4B', fontWeight: 400 }}>{item.person}</Text>
-                            <Text style={{ fontSize: 10, fontWeight: 400, color: '#6E6E6E' }}>{item.date}</Text>
+                            <Text style={{ fontSize: 12, color: '#4B4B4B', fontWeight: 400 }}>{item.userName}</Text>
+                            <Text style={{ fontSize: 10, fontWeight: 400, color: '#6E6E6E' }}>{item.commentDate}</Text>
                           </View>
                           <Text style={{ fontSize: 14, fontWeight: 400, marginTop: 5 }}>{item.comment}</Text>
                         </View>
@@ -625,7 +676,7 @@ function Dashboard(props) {
 
                 <View style={{ paddingBottom: 20 }}>
                   <View style={{ paddingTop: 3, paddingBottom: 4, borderWidth: 1, borderRadius: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <TextInput value={commentMessage} placeholder="Post your Reply here" onChangeText={setCommentmessage} />
+                    <TextInput value={sendComment} placeholder="Post your Reply here" onChangeText={setSendComment} />
                     <TouchableOpacity onPress={sendclick} style={{ paddingRight: 10 }}>
                       <Image source={SendButton} style={{ width: 34, height: 34 }} />
                     </TouchableOpacity>
@@ -637,124 +688,125 @@ function Dashboard(props) {
             ) : (
               <View style={{ flex: 1 }}>
                 {selectedComplaint && (
-                  <ScrollView style={{flex:1}} 
-                  showsVerticalScrollIndicator={false} > 
-                  <View style={{justifyContent:'flex-end',flex:1}}>
-                    <View>
-                      <View style={{ flexDirection: "row", justifyContent: "space-between", paddingLeft: 5, paddingRight: 8, marginBottom: 10, paddingTop: 10, }}>
-                        <View>
-                          <Text style={{ fontSize: 18, fontWeight: "500", fontFamily: "gilroy-semibold", }} >
-                            {selectedComplaint.complaintTypeName}
-                          </Text>
-                          <Text style={{ fontSize: 12.8, fontWeight: "400", color: "#424242", marginTop: 6 }}>
-                            {selectedComplaint.complaintDate}
-                          </Text>
-                        </View>
-
-                        <View style={{ flexDirection: "row", alignItems: "center" }}>
-                          <TouchableOpacity onPress={() => { setShowEditComplaint(true) }} style={{ paddingRight: 10 }}>
-                            <Image source={Edit} style={{ width: 17.72, height: 17.72 }} />
-                          </TouchableOpacity>
-                          <TouchableOpacity onPress={() => deleteClick(selectedComplaint.complaintId)} style={{ paddingLeft: 10 }}>
-                            <Image source={Delete} style={{ width: 17.72, height: 17.72 }} />
-                          </TouchableOpacity>
-                        </View>
-                      </View>
-
-                      {/* -----Divider */}
-                      <View style={{ height: 1, backgroundColor: "#eee", marginVertical: 10 }} />
-
-                      {/* DESCRIPTION */}
-                      <View style={{ paddingTop: 5 }}>
-                        <Text style={{ fontSize: 12, fontWeight: "400", color: "#4B4B4B" }}>Description </Text>
-                        <Text style={{ fontSize: 16, fontWeight: "400", marginTop: 9 }}>
-                          {selectedComplaint.description}
-                        </Text>
-                      </View>
-
-                      {/* ASSIGNED TO */}
-                      <View style={{ paddingTop: 10 }}>
-                        <Text style={{ fontSize: 12, fontWeight: "400", color: "#4B4B4B" }}> Assigned to</Text>
-
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", paddingTop: 8, }}>
-                          {selectedComplaint.assigneeName != null ? <Text style={{ fontSize: 15, fontWeight: "500" }}>
-                            {selectedComplaint.assigneeName}</Text>
-                            : <Text style={{ fontSize: 14, fontWeight: "500", color: "#FF3B30", }}>
-                              Not Assigned Yet
+                  <ScrollView style={{ flex: 1 }}
+                    showsVerticalScrollIndicator={false} >
+                    <View style={{ justifyContent: 'flex-end', flex: 1 }}>
+                      <View>
+                        <View style={{ flexDirection: "row", justifyContent: "space-between", paddingLeft: 5, paddingRight: 8, marginBottom: 10, paddingTop: 10, }}>
+                          <View>
+                            <Text style={{ fontSize: 18, fontWeight: "500", fontFamily: "gilroy-semibold", }} >
+                              {selectedComplaint.complaintTypeName}
                             </Text>
-                          }
+                            <Text style={{ fontSize: 12.8, fontWeight: "400", color: "#424242", marginTop: 6 }}>
+                              {selectedComplaint.complaintDate}
+                            </Text>
+                          </View>
 
-                          {selectedComplaint.PhoneNO != null ?
-                            <Text style={{ fontSize: 12, color: "#1E45E1", fontWeight: "400" }}>
-                              {selectedComplaint.PhoneNO}
-                            </Text> : null}
+                          <View style={{ flexDirection: "row", alignItems: "center" }}>
+                            <TouchableOpacity onPress={() => { setShowEditComplaint(true) }} style={{ paddingRight: 10 }}>
+                              <Image source={Edit} style={{ width: 17.72, height: 17.72 }} />
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => deleteClick(selectedComplaint.complaintId)} style={{ paddingLeft: 10 }}>
+                              <Image source={Delete} style={{ width: 17.72, height: 17.72 }} />
+                            </TouchableOpacity>
+                          </View>
                         </View>
-                      </View>
 
-                      {/* ATTACHED IMAGES */}
-                      <View style={{ paddingTop: 15 }}>
-                        <Text style={{ fontSize: 12, fontWeight: "400", color: "#4B4B4B" }}> Attached images</Text>
+                        {/* -----Divider */}
+                        <View style={{ height: 1, backgroundColor: "#eee", marginVertical: 10 }} />
 
-                       <FlatList horizontal
-                          style={{ paddingTop: 15 }}
-                          keyExtractor={(item) => item.id.toString()}
-                          data={selectedComplaint.images}
-                          renderItem={({ item }) => { console.log(item)
-                           return <View key={item.id}
-                              style={{ paddingLeft: 10, position: "relative" }}>
-                                
-                              <TouchableOpacity onPress={() => imageclick(item.id)}>
-                                <Image source={{uri:item.imageUrl }} style={{ width: 90, height: 70, borderRadius: 5 }} />
-                                {imageid === item.id && deletevisible && (
-                                  <TouchableOpacity style={{ position: "absolute", bottom: 25, right: 35, }} >
-                                    <Image source={Trash} style={{ width: 21.09, height: 21.09, }} />
-                                  </TouchableOpacity>
-                                )}
-                              </TouchableOpacity>
-                            </View>
-                          }}
-                        />
-                        
-                      </View>
-                    </View>
-
-                    <View style={{marginTop:10}} >
-                      {/* COMMENT INPUT */}
-                      <View style={{ paddingTop: 22 }}>
-                        <View style={{ padding: 4, borderRadius: 10, borderWidth: 1, justifyContent: "space-between", flexDirection: "row", alignItems: "center", }} >
-                          <TextInput value={sendComment} placeholder="Add your Comment"  onChangeText={setSendComment}/>
-                          <TouchableOpacity onPress={sendComment?sendclick:commentclick}>
-                            <Image
-                              source={sendComment?SendButton:CommentMesg}
-                              style={{ width: 23, height: 23, marginRight: 15, }} />
-                          </TouchableOpacity>
-                        </View>
-                      </View>
-
-                      {/* STATUS BUTTON */}
-                      <TouchableOpacity>
-                        <View
-                          style={{
-                            padding: 13, borderRadius: 10, borderWidth: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: 15, marginBottom: 20,
-                            backgroundColor: selectedComplaint.status === "PENDING" ? "#FFEEEEA3" : selectedComplaint.status === "Inpogress" ? "#FFF6E7" : "lightgreen",
-                            borderColor: selectedComplaint.status === "PENDING" ? "#FFD5D5" : selectedComplaint.status === "Inpogress" ? "#FFE7C6" : "lightgreen",
-                          }}>
-                          <Image source={Group}
-                            style={{
-                              width: 17.93, height: 18, marginTop: 4,
-                              tintColor: selectedComplaint.status === "PENDING" ? "#FF3B30" : selectedComplaint.status === "Inpogress" ? "#FF9500" : "green",
-                            }} />
-                          <Text
-                            style={{
-                              color: selectedComplaint.status === "PENDING" ? "#FF3B30" : selectedComplaint.status === "Inpogress" ? "#FF9500" : "green",
-                              fontSize: 14.11, fontWeight: "600", marginLeft: 10,
-                            }}>
-                            {selectedComplaint.status}
+                        {/* DESCRIPTION */}
+                        <View style={{ paddingTop: 5 }}>
+                          <Text style={{ fontSize: 12, fontWeight: "400", color: "#4B4B4B" }}>Description </Text>
+                          <Text style={{ fontSize: 16, fontWeight: "400", marginTop: 9 }}>
+                            {selectedComplaint.description}
                           </Text>
                         </View>
-                      </TouchableOpacity>
 
-                    </View>
+                        {/* ASSIGNED TO */}
+                        <View style={{ paddingTop: 10 }}>
+                          <Text style={{ fontSize: 12, fontWeight: "400", color: "#4B4B4B" }}> Assigned to</Text>
+
+                          <View style={{ flexDirection: "row", justifyContent: "space-between", paddingTop: 8, }}>
+                            {selectedComplaint.assigneeName != null ? <Text style={{ fontSize: 15, fontWeight: "500" }}>
+                              {selectedComplaint.assigneeName}</Text>
+                              : <Text style={{ fontSize: 14, fontWeight: "500", color: "#FF3B30", }}>
+                                Not Assigned Yet
+                              </Text>
+                            }
+
+                            {selectedComplaint.PhoneNO != null ?
+                              <Text style={{ fontSize: 12, color: "#1E45E1", fontWeight: "400" }}>
+                                {selectedComplaint.PhoneNO}
+                              </Text> : null}
+                          </View>
+                        </View>
+
+                        {/* ATTACHED IMAGES */}
+                        <View style={{ paddingTop: 15 }}>
+                          <Text style={{ fontSize: 12, fontWeight: "400", color: "#4B4B4B" }}> Attached images</Text>
+
+                          <FlatList horizontal
+                            style={{ paddingTop: 15 }}
+                            keyExtractor={(item) => item.id.toString()}
+                            data={selectedComplaint.images}
+                            renderItem={({ item }) => {
+                              console.log(item)
+                              return <View key={item.id}
+                                style={{ paddingLeft: 10, position: "relative" }}>
+
+                                <TouchableOpacity onPress={() => imageclick(item.id)}>
+                                  <Image source={{ uri: item.imageUrl }} style={{ width: 90, height: 70, borderRadius: 5 }} />
+                                  {imageid === item.id && deletevisible && (
+                                    <TouchableOpacity style={{ position: "absolute", bottom: 25, right: 35, }} >
+                                      <Image source={Trash} style={{ width: 21.09, height: 21.09, }} />
+                                    </TouchableOpacity>
+                                  )}
+                                </TouchableOpacity>
+                              </View>
+                            }}
+                          />
+
+                        </View>
+                      </View>
+
+                      <View style={{ marginTop: 10 }} >
+                        {/* COMMENT INPUT */}
+                        <View style={{ paddingTop: 22 }}>
+                          <View style={{ padding: 4, borderRadius: 10, borderWidth: 1, justifyContent: "space-between", flexDirection: "row", alignItems: "center", }} >
+                            <TextInput value={sendComment} placeholder="Add your Comment" onChangeText={setSendComment} />
+                            <TouchableOpacity onPress={sendComment ? sendclick : commentclick}>
+                              <Image
+                                source={sendComment ? SendButton : CommentMesg}
+                                style={{ width: 23, height: 23, marginRight: 15, }} />
+                            </TouchableOpacity>
+                          </View>
+                        </View>
+
+                        {/* STATUS BUTTON */}
+                        <TouchableOpacity>
+                          <View
+                            style={{
+                              padding: 13, borderRadius: 10, borderWidth: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: 15, marginBottom: 20,
+                              backgroundColor: selectedComplaint.status === "PENDING" ? "#FFEEEEA3" : selectedComplaint.status === "Inpogress" ? "#FFF6E7" : "lightgreen",
+                              borderColor: selectedComplaint.status === "PENDING" ? "#FFD5D5" : selectedComplaint.status === "Inpogress" ? "#FFE7C6" : "lightgreen",
+                            }}>
+                            <Image source={Group}
+                              style={{
+                                width: 17.93, height: 18, marginTop: 4,
+                                tintColor: selectedComplaint.status === "PENDING" ? "#FF3B30" : selectedComplaint.status === "Inpogress" ? "#FF9500" : "green",
+                              }} />
+                            <Text
+                              style={{
+                                color: selectedComplaint.status === "PENDING" ? "#FF3B30" : selectedComplaint.status === "Inpogress" ? "#FF9500" : "green",
+                                fontSize: 14.11, fontWeight: "600", marginLeft: 10,
+                              }}>
+                              {selectedComplaint.status}
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+
+                      </View>
                     </View>
                   </ScrollView>
                 )}
@@ -990,8 +1042,8 @@ function Dashboard(props) {
             <SuccessModal
               visible={showSuccessModal}
               onClose={() => setShowSuccessModal(false)}
-              message="Complaint Added Successfully!"
-              type="sucess"
+              message={toastMessage}
+              type={modelType}
             />
             <View style={{ paddingTop: 10, justifyContent: 'space-between', flex: 1 }}>
               <View>
@@ -999,7 +1051,7 @@ function Dashboard(props) {
 
                 <View style={{ paddingTop: 20 }}>
                   <Text>Complaint type
-                     <Text style={{ color: 'red' }}> *</Text>
+                    <Text style={{ color: 'red' }}> *</Text>
                   </Text>
 
                   <Dropdown style={{ borderWidth: 1, borderRadius: 10, paddingVertical: 10, marginTop: 10, borderColor: '#e5e5e5', paddingLeft: 15 }}
@@ -1027,7 +1079,7 @@ function Dashboard(props) {
 
                 <View style={{ paddingTop: 16 }}>
                   <Text style={{ fontSize: 14, fontWeight: 400 }}>Complaint message
-                       <Text style={{ color: 'red' }}> *</Text>
+                    <Text style={{ color: 'red' }}> *</Text>
                   </Text>
                   <View style={{ borderWidth: 1, borderRadius: 10, marginTop: 8, paddingTop: 7, paddingLeft: 10, borderColor: '#e5e5e5', height: 80 }}>
                     <TextInput value={complaintDescription} placeholder="Enter message" onChangeText={(value) => setDespriction(value)} />
@@ -1072,13 +1124,13 @@ function Dashboard(props) {
               </View>
 
               <View style={{ paddingBottom: 20 }}>
-              <TouchableOpacity onPress={submitClick}  
-              disabled={
-                selectedComplaintTypeId ===0||!complaintDescription ||complaintDescription.trim().length < 15
-              }
-                    style={{ paddingTop: 12, paddingBottom: 12, borderRadius: 22, justifyContent: 'center',
-                      backgroundColor: selectedComplaintTypeId ===0||!complaintDescription ||complaintDescription.trim().length < 15?'#9EB3FF':'#1E45E1',
-                     alignItems: 'center' }}>
+                <TouchableOpacity onPress={submitClick}
+
+                  style={{
+                    paddingTop: 12, paddingBottom: 12, borderRadius: 22, justifyContent: 'center',
+                    backgroundColor: selectedComplaintTypeId === 0 || !complaintDescription || complaintDescription.trim().length < 15 ? '#9EB3FF' : '#1E45E1',
+                    alignItems: 'center'
+                  }}>
                   <Text style={{ fontSize: 14, fontWeight: 600, color: '#ffffff' }}>Submit</Text>
                 </TouchableOpacity>
               </View>
@@ -1258,8 +1310,8 @@ function Dashboard(props) {
             <SuccessModal
               visible={showSuccessModal}
               onClose={() => setShowSuccessModal(false)}
-              message="Request Raised"
-              type="success"
+              message={toastMessage}
+              type={modelType}
             />
 
             <View style={{ paddingTop: 15, justifyContent: 'space-between', flex: 1 }}>
@@ -1275,17 +1327,21 @@ function Dashboard(props) {
                   }}>
                     <View style={{ backgroundColor: '#F9D796', paddingVertical: 4.64, paddingHorizontal: 9.28, alignSelf: 'flex-start', borderRadius: 46.38 }}>
                       <Text style={{ color: '#642B00', fontSize: 10.82, fontWeight: 400 }}>
-                        Ground Floor</Text>
+                       {context.getCustomerDetail?.bookingDetails?.floorName}</Text>
                     </View>
 
                     <View style={{ flexDirection: 'row', paddingLeft: 20, alignItems: 'center' }}>
                       <Image source={Room} style={{ width: 21.17, height: 21.17 }} />
-                      <Text style={{ marginLeft: 10, fontSize: 15.97, fontWeight: 400 }}>203</Text>
+                      <Text style={{ marginLeft: 10, fontSize: 15.97, fontWeight: 400 }}>
+                        {context.getCustomerDetail?.bookingDetails?.roomName}
+                      </Text>
                     </View>
 
                     <View style={{ flexDirection: 'row', paddingLeft: 10, alignItems: 'center' }}>
                       <Image source={Bed} style={{ width: 21.17, height: 21.17 }} />
-                      <Text style={{ marginLeft: 10, fontSize: 15.97, fontWeight: 400 }}>300</Text>
+                      <Text style={{ marginLeft: 10, fontSize: 15.97, fontWeight: 400 }}>
+                          {context.getCustomerDetail?.bookingDetails?.bedName}
+                      </Text>
                     </View>
                   </View>
                 </View>
@@ -1295,33 +1351,50 @@ function Dashboard(props) {
                     <Text style={{ color: 'red' }}> *</Text>
                   </Text>
 
-                  <Dropdown style={{ borderWidth: 1, borderRadius: 10, paddingVertical: 15, marginTop: 10, borderColor: '#e5e5e5', paddingLeft: 10 }}
-                    onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
+                  <Dropdown ref={bedDropdownRef}
+                    style={{
+                      borderWidth: 1,
+                      borderRadius: 10,
+                      paddingVertical: 15,
+                      marginTop: 10,
+                      borderColor: '#e5e5e5',
+                      paddingLeft: 10,
+                    }}
+                    onClose={focusReason}
                     data={bed}
-                    containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
-                    placeholderStyle={{ fontSize: 14, paddingRight: 10 }}
-                    selectedTextStyle={{ fontSize: 15, fontWeight: 400 }}
-                    placeholder="Select Reason"
                     labelField="label"
                     valueField="value"
                     value={changeBed}
+                    placeholder="Select Reason"
+                    placeholderStyle={{ fontSize: 14, paddingRight: 10 }}
+                    selectedTextStyle={{ fontSize: 15, fontWeight: '400' }}
+                    containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
+
+                    onFocus={() => setFocusReason(true)}
+                    onBlur={() => setFocusReason(false)}
 
                     onChange={item => {
-                      console.log(item.value)
-                      setChangeBed(item.value)
+                      setChangeBed(item.value);
                     }}
 
                     renderRightIcon={() => (
-                      <Ionicons name={isFocus ? "chevron-up" : "chevron-down"} size={22} color="#000"
-                        style={{ paddingRight: 10 }} />
+                      <Ionicons
+                        name={focusReason ? 'chevron-up' : 'chevron-down'}
+                        size={22}
+                        color="#000"
+                        style={{ paddingRight: 10 }}
+                      />
                     )}
-                    renderItem={(item, index) => {
-                      const isSelected = item.value === changeBed;
 
+                    renderItem={(item) => {
+                      const isSelected = item.value === changeBed;
                       return (
-                        <TouchableOpacity onPress={() => {
-                          setChangeBed(item.value)
-                        }}
+                        <TouchableOpacity
+                          onPress={() => {
+                            setChangeBed(item.value);
+                            setFocusReason(false); // Close dropdown on item press
+                            bedDropdownRef.current?.close();
+                          }}
                           style={{
                             paddingVertical: 14,
                             paddingHorizontal: 14,
@@ -1329,18 +1402,17 @@ function Dashboard(props) {
                             marginVertical: 5,
                             marginRight: 10,
                             marginTop: 10,
-                            backgroundColor: isSelected ? "#1D4ED8" : "#F5F5F5",
-
+                            backgroundColor: isSelected ? '#1D4ED8' : '#F5F5F5',
                           }}
                         >
-                          <Text
-                            style={{ color: isSelected ? "#fff" : "#000", fontSize: 15, }}>
+                          <Text style={{ color: isSelected ? '#fff' : '#000', fontSize: 15 }}>
                             {item.label}
                           </Text>
                         </TouchableOpacity>
                       );
                     }}
                   />
+
 
                 </View>
 
@@ -1349,7 +1421,11 @@ function Dashboard(props) {
                     <Text style={{ color: 'red' }}> *</Text>
                   </Text>
 
-                  <Dropdown style={{ borderWidth: 1, borderRadius: 10, paddingVertical: 15, marginTop: 10, borderColor: '#e5e5e5', paddingLeft: 10 }}
+                  <Dropdown ref={bedTypeDropdow}
+                    style={{
+                      borderWidth: 1, borderRadius: 10, paddingVertical: 15,
+                      marginTop: 10, borderColor: '#e5e5e5', paddingLeft: 10
+                    }}
                     onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
                     data={selectBed}
                     containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
@@ -1375,6 +1451,8 @@ function Dashboard(props) {
                       return (
                         <TouchableOpacity onPress={() => {
                           setBedType(item.value)
+                          setFocusReason(false)
+                          bedTypeDropdow.current?.close();
                         }}
                           style={{
                             paddingVertical: 14,
@@ -1402,7 +1480,11 @@ function Dashboard(props) {
                     <Text style={{ color: 'red' }}> *</Text>
                   </Text>
 
-                  <Dropdown style={{ borderWidth: 1, borderRadius: 10, paddingVertical: 15, borderColor: '#e5e5e5', marginTop: 10, paddingLeft: 10 }}
+                  <Dropdown ref={urgencyDropdown}
+                    style={{
+                      borderWidth: 1, borderRadius: 10, paddingVertical: 15, borderColor: '#e5e5e5',
+                      marginTop: 10, paddingLeft: 10
+                    }}
                     onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
                     data={urgency}
                     containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
@@ -1418,7 +1500,7 @@ function Dashboard(props) {
                     }}
 
                     renderRightIcon={() => (
-                      <Ionicons name={isFocus ? "chevron-up" : "chevron-down"} size={22} color="#000"
+                      <Ionicons name={focusReason ? "chevron-up" : "chevron-down"} size={22} color="#000"
                         style={{ paddingRight: 10 }} />
                     )}
 
@@ -1428,6 +1510,8 @@ function Dashboard(props) {
                       return (
                         <TouchableOpacity onPress={() => {
                           setUrgencyType(item.value)
+                          setFocusReason(false)
+                          urgencyDropdown.current?.close();
                         }}
                           style={{
                             paddingVertical: 14, paddingHorizontal: 14, borderRadius: 10,
@@ -1695,7 +1779,7 @@ const style = StyleSheet.create({
 
   },
   bottomSheet: {
-    height:'60%',
+    height: '60%',
     backgroundColor: '#fff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
@@ -1703,8 +1787,8 @@ const style = StyleSheet.create({
     paddingTop: 20,
     paddingBottom: 5
   },
-   bottomSheetwithimage: {
-    height:'50%',
+  bottomSheetwithimage: {
+    height: '50%',
     backgroundColor: '#fff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,

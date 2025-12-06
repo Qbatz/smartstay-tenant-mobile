@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image,ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import HostelImage from "../../assets/Images/Group 1.png"
@@ -9,12 +9,14 @@ import DateIcon from "../../assets/Images/calendar.png";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import CustomerImage from "../../assets/Images/Customer_Icon.png";
 import LeftArrow from "../../assets/Images/LeftArrow.png"
+import { UsersContext } from "../../Context/UserContext";
 
 
 const ProfileHostels = () => {
 
 
   const navigation = useNavigation();
+  const userContext=useContext(UsersContext)
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [selectedHostel, setSelectedHostel] = useState("Smartstay Hostel");
 
@@ -23,6 +25,8 @@ const ProfileHostels = () => {
     { id: 2, name: "StayEasy Hostel", location: "Velachery" },
     { id: 3, name: "ComfortNest", location: "Thoraipakkam" },
   ];
+
+  console.log(userContext.getCustomerDetail)
 
   const handleSelectHostel = (hostel) => {
     setSelectedHostel(hostel.name);
@@ -73,14 +77,14 @@ const ProfileHostels = () => {
       {dropdownVisible && (
         <View style={styles.dropdown}>
           <ScrollView>
-            {hostels.map((item) => (
+            {userContext.getHostelList.map((item) => (
               <TouchableOpacity
-                key={item.id}
+                key={item.hostelId}
                 style={styles.dropdownItem}
                 onPress={() => handleSelectHostel(item)}
               >
-                <Text style={styles.dropdownText}>{item.name}</Text>
-                <Text style={styles.dropdownSub}>{item.location}</Text>
+                <Text style={styles.dropdownText}>{item.hostelName}</Text>
+                <Text style={styles.dropdownSub}>{item.city}</Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
