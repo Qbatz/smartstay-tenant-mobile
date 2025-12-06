@@ -1,26 +1,27 @@
 import React, { useState, useRef, useContext } from "react";
-import { View, Text, TextInput, StyleSheet, Image, Alert , TouchableOpacity, } from "react-native";
+import { View, Text, TextInput, StyleSheet, Image, Alert, TouchableOpacity, } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { LoginContext } from "../../Context/LoginContext"; 
-import { verifyOtp } from "../../Action/LoginAction";
+import { LoginContext } from "../../Context/LoginContext";
+import { postResendOtp, verifyOtp } from "../../Action/LoginAction";
 import { UsersContext } from "../../Context/UserContext";
 import { storeData } from "../../Utils/Storage";
-import { ACCESS_TOKEN,PHONE_NO,LOGGEDIN, USERID } from "../../Utils/Constant";
+import { ACCESS_TOKEN, PHONE_NO, LOGGEDIN, USERID } from "../../Utils/Constant";
 import SuccessModal from "../ToastFile/TostFilePage";
 import { LoginContexts } from "../../Context/LoginContext";
 
-const OtpDesign =({ route }) => {
+const OtpDesign = ({ route }) => {
+
   const navigation = useNavigation();
   const { phone } = route.params;
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const inputs = useRef([]);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [showModelMessage, setShowModelMessage]=useState()
-  const [modelType,setModelType]=useState();
+  const [showModelMessage, setShowModelMessage] = useState()
+  const [modelType, setModelType] = useState();
 
 
-  const context=useContext(UsersContext)
-  const loginContext=useContext(LoginContexts)
+  const context = useContext(UsersContext)
+  const loginContext = useContext(LoginContexts)
   console.log(loginContext.SerialNo)
   // const { verifyOtp , resendOtp } = useContext(LoginContext); 
 
@@ -33,36 +34,36 @@ const OtpDesign =({ route }) => {
       inputs.current[index + 1].focus();
     }
 
-   
+
 
     if (newOtp.every((digit) => digit !== "")) {
       const otpValue = newOtp.join("");
       console.log("Entered OTP:", otpValue);
-      const data= await verifyOtp(route.params.phone,otpValue,context.SerialNo)
+      const data = await verifyOtp(route.params.phone, otpValue, context.SerialNo)
       console.log(data)
-      if(data.status==200){
+      if (data.status == 200) {
         console.log(data.data)
         loginContext.userId(data.data.xuid)
         loginContext.phoneNo(route.params.phone)
-        storeData(PHONE_NO,route.params.phone)
-        storeData(LOGGEDIN,'true')
-        storeData(USERID,data.data.xuid)
+        storeData(PHONE_NO, route.params.phone)
+        storeData(LOGGEDIN, 'true')
+        storeData(USERID, data.data.xuid)
 
-        if(data.data.isMpinVerified==true){
+        if (data.data.isMpinVerified == true) {
           loginContext.loggedin('true')
         }
-        else{
+        else {
           navigation.navigate('CreateMpin')
-        }      
-      }      
-      else if(data.status==401){
+        }
+      }
+      else if (data.status == 401) {
         setShowSuccessModal(true)
         setShowModelMessage("Invalid OTP")
         setModelType('error')
 
         setTimeout(() => {
-            setShowSuccessModal(false);
-            }, 2000);  
+          setShowSuccessModal(false);
+        }, 2000);
       }
     }
   };
@@ -73,9 +74,35 @@ const OtpDesign =({ route }) => {
     }
   };
 
+  const resendOtp = () => {
+
+    postResendOtp(loginContext.getUserId).then(r => {
+      console.log(r)
+
+      if (r.status == 200) {
+        setShowSuccessModal(true)
+        setShowModelMessage(r.data)
+        setModelType('success')
+
+        setTimeout(() => {
+          setShowSuccessModal(false)
+        }, 4000);
+      }else{
+        setShowSuccessModal(true)
+        setShowModelMessage('Invalid Otp')
+        setModelType('error')
+
+        setTimeout(() => {
+          setShowSuccessModal(false)
+        }, 2000);
+      }
+
+    })
+  }
+
   return (
     <View style={styles.container}>
-       <SuccessModal
+      <SuccessModal
         visible={showSuccessModal}
         onClose={() => setShowSuccessModal(false)}
         message={showModelMessage}
@@ -101,13 +128,13 @@ const OtpDesign =({ route }) => {
           />
         ))}
       </View>
-      
+
       <Text style={styles.resendText}>
         Didn’t receive OTP?
-         <TouchableOpacity >
-         <Text style={styles.resendLink}>Resend</Text></TouchableOpacity>
+        <TouchableOpacity onPress={resendOtp} >
+          <Text style={styles.resendLink}>Resend</Text></TouchableOpacity>
       </Text>
-     
+
     </View>
   );
 };

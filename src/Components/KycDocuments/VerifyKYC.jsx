@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
   kycImage: {
     width: 120,
     height: 120,
-    marginTop:30,
+    marginTop:'40%',
   },
   title: {
     fontSize: 25,

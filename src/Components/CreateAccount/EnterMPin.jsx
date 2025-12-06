@@ -1,26 +1,54 @@
-import React, { useContext, useRef, useState } from "react";
-import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity } from "react-native";
+import React, { useContext, useRef, useState,useEffect } from "react";
+import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity,Animated } from "react-native";
 import Sm_logo from '../../assets/Images/Sm_logo.png'
 import { useNavigation } from "@react-navigation/native";
 import { UsersContext } from "../../Context/UserContext";
 import { verifyMPin } from "../../Action/LoginAction";
 import SuccessModal from "../ToastFile/TostFilePage";
 import { storeData } from "../../Utils/Storage";
-import { ACCESS_TOKEN,LOGGEDIN } from "../../Utils/Constant";
+import { ACCESS_TOKEN, LOGGEDIN } from "../../Utils/Constant";
 import { LoginContexts } from "../../Context/LoginContext";
+import WaveIcon from '../../assets/Images/HiIcon.png';
+
 
 const EnterMPin = (route) => {
 
     const context = useContext(UsersContext)
-    const loginContext=useContext(LoginContexts)
-    const navigation=useNavigation()
+    const loginContext = useContext(LoginContexts)
+    const navigation = useNavigation()
     const [createMpin, setCreateMpin] = useState(["", "", "", ""])
     const [mPinNumber, setmPinNumber] = useState(null)
     const inputs = useRef([])
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [showModelMessage, setShowModelMessage] = useState()
     const [modelType, setModelType] = useState();
-    const [hostelList,setHostelList] =useState([]);
+    const [hostelList, setHostelList] = useState([]);
+
+    const rotation = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+        Animated.loop(
+            Animated.sequence([
+                Animated.timing(rotation, {
+                    toValue: 1,
+                    duration: 300,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(rotation, {
+                    toValue: 0,
+                    duration: 300,
+                    useNativeDriver: true,
+                }),
+            ])
+        ).start();
+    }, []);
+
+    const rotateInterpolate = rotation.interpolate({
+        inputRange: [-1, 1],
+        outputRange: ["0deg", "10deg"], // waving angle
+    });
+
+
     const handlePinChange = async (text, index) => {
         const newPin = [...createMpin];
         newPin[index] = text;
@@ -90,6 +118,25 @@ const EnterMPin = (route) => {
         <View>
             <Image source={Sm_logo} style={style.logo} />
 
+            <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 15 }}>
+                <Text style={style.title}>Welcome Back</Text>
+
+                <Animated.Image
+                    source={WaveIcon}
+                    style={[
+                        style.hand,
+                        {
+                            width: 25,
+                            height: 25,
+                            marginTop: 8,
+                            marginLeft: 5,
+                            transform: [{ rotate: rotateInterpolate }],
+                        },
+                    ]}
+                />
+
+            </View>
+
             <Text style={style.createText}>Enter mPIN</Text>
 
             <Text style={style.subtitle}>Please enter the mPIN </Text>
@@ -132,7 +179,12 @@ const style = StyleSheet.create({
         fontSize: 20, color: "#000"
     },
     nextButton: { backgroundColor: '#1A73E8', borderRadius: 8, paddingVertical: 20, alignItems: 'center', marginTop: 250 },
-    nextText: { color: '#ffffff', fontSize: 16, fontWeight: 600 }
+    nextText: { color: '#ffffff', fontSize: 16, fontWeight: 600 },
+    title: {
+        fontSize: 28,
+        fontWeight: "600",
+        marginTop: 10,
+    },
 
 })
 
