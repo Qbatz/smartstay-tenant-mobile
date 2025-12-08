@@ -135,7 +135,6 @@ function AppContent(props) {
   const getFCMToken = async ( newToken ) => {
     const token = await retriveData(FCM_TOKEN)
      if (token !== newToken || token === null || token === undefined) {
-          console.log("******")
           storeData(FCM_TOKEN, newToken)
           storeData(SHOULD_TOKEN_UPDATE, "true")
         }
@@ -160,6 +159,7 @@ function AppContent(props) {
 
     CommonModule.fetchSerialNumber().then(r => {
       loginContext.serialNo(r)
+      console.log(r)
     }).catch(error => {
       console.log(error)
     })
