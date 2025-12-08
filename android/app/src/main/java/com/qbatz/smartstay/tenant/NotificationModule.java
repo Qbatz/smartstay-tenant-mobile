@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 
 
 import androidx.annotation.NonNull;
@@ -30,7 +31,7 @@ public class NotificationModule extends ReactContextBaseJavaModule {
 
 
         IntentFilter filter=new IntentFilter();
-        filter.addAction("com.Notification_Event");
+        filter.addAction("com.smartstay.token");
 
         int receiverflags = ContextCompat.RECEIVER_NOT_EXPORTED;
 
@@ -40,9 +41,6 @@ public class NotificationModule extends ReactContextBaseJavaModule {
 
 
     class Receiver extends BroadcastReceiver{
-
-
-
         @Override
         public void onReceive(Context context, Intent intent) {
 

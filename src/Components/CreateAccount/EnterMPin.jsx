@@ -50,8 +50,9 @@ const EnterMPin = (route) => {
 
 
     const handlePinChange = async (text, index) => {
+         const cleanText = text.replace(/[^0-9]/g, "");
         const newPin = [...createMpin];
-        newPin[index] = text;
+        newPin[index] = cleanText;
         setCreateMpin(newPin);
 
         if (text && index < 3) {

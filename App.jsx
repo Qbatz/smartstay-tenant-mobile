@@ -44,8 +44,7 @@ import AgreementViewScreen from './src/Components/RentalAggreements/AggreementVi
 import NOCBillPdf from './src/Components/NocBillPdf';
 import NOCReceiptPdf from './src/Components/NocReceipt';
 import InvoiceDesign from './src/Components/Payments/BillPDF';
-import { retriveData } from './src/Utils/Storage';
-import { ACCESS_TOKEN, LOGGEDIN, PHONE_NO, USERID } from './src/Utils/Constant';
+import { ACCESS_TOKEN, FCM_TOKEN, LOGGEDIN, PHONE_NO, SHOULD_TOKEN_UPDATE, USERID } from './src/Utils/Constant';
 import CreateMpin from './src/Components/CreateAccount/CreateMpin';
 import ConfirmMPin from './src/Components/CreateAccount/ConfirmMPin';
 import LoginPage from './src/Components/CreateAccount/LoginPage';
@@ -60,11 +59,11 @@ import RentalAgreement from './src/Components/CustomerProfile/RentalAgreement';
 import ComplaintContext from './src/Context/ComplaintContext';
 import AmenitiesContext from './src/Context/AmenitiesContext';
 
-
-  const { width, height } = Dimensions.get("window");
-
+import { storeData, retriveData } from './src/Utils/Storage';
 
 
+
+const { width, height } = Dimensions.get("window");
 
 function App() {
 
@@ -129,19 +128,38 @@ function AppContent(props) {
   const loginContext=useContext(LoginContexts)
   const [isLoggedIn, setIsLoggedIn] = useState()
   const [initialRoute,setInitialRoute]=useState()
+  const [fcmToken, setFCMToken] = useState()
 
   //  const initialRoute = loginContext.getRoute === "confirmMPin" ? "HostelList": "EnterMPin";
 
+  const getFCMToken = async ( newToken ) => {
+    const token = await retriveData(FCM_TOKEN)
+     if (token !== newToken || token === null || token === undefined) {
+          storeData(FCM_TOKEN, newToken)
+          storeData(SHOULD_TOKEN_UPDATE, "true")
+        }
+    return token;
+  }
 
 
-  useEffect(() => {
-    NotificationModule.fetchFcmToken().then(r => {
+    useEffect(() => {
+      NotificationModule.fetchFcmToken().then(r => {
+      if (r != null) {
+        setFCMToken(fcmToken)
+        getFCMToken(r);
+       
+      }
     }).catch(error => {
       console.log(error)
     })
+    }, [])
+
+
+  useEffect(() => {
 
     CommonModule.fetchSerialNumber().then(r => {
       loginContext.serialNo(r)
+      console.log(r)
     }).catch(error => {
       console.log(error)
     })
