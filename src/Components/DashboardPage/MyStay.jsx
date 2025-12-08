@@ -13,6 +13,7 @@ import { hostelDetails } from "../../Action/HostelAction";
 import { LoginContexts } from "../../Context/LoginContext";
 import requestProfile from '../../assets/Images/profile-2user.png'
 import { getRequestRaised } from "../../Action/CustomerAction";
+import Clippath from '../../assets/Images/Clippath.png'
 
 function MyStay(props) {
 
@@ -25,7 +26,7 @@ function MyStay(props) {
     const [rentBill, setRentBill] = useState([])
     const [request,setRequest]=useState([])
 
-    console.log(rentBill)
+    console.log(context.getRequestRaised)
 
     const announcements = [
         { id: 1, text: 'Hello water maintenance on 5th June' },
@@ -42,6 +43,7 @@ function MyStay(props) {
 
         getRequestRaised(context.getHostelDetail.hostelId, loginContext.getToken).then(r=>{
             console.log(r)
+            context.updateRequestRaised(r.data)
         })
     }, [])
 
@@ -101,29 +103,6 @@ function MyStay(props) {
             </Swiper>
         </View>
 
-
-        {/* <View style={{ height: 140, marginTop: 5 }}>
-            <Swiper loop showsPagination index={0} autoplay autoplayTimeout={2}
-             paginationStyle={{ bottom: 10 }} 
-             removeClippedSubviews 
-                dotStyle={{
-                    width: 10, height: 10, borderRadius: 5, backgroundColor: 'transparent', borderWidth: 1.5, 
-                    borderColor: '#CFCFCF', marginHorizontal: 5       
-                }} 
-                activeDotColor="#1E45E1"
-                style={{ borderRadius: 10, overflow: 'hidden', alignSelf: 'center' }} >
-                <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} colors={['#10267B', '#0227B5']} style={style.card}>
-                    <Text style={{ color: '#ffffff', fontSize: 17,flexShrink:1,flexWrap: 'wrap',lineHeight:24 }}>
-                            Hello water matainence on 5th June </Text>
-                </LinearGradient>
-                <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} colors={['#10267B', '#0227B5']} style={style.card}>
-                    <Text style={{ color: '#ffffff', fontSize: 17 }}>field2</Text>
-                </LinearGradient>
-                <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} colors={['#10267B', '#0227B5']} style={style.card}>
-                    <Text style={{ color: '#ffffff', fontSize: 17 }}> field3</Text>
-                </LinearGradient>
-            </Swiper>
-        </View> */}
 
         <View>
             <View style={{ flexDirection: 'row', width: '100%' }}>
@@ -262,21 +241,41 @@ function MyStay(props) {
             <Text style={{fontSize:16,fontWeight:600}}>Request</Text>
 
 
-            {request && request.length > 0? <View style={{borderWidth:1,borderRadius:10,flexDirection:'row',paddingVertical:15,borderColor:'#EFF2FF',
-                        justifyContent:'space-between',marginTop:10
-            }}>
+            {context.getRequestRaised && context.getRequestRaised.length > 0? 
+
+            context.getRequestRaised.map(i=>{
+                 return  <View key={i.requestId}
+                      style={{borderWidth:1,borderRadius:10,flexDirection:'row',paddingVertical:15,
+                        borderColor:'#EFF2FF', justifyContent:'space-between',marginTop:10               
+                     }}>
                  <View style={{paddingLeft:12,paddingRight:10}}>
                     <Text style={{fontSize:16,fontWeight:600,marginBottom:5}}>
-                        No Request yet
+                       {i.type}
                     </Text>
-                    <Text style={{fontSize:14,fontWeight:400,color:'#4B4B4B',marginTop:5}}>
-                        You have'nt raised any request</Text>
+
+                    <View style={{flexDirection:'row',alignItems:'center',marginTop:5}}>
+                         <Image source={Clippath} style={{width:20,height:20}}/>
+
+                         <Text style={{fontSize:14,fontWeight:400,marginLeft:10}}>
+                            {i.title}</Text>                    
+                    </View>
+                    
                 </View>
 
-                <View>
-                    <Text>Hi</Text>
+                <View style={{paddingRight:10}}>
+                    <Text style={{color:'#9C9C9C',fontSize:11,fontWeight:400,marginBottom:5}}>
+                        {i.requestedDate}
+                    </Text>
+
+                    <Text style={{fontSize:12,fontWeight:400,paddingHorizontal:8,paddingVertical:4,backgroundColor:'#FFF8EC',
+                        color:'#FF9500',borderRadius:28,textAlign:'center',textAlignVertical:'center',marginTop:8
+                    }}>
+                        {i.status}
+                    </Text>
                 </View>
-            </View>:
+            </View>
+            })
+           :
             <View style={{borderWidth:1,borderRadius:10,flexDirection:'row',paddingVertical:15,borderColor:'#EFF2FF',
                         justifyContent:'space-between',marginTop:10
             }}>

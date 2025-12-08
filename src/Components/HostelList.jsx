@@ -19,37 +19,37 @@ import { useNavigation } from "@react-navigation/native";
 
 const HostelList = (route) => {
 
-  const context=useContext(UsersContext)
-  const loginContext=useContext(LoginContexts)
-  const [hostels,setHostelList]=useState([]);
+  const context = useContext(UsersContext)
+  const loginContext = useContext(LoginContexts)
+  const [hostels, setHostelList] = useState([]);
   const [selectedHostel, setSelectedHostel] = useState();
-  const navigation=useNavigation()
+  const navigation = useNavigation()
 
 
   const handleSelect = (hosteldetail) => {
-    console.log("hostellist lall",hosteldetail)
+    console.log("hostellist lall", hosteldetail)
     setSelectedHostel(hosteldetail);
-     loginContext.updateRoute(null)
+    loginContext.updateRoute(null)
   };
 
   const handleGo = () => {
 
-    const data= {
-      xuid:loginContext.getUserId,
-      hostelId:selectedHostel?.hostelId,
+    const data = {
+      xuid: loginContext.getUserId,
+      hostelId: selectedHostel?.hostelId,
     }
     console.log(data)
 
-    getToken(data).then(r=>{
-      if (r?.status==200) {
-      fetchFCMToken(r.data);
-      storeData(ACCESS_TOKEN,r.data)
-      loginContext.updateToken(r.data)
-      context.updateHostelDetail(selectedHostel)
-      navigation.navigate("VerifyKYC");
-    }
+    getToken(data).then(r => {
+      if (r?.status == 200) {
+        fetchFCMToken(r.data);
+        storeData(ACCESS_TOKEN, r.data)
+        loginContext.updateToken(r.data)
+        context.updateHostelDetail(selectedHostel)
+        navigation.navigate("VerifyKYC");
+      }
     })
-    
+
   };
 
   const fetchFCMToken = async (authToken) => {
@@ -63,15 +63,29 @@ const HostelList = (route) => {
   }
 
   const renderHostel = ({ item }) => {
+    console.log(item.hostelInitial)
     return <TouchableOpacity
       style={[
         styles.hostelCard,
-        selectedHostel?.hostelId === item.hostelId&& styles.selectedCard,
+        selectedHostel?.hostelId === item.hostelId && styles.selectedCard,
       ]}
       onPress={() => handleSelect(item)}
     >
       <View style={styles.cardLeft}>
-        <Image source={item.hostelPic} style={styles.hostelImage} />
+
+        {item.hostelPic ? (
+          <Image
+            source={{ uri: item.hostelPic }}
+            style={styles.hostelImage}/>
+        ) : (
+          <View style={[styles.hostelImage, styles.initialContainer]}>
+            <Text style={styles.initialText}>
+              {item.hostelInitial?.charAt(0).toUpperCase()}
+            </Text>
+          </View>
+        )}
+
+
         <View>
           <Text style={styles.hostelName}>{item.hostelName}</Text>
           <View style={styles.locationRow}>
@@ -91,7 +105,7 @@ const HostelList = (route) => {
 
   return (
     <View style={styles.container}>
-      <View style={{height:'50%'}}>
+      <View style={{ height: '50%' }}>
         <Text style={styles.title}>Select Hostel</Text>
         <Text style={styles.subtitle}>Select Your Current Staying Hostel</Text>
 
@@ -121,7 +135,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     padding: 25,
     paddingTop: 50,
-    justifyContent: "space-between", 
+    justifyContent: "space-between",
   },
   title: {
     fontSize: 22,
@@ -158,9 +172,20 @@ const styles = StyleSheet.create({
   hostelImage: {
     width: 50,
     height: 50,
-    borderRadius: 8,
+    borderRadius: 25,
     marginRight: 15,
   },
+  initialText: {
+  color: '#788fed',
+  fontSize: 20,
+  fontWeight: 'bold',
+},
+
+initialContainer: {
+  backgroundColor: '#eef1ff',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
   hostelName: {
     fontSize: 16,
     fontWeight: "600",
@@ -178,7 +203,7 @@ const styles = StyleSheet.create({
   },
   goButtonContainer: {
     flex: 1,
-    justifyContent: "center", 
+    justifyContent: "center",
     alignItems: "center",
   },
   goButton: {

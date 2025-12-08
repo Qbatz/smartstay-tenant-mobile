@@ -10,6 +10,7 @@ const UserContext=(props)=> {
     const [HostelDetail,setHostelDetail]=useState();
     const [hostelList,setHostelList]=useState([])
      const [customer, setCustomers] = useState()
+     const [requestRaised,setUpdateRequest]=useState([])
 
 
 
@@ -28,7 +29,7 @@ const UserContext=(props)=> {
 
     return<UsersContext.Provider value={{ jumpComplain:jumpcomplainfn,Complaint:complaint,Amenities:amenitiesfn, 
          updateHostelDetail:setHostelDetail,getHostelDetail:HostelDetail,updateHostelList:hostelListfn,getHostelList:hostelList,
-         updateCustomer:setCustomers,getCustomerDetail:customer
+         updateCustomer:setCustomers,getCustomerDetail:customer,updateRequestRaised:setUpdateRequest,getRequestRaised:requestRaised
        
          
     }} >

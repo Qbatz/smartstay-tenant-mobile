@@ -80,10 +80,7 @@ export const getAmenties=async(hostelId,amenityId,token)=>{
 }
 
 export const deleteComplaint=async(hostelId,complaintId,token, reason)=>{
-    console.log(hostelId)
-    console.log(complaintId)
-    console.log(token)
-    console.log(reason)
+   
 
     const data={
         message: reason

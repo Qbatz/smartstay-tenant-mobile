@@ -153,6 +153,47 @@ function Dashboard(props) {
     }
   }, [showSheet, addComplaints, showBedChange, editCompliant, showAmenities, modalVisible]);
 
+  useEffect(() => {
+  const backAction = () => {
+
+    // 1️⃣ Close bottom sheets/modals first
+    if (showBedChange || addComplaints || showSheet || editCompliant || showAmenities || modalVisible) {
+      setShowBedChange(false);
+      setAddComplaint(false);
+      setShowSheet(false);
+      setShowAmenities(false);
+      setModalVisible(false);
+      return true;
+    }
+
+    // 2️⃣ Handle tab navigation
+    if (index > 0) {
+      setindex(index - 1); // move back to previous tab
+      return true;
+    }
+
+    // 3️⃣ If already on MyStay tab → go back to VerifyKYC
+    navigation.goBack();
+    return true;
+  };
+
+  const backHandler = BackHandler.addEventListener(
+    "hardwareBackPress",
+    backAction
+  );
+
+  return () => backHandler.remove();
+}, [
+  index,
+  showBedChange,
+  addComplaints,
+  showSheet,
+  editCompliant,
+  showAmenities,
+  modalVisible,
+]);
+
+
   function onClose() {
     Animated.timing(sheetY, {
       toValue: 700,
@@ -622,7 +663,7 @@ function Dashboard(props) {
     </LinearGradient>
 
     <View style={{ flex: 1, paddingLeft: 20, paddingRight: 20 }}>
-      <TabView navigationState={{ index, routes }}
+      <TabView navigationState={{ index:index, routes }}
         commonOptions={{
           icon: ({ route, color }) => (<Image source={route.icon} style={{ width: 21.12, height: 21.12, tintColor: color }} />)
         }}
