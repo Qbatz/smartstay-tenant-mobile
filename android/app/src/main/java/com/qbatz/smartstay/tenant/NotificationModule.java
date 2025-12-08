@@ -69,6 +69,7 @@ public class NotificationModule extends ReactContextBaseJavaModule {
     public void fetchFcmToken(Promise promise){
         if(token!=null){
             promise.resolve(token);
+            System.out.println((token));
         }
         else {
             this.promise = promise;

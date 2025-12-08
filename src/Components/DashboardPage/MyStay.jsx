@@ -82,7 +82,8 @@ function MyStay(props) {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 20 }}>
 
-        <View style={{height:130, marginTop: 15,overflow: 'hidden', width: width  }}>
+        <View style={{height:130, marginTop: 15,marginRight:width*0.10,overflow: 'hidden', width: width*0.97  }}>
+            <View style={{marginRight:10,flex:1}}> 
             <Swiper loop showsPagination
                 index={0} paginationStyle={{ bottom: 10,width: "100%",paddingRight:22}}
                 removeClippedSubviews={false}
@@ -99,6 +100,7 @@ function MyStay(props) {
                     </Text>
                 </LinearGradient>))}
             </Swiper>
+            </View>
         </View>
 
 

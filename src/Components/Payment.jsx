@@ -144,8 +144,8 @@ const handleReceiptPdfDownload =  () => {
     <>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {payment?.map((item, index) => (
-          <TouchableOpacity key={index} onPress={() => props.onPayment(item)}>
-            <View style={styles.card}>
+          <TouchableOpacity key={index} onPress={() => props.onPayment(item)} style={styles.card}>
+            <View style={{flexDirection: "row",}}>
               <View style={styles.iconContainer}>
                 {item?.title === "July EB Bill" ? (
                   <Image
@@ -439,7 +439,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   card: {
-    flexDirection: "row",
+    
     backgroundColor: "#fff",
     borderRadius: 14,
     padding: 12  ,

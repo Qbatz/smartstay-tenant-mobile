@@ -132,16 +132,18 @@ function AppContent(props) {
 
   //  const initialRoute = loginContext.getRoute === "confirmMPin" ? "HostelList": "EnterMPin";
 
-
-
-  useEffect(() => {
-    NotificationModule.fetchFcmToken().then(r => {
+console.log('notewoldfsd')
+NotificationModule.fetchFcmToken().then(r => {
+      console.log(r)
     }).catch(error => {
       console.log(error)
     })
 
+  useEffect(() => {
+
     CommonModule.fetchSerialNumber().then(r => {
       loginContext.serialNo(r)
+      console.log(r)
     }).catch(error => {
       console.log(error)
     })
