@@ -140,7 +140,7 @@ function Services(props) {
         </View>
 
         {selectedfield == 'Complaint' ? complaintContext.getComplaintList?.length > 0 ? <FlatList showsVerticalScrollIndicator={false}
-            style={{ marginTop: 10, position: 'relative' }}
+            style={{ marginTop: 10, position: 'relative',marginBottom:10 }}
             keyExtractor={(item) => item.complaintId}
             data={complaintContext.getComplaintList}
             renderItem={({ item }) => {

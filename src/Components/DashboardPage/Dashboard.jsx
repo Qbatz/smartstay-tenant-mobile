@@ -49,6 +49,7 @@ import ArrowRightIcon from "../../assets/Images/arrow-right.png";
 import LinearGradient from "react-native-linear-gradient";
 import { compliantContexts } from "../../Context/ComplaintContext";
 
+const { width, height } = Dimensions.get("window");
 
 function Dashboard(props) {
 
@@ -209,6 +210,7 @@ function Dashboard(props) {
       setmyAminites(null); setModalVisible(false)
       setSendComment(null); setChangeBed(null)
       setBedType(null); setUrgencyType(null)
+      setSelectedComplaintTypeId(0)
     });
   }
 
@@ -370,10 +372,11 @@ function Dashboard(props) {
 
       })
     }
-
-    if (complaintDescription.trim().length > 15) {
+    if(selectedComplaintTypeId!=0){
+        if (complaintDescription.trim().length > 15) {
       postComplaint(context.getHostelDetail.hostelId, loginContext.getToken, formData).then(r => {
         setLoading(true)
+        console.log(r)
 
         setTimeout(() => {
           setLoading(false)
@@ -412,6 +415,17 @@ function Dashboard(props) {
       }, 2000);
 
     }
+
+    }else{
+      setShowSuccessModal(true)
+      setToastMessage('select Complaint type')
+      setModelType('error')
+
+      setTimeout(() => {
+         setShowSuccessModal(false)
+      }, 2000);
+    }
+    
 
   }
 
@@ -681,7 +695,7 @@ function Dashboard(props) {
           <View style={StyleSheet.absoluteFill} />
         </TouchableWithoutFeedback>
 
-        <Animated.View style={[selectedComplaint?.images?.length > 0 ? style.bottomSheet : style.bottomSheetwithimage, { transform: [{ translateY: sheetY }] }]}
+        <Animated.View style={[selectedComplaint?.images?.length > 0 ? style.bottomSheetwithimage : style.bottomSheet, { transform: [{ translateY: sheetY }] }]}
           {...panResponder.panHandlers}>
 
           <View style={{ flex: 1 }}>
@@ -1819,8 +1833,8 @@ const style = StyleSheet.create({
     justifyContent: "flex-end",
 
   },
-  bottomSheet: {
-    height: '60%',
+  bottomSheetwithimage: {
+    height: height*0.65,
     backgroundColor: '#fff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
@@ -1828,8 +1842,8 @@ const style = StyleSheet.create({
     paddingTop: 20,
     paddingBottom: 5
   },
-  bottomSheetwithimage: {
-    height: '50%',
+  bottomSheet: {
+    height: height*0.55,
     backgroundColor: '#fff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
