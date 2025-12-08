@@ -11,9 +11,9 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import { hostelList } from "../Action/HostelAction";
 import { UsersContext } from "../Context/UserContext";
 import { LoginContexts } from "../Context/LoginContext";
-import { generateToken, getToken } from "../Action/LoginAction";
-import { storeData } from "../Utils/Storage";
-import { ACCESS_TOKEN } from "../Utils/Constant";
+import { generateToken, getToken, updateFCMToken } from "../Action/LoginAction";
+import { retriveData, storeData } from "../Utils/Storage";
+import { ACCESS_TOKEN, FCM_TOKEN, SHOULD_TOKEN_UPDATE } from "../Utils/Constant";
 import { useNavigation } from "@react-navigation/native";
 
 
@@ -24,8 +24,6 @@ const HostelList = (route) => {
   const [hostels,setHostelList]=useState([]);
   const [selectedHostel, setSelectedHostel] = useState();
   const navigation=useNavigation()
-
-  console.log(context.getHostelList)
 
 
   const handleSelect = (hosteldetail) => {
@@ -44,7 +42,7 @@ const HostelList = (route) => {
 
     getToken(data).then(r=>{
       if (r?.status==200) {
-      console.log(selectedHostel)
+      fetchFCMToken(r.data);
       storeData(ACCESS_TOKEN,r.data)
       loginContext.updateToken(r.data)
       context.updateHostelDetail(selectedHostel)
@@ -53,6 +51,16 @@ const HostelList = (route) => {
     })
     
   };
+
+  const fetchFCMToken = async (authToken) => {
+    const shouldUpdate = await retriveData(SHOULD_TOKEN_UPDATE)
+    if (shouldUpdate === 'true') {
+      const token = await retriveData(FCM_TOKEN);
+      updateFCMToken(loginContext.getUserId, token, authToken).then(response => {
+        storeData(SHOULD_TOKEN_UPDATE, "false")
+      })
+    }
+  }
 
   const renderHostel = ({ item }) => {
     return <TouchableOpacity
