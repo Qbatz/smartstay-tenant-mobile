@@ -3,7 +3,9 @@ package com.qbatz.smartstay.tenant;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.util.Log;
@@ -24,6 +26,12 @@ public class FireBaseServices extends FirebaseMessagingService {
     @Override
     public void onNewToken(@NonNull String token) {
         super.onNewToken(token);
+
+        SharedPreferences mpref = getSharedPreferences("user_details", Context.MODE_PRIVATE);
+        SharedPreferences.Editor edt = mpref.edit();
+        edt.putString("token",token);
+        edt.putBoolean("is_token_set",false);
+        edt.apply();
 
 
         Intent intent=new Intent("com.smartstay.token");
