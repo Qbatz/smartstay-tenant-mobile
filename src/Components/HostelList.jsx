@@ -14,9 +14,6 @@ import { LoginContexts } from "../Context/LoginContext";
 import { generateToken, getToken, updateFCMToken } from "../Action/LoginAction";
 import { retriveData, storeData } from "../Utils/Storage";
 import { ACCESS_TOKEN, FCM_TOKEN, SHOULD_TOKEN_UPDATE } from "../Utils/Constant";
-import { generateToken, getToken, updateFCMToken } from "../Action/LoginAction";
-import { retriveData, storeData } from "../Utils/Storage";
-import { ACCESS_TOKEN, FCM_TOKEN, SHOULD_TOKEN_UPDATE } from "../Utils/Constant";
 import { useNavigation } from "@react-navigation/native";
 
 
@@ -65,15 +62,7 @@ const HostelList = (route) => {
     }
   }
 
-  const fetchFCMToken = async (authToken) => {
-    const shouldUpdate = await retriveData(SHOULD_TOKEN_UPDATE)
-    if (shouldUpdate === 'true') {
-      const token = await retriveData(FCM_TOKEN);
-      updateFCMToken(loginContext.getUserId, token, authToken).then(response => {
-        storeData(SHOULD_TOKEN_UPDATE, "false")
-      })
-    }
-  }
+  
 
   const renderHostel = ({ item }) => {
     console.log(item.hostelInitial)

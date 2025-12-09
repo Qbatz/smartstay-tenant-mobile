@@ -26,6 +26,7 @@ function MyStay(props) {
     const [rentBill, setRentBill] = useState([])
     const [request,setRequest]=useState([])
 
+
     console.log(context.getRequestRaised)
 
     const announcements = [
@@ -39,6 +40,8 @@ function MyStay(props) {
          console.log(r.data)
             setComplaints(r.data.complaints)
             setRentBill(r.data.currentMonthBills)
+           context.updateCurrentMonthBills(r.data.currentMonthBills)
+           context.updatePreviousMonth(r.data.previousMonthBills)
         })
 
         getRequestRaised(context.getHostelDetail.hostelId, loginContext.getToken).then(r=>{
@@ -112,7 +115,7 @@ function MyStay(props) {
                 <View style={style.EbContainer}>
                     <View>
                         <Text style={{ fontSize: 22, fontWeight: '700', color: '#1C1C1E' }}>
-                            {'\u20B9'} 350.00
+                            {'\u20B9'} {context.getPreviousMonthBills?.eb != null ? context.getPreviousMonthBills?.eb : "N/A"}
                         </Text>
 
                         <Text style={{ fontSize: 13, fontWeight: '400', color: '#AEAEB2', marginTop: 5 }}>
@@ -137,7 +140,7 @@ function MyStay(props) {
                 <View style={style.container}>
                     <View>
                         <Text style={{ fontSize: 22, fontWeight: '700', color: '#1C1C1E' }}>
-                            {'\u20B9'} {rentBill?.rent != null ? rentBill?.rent : "N/A"}
+                            {'\u20B9'} {context.getPreviousMonthBills?.rent != null ? context.getPreviousMonthBills?.rent : "N/A"}
                         </Text>
 
                         <Text style={{ fontSize: 13, fontWeight: '400', color: '#AEAEB2', marginTop: 5 }}>
@@ -146,7 +149,9 @@ function MyStay(props) {
 
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
                             <Text style={{ fontSize: 11, fontWeight: '400', color: '#8E8E93' }}>Paid On:</Text>
-                            <Text style={{ fontSize: 12, fontWeight: '600', marginLeft: 4 }}>02 June</Text>
+                            <Text style={{ fontSize: 12, fontWeight: '600', marginLeft: 4 }}>
+                                {context.getPreviousMonthBills?.invoiceGeneratedDate != null ? context.getPreviousMonthBills?.invoiceGeneratedDate : "N/A"}
+                            </Text>
                         </View>
                     </View>
 
@@ -246,7 +251,7 @@ function MyStay(props) {
             {context.getRequestRaised && context.getRequestRaised.length > 0? 
 
             context.getRequestRaised.map(i=>{
-                 return  <View key={i.requestId}
+                 return  <View key={i?.requestId}
                       style={{borderWidth:1,borderRadius:10,flexDirection:'row',paddingVertical:15,
                         borderColor:'#EFF2FF', justifyContent:'space-between',marginTop:10               
                      }}>

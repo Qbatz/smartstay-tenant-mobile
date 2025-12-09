@@ -39,12 +39,12 @@ import { LoginContexts } from "../../Context/LoginContext";
 const CustomerProfile = (route) => {
 
   const context = useContext(UsersContext)
-  const loginContext=useContext(LoginContexts)
+  const loginContext = useContext(LoginContexts)
 
   const navigation = useNavigation();
   const [customer, setCustomers] = useState()
 
-  console.log(context.getCustomerDetail )
+  console.log(context.getCustomerDetail)
 
 
 
@@ -121,7 +121,7 @@ const CustomerProfile = (route) => {
     // navigation.navigate("SplashScreen");
   }
 
-  const HostelClick=()=>{
+  const HostelClick = () => {
     navigation.navigate('ProfileHostels')
   }
 
@@ -145,13 +145,23 @@ const CustomerProfile = (route) => {
 
         <View style={styles.profileCard}>
           <View style={styles.profileRow}>
-            <Image
-              source={{ uri: context.getCustomerDetail?.profilePic }}
-              style={styles.profileImage} resizeMode="contain"
-            />
+
+            {context.getCustomerDetail?.profilePic ? (
+              <Image
+                source={{ uri: context.getCustomerDetail?.profilePic }}
+                style={styles.profileImage} />
+            ) : (
+              <View style={[styles.profileImage, styles.initialContainer]}>
+                <Text style={styles.initialText}>
+                  {context.getCustomerDetail?.initials?.charAt(0).toUpperCase()}
+                </Text>
+              </View>
+            )}
             <View style={{ flex: 1, marginLeft: 10 }}>
               <View style={{ display: 'flex', flexDirection: 'row' }}>
                 <Text style={styles.profileName}>{context.getCustomerDetail?.firstName}</Text>
+
+                <Text style={styles.lastName}>{context.getCustomerDetail?.lastName}</Text>
                 <Image source={VerifyIcon} resizeMode="contain" style={{ marginTop: 2, marginLeft: 4, height: 20, width: 20 }} />
               </View>
 
@@ -189,7 +199,7 @@ const CustomerProfile = (route) => {
         </View>
 
         {/* ----KYC------ */}
-        
+
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Complete your KYC verification</Text>
           <Text style={styles.warningText}>
@@ -219,7 +229,7 @@ const CustomerProfile = (route) => {
           <TouchableOpacity onPress={HostelClick} style={styles.row}>
             <View style={{ flexDirection: 'row' }}>
               <Image source={buildings} style={{ width: 20, height: 20 }} />
-              <Text style={{fontSize:14,fontWeight:400,marginLeft:5}}>
+              <Text style={{ fontSize: 14, fontWeight: 400, marginLeft: 5 }}>
                 Hostels</Text>
             </View>
 
@@ -228,10 +238,10 @@ const CustomerProfile = (route) => {
 
           <View style={styles.divider} />
 
-          <TouchableOpacity onPress={()=>navigation.navigate('RentalAgreement')} style={styles.row}>
+          <TouchableOpacity onPress={() => navigation.navigate('RentalAgreement')} style={styles.row}>
             <View style={{ flexDirection: 'row' }}>
               <Image source={paperclip} style={{ width: 20, height: 20 }} />
-              <Text style={{fontSize:14,fontWeight:400,marginLeft:5}}>Rental Agreement</Text>
+              <Text style={{ fontSize: 14, fontWeight: 400, marginLeft: 5 }}>Rental Agreement</Text>
             </View>
 
             <Image source={sideframe} style={{ width: 23, height: 23 }} />
@@ -266,14 +276,14 @@ const CustomerProfile = (route) => {
               <Text style={styles.primaryButtonText}>Download</Text>
                  <Image  source={DownloadIcon} resizeMode="contain" style={{ width: 20, height: 20 , marginLeft:8 }}/>
             </TouchableOpacity> */}
-            {/* <TouchableOpacity style={styles.primaryButtonSmall} onPress={handleDownload}>
+        {/* <TouchableOpacity style={styles.primaryButtonSmall} onPress={handleDownload}>
               <Text style={styles.primaryButtonText}>Download</Text>
               <Image source={DownloadIcon} resizeMode="contain" style={{ width: 20, height: 20, marginLeft: 8 }} />
             </TouchableOpacity> */}
 
 
-          {/* </View> */}
-        {/* </View> */} 
+        {/* </View> */}
+        {/* </View> */}
 
         <View style={styles.helpRow}>
           <Image source={InfoIcon} resizeMode="contain" style={{ width: 20, height: 20 }} />
@@ -332,10 +342,27 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 30,
   },
+   initialText: {
+  color: '#788fed',
+  fontSize: 20,
+  fontWeight: 'bold',
+},
+
+initialContainer: {
+  backgroundColor: '#eef1ff',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
   profileName: {
     fontSize: 18,
     fontWeight: "700",
     color: "#000",
+  },
+   lastName: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#000",
+    marginLeft:5,
   },
   infoRow: {
     flexDirection: "row",
@@ -398,7 +425,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  cards:{
+  cards: {
     backgroundColor: "#fff",
     padding: 20,
     borderRadius: 12,
@@ -430,7 +457,7 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: "#eee",
-    marginVertical:20
+    marginVertical: 20
 
   },
   sectionTitle: {

@@ -26,6 +26,7 @@ import ArrowRightIcon from "../assets/Images/arrow-right.png";
 import { getPaymentList } from "../Action/HostelAction";
 import { UsersContext } from "../Context/UserContext";
 import { LoginContexts } from "../Context/LoginContext";
+import { paymentContexts } from "../Context/PaymentContext";
 
 
 
@@ -35,18 +36,19 @@ const Payment = (props) => {
      const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState(null);
-  const [payment,setPayment]=useState([])
   const context=useContext(UsersContext)
   const loginContext=useContext(LoginContexts)
+  const paymentContext=useContext(paymentContexts)
 
 
   useEffect(()=>{
       getPaymentList(context.getHostelDetail.hostelId,loginContext.getToken).then(r=>{
         console.log(r)
-        setPayment(r.data)
+        paymentContext.updateInvoiceList(r.data)
       })
   },[])
 
+  console.log(paymentContext.getInvoiceList)
 
 
 
@@ -143,7 +145,7 @@ const handleReceiptPdfDownload =  () => {
   return (
     <>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        {payment?.map((item, index) => (
+        {paymentContext.getInvoiceList?.map((item, index) => (
           <TouchableOpacity key={index} onPress={() => props.onPayment(item)} style={styles.card}>
             <View style={{flexDirection: "row",}}>
               <View style={styles.iconContainer}>

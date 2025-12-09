@@ -166,6 +166,19 @@ export const getPaymentList=async(hostelId,token)=>{
     }
 }
 
+export const getInvoices=async(hostelId,invoiceId,token)=>{
+    try{
+        const response=await AxiosConfig.get('/v2/invoices/' +hostelId + "/" + invoiceId  ,{
+            headers: {
+                Authorization: 'Bearer ' + token
+            }
+        })
+        return response;
+    }catch(error){
+        return {status: error.response.status, message: error.response.data}
+    }
+}
+
 export const getComplaintTypes=async(hostelId,token)=>{
     try{
         const response=await AxiosConfig('/v2/ComplaintType/all-complaintTypes/' + hostelId, {
