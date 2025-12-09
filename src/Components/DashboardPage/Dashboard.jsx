@@ -268,6 +268,7 @@ function Dashboard(props) {
 
     getComplaints(context.getHostelDetail.hostelId, complaint.complaintId, loginContext.getToken).then(r => {
       setSelectComplaint(r.data)
+      console.log(r.data)
       complaintContext.updateComplaint(r.data)
       complaintContext.updateComments(r.data.comments)
     })
@@ -835,7 +836,6 @@ function Dashboard(props) {
                             keyExtractor={(item) => item.id.toString()}
                             data={selectedComplaint.images}
                             renderItem={({ item }) => {
-                              console.log(item)
                               return <View key={item.id}
                                 style={{ paddingLeft: 10, position: "relative" }}>
 
@@ -942,10 +942,10 @@ function Dashboard(props) {
                     placeholder="Select a type"
                     labelField="complaintTypeName"
                     valueField="complaintTypeId"
-                    value={selectedValue}
+                    value={selectedComplaintTypeId}
 
                     onChange={item => {
-
+                      setSelectedComplaintTypeId(item.complaintTypeId)
                       setSelectedValue(item.value)
                     }}
                     renderRightIcon={() => (
