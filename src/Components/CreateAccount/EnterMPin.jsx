@@ -50,11 +50,12 @@ const EnterMPin = (route) => {
 
 
     const handlePinChange = async (text, index) => {
+         const cleanText = text.replace(/[^0-9]/g, "");
         const newPin = [...createMpin];
-        newPin[index] = text;
+        newPin[index] = cleanText;
         setCreateMpin(newPin);
 
-        if (text && index < 3) {
+        if (cleanText && index < 3) {
             inputs.current[index + 1].focus();
         }
 
@@ -159,7 +160,7 @@ const EnterMPin = (route) => {
         </View>
 
 
-
+        
         <TouchableOpacity onPress={enterPinClick} style={style.nextButton}>
             <Text style={style.nextText}>Enter mPIN</Text>
         </TouchableOpacity>
@@ -185,6 +186,11 @@ const style = StyleSheet.create({
         fontWeight: "600",
         marginTop: 10,
     },
+    centerButtonContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
 
 })
 

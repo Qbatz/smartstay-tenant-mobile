@@ -26,11 +26,12 @@ const OtpDesign = ({ route }) => {
   // const { verifyOtp , resendOtp } = useContext(LoginContext); 
 
   const handleOtpChange = async (text, index) => {
+     const cleanText = text.replace(/[^0-9]/g, "");
     const newOtp = [...otp];
-    newOtp[index] = text;
+    newOtp[index] = cleanText;
     setOtp(newOtp);
 
-    if (text && index < 5) {
+    if (cleanText && index < 5) {
       inputs.current[index + 1].focus();
     }
 
