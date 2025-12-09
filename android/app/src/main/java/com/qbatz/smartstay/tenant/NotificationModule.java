@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -23,12 +24,13 @@ public class NotificationModule extends ReactContextBaseJavaModule {
     String token = null;
 
     Receiver receiver;
+    private Context context;
 
     NotificationModule(ReactApplicationContext context){
         super(context);
+        this.context = context;
 
         receiver=new Receiver();
-
 
         IntentFilter filter=new IntentFilter();
         filter.addAction("com.smartstay.token");
@@ -65,13 +67,17 @@ public class NotificationModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void fetchFcmToken(Promise promise){
-        if(token!=null){
-            promise.resolve(token);
-            System.out.println((token));
+        SharedPreferences mpref = context.getSharedPreferences("user_details", Context.MODE_PRIVATE);
+        if (!mpref.getBoolean("is_token_set", false)) {
+            SharedPreferences.Editor editor = mpref.edit();
+            editor.putBoolean("is_token_set", true);
+            editor.apply();
+            promise.resolve(mpref.getString("token", null));
         }
         else {
-            this.promise = promise;
+            promise.reject("-1", "Not available");
         }
+
     }
 
 

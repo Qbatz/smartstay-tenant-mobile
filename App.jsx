@@ -132,33 +132,7 @@ function AppContent(props) {
   const loginContext=useContext(LoginContexts)
   const [isLoggedIn, setIsLoggedIn] = useState()
   const [initialRoute,setInitialRoute]=useState()
-  const [fcmToken, setFCMToken] = useState()
-  const [isMpinVerified, setMpinVerified]=useState(false)
 
-  //  const initialRoute = loginContext.getRoute === "confirmMPin" ? "HostelList": "EnterMPin";
-
-  const getFCMToken = async ( newToken ) => {
-    const token = await retriveData(FCM_TOKEN)
-     if (token !== newToken || token === null || token === undefined) {
-          console.log("******")
-          storeData(FCM_TOKEN, newToken)
-          storeData(SHOULD_TOKEN_UPDATE, "true")
-        }
-    return token;
-  }
-
-
-    useEffect(() => {
-      NotificationModule.fetchFcmToken().then(r => {
-      if (r != null) {
-        setFCMToken(fcmToken)
-        getFCMToken(r);
-       
-      }
-    }).catch(error => {
-      console.log(error)
-    })
-    }, [])
 
 
   useEffect(() => {

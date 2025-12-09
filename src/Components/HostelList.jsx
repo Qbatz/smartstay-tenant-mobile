@@ -6,6 +6,7 @@ import {
   Image,
   StyleSheet,
   FlatList,
+  NativeModules
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { hostelList } from "../Action/HostelAction";
@@ -25,6 +26,24 @@ const HostelList = (route) => {
   const [selectedHostel, setSelectedHostel] = useState();
   const [showVerifyKyc,setShowVerifyKyc]=useState(false)
   const navigation = useNavigation()
+  const [fcmToken, setFcmToken] = useState();
+  const { NotificationModule } = NativeModules;
+
+  const fetchFcmTokenAsync = () => {
+      NotificationModule.fetchFcmToken().then(r => {
+        console.log(r)
+        setFcmToken(r)
+      })
+      .catch(error => {
+        console.log(error);
+        setFcmToken(null)
+      })
+
+  }
+
+  useEffect(() => {
+    fetchFcmTokenAsync();
+  }, [])
 
 
   const handleSelect = (hosteldetail) => {
@@ -44,7 +63,6 @@ const HostelList = (route) => {
     getToken(data).then(r => {
       if (r?.status == 200) {
         fetchFCMToken(r.data);
-        storeData(ACCESS_TOKEN, r.data)
         loginContext.updateToken(r.data)
         context.updateHostelDetail(selectedHostel)
         navigation.navigate("VerifyKYC");
@@ -56,14 +74,11 @@ const HostelList = (route) => {
 
   };
 
-  const fetchFCMToken = async (authToken) => {
-    const shouldUpdate = await retriveData(SHOULD_TOKEN_UPDATE)
-    if (shouldUpdate === 'true') {
-      const token = await retriveData(FCM_TOKEN);
-      updateFCMToken(loginContext.getUserId, token, authToken).then(response => {
-        storeData(SHOULD_TOKEN_UPDATE, "false")
-      })
+  const fetchFCMToken =  async (authToken) => {
+    if (fcmToken != null) {
+      await updateFCMToken(loginContext.getUserId, fcmToken, authToken);
     }
+   
   }
 
   
