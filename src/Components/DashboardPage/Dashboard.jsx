@@ -645,6 +645,8 @@ function Dashboard(props) {
 
   // ----------
 
+  
+
   return <View style={style.mainDashb}>
     <LinearGradient
       colors={["#DAEEFF", "#FFFFFF"]}
@@ -657,7 +659,7 @@ function Dashboard(props) {
 
         <View style={{ flexDirection: 'row', width:width*0.67 }}>
 
-           {context.getHostelDetail.hostelPic ? (
+           {context.getHostelDetail?.hostelPic ? (
                     <Image
                       source={{ uri: context.getHostelDetail.hostelPic }}
                       style={style.hostelImage}/>

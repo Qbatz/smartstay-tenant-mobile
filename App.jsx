@@ -61,6 +61,7 @@ import AmenitiesContext from './src/Context/AmenitiesContext';
 
 import { storeData, retriveData } from './src/Utils/Storage';
 import PaymentContext from './src/Context/PaymentContext';
+import SuccessFlow from './src/SuccessFlow';
 
 
 
@@ -132,6 +133,7 @@ function AppContent(props) {
   const [isLoggedIn, setIsLoggedIn] = useState()
   const [initialRoute,setInitialRoute]=useState()
   const [fcmToken, setFCMToken] = useState()
+  const [isMpinVerified, setMpinVerified]=useState(false)
 
   //  const initialRoute = loginContext.getRoute === "confirmMPin" ? "HostelList": "EnterMPin";
 
@@ -211,40 +213,20 @@ function AppContent(props) {
       console.log(error)
     })
   }
+
+  const verifiedmpin=()=>{
+    setMpinVerified(true)
+  }
+
   return (
 
     <View style={styles.container}>
-      {isLoggedIn === "true" ? loginContext.getRoute==='confirmMPin'? <NavigationContainer>
-        <Navigation.Navigator screenOptions={{ headerShown: false }}>
-          <Navigation.Screen name='HostelList' component={HostelList} />
-        </Navigation.Navigator>
+      {isLoggedIn === "true" ? 
         
-       </NavigationContainer> 
-          :
-        <NavigationContainer>
-        <Navigation.Navigator screenOptions={{ headerShown: false }} initialRouteName= 'Dashboard'>
-          <Navigation.Screen name='EnterMPin' component={EnterMPin}/>
-          <Navigation.Screen name='HostelList' component={HostelList} />
-          <Navigation.Screen name="KYCUpload" component={KYCUpload} />
-          <Navigation.Screen name='VerifyKYC' component={VerifyKYC}/>
-          <Navigation.Screen name="KycSuccess" component={KycSuccessDesign} />
-          <Navigation.Screen name='Dashboard' component={Dashboard} />
-          <Navigation.Screen name="CustomerProfile" component={CustomerProfile} />
-          <Navigation.Screen name='ProfileHostels' component={ProfileHostels}/>
-          <Navigation.Screen name='RentalAgreement' component={RentalAgreement}/>
-          <Navigation.Screen name="Notification" component={Notification} />
-          <Navigation.Screen name="EditProfile" component={EditProfile} />
-          <Navigation.Screen name="Agreement" component={Agreement} />
-          <Navigation.Screen name="SignatureScreen" component={SignatureScreen} />
-          <Navigation.Screen name="ReceiptPdfView" component={ReceiptPdfView} />
-          <Navigation.Screen name="AgreementViewScreen" component={AgreementViewScreen} />
-          <Navigation.Screen name="SuccessModal" component={SuccessModal} />
-          <Navigation.Screen name="NocBillPdf" component={NOCBillPdf} />
-          <Navigation.Screen name="NocReceiptPdf" component={NOCReceiptPdf} />
-          <Navigation.Screen name="InvoiceDesign" component={InvoiceDesign} />
-        </Navigation.Navigator>
-
-      </NavigationContainer> : <NavigationContainer>
+        <SuccessFlow/>
+         
+      //   
+      : <NavigationContainer>
 
         <Navigation.Navigator screenOptions={{ headerShown: false }} initialRouteName='SplashScreen'>
           {/* <Navigation.Screen name='WelcomeBack' component={LoginScreen}/> */}
@@ -353,3 +335,29 @@ const styles = StyleSheet.create({
 
 
 export default App;
+
+
+// <NavigationContainer>
+      //   <Navigation.Navigator screenOptions={{ headerShown: false }} initialRouteName= 'Dashboard'>
+      //     <Navigation.Screen name='EnterMPin' component={EnterMPin}/>
+      //     <Navigation.Screen name='HostelList' component={HostelList} />
+      //     <Navigation.Screen name="KYCUpload" component={KYCUpload} />
+      //     <Navigation.Screen name='VerifyKYC' component={VerifyKYC}/>
+      //     <Navigation.Screen name="KycSuccess" component={KycSuccessDesign} />
+      //     <Navigation.Screen name='Dashboard' component={Dashboard} />
+      //     <Navigation.Screen name="CustomerProfile" component={CustomerProfile} />
+      //     <Navigation.Screen name='ProfileHostels' component={ProfileHostels}/>
+      //     <Navigation.Screen name='RentalAgreement' component={RentalAgreement}/>
+      //     <Navigation.Screen name="Notification" component={Notification} />
+      //     <Navigation.Screen name="EditProfile" component={EditProfile} />
+      //     <Navigation.Screen name="Agreement" component={Agreement} />
+      //     <Navigation.Screen name="SignatureScreen" component={SignatureScreen} />
+      //     <Navigation.Screen name="ReceiptPdfView" component={ReceiptPdfView} />
+      //     <Navigation.Screen name="AgreementViewScreen" component={AgreementViewScreen} />
+      //     <Navigation.Screen name="SuccessModal" component={SuccessModal} />
+      //     <Navigation.Screen name="NocBillPdf" component={NOCBillPdf} />
+      //     <Navigation.Screen name="NocReceiptPdf" component={NOCReceiptPdf} />
+      //     <Navigation.Screen name="InvoiceDesign" component={InvoiceDesign} />
+      //   </Navigation.Navigator>
+
+      // </NavigationContainer> 

@@ -11,11 +11,11 @@ import { LoginContexts } from "../../Context/LoginContext";
 import WaveIcon from '../../assets/Images/HiIcon.png';
 
 
-const EnterMPin = (route) => {
+const EnterMPin = (props) => {
 
     const context = useContext(UsersContext)
     const loginContext = useContext(LoginContexts)
-    const navigation = useNavigation()
+    // const navigation = useNavigation()
     const [createMpin, setCreateMpin] = useState(["", "", "", ""])
     const [mPinNumber, setmPinNumber] = useState(null)
     const inputs = useRef([])
@@ -94,7 +94,8 @@ const EnterMPin = (route) => {
 
                 setTimeout(() => {
                     setShowSuccessModal(false);
-                    navigation.navigate('HostelList')
+                    // navigation.navigate('HostelList')
+                    props.callbackMpin()
                 }, 2000);
             }
             else if (r.status == 400) {
@@ -160,7 +161,7 @@ const EnterMPin = (route) => {
         </View>
 
 
-        
+
         <TouchableOpacity onPress={enterPinClick} style={style.nextButton}>
             <Text style={style.nextText}>Enter mPIN</Text>
         </TouchableOpacity>
@@ -186,11 +187,6 @@ const style = StyleSheet.create({
         fontWeight: "600",
         marginTop: 10,
     },
-    centerButtonContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
 
 })
 

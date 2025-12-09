@@ -23,6 +23,7 @@ const HostelList = (route) => {
   const loginContext = useContext(LoginContexts)
   const [hostels, setHostelList] = useState([]);
   const [selectedHostel, setSelectedHostel] = useState();
+  const [showVerifyKyc,setShowVerifyKyc]=useState(false)
   const navigation = useNavigation()
 
 
@@ -47,6 +48,9 @@ const HostelList = (route) => {
         loginContext.updateToken(r.data)
         context.updateHostelDetail(selectedHostel)
         navigation.navigate("VerifyKYC");
+      
+
+
       }
     })
 
