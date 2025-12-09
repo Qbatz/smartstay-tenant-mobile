@@ -30,7 +30,7 @@ import { launchImageLibrary } from "react-native-image-picker";
 import Exclamation from '../../assets/Images/exclamation.png'
 import DeleteIcon from '../../assets/Images/deleteIcon.png'
 import HostelProfile from "../../assets/Images/Group 1.png"
-import { addComment, complaints, deleteComplaint, getAmenties, getComplaints, getComplaintTypes, hostelDetails, postRequestBedChange, postRquestAmenties } from "../../Action/HostelAction";
+import { addComment, complaints, deleteComplaint, getAmenties, getComplaints, getComplaintTypes, getInvoices, hostelDetails, postRequestBedChange, postRquestAmenties } from "../../Action/HostelAction";
 import { customerDetails, postComplaint } from "../../Action/CustomerAction";
 import { UsersContext } from "../../Context/UserContext";
 import { LoginContexts } from '../../Context/LoginContext'
@@ -48,13 +48,16 @@ import ViewIcon from "../../assets/Images/view.png";
 import ArrowRightIcon from "../../assets/Images/arrow-right.png";
 import LinearGradient from "react-native-linear-gradient";
 import { compliantContexts } from "../../Context/ComplaintContext";
+import { paymentContexts } from "../../Context/PaymentContext";
 
+const { width, height } = Dimensions.get("window");
 
 function Dashboard(props) {
 
   const context = useContext(UsersContext)
   const loginContext = useContext(LoginContexts)
   const complaintContext = useContext(compliantContexts)
+  const paymentContext = useContext(paymentContexts)
   const { width } = Dimensions.get('window');
   const bedDropdownRef = useRef(null)
   const bedTypeDropdow = useRef(null)
@@ -153,6 +156,47 @@ function Dashboard(props) {
     }
   }, [showSheet, addComplaints, showBedChange, editCompliant, showAmenities, modalVisible]);
 
+  useEffect(() => {
+    const backAction = () => {
+
+      // 1️⃣ Close bottom sheets/modals first
+      if (showBedChange || addComplaints || showSheet || editCompliant || showAmenities || modalVisible) {
+        setShowBedChange(false);
+        setAddComplaint(false);
+        setShowSheet(false);
+        setShowAmenities(false);
+        setModalVisible(false);
+        return true;
+      }
+
+      // 2️⃣ Handle tab navigation
+      if (index > 0) {
+        setindex(index - 1); // move back to previous tab
+        return true;
+      }
+
+      // 3️⃣ If already on MyStay tab → go back to VerifyKYC
+      navigation.goBack();
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, [
+    index,
+    showBedChange,
+    addComplaints,
+    showSheet,
+    editCompliant,
+    showAmenities,
+    modalVisible,
+  ]);
+
+
   function onClose() {
     Animated.timing(sheetY, {
       toValue: 700,
@@ -168,6 +212,7 @@ function Dashboard(props) {
       setmyAminites(null); setModalVisible(false)
       setSendComment(null); setChangeBed(null)
       setBedType(null); setUrgencyType(null)
+      setSelectedComplaintTypeId(0)
     });
   }
 
@@ -199,12 +244,12 @@ function Dashboard(props) {
       setComplaintTypes(r.data)
     })
 
-     customerDetails(loginContext.getToken).then(r => {
-          console.log(r.data)
-          context.updateCustomer(r.data)
-        }).catch(error => {
-          console.log(error)
-        })
+    customerDetails(loginContext.getToken).then(r => {
+      console.log(r.data)
+      context.updateCustomer(r.data)
+    }).catch(error => {
+      console.log(error)
+    })
   }, [])
 
 
@@ -329,48 +374,59 @@ function Dashboard(props) {
 
       })
     }
+    if (selectedComplaintTypeId != 0) {
+      if (complaintDescription.trim().length > 15) {
+        postComplaint(context.getHostelDetail.hostelId, loginContext.getToken, formData).then(r => {
+          setLoading(true)
 
-    if (complaintDescription.trim().length > 15) {
-      postComplaint(context.getHostelDetail.hostelId, loginContext.getToken, formData).then(r => {
-        setLoading(true)
+          setTimeout(() => {
+            setLoading(false)
+            if (r.status == 201) {
+              setShowSuccessModal(true)
+              setToastMessage("Complaint Added Successfully!")
+              setModelType('success')
+
+              setTimeout(() => {
+                setShowSuccessModal(false);
+                setShowSheet(false)
+                setSelectedComplaintTypeId(0)
+                setDespriction('')
+                setAddComplaint(false)
+
+                complaints(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
+                  complaintContext.updateComplaintList(r?.data?.content)
+                })
+              }, 2000);
+
+            }
+
+          }, 2000);
+
+
+        })
+
+      }
+      else if (complaintDescription.trim().length < 15) {
+        setShowSuccessModal(true)
+        setToastMessage("Comment should be above 15 letters")
+        setModelType('error')
 
         setTimeout(() => {
-          setLoading(false)
-          if (r.status == 201) {
-            setShowSuccessModal(true)
-            setToastMessage("Complaint Added Successfully!")
-            setModelType('success')
-
-            setTimeout(() => {
-              setShowSuccessModal(false);
-              setShowSheet(false)
-              setSelectedComplaintTypeId(0)
-              setDespriction('')
-              setAddComplaint(false)
-
-              complaints(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
-                complaintContext.updateComplaintList(r?.data?.content)
-              })
-            }, 2000);
-
-          }
-
+          setShowSuccessModal(false)
         }, 2000);
 
+      }
 
-      })
-
-    }
-    else if (complaintDescription.trim().length < 15) {
+    } else {
       setShowSuccessModal(true)
-      setToastMessage("Comment should be above 15 letters")
+      setToastMessage('select Complaint type')
       setModelType('error')
 
       setTimeout(() => {
         setShowSuccessModal(false)
       }, 2000);
-
     }
+
 
   }
 
@@ -461,13 +517,13 @@ function Dashboard(props) {
       })
 
     }
-    else{
+    else {
       setShowSuccessModal(true)
       setToastMessage('Fill all Fields')
       setModelType('error')
 
       setTimeout(() => {
-          setShowSuccessModal(false)
+        setShowSuccessModal(false)
       }, 2000);
     }
 
@@ -515,6 +571,12 @@ function Dashboard(props) {
 
     setSelectedPayment(item);
     setModalVisible(true);
+
+    getInvoices(context.getHostelDetail.hostelId, item.invoiceId, loginContext.getToken).then(r => {
+      console.log(r)
+
+      paymentContext.updateInvoice(r.data)
+    })
   };
 
   const handleDownload = async () => {
@@ -592,8 +654,20 @@ function Dashboard(props) {
 
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16, width: width }}>
 
-        <View style={{ flexDirection: 'row', width: '75%' }}>
-          <Image source={HostelProfile} resizeMode="contain" style={{ height: 44, width: 44 }} />
+        <View style={{ flexDirection: 'row', width:width*0.67 }}>
+
+           {context.getHostelDetail.hostelPic ? (
+                    <Image
+                      source={{ uri: context.getHostelDetail.hostelPic }}
+                      style={style.hostelImage}/>
+                  ) : (
+                    <View style={[style.hostelImage, style.initialContainer]}>
+                      <Text style={style.initialText}>
+                        {context.getHostelDetail.hostelInitial?.charAt(0).toUpperCase()}
+                      </Text>
+                    </View>
+                  )}
+
           <View style={{ marginLeft: 7 }}>
             <Text numberOfLines={1} ellipsizeMode="tail"
               style={{ fontSize: 18, fontWeight: '600', fontFamily: 'gilroy-semibold', color: '#1B1D21', flexShrink: 1, maxWidth: '90%' }}>
@@ -610,11 +684,21 @@ function Dashboard(props) {
         </View>
 
         <View style={{ flexDirection: 'row' }}>
-          <TouchableOpacity onPress={handleNotificationShow}>
-            <Image source={require("../../assets/Images/notification.png")} style={{ height: 44, width: 44 }} />
+          <TouchableOpacity onPress={handleNotificationShow} style={{marginRight:10}}>
+            <Image source={require("../../assets/Images/notification.png")} style={{ height: 50, width: 50 }} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleProfile} style={{ marginLeft: 10, marginRight: 10 }}>
-            <Image source={require("../../assets/Images/Customer_Icon.png")} style={{ width: 44, height: 44, borderRadius: 22 }} />
+          <TouchableOpacity onPress={handleProfile} style={{ marginRight: 10 }}>
+                    {context.getCustomerDetail?.profilePic ? (
+                    <Image
+                      source={{ uri: context.getCustomerDetail?.profilePic }}
+                      style={style.hostelImage}/>
+                  ) : (
+                    <View style={[style.hostelImage, style.initialContainer]}>
+                      <Text style={style.initialText}>
+                        {context.getCustomerDetail?.initials?.charAt(0).toUpperCase()}
+                      </Text>
+                    </View>
+                  )}
           </TouchableOpacity>
         </View>
       </View>
@@ -622,7 +706,7 @@ function Dashboard(props) {
     </LinearGradient>
 
     <View style={{ flex: 1, paddingLeft: 20, paddingRight: 20 }}>
-      <TabView navigationState={{ index, routes }}
+      <TabView navigationState={{ index: index, routes }}
         commonOptions={{
           icon: ({ route, color }) => (<Image source={route.icon} style={{ width: 21.12, height: 21.12, tintColor: color }} />)
         }}
@@ -640,7 +724,7 @@ function Dashboard(props) {
           <View style={StyleSheet.absoluteFill} />
         </TouchableWithoutFeedback>
 
-        <Animated.View style={[selectedComplaint?.images?.length > 0 ? style.bottomSheet : style.bottomSheetwithimage, { transform: [{ translateY: sheetY }] }]}
+        <Animated.View style={[selectedComplaint?.images?.length > 0 ? style.bottomSheetwithimage : style.bottomSheet, { transform: [{ translateY: sheetY }] }]}
           {...panResponder.panHandlers}>
 
           <View style={{ flex: 1 }}>
@@ -1327,7 +1411,7 @@ function Dashboard(props) {
                   }}>
                     <View style={{ backgroundColor: '#F9D796', paddingVertical: 4.64, paddingHorizontal: 9.28, alignSelf: 'flex-start', borderRadius: 46.38 }}>
                       <Text style={{ color: '#642B00', fontSize: 10.82, fontWeight: 400 }}>
-                       {context.getCustomerDetail?.bookingDetails?.floorName}</Text>
+                        {context.getCustomerDetail?.bookingDetails?.floorName}</Text>
                     </View>
 
                     <View style={{ flexDirection: 'row', paddingLeft: 20, alignItems: 'center' }}>
@@ -1340,7 +1424,7 @@ function Dashboard(props) {
                     <View style={{ flexDirection: 'row', paddingLeft: 10, alignItems: 'center' }}>
                       <Image source={Bed} style={{ width: 21.17, height: 21.17 }} />
                       <Text style={{ marginLeft: 10, fontSize: 15.97, fontWeight: 400 }}>
-                          {context.getCustomerDetail?.bookingDetails?.bedName}
+                        {context.getCustomerDetail?.bookingDetails?.bedName}
                       </Text>
                     </View>
                   </View>
@@ -1566,21 +1650,24 @@ function Dashboard(props) {
           </View>
 
           <ScrollView showsVerticalScrollIndicator={false}>
-            {selectedPayment && (
+            {paymentContext.getInvoiceDetail && (
               <>
-                <Text style={style.modalTitle}>{selectedPayment.title}</Text>
+                <View style={{flexDirection:'row',justifyContent:'space-between'}}>
+                  <Text style={style.modalTitle}>{paymentContext.getInvoiceDetail.title}</Text>
 
-                <View style={{ flexDirection: "row" }}>
-                  <Text style={style.invoiceId}>#INV001</Text>
-                  <TouchableOpacity
-                    onPress={() => handleReceiptPdfDownload(staticReceiptData)}
-                  >
-                    <Image
-                      source={ViewIcon}
-                      style={{ width: 15, height: 15, marginLeft: 5, marginTop: 2 }}
-                    />
-                  </TouchableOpacity>
+                  <View style={{ flexDirection: "row" }}>
+                    <Text style={style.invoiceId}>{paymentContext.getInvoiceDetail.invoiceNumber}</Text>
+                    <TouchableOpacity
+                      onPress={() => handleReceiptPdfDownload(staticReceiptData)}
+                    >
+                      <Image
+                        source={ViewIcon}
+                        style={{ width: 15, height: 15, marginLeft: 5, marginTop: 2 }}
+                      />
+                    </TouchableOpacity>
+                  </View>
                 </View>
+
 
                 {/* Amount Section */}
                 <View style={style.amountSection}>
@@ -1588,10 +1675,10 @@ function Dashboard(props) {
 
                   <View>
                     <Text style={style.totalAmount}>
-                      ₹{selectedPayment.amount.toFixed(2)}
+                      ₹{paymentContext.getInvoiceDetail.totalAmount.toFixed(2)}
                     </Text>
 
-                    {selectedPayment.status === "Pay Now" && (
+                    {paymentContext.getInvoiceDetail.status === "Pending" && (
                       <View
                         style={[
                           style.statusBadge,
@@ -1609,15 +1696,15 @@ function Dashboard(props) {
                       </View>
                     )}
 
-                    {(selectedPayment.status === "Partially Paid to" ||
-                      selectedPayment.status === "Paid to") && (
+                    {(paymentContext.getInvoiceDetail.status === "Partially Paid to" ||
+                      paymentContext.getInvoiceDetail.status === "Paid to") && (
                         <View style={{ flexDirection: "row", marginTop: 6 }}>
                           <Image
                             source={PaidIcon}
                             style={{ width: 20, height: 20 }}
                           />
                           <Text style={{ fontSize: 14, marginLeft: 6 }}>
-                            {selectedPayment.status === "Partially Paid to"
+                            {paymentContext.getInvoiceDetail.status === "Partially Paid to"
                               ? "Partially Paid"
                               : "Full Paid"}
                           </Text>
@@ -1630,15 +1717,15 @@ function Dashboard(props) {
                 <View style={style.detailsSection}>
                   <View style={style.row}>
                     <Text style={style.detailLabel}>Actual Rent</Text>
-                    <Text style={style.detailValue}>₹5512.00</Text>
+                    <Text style={style.detailValue}>₹{}</Text>
                   </View>
 
                   <View style={style.row}>
                     <Text style={style.detailLabel}>Taxes GST 10%</Text>
-                    <Text style={style.detailValue}>₹488.00</Text>
+                    <Text style={style.detailValue}>₹{paymentContext.getInvoiceDetail.gst}</Text>
                   </View>
 
-                  {selectedPayment.paid === "partial" && (
+                  {paymentContext.getInvoiceDetail.paid === "partial" && (
                     <>
                       <View style={style.row}>
                         <Text style={style.detailLabel}>Paid Amount</Text>
@@ -1668,13 +1755,13 @@ function Dashboard(props) {
                 {/* Paid / Due Date */}
                 <View style={style.Billbottom}>
                   <Text style={style.paiddetailLabel}>
-                    {selectedPayment.status === "Pay Now" ? "Due Date" : "Paid Date"}
+                    {selectedPayment.status === "Pending" ? "Due Date" : "Paid Date"}
                   </Text>
-                  <Text style={style.paiddetailValue}>25 Sep 2025</Text>
+                  <Text style={style.paiddetailValue}>{paymentContext.getInvoiceDetail.dueDate}</Text>
                 </View>
 
                 {/* Notes */}
-                {selectedPayment.status === "Pay Now" && (
+                {paymentContext.getInvoiceDetail.status === "Pending" && (
                   <View style={{ marginTop: 10 }}>
                     <Text style={{ fontSize: 13, color: "rgba(60,60,67,0.6)" }}>
                       Notes & Instructions
@@ -1692,7 +1779,7 @@ function Dashboard(props) {
                 )}
 
                 {/* Payment mode section */}
-                {selectedPayment.status !== "Pay Now" && (
+                {paymentContext.getInvoiceDetail.status !== "Pending" && (
                   <View style={{ marginTop: 10 }}>
                     <View style={style.Billbottom}>
                       <Text style={style.paiddetailLabel}>Payment Mode</Text>
@@ -1708,7 +1795,7 @@ function Dashboard(props) {
 
                 {/* Buttons */}
                 <View style={style.buttonRow}>
-                  {selectedPayment.status === "Pay Now" ? (
+                  {paymentContext.getInvoiceDetail.status === "Pending" ? (
                     <>
                       <TouchableOpacity
                         style={style.shareBtn}
@@ -1778,8 +1865,8 @@ const style = StyleSheet.create({
     justifyContent: "flex-end",
 
   },
-  bottomSheet: {
-    height: '60%',
+  bottomSheetwithimage: {
+    height: height * 0.65,
     backgroundColor: '#fff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
@@ -1787,8 +1874,8 @@ const style = StyleSheet.create({
     paddingTop: 20,
     paddingBottom: 5
   },
-  bottomSheetwithimage: {
-    height: '50%',
+  bottomSheet: {
+    height: height * 0.55,
     backgroundColor: '#fff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
@@ -1902,5 +1989,30 @@ const style = StyleSheet.create({
     padding: 20,
     height: "50%",
   },
+  statusBadge: {
+    borderRadius: 20,
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+    marginTop: 6,
+    alignItems:'center'
+  },
+  statusText: { fontSize: 12, fontWeight: "500" },
+  hostelImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 15,
+  },
+  initialText: {
+  color: '#788fed',
+  fontSize: 20,
+  fontWeight: 'bold',
+},
+
+initialContainer: {
+  backgroundColor: '#eef1ff',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
 })
 export default Dashboard;

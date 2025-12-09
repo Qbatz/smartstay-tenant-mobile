@@ -60,6 +60,7 @@ import ComplaintContext from './src/Context/ComplaintContext';
 import AmenitiesContext from './src/Context/AmenitiesContext';
 
 import { storeData, retriveData } from './src/Utils/Storage';
+import PaymentContext from './src/Context/PaymentContext';
 
 
 
@@ -107,7 +108,9 @@ function App() {
               <UserContext>
                 <ComplaintContext>
                   <AmenitiesContext>
-                      <AppContent isLoggedIn={loggedIn} token={token} />
+                    <PaymentContext>
+                        <AppContent isLoggedIn={loggedIn} token={token} />
+                    </PaymentContext>
                   </AmenitiesContext>                 
                 </ComplaintContext>
               </UserContext>
@@ -135,6 +138,7 @@ function AppContent(props) {
   const getFCMToken = async ( newToken ) => {
     const token = await retriveData(FCM_TOKEN)
      if (token !== newToken || token === null || token === undefined) {
+          console.log("******")
           storeData(FCM_TOKEN, newToken)
           storeData(SHOULD_TOKEN_UPDATE, "true")
         }

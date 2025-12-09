@@ -31,7 +31,7 @@ const OtpDesign = ({ route }) => {
     newOtp[index] = cleanText;
     setOtp(newOtp);
 
-    if (text && index < 5) {
+    if (cleanText && index < 5) {
       inputs.current[index + 1].focus();
     }
 

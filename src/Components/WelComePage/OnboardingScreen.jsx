@@ -14,6 +14,7 @@ import Logo from "../../assets/Images/Logo.png";
 const { width, height } = Dimensions.get("window");
 
 export default function OnboardingScreen({ navigation }) {
+  const { width, height } = Dimensions.get("window");
   const goNext = () => {
     navigation.navigate("CreateAccount");
   };
@@ -33,9 +34,9 @@ export default function OnboardingScreen({ navigation }) {
            <Swiper
         loop
         showsPagination
-        autoplay autoplayTimeout={3}
+       
         activeDot={<View style={styles.activeDot} />} 
-        paginationStyle={{ bottom: 30 }}
+        paginationStyle={{ bottom:  height*0.01}}
       >
         <View style={styles.card}>
           <Image source={onboardImg} style={styles.image} />
