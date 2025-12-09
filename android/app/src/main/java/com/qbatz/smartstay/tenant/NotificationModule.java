@@ -68,7 +68,7 @@ public class NotificationModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void fetchFcmToken(Promise promise){
         SharedPreferences mpref = context.getSharedPreferences("user_details", Context.MODE_PRIVATE);
-        if (mpref.getBoolean("is_token_set", false)) {
+        if (!mpref.getBoolean("is_token_set", false)) {
             SharedPreferences.Editor editor = mpref.edit();
             editor.putBoolean("is_token_set", true);
             editor.apply();
