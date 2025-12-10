@@ -268,6 +268,7 @@ function Dashboard(props) {
 
     getComplaints(context.getHostelDetail.hostelId, complaint.complaintId, loginContext.getToken).then(r => {
       setSelectComplaint(r.data)
+      console.log(r.data)
       complaintContext.updateComplaint(r.data)
       complaintContext.updateComments(r.data.comments)
     })
@@ -644,6 +645,8 @@ function Dashboard(props) {
 
   // ----------
 
+  
+
   return <View style={style.mainDashb}>
     <LinearGradient
       colors={["#DAEEFF", "#FFFFFF"]}
@@ -654,9 +657,9 @@ function Dashboard(props) {
 
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16, width: width }}>
 
-        <View style={{ flexDirection: 'row', width:width*0.67 }}>
+        <View style={{ flexDirection: 'row', width:width*0.65,backgroundColor:'grey' }}>
 
-           {context.getHostelDetail.hostelPic ? (
+           {context.getHostelDetail?.hostelPic ? (
                     <Image
                       source={{ uri: context.getHostelDetail.hostelPic }}
                       style={style.hostelImage}/>
@@ -812,7 +815,7 @@ function Dashboard(props) {
                           <Text style={{ fontSize: 12, fontWeight: "400", color: "#4B4B4B" }}> Assigned to</Text>
 
                           <View style={{ flexDirection: "row", justifyContent: "space-between", paddingTop: 8, }}>
-                            {selectedComplaint.assigneeName != null ? <Text style={{ fontSize: 15, fontWeight: "500" }}>
+                            {selectedComplaint.assigneeName != "Unassigned" ? <Text style={{ fontSize: 15, fontWeight: "500" }}>
                               {selectedComplaint.assigneeName}</Text>
                               : <Text style={{ fontSize: 14, fontWeight: "500", color: "#FF3B30", }}>
                                 Not Assigned Yet
@@ -835,7 +838,6 @@ function Dashboard(props) {
                             keyExtractor={(item) => item.id.toString()}
                             data={selectedComplaint.images}
                             renderItem={({ item }) => {
-                              console.log(item)
                               return <View key={item.id}
                                 style={{ paddingLeft: 10, position: "relative" }}>
 
@@ -942,10 +944,10 @@ function Dashboard(props) {
                     placeholder="Select a type"
                     labelField="complaintTypeName"
                     valueField="complaintTypeId"
-                    value={selectedValue}
+                    value={selectedComplaintTypeId}
 
                     onChange={item => {
-
+                      setSelectedComplaintTypeId(item.complaintTypeId)
                       setSelectedValue(item.value)
                     }}
                     renderRightIcon={() => (

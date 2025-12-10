@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState,useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image,ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import HostelImage from "../../assets/Images/Group 1.png"
@@ -10,6 +10,8 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import CustomerImage from "../../assets/Images/Customer_Icon.png";
 import LeftArrow from "../../assets/Images/LeftArrow.png"
 import { UsersContext } from "../../Context/UserContext";
+import { getRentalDetials } from "../../Action/CustomerAction";
+import { LoginContexts } from "../../Context/LoginContext";
 
 
 const ProfileHostels = () => {
@@ -17,8 +19,14 @@ const ProfileHostels = () => {
 
   const navigation = useNavigation();
   const userContext=useContext(UsersContext)
+  const loginContext=useContext(LoginContexts)
   const [dropdownVisible, setDropdownVisible] = useState(false);
-  const [selectedHostel, setSelectedHostel] = useState("Smartstay Hostel");
+  const [selectedHostel, setSelectedHostel] = useState(userContext.getHostelDetail);
+  const [rentDetails,setRentalDetails]=useState();
+
+  console.log(selectedHostel)
+  console.log(rentDetails)
+
 
   const hostels = [
     { id: 1, name: "Smartstay Hostel", location: "Kandanchavadi" },
@@ -26,12 +34,41 @@ const ProfileHostels = () => {
     { id: 3, name: "ComfortNest", location: "Thoraipakkam" },
   ];
 
-  console.log(userContext.getCustomerDetail)
+  console.log(userContext.getHostelList)
+
+  useEffect(()=>{
+    getRentalDetials(userContext?.getHostelDetail?.hostelId, loginContext.getToken)
+    .then(res => {
+      setRentalDetails(res.data);
+    })
+  },[])
 
   const handleSelectHostel = (hostel) => {
-    setSelectedHostel(hostel.name);
+    console.log(hostel)
+    setSelectedHostel(hostel);
     setDropdownVisible(false);
+
+    console.log(hostel.hostelId)
+    getRentalDetials(hostel.hostelId, loginContext.getToken)
+    .then(res => {
+      setRentalDetails(res.data);
+      console.log(res)
+    })
+    .catch(err => console.log("Error:", err));
+
   };
+
+
+
+//   useEffect(() => {
+//   if (!selectedHostel?.hostelId) return;
+
+//   getRentalDetials(selectedHostel.hostelId, loginContext.getToken)
+//     .then(res => {
+//       setRentalDetails(res.data);
+//     })
+//     .catch(err => console.log("Error:", err));
+// }, [selectedHostel]); 
 
   const handleBack = () => navigation.goBack();
   return <View style={styles.container}>
@@ -57,13 +94,13 @@ const ProfileHostels = () => {
           style={styles.hostelImage}
         />
         <View style={{ flex: 1 }}>
-          <Text style={styles.hostelTitle}>{selectedHostel}</Text>
+          <Text style={styles.hostelTitle}>{selectedHostel?.hostelName}</Text>
           <View style={styles.locationRow}>
             <Image
               source={LocationIcon}
               resizeMode="contain" style={{ width: 20, height: 20 }}
             />
-            <Text style={styles.locationText}>Kandanchavadi</Text>
+            <Text style={styles.locationText}>{selectedHostel?.city}</Text>
           </View>
         </View>
 
@@ -103,7 +140,7 @@ const ProfileHostels = () => {
             source={DateIcon}
             resizeMode="contain" style={{ width: 20, height: 20 }}
           />
-          <Text style={styles.detailValue}>02 May 2024</Text>
+          <Text style={styles.detailValue}>{rentDetails?.joiningDate}</Text>
         </View>
       </View>
 
@@ -115,7 +152,7 @@ const ProfileHostels = () => {
             source={MoneyIcon}
             resizeMode="contain" style={{ width: 20, height: 20 }}
           />
-          <Text style={styles.detailValue}>₹4,000.00</Text>
+          <Text style={styles.detailValue}>{!rentDetails?.advancePaidAmount ? rentDetails?.advancePaidAmount:'N/A'}</Text>
         </View>
       </View>
 
@@ -127,7 +164,7 @@ const ProfileHostels = () => {
             source={RentAmountIcon}
             resizeMode="contain" style={{ width: 20, height: 20 }}
           />
-          <Text style={styles.detailValue}>₹8,000.00</Text>
+          <Text style={styles.detailValue}>₹{rentDetails?.rentAmount}</Text>
         </View>
       </View>
 
@@ -139,7 +176,7 @@ const ProfileHostels = () => {
             source={DateIcon}
             resizeMode="contain" style={{ width: 20, height: 20 }}
           />
-          <Text style={styles.detailValue}>5th of Every Month</Text>
+          <Text style={styles.detailValue}>{rentDetails?.dueDate}</Text>
         </View>
       </View>
     </View>

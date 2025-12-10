@@ -24,6 +24,7 @@ const HostelList = (route) => {
   const loginContext = useContext(LoginContexts)
   const [hostels, setHostelList] = useState([]);
   const [selectedHostel, setSelectedHostel] = useState();
+  const [showVerifyKyc,setShowVerifyKyc]=useState(false)
   const navigation = useNavigation()
   const [fcmToken, setFcmToken] = useState();
   const { NotificationModule } = NativeModules;
@@ -65,6 +66,9 @@ const HostelList = (route) => {
         loginContext.updateToken(r.data)
         context.updateHostelDetail(selectedHostel)
         navigation.navigate("VerifyKYC");
+      
+
+
       }
     })
 
@@ -80,7 +84,6 @@ const HostelList = (route) => {
   
 
   const renderHostel = ({ item }) => {
-    console.log(item.hostelInitial)
     return <TouchableOpacity
       style={[
         styles.hostelCard,
@@ -122,7 +125,7 @@ const HostelList = (route) => {
 
   return (
     <View style={styles.container}>
-      <View style={{ height: '50%' }}>
+      <View style={{ flex:1 }}>
         <Text style={styles.title}>Select Hostel</Text>
         <Text style={styles.subtitle}>Select Your Current Staying Hostel</Text>
 

@@ -6,7 +6,7 @@ export const LoginContexts = createContext();
 export const LoginProvider = (props) => {
 
       const [AccessToken, settoken]=useState();
-      const [Network,setCheckNetConnectivity]=useState()
+      const [Network,setCheckNetConnectivity]=useState(true)
       const [UserId,setUserId]=useState();
       const [LoggedIn,setLoggedIn]=useState()
       const [SerialNo, setSerialNo]=useState();

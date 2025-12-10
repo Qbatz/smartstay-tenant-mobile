@@ -1,5 +1,5 @@
-import React, { useContext, useRef, useState,useEffect } from "react";
-import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity,Animated } from "react-native";
+import React, { useContext, useRef, useState, useEffect } from "react";
+import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity, Animated } from "react-native";
 import Sm_logo from '../../assets/Images/Sm_logo.png'
 import { useNavigation } from "@react-navigation/native";
 import { UsersContext } from "../../Context/UserContext";
@@ -11,11 +11,11 @@ import { LoginContexts } from "../../Context/LoginContext";
 import WaveIcon from '../../assets/Images/HiIcon.png';
 
 
-const EnterMPin = (route) => {
+const EnterMPin = (props) => {
 
     const context = useContext(UsersContext)
     const loginContext = useContext(LoginContexts)
-    const navigation = useNavigation()
+    // const navigation = useNavigation()
     const [createMpin, setCreateMpin] = useState(["", "", "", ""])
     const [mPinNumber, setmPinNumber] = useState(null)
     const inputs = useRef([])
@@ -50,7 +50,7 @@ const EnterMPin = (route) => {
 
 
     const handlePinChange = async (text, index) => {
-         const cleanText = text.replace(/[^0-9]/g, "");
+        const cleanText = text.replace(/[^0-9]/g, "");
         const newPin = [...createMpin];
         newPin[index] = cleanText;
         setCreateMpin(newPin);
@@ -94,7 +94,8 @@ const EnterMPin = (route) => {
 
                 setTimeout(() => {
                     setShowSuccessModal(false);
-                    navigation.navigate('HostelList')
+                    // navigation.navigate('HostelList')
+                    props.callbackMpin()
                 }, 2000);
             }
             else if (r.status == 400) {
@@ -116,7 +117,7 @@ const EnterMPin = (route) => {
             message={showModelMessage}
             type={modelType}
         />
-        <View>
+        <View style={{flex:1}}>
             <Image source={Sm_logo} style={style.logo} />
 
             <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 15 }}>
@@ -160,10 +161,12 @@ const EnterMPin = (route) => {
         </View>
 
 
-        
-        <TouchableOpacity onPress={enterPinClick} style={style.nextButton}>
-            <Text style={style.nextText}>Enter mPIN</Text>
-        </TouchableOpacity>
+        <View style={{flex:1}}>
+            <TouchableOpacity onPress={enterPinClick} style={style.nextButton}>
+                <Text style={style.nextText}>Enter mPIN</Text>
+            </TouchableOpacity>
+        </View>
+
 
 
     </View>
@@ -179,18 +182,13 @@ const style = StyleSheet.create({
         width: 50, heiht: 50, borderWidth: 1, borderColor: "#ccc", borderRadius: 8, textAlign: "center",
         fontSize: 20, color: "#000"
     },
-    nextButton: { backgroundColor: '#1A73E8', borderRadius: 8, paddingVertical: 20, alignItems: 'center', marginTop: 250 },
+    nextButton: { backgroundColor: '#1A73E8', borderRadius: 8, paddingVertical: 20, alignItems: 'center' },
     nextText: { color: '#ffffff', fontSize: 16, fontWeight: 600 },
     title: {
         fontSize: 28,
         fontWeight: "600",
         marginTop: 10,
     },
-    centerButtonContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
 
 })
 

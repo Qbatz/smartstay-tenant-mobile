@@ -58,11 +58,7 @@ const CustomerProfile = (route) => {
   }, [])
 
 
-  const hostels = [
-    { id: 1, name: "Smartstay Hostel", location: "Kandanchavadi" },
-    { id: 2, name: "StayEasy Hostel", location: "Velachery" },
-    { id: 3, name: "ComfortNest", location: "Thoraipakkam" },
-  ];
+  
 
 
   const handleDownload = async () => {

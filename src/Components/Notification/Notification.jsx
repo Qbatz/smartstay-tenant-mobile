@@ -13,7 +13,9 @@ import NotificationItem from "./NotificationItem";
 import { SwipeListView } from "react-native-swipe-list-view";
 import Delete from '../../assets/Images/trash.png'
 import { UsersContext } from "../../Context/UserContext";
-import { getNotification } from "../../Action/HostelAction";
+import { getNotification } from "../../Action/NotificationAction";
+import { LoginContexts } from "../../Context/LoginContext";
+import { notificationContexts } from "../../Context/NotificationCOntext";
 
 const notifications = [
   {
@@ -72,6 +74,8 @@ const notifications = [
 const Notification = (props) => {
   console.log(props)
   const context=useContext(UsersContext)
+  const loginContext=useContext(LoginContexts)
+  const notificationContext=useContext(notificationContexts)
   const navigation = useNavigation();
   const renderItem = ({ item }) => <NotificationItem item={item} />;
   const handleBack = () => navigation.goBack();
@@ -79,9 +83,12 @@ const Notification = (props) => {
   const [listData, setListData] = useState([]);
 
   useEffect(()=>{
-    getNotification(context.getHostelDetail.hostelId,context.getToken).then(r=>{
+    console.log(context.getHostelDetail.hostelId)
+    getNotification(context.getHostelDetail.hostelId,loginContext.getToken).then(r=>{
       console.log(r)
       setListData(r.data)
+      notificationContext.updateNoticationList(r.data)
+
     })
   },[])
 
@@ -105,7 +112,7 @@ const Notification = (props) => {
       </View>
 
       <SwipeListView
-        data={listData}
+        data={notificationContext.getNotificationList}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.listContainer}

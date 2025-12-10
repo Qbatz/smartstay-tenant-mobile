@@ -139,18 +139,6 @@ export const postRquestAmenties=async(hostelId,token,amenityId)=>{
     }   
 }
 
-export const getNotification=async(hostelId,token)=>{
-    try{
-        const response=await AxiosConfig.get('/v2/notifications/all-notifications/' + hostelId, {
-            headers: {
-                Authorization: 'Bearer ' + token
-            }
-        })
-        return response;
-    }catch(error){
-            return{status: error.response.status, message: error.response.data}
-    }
-}
 
 export const getPaymentList=async(hostelId,token)=>{
 
