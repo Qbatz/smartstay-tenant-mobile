@@ -7,18 +7,18 @@ const NotificationItem = ({ item }) => {
     info: require("../../assets/Images/command.png"),
     bill: require("../../assets/Images/command.png"),
     user: require("../../assets/Images/user-add.png"),
-    complaint: require("../../assets/Images/NK.png"),
+    Complaint: require("../../assets/Images/NK.png"),
     resolved: require("../../assets/Images/money-check.png"),
   };
 
   return (
     <View style={styles.card}>
       <View style={styles.iconContainer}>
-        <Image source={iconMap[item.type]} style={styles.iconImage} />
+        <Image source={iconMap[item.notificationType]} style={styles.iconImage} />
       </View>
 
       <View style={styles.contentContainer}>
-        <Text style={styles.title}>{item.notificationType}</Text>
+        <Text style={styles.title}>{item.title}</Text>
         <Text style={styles.description}>{item.description}</Text>
         <Text style={styles.time}>{item.createdDate}</Text>
       </View>

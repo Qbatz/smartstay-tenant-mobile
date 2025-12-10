@@ -657,7 +657,7 @@ function Dashboard(props) {
 
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16, width: width }}>
 
-        <View style={{ flexDirection: 'row', width:width*0.67 }}>
+        <View style={{ flexDirection: 'row', width:width*0.65,backgroundColor:'grey' }}>
 
            {context.getHostelDetail?.hostelPic ? (
                     <Image
@@ -815,7 +815,7 @@ function Dashboard(props) {
                           <Text style={{ fontSize: 12, fontWeight: "400", color: "#4B4B4B" }}> Assigned to</Text>
 
                           <View style={{ flexDirection: "row", justifyContent: "space-between", paddingTop: 8, }}>
-                            {selectedComplaint.assigneeName != null ? <Text style={{ fontSize: 15, fontWeight: "500" }}>
+                            {selectedComplaint.assigneeName != "Unassigned" ? <Text style={{ fontSize: 15, fontWeight: "500" }}>
                               {selectedComplaint.assigneeName}</Text>
                               : <Text style={{ fontSize: 14, fontWeight: "500", color: "#FF3B30", }}>
                                 Not Assigned Yet

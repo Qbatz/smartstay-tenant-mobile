@@ -43,7 +43,7 @@ export default function AgreementViewScreen({ route,navigation }) {
 
   return (
     <ViewShot ref={viewRef} style={{ flex:1 }} options={{ format: "png", quality: 1 }}>
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false} pointerEvents="auto">
      <View style={styles.headerContainer}>
   <TouchableOpacity onPress={() => navigation.navigate("SignatureScreen")}>
     <Image

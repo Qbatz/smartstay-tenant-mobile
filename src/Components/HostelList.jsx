@@ -84,7 +84,6 @@ const HostelList = (route) => {
   
 
   const renderHostel = ({ item }) => {
-    console.log(item.hostelInitial)
     return <TouchableOpacity
       style={[
         styles.hostelCard,
@@ -126,7 +125,7 @@ const HostelList = (route) => {
 
   return (
     <View style={styles.container}>
-      <View style={{ height: '50%' }}>
+      <View style={{ flex:1 }}>
         <Text style={styles.title}>Select Hostel</Text>
         <Text style={styles.subtitle}>Select Your Current Staying Hostel</Text>
 

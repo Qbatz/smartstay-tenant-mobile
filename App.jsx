@@ -62,6 +62,7 @@ import AmenitiesContext from './src/Context/AmenitiesContext';
 import { storeData, retriveData } from './src/Utils/Storage';
 import PaymentContext from './src/Context/PaymentContext';
 import SuccessFlow from './src/SuccessFlow';
+import NotificationContext from './src/Context/NotificationCOntext';
 
 
 
@@ -110,7 +111,9 @@ function App() {
                 <ComplaintContext>
                   <AmenitiesContext>
                     <PaymentContext>
-                        <AppContent isLoggedIn={loggedIn} token={token} />
+                      <NotificationContext>
+                          <AppContent isLoggedIn={loggedIn} token={token} />
+                      </NotificationContext>                       
                     </PaymentContext>
                   </AmenitiesContext>                 
                 </ComplaintContext>

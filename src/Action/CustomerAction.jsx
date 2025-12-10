@@ -59,3 +59,17 @@ export const getRequestRaised=async(hostelId, token)=>{
         return{status: error.response.status, message: error.response.data}
    }
 }
+
+export const getRentalDetials=async(hostelId,token)=>{
+    try{
+        const response=await AxiosConfig.get('/v2/customer/rentDetails/' + hostelId , {
+            headers: {
+                Authorization: 'Bearer ' + token
+            }
+        })
+        return response;
+    }catch(error){
+        return{status: error.response.status, message: error.response.data}
+    }
+
+}
