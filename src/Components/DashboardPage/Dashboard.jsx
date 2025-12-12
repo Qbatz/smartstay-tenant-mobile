@@ -104,7 +104,7 @@ function Dashboard(props) {
   const [complaintType, setComplaintTypes] = useState([])
   const [selectedComplaintTypeId, setSelectedComplaintTypeId] = useState(0);
   const [editCompliantBottomsheet, setEditCompliantBottomSheet] = useState(false);
-  const [showOptionSheet,setShowOptionSheet]=useState(false)
+  const [showDownloadOption,setShowOption]=useState(false)
 
   const sheetY = useRef(new Animated.Value(700)).current;
 
@@ -147,7 +147,7 @@ function Dashboard(props) {
   };
 
   useEffect(() => {
-    if (showSheet || addComplaints || showBedChange || editCompliant || showAmenities || modalVisible || showOptionSheet) {
+    if (showSheet || addComplaints || showBedChange || editCompliant || showAmenities || modalVisible) {
       setTimeout(() => {
         sheetY.setValue(700)
         Animated.timing(sheetY, {
@@ -157,7 +157,7 @@ function Dashboard(props) {
         }).start();
       }, 10);
     }
-  }, [showSheet, addComplaints, showBedChange, editCompliant, showAmenities, modalVisible, showOptionSheet]);
+  }, [showSheet, addComplaints, showBedChange, editCompliant, showAmenities, modalVisible]);
 
   useEffect(() => {
     const backAction = () => {
@@ -675,9 +675,8 @@ function Dashboard(props) {
     navigation.navigate("ReceiptPdfView");
   };
 
-  const OptionDownload=()=>{
-    
-
+  const downloadOption=()=>{
+      setShowOption(true)
   }
 
   // ---------------------------
@@ -1949,7 +1948,7 @@ function Dashboard(props) {
 
                       <TouchableOpacity
                         style={style.downloadBtn}
-                        onPress={OptionDownload}
+                        onPress={downloadOption}
                       >
                         <Text style={style.downloadText}>Download</Text>
                         <Image
@@ -1962,6 +1961,30 @@ function Dashboard(props) {
                 </View>
               </>
             )}
+          </ScrollView>
+        </Animated.View>
+      </View>
+    )}
+
+
+    {showDownloadOption && (
+      <View style={style.sheetOverlay}>
+
+        {/* Tap outside to close */}
+        <TouchableWithoutFeedback onPress={onClose}>
+          <View style={StyleSheet.absoluteFill} />
+        </TouchableWithoutFeedback>
+
+        <Animated.View
+          style={[style.bottomSheetoption, { transform: [{ translateY: sheetY }] }]}
+          {...panResponder.panHandlers}
+        >
+          <View {...panResponder.panHandlers}>
+            <View style={style.dragindictor} />
+          </View>
+
+          <ScrollView showsVerticalScrollIndicator={false}>
+              <Text>Hii</Text>
           </ScrollView>
         </Animated.View>
       </View>
@@ -2133,5 +2156,12 @@ const style = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  bottomSheetoption:{
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    height: "50%",
+  }
 })
 export default Dashboard;
