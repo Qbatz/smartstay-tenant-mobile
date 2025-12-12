@@ -6,7 +6,8 @@ import {
   Image,
   StyleSheet,
   FlatList,
-  NativeModules
+  NativeModules,
+  Platform
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { hostelList } from "../Action/HostelAction";
@@ -42,7 +43,10 @@ const HostelList = (route) => {
   }
 
   useEffect(() => {
-    fetchFcmTokenAsync();
+    if (Platform.OS == 'android') {
+      fetchFcmTokenAsync();
+    }
+    
   }, [])
 
 

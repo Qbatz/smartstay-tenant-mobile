@@ -712,7 +712,7 @@ function Dashboard(props) {
       colors={["#DAEEFF", "#FFFFFF"]}
       start={{ x: 0.5, y: 0 }}
       end={{ x: 0.5, y: 1 }}
-      style={{ paddingTop: 25, paddingBottom: 15, width: "100%" }}
+      style={{ paddingTop: 25, width: "100%", height: 130 }}
     >
 
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16, width: width }}>
@@ -739,7 +739,7 @@ function Dashboard(props) {
             </Text>
 
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Image source={Location} style={{ width: 12.75, height: 14.17 }} />
+              <Image source={Location} style={{ width: 16, height: 16 }} />
               <Text style={{ marginLeft: 7, fontSize: 14, color: '#4B4B4B' }}>
                 {context.getHostelDetail.city}
               </Text>
@@ -769,7 +769,7 @@ function Dashboard(props) {
 
     </LinearGradient>
 
-    <View style={{ flex: 1, paddingLeft: 20, paddingRight: 20 }}>
+    <View style={{ flex: 1, paddingLeft: 20, paddingRight: 20, }}>
       <TabView navigationState={{ index: index, routes }}
         commonOptions={{
           icon: ({ route, color }) => (<Image source={route.icon} style={{ width: 21.12, height: 21.12, tintColor: color }} />)
@@ -778,7 +778,7 @@ function Dashboard(props) {
         renderScene={renderScene}
         onIndexChange={setindex}
         initialLayout={{ width: Dimensions.get('window').width }}
-        style={{ flex: 1, justifyContent: 'center', marginTop: 10 }} />
+        style={{ flex: 1, justifyContent: 'center' }} />
 
     </View>
 
@@ -1972,7 +1972,7 @@ function Dashboard(props) {
 }
 
 const style = StyleSheet.create({
-  mainDashb: { flex: 1, backgroundColor: '#ffffff', position: 'relative' },
+  mainDashb: { flex: 1, backgroundColor: '#FFFFFF', position: 'relative' },
   container: { flexDirection: 'row', paddingTop: 10, paddingLeft: 16, paddingRight: 16, justifyContent: 'space-between', paddingLeft: 10, alignItems: 'center' },
   sheetOverlay: {
     position: "absolute",
