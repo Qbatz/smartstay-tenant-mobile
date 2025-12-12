@@ -22,7 +22,6 @@ const OtpDesign = ({ route }) => {
 
   const context = useContext(UsersContext)
   const loginContext = useContext(LoginContexts)
-  console.log(loginContext.SerialNo)
   // const { verifyOtp , resendOtp } = useContext(LoginContext); 
 
   const handleOtpChange = async (text, index) => {
@@ -40,7 +39,7 @@ const OtpDesign = ({ route }) => {
     if (newOtp.every((digit) => digit !== "")) {
       const otpValue = newOtp.join("");
       console.log("Entered OTP:", otpValue);
-      const data = await verifyOtp(route.params.phone, otpValue, context.SerialNo)
+      const data = await verifyOtp(route.params.phone, otpValue)
       console.log(data)
       if (data.status == 200) {
         console.log(data.data)
