@@ -4,6 +4,7 @@ import Signature from "react-native-signature-canvas";
 import Clear from "../../assets/Images/clear.png"
 import shield from "../../assets/Images/shield.png"
 import close from "../../assets/Images/close.png"
+import { useNavigation,StackActions,CommonActions } from "@react-navigation/native";
 
 export default function SignatureScreen({ navigation }) {
   const ref = useRef();
@@ -16,12 +17,28 @@ export default function SignatureScreen({ navigation }) {
   setSignature(sig); 
   
 
-  navigation.navigate("AgreementViewScreen", { signature: sig });
+  // navigation.navigate("AgreementViewScreen", { signature: sig });
 };
 
  const handleSubmit = () => {  
   
   ref.current.readSignature();
+
+ navigation.dispatch(
+  CommonActions.reset({
+    index: 2,  
+    routes: [
+      { name: 'Dashboard' },
+      { name: 'CustomerProfile' },
+      { name: 'RentalAgreement' }
+    ],
+  })
+);
+
+  // navigation.dispatch(
+  //   StackActions.replace('RentalAgreement')
+  // );
+
 };
 
 
@@ -39,7 +56,9 @@ const handleClear = () => {
 
  
 
-
+  const handleBack=()=>{
+    navigation.goBack();
+  }
 
   return (
     <View style={styles.container}>
@@ -53,7 +72,7 @@ const handleClear = () => {
 
   <TouchableOpacity
 
- onPress={() => navigation.navigate("Agreement")}
+ onPress={handleBack}
    >
     <Image
       source={close}

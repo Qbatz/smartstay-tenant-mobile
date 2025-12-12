@@ -39,13 +39,17 @@ export default function AgreementViewScreen({ route,navigation }) {
     console.log(e);
   }
 };
+// onPress={() => navigation.navigate("SignatureScreen")}
+  const handleBack=()=>{
+    navigation.replace("AgreementViewScreen");
 
+    navigation.goBack()}
 
   return (
-    <ViewShot ref={viewRef} style={{ flex:1 }} options={{ format: "png", quality: 1 }}>
+    <View  style={{ flex:1 }} >
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false} pointerEvents="auto">
      <View style={styles.headerContainer}>
-  <TouchableOpacity onPress={() => navigation.navigate("SignatureScreen")}>
+  <TouchableOpacity onPress={handleBack} >
     <Image
       source={LeftArrow}
       resizeMode="contain"
@@ -110,7 +114,7 @@ export default function AgreementViewScreen({ route,navigation }) {
 
       <View style={{ height:50 }} />
     </ScrollView>
-    </ViewShot>
+    </View>
   );
 }
 

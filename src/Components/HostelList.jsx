@@ -49,7 +49,7 @@ const HostelList = (route) => {
   const handleSelect = (hosteldetail) => {
     console.log("hostellist lall", hosteldetail)
     setSelectedHostel(hosteldetail);
-    loginContext.updateRoute(null)
+    // loginContext.updateRoute(null)
   };
 
   const handleGo = () => {

@@ -64,6 +64,7 @@ function Services(props) {
 
     useEffect(() => {
         complaints(commonContext.getHostelDetail.hostelId, loginContext.getToken).then(r => {
+            console.log(r)
             complaintContext.updateComplaintList(r?.data?.content)
         })
 
@@ -71,7 +72,7 @@ function Services(props) {
             amenitiesContext.updateAssignedAmenities(r.data.assignedAmenities)
             amenitiesContext.updateUnassginedAmenites(r.data.unassignedAmenities)
         })
-    }, [])
+    },[])
 
     useEffect(() => {
         console.log(commonContext.Complaint)

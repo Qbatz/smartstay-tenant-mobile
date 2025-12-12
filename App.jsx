@@ -62,7 +62,7 @@ import AmenitiesContext from './src/Context/AmenitiesContext';
 import { storeData, retriveData } from './src/Utils/Storage';
 import PaymentContext from './src/Context/PaymentContext';
 import SuccessFlow from './src/SuccessFlow';
-import NotificationContext from './src/Context/NotificationCOntext';
+import NotificationContext from './src/Context/NotificationContext';
 
 
 
@@ -105,7 +105,7 @@ function App() {
     <GestureHandlerRootView>
 
       <SafeAreaProvider>
-        <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
+        <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} style={{flex: 1, paddingTop: StatusBar.currentHeight}}/>
            <LoginProvider>
               <UserContext>
                 <ComplaintContext>

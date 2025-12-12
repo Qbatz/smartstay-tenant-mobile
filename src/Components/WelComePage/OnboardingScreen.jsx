@@ -65,7 +65,7 @@ export default function OnboardingScreen({ navigation }) {
       </View>
 
       {/* BUTTON */}
-      <View style={{flex:1}}>
+      <View >
           <TouchableOpacity style={styles.button} onPress={goNext}>
         <Text style={styles.buttonText}>Get Started →</Text>
       </TouchableOpacity>
@@ -188,6 +188,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
      borderRadius: 12,
      alignItems: "center",
+     bottom:height*0.05
     //  position: "absolute",
     
     // backgroundColor: "#1E45E1",
