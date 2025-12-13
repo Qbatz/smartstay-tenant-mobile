@@ -1,4 +1,4 @@
-import React, { useRef, useContext, useEffect, useState, useMemo } from "react";
+import React, { useRef, useContext, useEffect, useState, useMemo, useCallback } from "react";
 import { View, Text, Image, FlatList, TouchableOpacity, ScrollView, StyleSheet, Button, BackHandler, Platform, Dimensions, PanResponder, Animated } from "react-native";
 import Swiper from "react-native-swiper";
 import LinearGradient from "react-native-linear-gradient";
@@ -6,7 +6,7 @@ import Electricity from '../../assets/Images/electricity.png';
 import Frame from '../../assets/Images/Frame.png'
 import FrameAdd from '../../assets/Images/Frameadd.png'
 import Receipt from '../../assets/Images/receipt.png'
-import { TabActions, useNavigation } from "@react-navigation/native";
+import { TabActions, useFocusEffect, useNavigation } from "@react-navigation/native";
 import { Screen } from "react-native-screens";
 import { UsersContext } from "../../Context/UserContext";
 import { hostelDetails } from "../../Action/HostelAction";
@@ -35,8 +35,8 @@ function MyStay(props) {
         { id: 3, text: 'field3' }
     ];
 
-    useEffect(() => {
-        hostelDetails(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
+    const fetchMystayData=()=>{
+         hostelDetails(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
          console.log(r.data)
             setComplaints(r.data.complaints)
             setRentBill(r.data.currentMonthBills)
@@ -48,7 +48,19 @@ function MyStay(props) {
             console.log(r)
             context.updateRequestRaised(r.data)
         })
-    }, [])
+    }
+
+    useFocusEffect(
+        useCallback(()=>{
+            fetchMystayData();
+
+            const intervalId=setInterval(()=>{
+                fetchMystayData();
+            },6000)
+            return ()=>clearInterval(intervalId)
+        },[])
+    )
+
 
     const getStatusColor = (status) => {
         switch (status.toLowerCase()) {

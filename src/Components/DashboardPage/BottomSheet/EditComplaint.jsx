@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, FlatList, Image, TouchableWithoutFeedback, Animated } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, FlatList, Image, TouchableWithoutFeedback, Animated, ScrollView } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import SuccessModal from "../../ToastFile/TostFilePage";
@@ -86,6 +86,7 @@ const EditComplaintSheet = ({
             setTimeout(() => {
                 setShowSuccessModal(false)
             }, 2000);
+            return;
         }
         const payloads = {
             complaintTypeId: selectedComplaintTypeId,
@@ -141,8 +142,8 @@ const EditComplaintSheet = ({
                 setLoading(true)
 
                 setTimeout(() => {
-                     setLoading(false)
-                    if (r.status == 200) {      
+                    setLoading(false)
+                    if (r.status == 200) {
                         setShowSuccessModal(true)
                         setToastMessage("Updated Successfully")
                         setModelType('success')
@@ -152,7 +153,7 @@ const EditComplaintSheet = ({
                             onClose();
                         }, 2000);
                     }
-                    else if(r.status == r.status){
+                    else if (r.status == r.status) {
                         setShowSuccessModal(true)
                         setToastMessage(r.message)
                         setModelType('error')
@@ -197,6 +198,7 @@ const EditComplaintSheet = ({
                 {...panResponder.panHandlers}
             >
                 <View style={{ flex: 1 }}>
+
                     <View {...panResponder.panHandlers}>
                         <View style={styles.dragindictor} />
                     </View>
@@ -209,78 +211,80 @@ const EditComplaintSheet = ({
                         message={toastMessage}
                         type={modelType}
                     />
+                    <ScrollView showsVerticalScrollIndicator={false}
+                        contentContainerStyle={{ flexGrow: 1 }}>
+                        <View style={{ padding: 20, justifyContent: 'space-between', flex: 1 }}>
 
-                    <View style={{ padding: 20, justifyContent: 'space-between', flex: 1 }}>
+                            <View>
+                                <Text style={{ fontSize: 20, fontWeight: 600 }}>Edit complaint</Text>
 
-                        <View>
-                            <Text style={{ fontSize: 20, fontWeight: 600 }}>Edit complaint</Text>
+                                <View style={{ paddingTop: 20 }}>
+                                    <Text>Complaint type</Text>
 
-                            <View style={{ paddingTop: 20 }}>
-                                <Text>Complaint type</Text>
-
-                                <Dropdown
-                                    style={styles.dropdown}
-                                    onFocus={() => setIsFocus(true)}
-                                    onBlur={() => setIsFocus(false)}
-                                    data={complaintType}
-                                    containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
-                                    placeholder="Select a type"
-                                    labelField="complaintTypeName"
-                                    valueField="complaintTypeId"
-                                    value={selectedComplaintTypeId}
-                                    onChange={(item) => setSelectedComplaintTypeId(item.complaintTypeId)}
-                                    renderRightIcon={() => (
-                                        <Ionicons
-                                            name={isFocus ? "chevron-up" : "chevron-down"}
-                                            size={22}
-                                            color="#000"
-                                            style={{ paddingRight: 10 }}
-                                        />
-                                    )}
-                                />
-                            </View>
-
-                            <View style={{ paddingTop: 16 }}>
-                                <Text>Complaint message</Text>
-                                <View style={styles.textInputBox}>
-                                    <TextInput value={description} placeholder="Enter message" onChangeText={setDespriction}
-                                        multiline={true}
-                                        numberOfLines={4}
-                                        style={{ textAlignVertical: "top" }} />
-                                </View>
-                            </View>
-
-                            <View style={{ paddingTop: 16 }}>
-                                <Text>Add Proof</Text>
-                                <TouchableOpacity onPress={uploadimage} style={styles.uploadBox}>
-                                    <Image source={CameraPic} style={{ width: 32, height: 32 }} />
-                                    <View style={{ paddingLeft: 22 }}>
-                                        <Text style={{ color: '#1E45E1' }}>Choose file</Text>
-                                        <Text style={{ fontSize: 11 }}>Must be PNG, JPG</Text>
-                                    </View>
-                                </TouchableOpacity>
-
-                                {mediaimage?.length > 0 && (
-                                    <FlatList
-                                        horizontal
-                                        style={{ paddingTop: 20 }}
-                                        data={mediaimage}
-                                        renderItem={({ item }) => (
-                                            <Image
-                                                source={{ uri: item.imageUrl || item }}
-                                                style={{ width: 80, height: 70, marginRight: 8, borderRadius: 5 }}
+                                    <Dropdown
+                                        style={styles.dropdown}
+                                        onFocus={() => setIsFocus(true)}
+                                        onBlur={() => setIsFocus(false)}
+                                        data={complaintType}
+                                        containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
+                                        placeholder="Select a type"
+                                        labelField="complaintTypeName"
+                                        valueField="complaintTypeId"
+                                        value={selectedComplaintTypeId}
+                                        onChange={(item) => setSelectedComplaintTypeId(item.complaintTypeId)}
+                                        renderRightIcon={() => (
+                                            <Ionicons
+                                                name={isFocus ? "chevron-up" : "chevron-down"}
+                                                size={22}
+                                                color="#000"
+                                                style={{ paddingRight: 10 }}
                                             />
                                         )}
                                     />
-                                )}
+                                </View>
+
+                                <View style={{ paddingTop: 16 }}>
+                                    <Text>Complaint message</Text>
+                                    <View style={styles.textInputBox}>
+                                        <TextInput value={description} placeholder="Enter message" onChangeText={setDespriction}
+                                            multiline={true}
+                                            numberOfLines={4}
+                                            style={{ textAlignVertical: "top" }} />
+                                    </View>
+                                </View>
+
+                                <View style={{ paddingTop: 16 }}>
+                                    <Text>Add Proof</Text>
+                                    <TouchableOpacity onPress={uploadimage} style={styles.uploadBox}>
+                                        <Image source={CameraPic} style={{ width: 32, height: 32 }} />
+                                        <View style={{ paddingLeft: 22 }}>
+                                            <Text style={{ color: '#1E45E1' }}>Choose file</Text>
+                                            <Text style={{ fontSize: 11 }}>Must be PNG, JPG</Text>
+                                        </View>
+                                    </TouchableOpacity>
+
+                                    {mediaimage?.length > 0 && (
+                                        <FlatList
+                                            horizontal
+                                            style={{ paddingTop: 20 }}
+                                            data={mediaimage}
+                                            renderItem={({ item }) => (
+                                                <Image
+                                                    source={{ uri: item.imageUrl || item }}
+                                                    style={{ width: 80, height: 70, marginRight: 8, borderRadius: 5 }}
+                                                />
+                                            )}
+                                        />
+                                    )}
+                                </View>
+
                             </View>
 
+                            <TouchableOpacity onPress={submitBtn} style={styles.submitBtn}>
+                                <Text style={styles.submitText}>Submit</Text>
+                            </TouchableOpacity>
                         </View>
-
-                        <TouchableOpacity onPress={submitBtn} style={styles.submitBtn}>
-                            <Text style={styles.submitText}>Submit</Text>
-                        </TouchableOpacity>
-                    </View>
+                    </ScrollView>
                 </View>
             </Animated.View>
         </View>

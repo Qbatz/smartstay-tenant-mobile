@@ -9,7 +9,6 @@ import Building from '../../assets/Images/buildin.png'
 import Location from '../../assets/Images/location.png'
 import Flash from '../../assets/Images/flash.png'
 import MobilePayment from '../../assets/Images/payment.png'
-import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import Edit from '../../assets/Images/edit.png'
 import Delete from '../../assets/Images/trash.png'
 import Trash from '../../assets/Images/trash 01.png'
@@ -21,9 +20,6 @@ import { Dropdown } from "react-native-element-dropdown";
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import CameraPic from '../../assets/Images/cameraPic.png'
 import File from '../../assets/Images/files.png'
-import Damage1 from '../../assets/Images/damage1.png'
-import Damage2 from '../../assets/Images/damage2.png'
-import Damage3 from '../../assets/Images/damage3.png'
 import Dot from '../../assets/Images/dot.png'
 import calenderTick from '../../assets/Images/calendar-tick.png'
 import { launchImageLibrary } from "react-native-image-picker";
@@ -37,9 +33,8 @@ import { LoginContexts } from '../../Context/LoginContext'
 import Room from '../../assets/Images/Room.png'
 import Bed from '../../assets/Images/Bed_Icon.png'
 import SuccessModal from "../ToastFile/TostFilePage";
-import { add } from "react-native/types_generated/Libraries/Animated/AnimatedExports";
 import AppLoader from "../ToastFile/LoaderPage";
-
+import DownloadSide from "../../assets/Images/downloadSide.png"
 import DownloadIcon from "../../assets/Images/download.png"
 import DownloadBlueIcon from "../../assets/Images/download_Blue.png";
 import ShareIcon from "../../assets/Images/Union.png";
@@ -104,7 +99,8 @@ function Dashboard(props) {
   const [complaintType, setComplaintTypes] = useState([])
   const [selectedComplaintTypeId, setSelectedComplaintTypeId] = useState(0);
   const [editCompliantBottomsheet, setEditCompliantBottomSheet] = useState(false);
-  const [showDownloadOption,setShowOption]=useState(false)
+  const [showDownloadOption, setShowOption] = useState(false)
+  const [selected, setSelected] = useState("invoice");
 
   const sheetY = useRef(new Animated.Value(700)).current;
 
@@ -147,7 +143,8 @@ function Dashboard(props) {
   };
 
   useEffect(() => {
-    if (showSheet || addComplaints || showBedChange || editCompliant || showAmenities || modalVisible) {
+    if (showSheet || addComplaints || showBedChange || editCompliantBottomsheet || showAmenities || 
+        modalVisible || showDownloadOption) {
       setTimeout(() => {
         sheetY.setValue(700)
         Animated.timing(sheetY, {
@@ -157,17 +154,20 @@ function Dashboard(props) {
         }).start();
       }, 10);
     }
-  }, [showSheet, addComplaints, showBedChange, editCompliant, showAmenities, modalVisible]);
+  }, [showSheet, addComplaints, showBedChange, editCompliantBottomsheet, 
+    showAmenities, modalVisible, showDownloadOption]);
 
   useEffect(() => {
     const backAction = () => {
 
-      if (showBedChange || addComplaints || showSheet || editCompliant || showAmenities || modalVisible) {
+      if (showBedChange || addComplaints || showSheet || editCompliantBottomsheet|| showDownloadOption || showAmenities || modalVisible) {
         setShowBedChange(false);
         setAddComplaint(false);
         setShowSheet(false);
         setShowAmenities(false);
         setModalVisible(false);
+        setShowOption(false)
+        setEditCompliantBottomSheet(false)
         return true;
       }
 
@@ -191,7 +191,8 @@ function Dashboard(props) {
     showBedChange,
     addComplaints,
     showSheet,
-    editCompliant,
+    editCompliantBottomsheet,
+    showDownloadOption,
     showAmenities,
     modalVisible,
   ]);
@@ -213,6 +214,7 @@ function Dashboard(props) {
       setSendComment(null); setChangeBed(null)
       setBedType(null); setUrgencyType(null)
       setSelectedComplaintTypeId(0); setPlan(null)
+      setShowOption(false); setEditCompliantBottomSheet(false)
     });
   }
 
@@ -578,13 +580,13 @@ function Dashboard(props) {
 
   const onRequestAmenities = (amenityId) => {
 
-    if(monthlyplan ==null){
+    if (monthlyplan == null) {
       setShowSuccessModal(true)
       setToastMessage('Select plan')
       setModelType('error')
-       setTimeout(() => setShowSuccessModal(false), 2000);
+      setTimeout(() => setShowSuccessModal(false), 2000);
       return;
-      
+
     }
     postRquestAmenties(context.getHostelDetail.hostelId, loginContext.getToken, amenityId).then(r => {
 
@@ -594,29 +596,29 @@ function Dashboard(props) {
 
       setTimeout(() => {
         setLoading(false)
-           if(r.status == 200){
-              setShowSuccessModal(true)
-              setToastMessage('Request Raised')
-              setModelType('success')         
+        if (r.status == 200) {
+          setShowSuccessModal(true)
+          setToastMessage('Request Raised')
+          setModelType('success')
 
-              setTimeout(() => {
-                 setShowSuccessModal(false)
-                 setPlan(null)
-                 setShowAmenities(false)
-              }, 2000);
-          }else {
-            setShowSuccessModal(true)
-            setToastMessage(r.message || 'Something went wrong')
-            setModelType('error')
+          setTimeout(() => {
+            setShowSuccessModal(false)
+            setPlan(null)
+            setShowAmenities(false)
+          }, 2000);
+        } else {
+          setShowSuccessModal(true)
+          setToastMessage(r.message || 'Something went wrong')
+          setModelType('error')
 
-            setTimeout(() => {
-              setShowSuccessModal(false)
-              setPlan(null); setShowAmenities(false)
-            }, 2000);
-          }
+          setTimeout(() => {
+            setShowSuccessModal(false)
+            setPlan(null); setShowAmenities(false)
+          }, 2000);
+        }
       }, 2000);
-     
-      
+
+
     })
   }
 
@@ -675,8 +677,8 @@ function Dashboard(props) {
     navigation.navigate("ReceiptPdfView");
   };
 
-  const downloadOption=()=>{
-      setShowOption(true)
+  const downloadOption = () => {
+    setShowOption(true)
   }
 
   // ---------------------------
@@ -711,7 +713,7 @@ function Dashboard(props) {
       colors={["#DAEEFF", "#FFFFFF"]}
       start={{ x: 0.5, y: 0 }}
       end={{ x: 0.5, y: 1 }}
-      style={{ paddingTop: 25, width: "100%", height: 130 }}
+      style={{ paddingTop: 25, width: "100%", height: Platform.OS == "android" ? 100 : 130 }}
     >
 
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16, width: width }}>
@@ -882,9 +884,9 @@ function Dashboard(props) {
                               </Text>
                             }
 
-                            {complaintContext.getComplaintDetail?.PhoneNO != null ?
+                            {complaintContext.getComplaintDetail?.assigneeMobileNumber != null ?
                               <Text style={{ fontSize: 12, color: "#1E45E1", fontWeight: "400" }}>
-                                {complaintContext.getComplaintDetail?.PhoneNO}
+                                {complaintContext.getComplaintDetail?.assigneeMobileNumber}
                               </Text> : null}
                           </View>
                         </View>
@@ -918,7 +920,7 @@ function Dashboard(props) {
 
 
                       {complaintContext.getComplaintDetail?.status == "ASSIGNED" ?
-                        <View style={{ borderWidth: 1, borderRadius: 10, borderColor: '#DCDCDC', paddingVertical: 10, paddingHorizontal: 15,marginTop:15 }}>
+                        <View style={{ borderWidth: 1, borderRadius: 10, borderColor: '#DCDCDC', paddingVertical: 10, paddingHorizontal: 15, marginTop: 15 }}>
                           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                             <Text style={{ fontSize: 15, fontWeight: 600 }}>Complaint Assigned</Text>
 
@@ -944,7 +946,7 @@ function Dashboard(props) {
                           <View style={{ height: 1, backgroundColor: "#eee", marginVertical: 15 }} />
 
                           <TouchableOpacity 
-                          style={{justifyContent:'center',alignItems:'center',paddingBottom:10}}>
+                            style={{ justifyContent: 'center', alignItems: 'center', paddingBottom: 10 }}>
                             <Text style={{ color: "#00A1FF", fontSize: 14, fontWeight: 600 }}>
                               See all updates
                             </Text>
@@ -1020,116 +1022,6 @@ function Dashboard(props) {
       setShowSuccessModal={setShowSuccessModal}
     />
 
-    {/* {editCompliant && (
-      <View style={style.sheetOverlay}>
-        <TouchableWithoutFeedback onPress={onClose}>
-          <View style={StyleSheet.absoluteFill} />
-        </TouchableWithoutFeedback>
-
-        <Animated.View style={[style.bottomsheets, { transform: [{ translateY: sheetY }] }]}
-          {...panResponder.panHandlers}>
-
-          <View style={{ flex: 1 }}>
-
-            <View {...panResponder.panHandlers}>
-              <View style={style.dragindictor} />
-            </View>
-
-            <AppLoader visible={loading} />
-            <SuccessModal
-              visible={showSuccessModal}
-              onClose={() => setShowSuccessModal(false)}
-              message="Complaint Added Successfully!"
-              type="sucess"
-            />
-
-            <View style={{ paddingLeft: 5, paddingRight: 5, paddingTop: 20, justifyContent: 'space-between', flex: 1 }}>
-              <View>
-                <Text style={{ fontSize: 20, fontWeight: 600 }}>Edit complaint</Text>
-
-                <View style={{ paddingTop: 20 }}>
-                  <Text>Complaint type</Text>
-
-                  <Dropdown style={{ borderWidth: 1, borderRadius: 10, paddingVertical: 10, marginTop: 10, borderColor: '#e5e5e5' }}
-                    onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
-                    data={complaintType}
-                    containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
-                    placeholderStyle={{ fontSize: 14, paddingLeft: 10 }}
-                    placeholder="Select a type"
-                    labelField="complaintTypeName"
-                    valueField="complaintTypeId"
-                    value={selectedComplaintTypeId}
-                    de
-
-                    onChange={item => {
-                      setSelectedComplaintTypeId(item.complaintTypeId)
-                      setSelectedValue(item.value)
-                    }}
-                    renderRightIcon={() => (
-                      <Ionicons name={isFocus ? "chevron-up" : "chevron-down"}
-                        size={22}
-                        color="#000"
-                        style={{ paddingRight: 10 }}
-                      />
-                    )} />
-                </View>
-
-                <View style={{ paddingTop: 16 }}>
-                  <Text style={{ fontSize: 14, fontWeight: 400 }}>Complaint message</Text>
-                  <View style={{ borderWidth: 1, borderRadius: 10, marginTop: 8, paddingTop: 7, paddingLeft: 10, borderColor: '#e5e5e5' }}>
-                    <TextInput placeholder="Enter message" />
-                  </View>
-                </View>
-
-                <View style={{ paddingTop: 16 }}>
-                  <Text>Add Proof</Text>
-                  <View >
-                    <TouchableOpacity onPress={uploadimage} style={{
-                      borderWidth: 1, borderRadius: 9, paddingTop: 22, paddingBottom: 22,
-                      paddingLeft: 24, paddingRight: 24, borderColor: '#e5e5e5', marginTop: 8, flexDirection: 'row', alignItems: 'center'
-                    }}>
-                      <View>
-                        <Image source={CameraPic} style={{ width: 32.77, height: 32.77 }} />
-                      </View>
-                      <View style={{ paddingLeft: 22 }}>
-                        <View style={{ flexDirection: 'row' }}>
-                          <Text style={{ color: '#1E45E1', fontSize: 12, fontWeight: 500 }}>Choose file</Text>
-                          <Text style={{ fontSize: 12, fontWeight: 500 }}> to Upload</Text>
-                        </View>
-                        <Text style={{ fontSize: 11, fontWeight: 400, marginTop: 5 }}>Must be in PNG, JPG Format </Text>
-                      </View>
-                    </TouchableOpacity>
-
-                  </View>
-                </View>
-
-                <View>
-                  {mediaimage.length > 0 ? <FlatList horizontal showsHorizontalScrollIndicator={true} style={{ paddingTop: 20 }} key={(item) => item.id}
-                    data={mediaimage}
-                    renderItem={({ item }) => {
-                      console.log(item)
-                      return <View style={{ padding: 5 }}>
-                        <Image source={{ uri: item }} style={{ width: 80, height: 70, borderRadius: 5 }} />
-                      </View>
-                    }} /> : null}
-                </View>
-
-              </View>
-
-
-              <View style={{ paddingBottom: 20 }}>
-                <TouchableOpacity style={{ paddingTop: 12, paddingBottom: 12, borderWidth: 1, borderRadius: 22, justifyContent: 'center', alignItems: 'center', backgroundColor: '#1E45E1', borderColor: '#1E45E1' }}>
-                  <Text style={{ fontSize: 14, fontWeight: 600, color: '#ffffff' }}>Submit</Text>
-                </TouchableOpacity>
-              </View>
-
-            </View>
-
-          </View>
-
-        </Animated.View>
-      </View>
-    )} */}
 
 
     {/* -----Delete complaint----- */}
@@ -1361,14 +1253,14 @@ function Dashboard(props) {
               <View style={style.dragindictor} />
             </View>
 
-             <AppLoader visible={loading} />
+            <AppLoader visible={loading} />
             <SuccessModal
               visible={showSuccessModal}
               onClose={() => setShowSuccessModal(false)}
               message={toastMessage}
               type={modelType}
             />
-
+            <ScrollView contentContainerStyle={{flexGrow:1}}>
             <View style={{ paddingLeft: 10, paddingRight: 15, flex: 1 }}>
               {tag == 'My-Amenities' ? (<View>
                 <View style={{ paddingTop: 12 }}>
@@ -1484,6 +1376,7 @@ function Dashboard(props) {
 
 
             </View>
+            </ScrollView>
 
           </View>
 
@@ -1917,7 +1810,7 @@ function Dashboard(props) {
                     <>
                       <TouchableOpacity
                         style={style.shareBtn}
-                        onPress={handleDownload}
+                        onPress={downloadOption}
                       >
                         <Text style={{ fontWeight: "600", color: "#071C70" }}>
                           Download Bill
@@ -1948,7 +1841,7 @@ function Dashboard(props) {
 
                       <TouchableOpacity
                         style={style.downloadBtn}
-                        onPress={downloadOption}
+                        onPress={handleDownload}
                       >
                         <Text style={style.downloadText}>Download</Text>
                         <Image
@@ -1965,7 +1858,6 @@ function Dashboard(props) {
         </Animated.View>
       </View>
     )}
-
 
     {showDownloadOption && (
       <View style={style.sheetOverlay}>
@@ -1984,13 +1876,100 @@ function Dashboard(props) {
           </View>
 
           <ScrollView showsVerticalScrollIndicator={false}>
-              <Text>Hii</Text>
+            <Text style={style.title}>Select option</Text>
+
+            <TouchableOpacity
+              activeOpacity={0.9}
+              onPress={() => setSelected('invoice')}
+              style={
+                selected === 'invoice'
+                  ? [style.card, style.cardSelected]
+                  : style.card
+              }
+              accessibilityRole="radio"
+              accessibilityState={{ selected: selected === 'invoice' }}
+            >
+              <View style={style.cardInner}>
+                <View style={style.cardTextContainer}>
+                  <Text style={style.cardTitle}>Invoice Bill Summary</Text>
+                  <Text style={style.cardSubtitle}>
+                    Brief summary of total bill with taxes.
+                  </Text>
+                </View>
+
+
+                <View style={selected === 'invoice' ? [style.radioOuter, style.radioOuterSelected] :
+                  style.radioOuter}>
+                  <View
+                    style={
+                      selected === 'invoice'
+                        ? [style.radioInner, style.radioInnerSelected]
+                        : style.radioInner
+                    }
+                  />
+                </View>
+              </View>
+            </TouchableOpacity>
+
+
+            <View style={style.secondOptionContainer}>
+              <TouchableOpacity
+                activeOpacity={0.9}
+                onPress={() => setSelected('receipt')}
+                style={
+                  selected === 'receipt'
+                    ? [style.card, style.cardSelected]
+                    : style.card
+                }
+                accessibilityRole="radio"
+                accessibilityState={{ selected: selected === 'receipt' }}
+              >
+                <View style={style.cardInner}>
+                  <View style={style.cardTextContainer}>
+                    <Text style={style.cardTitle}>Payment Receipt</Text>
+                    <Text style={style.cardSubtitle}>
+                      Receipt of payments made for the bill
+                    </Text>
+                  </View>
+
+
+                  <View style={selected === 'receipt' ? [style.radioOuter, style.radioOuterSelected] :
+                    style.radioOuter}>
+                    <View
+                      style={
+                        selected === 'receipt'
+                          ? [style.radioInner, style.radioInnerSelected]
+                          : style.radioInner
+                      }
+                    />
+                  </View>
+                </View>
+              </TouchableOpacity>
+
+            </View>
+
+
+            <View style={style.footer}>
+              <TouchableOpacity
+                onPress={handleDownload}
+                activeOpacity={0.9}
+
+              >
+
+                <View style={style.downloadContent}>
+                  <Image source={DownloadSide} style={{width:20,height:20}}/>
+                  <Text style={style.downloadText}> Download</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
           </ScrollView>
         </Animated.View>
-      </View>
-    )}
+      </View >
+    )
+    }
 
-  </View>
+
+  </View >
 
 }
 
@@ -2156,12 +2135,136 @@ const style = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  bottomSheetoption:{
+  bottomSheetoption: {
     backgroundColor: "#fff",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
     height: "50%",
-  }
+  },
+
+
+  backdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(12,12,13,0.45)',
+    justifyContent: 'flex-end',
+  },
+  fullFill: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
+  sheet: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    paddingHorizontal: 22,
+    paddingBottom: Platform.OS === 'ios' ? 36 : 24,
+    paddingTop: 12,
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: -6 },
+  },
+  grabberContainer: {
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  grabber: {
+    width: 44,
+    height: 4,
+    borderRadius: 4,
+    backgroundColor: '#E6E9EE',
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#0E1726',
+    marginBottom: 18,
+  },
+  card: {
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 18,
+  },
+  cardSelected: {
+    borderWidth: 1.5,
+    borderColor: '#2E44FF',
+    backgroundColor: '#F8FAFB',
+    shadowColor: '#2E44FF',
+    shadowOpacity: 0.07,
+    shadowRadius: 12,
+    elevation: 3,
+  },
+  cardInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  cardTextContainer: { flex: 1 },
+  cardTitle: { fontSize: 16, fontWeight: '700', color: '#0E1726' },
+  cardSubtitle: { fontSize: 14, color: '#8A97A8', marginTop: 8 },
+  radioOuter: {
+    width: 28,
+    height: 28,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: '#CFD8E6',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  radioOuterSelected: { borderColor: '#2E44FF' },
+  radioInner: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: 'transparent',
+  },
+  radioInnerSelected: {
+    backgroundColor: '#2E44FF',
+    borderRadius: 20,
+
+  },
+  secondOptionContainer: { marginBottom: 26 },
+  rowOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+
+  },
+  rowLeft: { flex: 1 },
+  rowTitle: { fontSize: 18, fontWeight: '700', color: '#0E1726' },
+  rowSubtitle: { fontSize: 14, color: '#8A97A8', marginTop: 6 },
+  radioOutline: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 2,
+    borderColor: '#C4CBD9',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  radioInnerSmall: { width: 8, height: 8, borderRadius: 4, backgroundColor: 'transparent' },
+  radioInnerSmallSelected: { backgroundColor: '#2E44FF' },
+
+
+  footer: {
+    marginTop: 4,
+    alignItems: 'center',
+    width: '100%',
+    borderRadius: 28,
+    paddingVertical: 14,
+    backgroundColor: '#2E44FF',
+
+  },
+  downloadbutton: {
+    width: '100%',
+    borderRadius: 28,
+    paddingVertical: 14,
+    shadowColor: '#2E44FF',
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+
+  downloadContent: { alignItems: 'center', justifyContent: 'center',flexDirection:'row' },
+  downloadText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
 })
 export default Dashboard;
