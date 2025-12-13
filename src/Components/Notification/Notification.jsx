@@ -15,7 +15,7 @@ import Delete from '../../assets/Images/trash.png'
 import { UsersContext } from "../../Context/UserContext";
 import { getNotification } from "../../Action/NotificationAction";
 import { LoginContexts } from "../../Context/LoginContext";
-import { notificationContexts } from "../../Context/NotificationCOntext";
+import { notificationContexts } from "../../Context/NotificationContext";
 
 const notifications = [
   {

@@ -6,7 +6,7 @@
  */
 
 import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View,Text,Image, TouchableOpacity,Dimensions } from 'react-native';
+import { StatusBar, StyleSheet, useColorScheme, View,Text,Image, TouchableOpacity,Dimensions, Platform } from 'react-native';
 import {
   SafeAreaProvider,
 } from 'react-native-safe-area-context';
@@ -62,7 +62,7 @@ import AmenitiesContext from './src/Context/AmenitiesContext';
 import { storeData, retriveData } from './src/Utils/Storage';
 import PaymentContext from './src/Context/PaymentContext';
 import SuccessFlow from './src/SuccessFlow';
-import NotificationContext from './src/Context/NotificationCOntext';
+import NotificationContext from './src/Context/NotificationContext';
 
 
 
@@ -105,7 +105,7 @@ function App() {
     <GestureHandlerRootView>
 
       <SafeAreaProvider>
-        <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
+        <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} style={{flex: 1, paddingTop: StatusBar.currentHeight}}/>
            <LoginProvider>
               <UserContext>
                 <ComplaintContext>
@@ -140,18 +140,14 @@ function AppContent(props) {
 
   useEffect(() => {
 
-    CommonModule.fetchSerialNumber().then(r => {
-      loginContext.serialNo(r)
-      console.log(r)
-    }).catch(error => {
-      console.log(error)
-    })
-
-    CommonModule.checkInternet().then(r=>{
+    if (Platform.OS == 'android') {
+      CommonModule.checkInternet().then(r=>{
     loginContext.internet(r)
     }).catch(error=>{
       console.log(error)
     })
+    }
+    
 
     if(props.token!=null){
       loginContext.updateToken(props.token)
@@ -184,11 +180,14 @@ function AppContent(props) {
   }, [loginContext.LoggedIn])
 
   const checkInternet=()=>{
-    CommonModule.checkInternet().then(r=>{
+    if (Platform.OS == "android") {
+      CommonModule.checkInternet().then(r=>{
       loginContext.internet(r)
     }).catch((error)=>{
       console.log(error)
     })
+    }
+    
   }
 
   const verifiedmpin=()=>{

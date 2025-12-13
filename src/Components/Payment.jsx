@@ -1,4 +1,4 @@
-import React, { useState,useRef,useEffect, useContext} from "react";
+import React, { useState,useRef,useEffect, useContext, useCallback} from "react";
 import {
   View,
   Text,
@@ -11,7 +11,7 @@ import {
   TouchableWithoutFeedback,  Linking, Alert, Animated,
     PanResponder,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation,useFocusEffect } from "@react-navigation/native";
 import SideArrow from "../assets/Images/arrow-up.png";
 import HostelImage from "../assets/Images/Group 1.png";
 import ElectrictyIcon from "../assets/Images/electricity.png";
@@ -41,14 +41,24 @@ const Payment = (props) => {
   const paymentContext=useContext(paymentContexts)
 
 
-  useEffect(()=>{
-      getPaymentList(context.getHostelDetail.hostelId,loginContext.getToken).then(r=>{
+  const fetchPaymentData=()=>{
+        getPaymentList(context.getHostelDetail.hostelId,loginContext.getToken).then(r=>{
         console.log(r)
         paymentContext.updateInvoiceList(r.data)
       })
-  },[])
+  }
 
-  console.log(paymentContext.getInvoiceList)
+  useFocusEffect(
+    useCallback(()=>{
+      fetchPaymentData();
+
+      const intervalId=setInterval(()=>{
+          fetchPaymentData()
+      },6000)
+      return ()=>clearInterval(intervalId)
+    },[])
+  )
+
 
 
 

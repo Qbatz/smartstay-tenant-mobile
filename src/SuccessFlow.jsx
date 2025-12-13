@@ -22,6 +22,11 @@ import SuccessModal from "./Components/ToastFile/TostFilePage";
 import NOCBillPdf from "./Components/NocBillPdf";
 import NocReciptPdf from "./Components/NocReceipt";
 import InvoiceDesign from "./Components/Payments/BillPDF";
+import EnterNumber from "./Components/ForgotMpin/EnterNumber";
+import ForgotMpinOtp from "./Components/ForgotMpin/ForgotMpinOtp";
+import ResetNewMpin from "./Components/ForgotMpin/ResetNewMpin";
+import ComingSoon from "./Components/RentalAggreements/ComingSoon";
+import ComplaintUpdatesScreen from "./Components/ComplaintUpdates/Updates";
 
 const SuccessFlow = (props) => {
 
@@ -32,6 +37,8 @@ const SuccessFlow = (props) => {
   const verifiedmpin = () => {
     setMpinVerified(true)
   }
+
+  console.log(isMpinVerified)
 
   return <View style={{ flex: 1 }}>
 
@@ -46,6 +53,8 @@ const SuccessFlow = (props) => {
           <Navigation.Screen name="CustomerProfile" component={CustomerProfile} />
           <Navigation.Screen name='ProfileHostels' component={ProfileHostels} />
           <Navigation.Screen name='RentalAgreement' component={RentalAgreement} />
+          <Navigation.Screen name="ComingSoonPage" component={ComingSoon}/>
+          <Navigation.Screen name="Updates" component={ComplaintUpdatesScreen}/>
           <Navigation.Screen name="Notification" component={Notification} />
           <Navigation.Screen name="EditProfile" component={EditProfile} />
           <Navigation.Screen name="Agreement" component={Agreement} />
@@ -60,7 +69,20 @@ const SuccessFlow = (props) => {
 
       </NavigationContainer>
 
-      : <EnterMPin callbackMpin={verifiedmpin} />}
+      : <NavigationContainer>
+    <Navigation.Navigator screenOptions={{ headerShown: false }}>
+      <Navigation.Screen name="EnterMPin" >
+        {(props) => <EnterMPin {...props} callbackMpin={verifiedmpin} />}
+      </Navigation.Screen>
+       <Navigation.Screen name="EnterNumber" component={EnterNumber} />
+      <Navigation.Screen name="ForgotMpinOtp" component={ForgotMpinOtp} />
+      <Navigation.Screen name="ResetNewMpin" component={ResetNewMpin}/>
+    </Navigation.Navigator>
+  </NavigationContainer>
+      
+      // <EnterMPin callbackMpin={verifiedmpin} />
+      
+      }
 
   </View>
 

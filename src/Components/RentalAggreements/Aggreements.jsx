@@ -8,16 +8,18 @@ import LeftArrow from "../../assets/Images/Line arrow-left.png"
 export default function Agreement({ navigation }) {
   const [checked, setChecked] = useState(false);
 
+  const handleBack = () => navigation.goBack();
+
   return (
     <ScrollView style={styles.container}>
-     <View style={styles.headerContainer}>
+     <TouchableOpacity onPress={handleBack} style={styles.headerContainer}>
       <Image
         source={LeftArrow}
         resizeMode="contain"
         style={styles.backIcon}
       />
       <Text style={styles.headerText}>Agreement</Text>
-    </View>
+    </TouchableOpacity>
   <View style={styles.sectionHeader}>
   <Image
     source={DocumentIcon}

@@ -1,5 +1,5 @@
-import React, { useState, useRef, useContext } from "react";
-import { View, Text, TextInput, StyleSheet, Image, Alert, TouchableOpacity, } from "react-native";
+import React, {useState,useContext,useRef} from "react";
+import { View,Text,TextInput,StyleSheet,Image,TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { LoginContext } from "../../Context/LoginContext";
 import { postResendOtp, verifyOtp } from "../../Action/LoginAction";
@@ -9,9 +9,9 @@ import { ACCESS_TOKEN, PHONE_NO, LOGGEDIN, USERID } from "../../Utils/Constant";
 import SuccessModal from "../ToastFile/TostFilePage";
 import { LoginContexts } from "../../Context/LoginContext";
 
-const OtpDesign = ({ route }) => {
 
-  const navigation = useNavigation();
+const ForgotMpinOtp=({route})=>{
+    const navigation = useNavigation();
   const { phone } = route.params;
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const inputs = useRef([]);
@@ -49,12 +49,20 @@ const OtpDesign = ({ route }) => {
         storeData(LOGGEDIN, 'true')
         storeData(USERID, data.data.xuid)
 
-        if (data.data.isMpinVerified == true) {
-          loginContext.loggedin('true')
+          if (data.data.isMpinVerified == true) {
+            navigation.navigate('ResetNewMpin')
+        //   loginContext.loggedin('true')
         }
         else {
           navigation.navigate('CreateMpin')
         }
+
+        // if (data.data.isMpinVerified == true) {
+        //   loginContext.loggedin('true')
+        // }
+        // else {
+        //   navigation.navigate('CreateMpin')
+        // }
       }
       else if (data.status == 401) {
         setShowSuccessModal(true)
@@ -129,11 +137,11 @@ const OtpDesign = ({ route }) => {
         ))}
       </View>
 
-      <Text style={styles.resendText}>
-        Didn’t receive OTP?
+      <View style={styles.resendText}>
+        <Text style={{color: "#555"}}>Didn’t receive OTP?</Text>  
         <TouchableOpacity onPress={resendOtp} >
           <Text style={styles.resendLink}>Resend</Text></TouchableOpacity>
-      </Text>
+      </View>
 
     </View>
   );
@@ -158,8 +166,9 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: "#000",
   },
-  resendText: { color: "#555" },
-  resendLink: { color: "#0057FF", fontWeight: "600" },
-});
+  resendText: { flexDirection:'row'},
+  resendLink: { color: "#0057FF", fontWeight: "600",marginLeft:3 },
 
-export default OtpDesign;
+});
+export default ForgotMpinOtp;
+

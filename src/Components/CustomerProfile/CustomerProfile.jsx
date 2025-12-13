@@ -123,12 +123,13 @@ const CustomerProfile = (route) => {
 
 
 
-  const handleBack = () => navigation.goBack();
+ 
+   const handleBack = () => navigation.goBack();
 
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer} onPress={handleBack}>
+      <ScrollView contentContainerStyle={styles.scrollContainer} >
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <TouchableOpacity style={styles.backButton} onPress={handleBack}>
             <Image
@@ -187,10 +188,10 @@ const CustomerProfile = (route) => {
 
               </View>
             </View>
-            <TouchableOpacity onPress={handleEditProfile}>
+            {/* <TouchableOpacity onPress={handleEditProfile}>
               <Image source={EditIcon} resizeMode="contain"
                 style={{ height: 20, width: 20 }} />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
         </View>
 
@@ -234,7 +235,7 @@ const CustomerProfile = (route) => {
 
           <View style={styles.divider} />
 
-          <TouchableOpacity onPress={() => navigation.navigate('RentalAgreement')} style={styles.row}>
+          <TouchableOpacity onPress={() => navigation.navigate('ComingSoonPage')} style={styles.row}>
             <View style={{ flexDirection: 'row' }}>
               <Image source={paperclip} style={{ width: 20, height: 20 }} />
               <Text style={{ fontSize: 14, fontWeight: 400, marginLeft: 5 }}>Rental Agreement</Text>

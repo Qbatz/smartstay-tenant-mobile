@@ -11,13 +11,14 @@ import NoResultPic from '../../assets/Images/NoResultPic.png'
 import { LoginContexts } from "../../Context/LoginContext";
 import { compliantContexts } from "../../Context/ComplaintContext";
 import { amenitiesContexts } from "../../Context/AmenitiesContext";
+import { useFocusEffect } from "@react-navigation/native";
 
 function Services(props) {
 
     const commonContext = useContext(UsersContext)
-    const loginContext=useContext(LoginContexts)
-    const complaintContext=useContext(compliantContexts)
-    const amenitiesContext=useContext(amenitiesContexts)
+    const loginContext = useContext(LoginContexts)
+    const complaintContext = useContext(compliantContexts)
+    const amenitiesContext = useContext(amenitiesContexts)
 
     console.log(commonContext.Complaint)
     console.log(props)
@@ -37,8 +38,8 @@ function Services(props) {
     }, [])
 
     const noAmenities =
-    (!amenitiesContext.getAssignedAmenities || amenitiesContext.getAssignedAmenities.length === 0) &&
-    (!amenitiesContext.getUnassignedAmenities || amenitiesContext.getUnassignedAmenities.length === 0);
+        (!amenitiesContext.getAssignedAmenities || amenitiesContext.getAssignedAmenities.length === 0) &&
+        (!amenitiesContext.getUnassignedAmenities || amenitiesContext.getUnassignedAmenities.length === 0);
 
 
     const getStatusColor = (status) => {
@@ -62,16 +63,32 @@ function Services(props) {
         }
     };
 
-    useEffect(() => {
-        complaints(commonContext.getHostelDetail.hostelId, loginContext.getToken).then(r => {
-            complaintContext.updateComplaintList(r?.data?.content)
-        })
+    const fetchServiceData = () => {
+        complaints(commonContext.getHostelDetail.hostelId, loginContext.getToken)
+            .then(r => {
+                console.log("Complaints API:", r);
+                complaintContext.updateComplaintList(r?.data?.content);
+            })
+            .catch(err => console.log("Error:", err));
 
         getAmenitiesList(commonContext.getHostelDetail.hostelId, loginContext.getToken).then(r => {
             amenitiesContext.updateAssignedAmenities(r.data.assignedAmenities)
             amenitiesContext.updateUnassginedAmenites(r.data.unassignedAmenities)
         })
-    }, [])
+    };
+
+    useFocusEffect(
+        useCallback(() => {
+            fetchServiceData();
+
+            const intervalId = setInterval(() => {
+                fetchServiceData();
+            }, 6000)
+
+            return () => clearInterval(intervalId)
+        }, [])
+    )
+
 
     useEffect(() => {
         console.log(commonContext.Complaint)
@@ -140,70 +157,70 @@ function Services(props) {
         </View>
 
         {selectedfield == 'Complaint' ? complaintContext.getComplaintList?.length > 0 ? <FlatList showsVerticalScrollIndicator={false}
-            style={{ marginTop: 10, position: 'relative',marginBottom:10 }}
+            style={{ marginTop: 10, position: 'relative', marginBottom: 10 }}
             keyExtractor={(item) => item.complaintId}
             data={complaintContext.getComplaintList}
             renderItem={({ item }) => {
                 const { backgroundColor, textColor } = getStatusColor(item.status);
                 return <View key={item.complaintId}>
                     <TouchableOpacity onPress={() => props.onOpen(item)}
-                         style={style.complaintStyle}>
-                            {/* LEFT SIDE */}
-                            <View style={{ flex: 1, paddingRight: 10 }}>
-                                <Text
-                                    numberOfLines={1}
-                                    ellipsizeMode="tail"
-                                    style={{
-                                        fontSize: 16, fontWeight: '600', color: '#1C1C1C', marginBottom: 10
-                                    }}
-                                >
-                                    {item.description}
-                                </Text>
+                        style={style.complaintStyle}>
+                        {/* LEFT SIDE */}
+                        <View style={{ flex: 1, paddingRight: 10 }}>
+                            <Text
+                                numberOfLines={1}
+                                ellipsizeMode="tail"
+                                style={{
+                                    fontSize: 16, fontWeight: '600', color: '#1C1C1C', marginBottom: 10
+                                }}
+                            >
+                                {item.description}
+                            </Text>
 
-                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    <Image
-                                        source={require('../../assets/Images/bill.png')}
-                                        style={{ width: 18, height: 18, tintColor: '#1E45E1' }}
-                                    />
-                                    <Text
-                                        style={{
-                                            marginLeft: 8, fontSize: 14, fontWeight: '400', color: '#505050',
-                                        }}
-                                    >
-                                        {item.complaintTypeName}
-                                    </Text>
-                                </View>
-                            </View>
-
-                            {/* RIGHT SIDE */}
-                            <View style={{ alignItems: 'flex-end' }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <Image
+                                    source={require('../../assets/Images/bill.png')}
+                                    style={{ width: 18, height: 18, tintColor: '#1E45E1' }}
+                                />
                                 <Text
                                     style={{
-                                        fontSize: 12, color: '#A4A4A4', marginBottom: 8, fontWeight: '400',
+                                        marginLeft: 8, fontSize: 14, fontWeight: '400', color: '#505050',
                                     }}
                                 >
-                                    {item.complaintDate}
+                                    {item.complaintTypeName}
                                 </Text>
+                            </View>
+                        </View>
 
-                                <View
+                        {/* RIGHT SIDE */}
+                        <View style={{ alignItems: 'flex-end' }}>
+                            <Text
+                                style={{
+                                    fontSize: 12, color: '#A4A4A4', marginBottom: 8, fontWeight: '400',
+                                }}
+                            >
+                                {item.complaintDate}
+                            </Text>
+
+                            <View
+                                style={{
+                                    backgroundColor: backgroundColor,
+                                    paddingVertical: 4,
+                                    paddingHorizontal: 12,
+                                    borderRadius: 20,
+                                }}
+                            >
+                                <Text
                                     style={{
-                                        backgroundColor: backgroundColor,
-                                        paddingVertical: 4,
-                                        paddingHorizontal: 12,
-                                        borderRadius: 20,
+                                        fontSize: 12,
+                                        fontWeight: '500',
+                                        color: textColor,
                                     }}
                                 >
-                                    <Text
-                                        style={{
-                                            fontSize: 12,
-                                            fontWeight: '500',
-                                            color: textColor,
-                                        }}
-                                    >
-                                        {item.status}
-                                    </Text>
-                                </View>
+                                    {item.status}
+                                </Text>
                             </View>
+                        </View>
                     </TouchableOpacity>
                 </View>
 
@@ -212,9 +229,9 @@ function Services(props) {
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
                     source={NoResultPic}
-                    style={{ width: 324, height: 221, resizeMode: 'contain', marginBottom: 20,}}
+                    style={{ width: 324, height: 221, resizeMode: 'contain', marginBottom: 20, }}
                 />
-                <Text style={{fontSize: 22,fontWeight: '700',color: '#000',marginBottom: 8,}}>
+                <Text style={{ fontSize: 22, fontWeight: '700', color: '#000', marginBottom: 8, }}>
                     No Results Found!
                 </Text>
                 <Text style={{ fontSize: 15, color: '#555', textAlign: 'center', width: 260, lineHeight: 18, }}>
@@ -224,114 +241,114 @@ function Services(props) {
         </View>
 
             :
-    noAmenities ? (
-        <View style={style.noResult}>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                    source={NoResultPic}
-                    style={{ width: 324, height: 221, resizeMode: 'contain', marginBottom: 20 }}
-                />
-                <Text style={{fontSize: 22,fontWeight: '700',color: '#000',marginBottom: 8}}>
-                    No Results Found!
-                </Text>
-                <Text style={{ fontSize: 15, color: '#555', textAlign: 'center', width: 260, lineHeight: 18 }}>
-                    Try adjusting your search or filters to see more options.
-                </Text>
-            </View>
-        </View>
-    ) : (
-        <ScrollView
-            style={{ marginTop: 10 }}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 80 }}
-        >
-            {/* MY AMENITIES */}
-            {amenitiesContext.getAssignedAmenities?.length > 0 && (
-                <>
-                    <View style={{ paddingTop: 10 }}>
-                        <Text style={{ fontSize: 14, fontWeight: '400' }}>My Amenities</Text>
+            noAmenities ? (
+                <View style={style.noResult}>
+                    <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                        <Image
+                            source={NoResultPic}
+                            style={{ width: 324, height: 221, resizeMode: 'contain', marginBottom: 20 }}
+                        />
+                        <Text style={{ fontSize: 22, fontWeight: '700', color: '#000', marginBottom: 8 }}>
+                            No Results Found!
+                        </Text>
+                        <Text style={{ fontSize: 15, color: '#555', textAlign: 'center', width: 260, lineHeight: 18 }}>
+                            Try adjusting your search or filters to see more options.
+                        </Text>
                     </View>
-
-                    <FlatList
-                        data={amenitiesContext.getAssignedAmenities}
-                        keyExtractor={(item) => item.amenityId}
-                        scrollEnabled={false}
-                        renderItem={({ item }) => (
+                </View>
+            ) : (
+                <ScrollView
+                    style={{ marginTop: 10 }}
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={{ paddingBottom: 80 }}
+                >
+                    {/* MY AMENITIES */}
+                    {amenitiesContext.getAssignedAmenities?.length > 0 && (
+                        <>
                             <View style={{ paddingTop: 10 }}>
-                                <TouchableOpacity onPress={() => props.onAmenities(item, 'My-Amenities')}>
-                                    <View
-                                        style={{
-                                            paddingTop: 10,
-                                            paddingBottom: 12,
-                                            borderWidth: 1,
-                                            borderRadius: 10,
-                                            flexDirection: 'row',
-                                            justifyContent: 'space-between',
-                                            paddingHorizontal: 14,
-                                            alignItems: 'center',
-                                            borderColor: '#edf3ff',
-                                        }}
-                                    >
-                                        <View>
-                                            <Text style={{ fontSize: 16, fontWeight: '600' }}>
-                                                {item.amenityName}
-                                            </Text>
-                                            <View style={{ paddingTop: 7 }}>
-                                                <Text style={{ fontSize: 14, color: '#4B4B4B' }}>
-                                                    {'\u20B9'}{item.amenityAmount}/month
-                                                </Text>
+                                <Text style={{ fontSize: 14, fontWeight: '400' }}>My Amenities</Text>
+                            </View>
+
+                            <FlatList
+                                data={amenitiesContext.getAssignedAmenities}
+                                keyExtractor={(item) => item.amenityId}
+                                scrollEnabled={false}
+                                renderItem={({ item }) => (
+                                    <View style={{ paddingTop: 10 }}>
+                                        <TouchableOpacity onPress={() => props.onAmenities(item, 'My-Amenities')}>
+                                            <View
+                                                style={{
+                                                    paddingTop: 10,
+                                                    paddingBottom: 12,
+                                                    borderWidth: 1,
+                                                    borderRadius: 10,
+                                                    flexDirection: 'row',
+                                                    justifyContent: 'space-between',
+                                                    paddingHorizontal: 14,
+                                                    alignItems: 'center',
+                                                    borderColor: '#edf3ff',
+                                                }}
+                                            >
+                                                <View>
+                                                    <Text style={{ fontSize: 16, fontWeight: '600' }}>
+                                                        {item.amenityName}
+                                                    </Text>
+                                                    <View style={{ paddingTop: 7 }}>
+                                                        <Text style={{ fontSize: 14, color: '#4B4B4B' }}>
+                                                            {'\u20B9'}{item.amenityAmount}/month
+                                                        </Text>
+                                                    </View>
+                                                </View>
+                                                <Image source={RightDirection} style={{ width: 26, height: 26 }} />
                                             </View>
-                                        </View>
-                                        <Image source={RightDirection} style={{ width: 26, height: 26 }} />
+                                        </TouchableOpacity>
                                     </View>
-                                </TouchableOpacity>
+                                )}
+                            />
+                        </>
+                    )}
+
+                    {/* AVAILABLE AMENITIES */}
+                    {amenitiesContext.getUnassignedAmenities?.length > 0 && (
+                        <>
+                            <View style={{ paddingTop: 12 }}>
+                                <Text style={{ fontSize: 14, fontWeight: '400' }}>Available Amenities</Text>
                             </View>
-                        )}
-                    />
-                </>
-            )}
 
-            {/* AVAILABLE AMENITIES */}
-            {amenitiesContext.getUnassignedAmenities?.length > 0 && (
-                <>
-                    <View style={{ paddingTop: 12 }}>
-                        <Text style={{ fontSize: 14, fontWeight: '400' }}>Available Amenities</Text>
-                    </View>
-
-                    <FlatList
-                        data={amenitiesContext.getUnassignedAmenities}
-                        keyExtractor={(item) => item.amenityId}
-                        scrollEnabled={false}
-                        renderItem={({ item }) => (
-                            <View style={{ paddingTop: 10 }}>
-                                <TouchableOpacity onPress={() => props.onAmenities(item, 'available')}>
-                                    <View
-                                        style={{
-                                            paddingTop: 11,
-                                            paddingBottom: 13,
-                                            borderWidth: 1,
-                                            borderRadius: 10,
-                                            flexDirection: 'row',
-                                            justifyContent: 'space-between',
-                                            paddingHorizontal: 14,
-                                            alignItems: 'center',
-                                            borderColor: '#edf3ff',
-                                        }}
-                                    >
-                                        <Text style={{ fontSize: 16, fontWeight: '500' }}>{item.amenityName}</Text>
-                                        <Image source={AddSquare} style={{ width: 22, height: 22 }} />
+                            <FlatList
+                                data={amenitiesContext.getUnassignedAmenities}
+                                keyExtractor={(item) => item.amenityId}
+                                scrollEnabled={false}
+                                renderItem={({ item }) => (
+                                    <View style={{ paddingTop: 10 }}>
+                                        <TouchableOpacity onPress={() => props.onAmenities(item, 'available')}>
+                                            <View
+                                                style={{
+                                                    paddingTop: 11,
+                                                    paddingBottom: 13,
+                                                    borderWidth: 1,
+                                                    borderRadius: 10,
+                                                    flexDirection: 'row',
+                                                    justifyContent: 'space-between',
+                                                    paddingHorizontal: 14,
+                                                    alignItems: 'center',
+                                                    borderColor: '#edf3ff',
+                                                }}
+                                            >
+                                                <Text style={{ fontSize: 16, fontWeight: '500' }}>{item.amenityName}</Text>
+                                                <Image source={AddSquare} style={{ width: 22, height: 22 }} />
+                                            </View>
+                                        </TouchableOpacity>
                                     </View>
-                                </TouchableOpacity>
-                            </View>
-                        )}
-                    />
-                </>
-            )}
-        </ScrollView>
-    )
-}
+                                )}
+                            />
+                        </>
+                    )}
+                </ScrollView>
+            )
+        }
 
-        
+
 
 
         {selectedfield == 'Complaint' && <View style={{ position: 'absolute', bottom: 35, right: -3 }}>
@@ -348,7 +365,7 @@ const style = StyleSheet.create({
         paddingHorizontal: 18, backgroundColor: '#FFFFFF', shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.08, shadowRadius: 4, elevation: 2, flexDirection: 'row', justifyContent: 'space-between',
     },
-    noResult:{flex: 1,justifyContent: 'center',alignItems: 'center',paddingBottom:20}
+    noResult: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: 20 }
 
 })
 export default Services;

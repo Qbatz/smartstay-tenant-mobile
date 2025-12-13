@@ -15,7 +15,7 @@ const EnterMPin = (props) => {
 
     const context = useContext(UsersContext)
     const loginContext = useContext(LoginContexts)
-    // const navigation = useNavigation()
+    const navigation = useNavigation()
     const [createMpin, setCreateMpin] = useState(["", "", "", ""])
     const [mPinNumber, setmPinNumber] = useState(null)
     const inputs = useRef([])
@@ -110,6 +110,11 @@ const EnterMPin = (props) => {
         })
     }
 
+    const forgotMpinClick = () => {
+
+        navigation.navigate('EnterNumber')
+    }
+
     return <View style={{ paddingHorizontal: 20, flex: 1 }}>
         <SuccessModal
             visible={showSuccessModal}
@@ -117,7 +122,7 @@ const EnterMPin = (props) => {
             message={showModelMessage}
             type={modelType}
         />
-        <View style={{flex:1}}>
+        <View style={{ paddingTop: 70 }} >
             <Image source={Sm_logo} style={style.logo} />
 
             <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 15 }}>
@@ -157,11 +162,20 @@ const EnterMPin = (props) => {
                     />
                 ))}
             </View>
+            <View  style={{ alignItems: 'flex-end', paddingTop: 20, paddingRight: 20 }}> 
+                <TouchableOpacity onPress={forgotMpinClick}
+                   >
+                    <Text style={{ color: '#1E45E1', fontSize: 14, fontWeight: 400, textDecorationLine: 'underline', }}>
+                        Forgot Mpin</Text>
+                </TouchableOpacity>
+            </View>
+
+
 
         </View>
 
 
-        <View style={{flex:1}}>
+        <View style={{ flex: 1, justifyContent: "center", }}>
             <TouchableOpacity onPress={enterPinClick} style={style.nextButton}>
                 <Text style={style.nextText}>Enter mPIN</Text>
             </TouchableOpacity>
@@ -174,12 +188,12 @@ const EnterMPin = (props) => {
 }
 
 const style = StyleSheet.create({
-    logo: { width: 151, height: 28.22, marginTop: 70, },
+    logo: { width: 151, height: 28.22 },
     createText: { fontSize: 27, fontWeight: 600, color: '#222222', marginTop: 20 },
     subtitle: { fontSize: 14, fontWeight: 400, color: '#4B4B4B', marginTop: 15 },
-    pinContainer: { flexDirection: 'row', justifyContent: 'space-between', paddingTop: 20, paddingLeft: 20, paddingRight: 80 },
+    pinContainer: { flexDirection: 'row', justifyContent: 'space-between', paddingTop: 20, paddingLeft: 20, paddingRight: 60 },
     pinBox: {
-        width: 50, heiht: 50, borderWidth: 1, borderColor: "#ccc", borderRadius: 8, textAlign: "center",
+        width: 50, heiht: 70, borderWidth: 1, borderColor: "#ccc", borderRadius: 8, textAlign: "center",
         fontSize: 20, color: "#000"
     },
     nextButton: { backgroundColor: '#1A73E8', borderRadius: 8, paddingVertical: 20, alignItems: 'center' },

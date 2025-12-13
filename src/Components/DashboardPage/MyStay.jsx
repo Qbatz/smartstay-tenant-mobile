@@ -1,4 +1,4 @@
-import React, { useRef, useContext, useEffect, useState, useMemo } from "react";
+import React, { useRef, useContext, useEffect, useState, useMemo, useCallback } from "react";
 import { View, Text, Image, FlatList, TouchableOpacity, ScrollView, StyleSheet, Button, BackHandler, Platform, Dimensions, PanResponder, Animated } from "react-native";
 import Swiper from "react-native-swiper";
 import LinearGradient from "react-native-linear-gradient";
@@ -6,7 +6,7 @@ import Electricity from '../../assets/Images/electricity.png';
 import Frame from '../../assets/Images/Frame.png'
 import FrameAdd from '../../assets/Images/Frameadd.png'
 import Receipt from '../../assets/Images/receipt.png'
-import { TabActions, useNavigation } from "@react-navigation/native";
+import { TabActions, useFocusEffect, useNavigation } from "@react-navigation/native";
 import { Screen } from "react-native-screens";
 import { UsersContext } from "../../Context/UserContext";
 import { hostelDetails } from "../../Action/HostelAction";
@@ -35,8 +35,8 @@ function MyStay(props) {
         { id: 3, text: 'field3' }
     ];
 
-    useEffect(() => {
-        hostelDetails(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
+    const fetchMystayData=()=>{
+         hostelDetails(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
          console.log(r.data)
             setComplaints(r.data.complaints)
             setRentBill(r.data.currentMonthBills)
@@ -48,7 +48,19 @@ function MyStay(props) {
             console.log(r)
             context.updateRequestRaised(r.data)
         })
-    }, [])
+    }
+
+    useFocusEffect(
+        useCallback(()=>{
+            fetchMystayData();
+
+            const intervalId=setInterval(()=>{
+                fetchMystayData();
+            },6000)
+            return ()=>clearInterval(intervalId)
+        },[])
+    )
+
 
     const getStatusColor = (status) => {
         switch (status.toLowerCase()) {
@@ -87,7 +99,7 @@ function MyStay(props) {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 20 }}>
 
-        <View style={{height:130, marginTop: 15,marginRight:width*0.10,overflow: 'hidden', width: width*0.97  }}>
+        {/* <View style={{height:130, marginTop: 15,marginRight:width*0.10,overflow: 'hidden', width: width*0.97  }}>
             <View style={{marginRight:10,flex:1}}> 
             <Swiper loop showsPagination
                 index={0} paginationStyle={{ bottom: 10,width: "100%",paddingRight:22}}
@@ -106,14 +118,14 @@ function MyStay(props) {
                 </LinearGradient>))}
             </Swiper>
             </View>
-        </View>
+        </View> */}
 
 
-        <View>
-            <View style={{ flexDirection: 'row', width: '100%' }}>
+        <View style={{marginTop:30}}>
+            <View style={{ flexDirection: 'row',flex:1}}>
 
                 <View style={style.EbContainer}>
-                    <View>
+                    <View> 
                         <Text style={{ fontSize: 22, fontWeight: '700', color: '#1C1C1E' }}>
                             {'\u20B9'} {context.getPreviousMonthBills?.eb != null ? context.getPreviousMonthBills?.eb : "N/A"}
                         </Text>
@@ -127,12 +139,12 @@ function MyStay(props) {
                                 Paid On:
                             </Text>
                             <Text style={{ fontSize: 12, fontWeight: '600', marginLeft: 4 }}>
-                                03 June
+                                {context.getPreviousMonthBills?.invoiceGeneratedDate != null ? context.getPreviousMonthBills?.invoiceGeneratedDate : "N/A"}
                             </Text>
                         </View>
                     </View>
 
-                    <View style={{ paddingRight: 10, marginTop: -12 }}>
+                    <View style={{ paddingRight: 10, marginTop: -12}}>
                         <Image source={Electricity} style={{ width: 28, height: 28 }} />
                     </View>
                 </View>
@@ -167,7 +179,7 @@ function MyStay(props) {
                 <View style={style.EbContainer}>
                     <View>
                         <Text style={{ fontSize: 22, fontWeight: '700', color: '#1C1C1E' }}>
-                            {'\u20B9'} 322.00
+                            {'\u20B9'} {context.getCurrentMonthBills?.eb !=0?context.getCurrentMonthBills?.eb:'N/A'}
                         </Text>
 
                         <Text style={{ fontSize: 13, fontWeight: '500', color: '#FF9500', marginTop: 5 }}>
@@ -176,7 +188,7 @@ function MyStay(props) {
 
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
                             <Text style={{ fontSize: 11, fontWeight: '400', color: '#8E8E93' }}>Due date:</Text>
-                            <Text style={{ fontSize: 12, fontWeight: '600', marginLeft: 4 }}>05 Nov</Text>
+                            <Text style={{ fontSize: 12, fontWeight: '600', marginLeft: 4 }}>{context.getCurrentMonthBills?.invoiceDueDate}</Text>
                         </View>
                     </View>
 
@@ -188,7 +200,7 @@ function MyStay(props) {
                 <View style={style.container}>
                     <View>
                         <Text style={{ fontSize: 22, fontWeight: '700', color: '#1C1C1E' }}>
-                            {'\u20B9'} 7400.00
+                            {'\u20B9'} {context.getCurrentMonthBills?.paidAmount !=0?context.getCurrentMonthBills?.paidAmount:'N/A'}
                         </Text>
 
                         <Text style={{ fontSize: 13, fontWeight: '500', color: '#FF9500', marginTop: 5 }}>
@@ -197,7 +209,7 @@ function MyStay(props) {
 
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
                             <Text style={{ fontSize: 11, fontWeight: '400', color: '#8E8E93' }}>Due date:</Text>
-                            <Text style={{ fontSize: 12, fontWeight: '600', marginLeft: 4 }}>05 Nov</Text>
+                            <Text style={{ fontSize: 12, fontWeight: '600', marginLeft: 4 }}>{context.getCurrentMonthBills?.invoiceDueDate}</Text>
                         </View>
                     </View>
 

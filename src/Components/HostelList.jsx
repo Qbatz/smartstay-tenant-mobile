@@ -6,7 +6,8 @@ import {
   Image,
   StyleSheet,
   FlatList,
-  NativeModules
+  NativeModules,
+  Platform
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { hostelList } from "../Action/HostelAction";
@@ -42,14 +43,17 @@ const HostelList = (route) => {
   }
 
   useEffect(() => {
-    fetchFcmTokenAsync();
+    if (Platform.OS == 'android') {
+      fetchFcmTokenAsync();
+    }
+    
   }, [])
 
 
   const handleSelect = (hosteldetail) => {
     console.log("hostellist lall", hosteldetail)
     setSelectedHostel(hosteldetail);
-    loginContext.updateRoute(null)
+    // loginContext.updateRoute(null)
   };
 
   const handleGo = () => {

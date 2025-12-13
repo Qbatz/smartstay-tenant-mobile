@@ -10,7 +10,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import CustomerImage from "../../assets/Images/Customer_Icon.png";
 import LeftArrow from "../../assets/Images/LeftArrow.png"
 import { UsersContext } from "../../Context/UserContext";
-import { getRentalDetials } from "../../Action/CustomerAction";
+import { getHostelRentalDetails, getRentalDetials } from "../../Action/CustomerAction";
 import { LoginContexts } from "../../Context/LoginContext";
 
 
@@ -23,6 +23,8 @@ const ProfileHostels = () => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [selectedHostel, setSelectedHostel] = useState(userContext.getHostelDetail);
   const [rentDetails,setRentalDetails]=useState();
+  const[hostelRental,setHostelRental]=useState([])
+  const [hostelList,setHostelList]=useState([])
 
   console.log(selectedHostel)
   console.log(rentDetails)
@@ -37,10 +39,23 @@ const ProfileHostels = () => {
   console.log(userContext.getHostelList)
 
   useEffect(()=>{
-    getRentalDetials(userContext?.getHostelDetail?.hostelId, loginContext.getToken)
-    .then(res => {
-      setRentalDetails(res.data);
+
+    getHostelRentalDetails(loginContext.getUserId,loginContext.getToken).then(r=>{
+
+        console.log(r)
+        // const newRentals=r.data.filter(i => i.hostelId === userContext?.getHostelDetail?.hostelId)
+        // console.log(newRentals)
+
     })
+
+
+    // getRentalDetials(userContext?.getHostelDetail?.hostelId, loginContext.getToken)
+    // .then(res => {
+    //   setRentalDetails(res.data);
+    //   console.log(res)
+    // })
+
+
   },[])
 
   const handleSelectHostel = (hostel) => {

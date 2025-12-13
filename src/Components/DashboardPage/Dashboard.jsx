@@ -9,7 +9,6 @@ import Building from '../../assets/Images/buildin.png'
 import Location from '../../assets/Images/location.png'
 import Flash from '../../assets/Images/flash.png'
 import MobilePayment from '../../assets/Images/payment.png'
-import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import Edit from '../../assets/Images/edit.png'
 import Delete from '../../assets/Images/trash.png'
 import Trash from '../../assets/Images/trash 01.png'
@@ -21,9 +20,6 @@ import { Dropdown } from "react-native-element-dropdown";
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import CameraPic from '../../assets/Images/cameraPic.png'
 import File from '../../assets/Images/files.png'
-import Damage1 from '../../assets/Images/damage1.png'
-import Damage2 from '../../assets/Images/damage2.png'
-import Damage3 from '../../assets/Images/damage3.png'
 import Dot from '../../assets/Images/dot.png'
 import calenderTick from '../../assets/Images/calendar-tick.png'
 import { launchImageLibrary } from "react-native-image-picker";
@@ -37,9 +33,8 @@ import { LoginContexts } from '../../Context/LoginContext'
 import Room from '../../assets/Images/Room.png'
 import Bed from '../../assets/Images/Bed_Icon.png'
 import SuccessModal from "../ToastFile/TostFilePage";
-import { add } from "react-native/types_generated/Libraries/Animated/AnimatedExports";
 import AppLoader from "../ToastFile/LoaderPage";
-
+import DownloadSide from "../../assets/Images/downloadSide.png"
 import DownloadIcon from "../../assets/Images/download.png"
 import DownloadBlueIcon from "../../assets/Images/download_Blue.png";
 import ShareIcon from "../../assets/Images/Union.png";
@@ -49,6 +44,7 @@ import ArrowRightIcon from "../../assets/Images/arrow-right.png";
 import LinearGradient from "react-native-linear-gradient";
 import { compliantContexts } from "../../Context/ComplaintContext";
 import { paymentContexts } from "../../Context/PaymentContext";
+import EditComplaintSheet from "./BottomSheet/EditComplaint";
 
 const { width, height } = Dimensions.get("window");
 
@@ -102,6 +98,9 @@ function Dashboard(props) {
   const [sendComment, setSendComment] = useState(null)
   const [complaintType, setComplaintTypes] = useState([])
   const [selectedComplaintTypeId, setSelectedComplaintTypeId] = useState(0);
+  const [editCompliantBottomsheet, setEditCompliantBottomSheet] = useState(false);
+  const [showDownloadOption, setShowOption] = useState(false)
+  const [selected, setSelected] = useState("invoice");
 
   const sheetY = useRef(new Animated.Value(700)).current;
 
@@ -144,7 +143,8 @@ function Dashboard(props) {
   };
 
   useEffect(() => {
-    if (showSheet || addComplaints || showBedChange || editCompliant || showAmenities || modalVisible) {
+    if (showSheet || addComplaints || showBedChange || editCompliantBottomsheet || showAmenities || 
+        modalVisible || showDownloadOption) {
       setTimeout(() => {
         sheetY.setValue(700)
         Animated.timing(sheetY, {
@@ -154,28 +154,28 @@ function Dashboard(props) {
         }).start();
       }, 10);
     }
-  }, [showSheet, addComplaints, showBedChange, editCompliant, showAmenities, modalVisible]);
+  }, [showSheet, addComplaints, showBedChange, editCompliantBottomsheet, 
+    showAmenities, modalVisible, showDownloadOption]);
 
   useEffect(() => {
     const backAction = () => {
 
-      // 1️⃣ Close bottom sheets/modals first
-      if (showBedChange || addComplaints || showSheet || editCompliant || showAmenities || modalVisible) {
+      if (showBedChange || addComplaints || showSheet || editCompliantBottomsheet|| showDownloadOption || showAmenities || modalVisible) {
         setShowBedChange(false);
         setAddComplaint(false);
         setShowSheet(false);
         setShowAmenities(false);
         setModalVisible(false);
+        setShowOption(false)
+        setEditCompliantBottomSheet(false)
         return true;
       }
 
-      // 2️⃣ Handle tab navigation
       if (index > 0) {
-        setindex(index - 1); // move back to previous tab
+        setindex(index - 1);
         return true;
       }
 
-      // 3️⃣ If already on MyStay tab → go back to VerifyKYC
       navigation.goBack();
       return true;
     };
@@ -191,7 +191,8 @@ function Dashboard(props) {
     showBedChange,
     addComplaints,
     showSheet,
-    editCompliant,
+    editCompliantBottomsheet,
+    showDownloadOption,
     showAmenities,
     modalVisible,
   ]);
@@ -212,7 +213,8 @@ function Dashboard(props) {
       setmyAminites(null); setModalVisible(false)
       setSendComment(null); setChangeBed(null)
       setBedType(null); setUrgencyType(null)
-      setSelectedComplaintTypeId(0)
+      setSelectedComplaintTypeId(0); setPlan(null)
+      setShowOption(false); setEditCompliantBottomSheet(false)
     });
   }
 
@@ -254,6 +256,10 @@ function Dashboard(props) {
 
 
 
+  // const openEdit = () => setEditCompliantbot(true);
+  const closeEdit = () => setEditCompliantBottomSheet(false);
+
+
   const handleNotificationShow = () => {
     navigation.navigate("Notification", { hostel: props.route.params.hostel });
   };
@@ -264,9 +270,11 @@ function Dashboard(props) {
 
   const handle = (complaint) => {
 
+
     setShowSheet(true)
 
     getComplaints(context.getHostelDetail.hostelId, complaint.complaintId, loginContext.getToken).then(r => {
+      console.log(r.data)
       setSelectComplaint(r.data)
       console.log(r.data)
       complaintContext.updateComplaint(r.data)
@@ -375,58 +383,69 @@ function Dashboard(props) {
 
       })
     }
-    if (selectedComplaintTypeId != 0) {
-      if (complaintDescription.trim().length > 15) {
-        postComplaint(context.getHostelDetail.hostelId, loginContext.getToken, formData).then(r => {
-          setLoading(true)
+    if (selectedComplaintTypeId === 0) {
+      setShowSuccessModal(true);
+      setToastMessage('Select complaint type');
+      setModelType('error');
+      setTimeout(() => setShowSuccessModal(false), 2000);
+      return;
+    }
 
-          setTimeout(() => {
-            setLoading(false)
-            if (r.status == 201) {
-              setShowSuccessModal(true)
-              setToastMessage("Complaint Added Successfully!")
-              setModelType('success')
+    const desc = complaintDescription?.trim() ?? "";
 
-              setTimeout(() => {
-                setShowSuccessModal(false);
-                setShowSheet(false)
-                setSelectedComplaintTypeId(0)
-                setDespriction('')
-                setAddComplaint(false)
+    if (!desc) {
+      setShowSuccessModal(true);
+      setToastMessage("Comment cannot be empty");
+      setModelType('error');
+      setTimeout(() => setShowSuccessModal(false), 2000);
+      return;
+    }
 
-                complaints(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
-                  complaintContext.updateComplaintList(r?.data?.content)
-                })
-              }, 2000);
+    if (desc.length < 15) {
+      setShowSuccessModal(true);
+      setToastMessage("Comment should be above 15 letters");
+      setModelType('error');
+      setTimeout(() => setShowSuccessModal(false), 2000);
+      return;
+    }
 
-            }
-
-          }, 2000);
-
-
-        })
-
-      }
-      else if (complaintDescription.trim().length < 15) {
-        setShowSuccessModal(true)
-        setToastMessage("Comment should be above 15 letters")
-        setModelType('error')
-
-        setTimeout(() => {
-          setShowSuccessModal(false)
-        }, 2000);
-
-      }
-
-    } else {
-      setShowSuccessModal(true)
-      setToastMessage('select Complaint type')
-      setModelType('error')
+    postComplaint(context.getHostelDetail.hostelId, loginContext.getToken, formData).then(r => {
+      setLoading(true);
 
       setTimeout(() => {
-        setShowSuccessModal(false)
+        setLoading(false);
+
+        if (r.status === 201) {
+          setShowSuccessModal(true);
+          setToastMessage("Complaint Added Successfully!");
+          setModelType('success');
+
+          setTimeout(() => {
+            setShowSuccessModal(false);
+            setShowSheet(false);
+            setSelectedComplaintTypeId(0);
+            setDespriction('');
+            setAddComplaint(false);
+
+            complaints(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
+              complaintContext.updateComplaintList(r?.data?.content);
+            });
+
+          }, 2000);
+        }
+        else {
+          setShowSuccessModal(true);
+          setToastMessage(r.message || "Something went wrong");
+          setModelType('error');
+          setTimeout(() => {
+            setShowSuccessModal(false);
+            setAddComplaint(false);
+          }, 2000);
+        }
+
       }, 2000);
-    }
+    });
+
 
 
   }
@@ -493,6 +512,7 @@ function Dashboard(props) {
     if (changeBed != null && bedType != null && urgencyType != null) {
       postRequestBedChange(context.getHostelDetail.hostelId, data, loginContext.getToken).then(r => {
         setLoading(true)
+        console.log(r)
 
         setTimeout(() => {
           setLoading(false)
@@ -560,8 +580,45 @@ function Dashboard(props) {
 
   const onRequestAmenities = (amenityId) => {
 
+    if (monthlyplan == null) {
+      setShowSuccessModal(true)
+      setToastMessage('Select plan')
+      setModelType('error')
+      setTimeout(() => setShowSuccessModal(false), 2000);
+      return;
+
+    }
     postRquestAmenties(context.getHostelDetail.hostelId, loginContext.getToken, amenityId).then(r => {
+
+
       console.log(r)
+      setLoading(true)
+
+      setTimeout(() => {
+        setLoading(false)
+        if (r.status == 200) {
+          setShowSuccessModal(true)
+          setToastMessage('Request Raised')
+          setModelType('success')
+
+          setTimeout(() => {
+            setShowSuccessModal(false)
+            setPlan(null)
+            setShowAmenities(false)
+          }, 2000);
+        } else {
+          setShowSuccessModal(true)
+          setToastMessage(r.message || 'Something went wrong')
+          setModelType('error')
+
+          setTimeout(() => {
+            setShowSuccessModal(false)
+            setPlan(null); setShowAmenities(false)
+          }, 2000);
+        }
+      }, 2000);
+
+
     })
   }
 
@@ -620,6 +677,10 @@ function Dashboard(props) {
     navigation.navigate("ReceiptPdfView");
   };
 
+  const downloadOption = () => {
+    setShowOption(true)
+  }
+
   // ---------------------------
   const routes = [{ key: 'mystay', title: 'MyStay', icon: Building }, { key: 'services', title: 'Services', icon: Flash }, { key: 'payment', title: 'Payment', icon: MobilePayment }]
   const renderTabBar = props => (<TabBar {...props}
@@ -633,11 +694,11 @@ function Dashboard(props) {
   const renderScene = ({ route, jumpTo }) => {
     switch (route.key) {
       case 'mystay':
-        return <MyStay onRequestBedChange={bedfn} hostel={props.route.params.hostel} jumpTo={jumpTo} />;
+        return <MyStay onRequestBedChange={bedfn} hostel={props?.route?.params?.hostel} jumpTo={jumpTo} />;
       case 'services':
-        return <Services onOpen={handle} onSheet={addComplaint} onAmenities={handleAmenity} jumpTo={jumpTo} hostel={props.route.params.hostel} />;
+        return <Services onOpen={handle} onSheet={addComplaint} onAmenities={handleAmenity} jumpTo={jumpTo} hostel={props?.route?.params?.hostel} />;
       case 'payment':
-        return <Payment onPayment={viewPay} hostel={props.route.params.hostel} jumpTo={jumpTo} />;
+        return <Payment onPayment={viewPay} hostel={props?.route?.params?.hostel} jumpTo={jumpTo} />;
       default:
         return null;
     }
@@ -645,40 +706,41 @@ function Dashboard(props) {
 
   // ----------
 
-  
+
 
   return <View style={style.mainDashb}>
     <LinearGradient
       colors={["#DAEEFF", "#FFFFFF"]}
       start={{ x: 0.5, y: 0 }}
       end={{ x: 0.5, y: 1 }}
-      style={{ paddingTop: 25, paddingBottom: 15, width: "100%" }}
+      style={{ paddingTop: 25, width: "100%", height: Platform.OS == "android" ? 100 : 130 }}
     >
 
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16, width: width }}>
 
-        <View style={{ flexDirection: 'row', width:width*0.65,backgroundColor:'grey' }}>
+        <View style={{ flexDirection: 'row', width: width * 0.65 }}>
 
-           {context.getHostelDetail?.hostelPic ? (
-                    <Image
-                      source={{ uri: context.getHostelDetail.hostelPic }}
-                      style={style.hostelImage}/>
-                  ) : (
-                    <View style={[style.hostelImage, style.initialContainer]}>
-                      <Text style={style.initialText}>
-                        {context.getHostelDetail.hostelInitial?.charAt(0).toUpperCase()}
-                      </Text>
-                    </View>
-                  )}
+          {context.getHostelDetail?.hostelPic ? (
+            <Image
+              source={{ uri: context.getHostelDetail.hostelPic }}
+              style={style.hostelImage} />
+          ) : (
+            <View style={[style.hostelImage, style.initialContainer]}>
+              <Text style={style.initialText}>
+                {context.getHostelDetail.hostelInitial?.charAt(0).toUpperCase()}
+              </Text>
+            </View>
+          )}
 
-          <View style={{ marginLeft: 7 }}>
+          <View style={{ marginLeft: 4 }}>
             <Text numberOfLines={1} ellipsizeMode="tail"
-              style={{ fontSize: 18, fontWeight: '600', fontFamily: 'gilroy-semibold', color: '#1B1D21', flexShrink: 1, maxWidth: '90%' }}>
+              style={{ fontSize: 18, fontWeight: '600', fontFamily: 'gilroy-semibold', color: '#1B1D21', flexShrink: 1 }}>
               {context.getHostelDetail.hostelName}
+              {/* maxWidth: '90%' */}
             </Text>
 
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Image source={Location} style={{ width: 12.75, height: 14.17 }} />
+              <Image source={Location} style={{ width: 16, height: 16 }} />
               <Text style={{ marginLeft: 7, fontSize: 14, color: '#4B4B4B' }}>
                 {context.getHostelDetail.city}
               </Text>
@@ -687,28 +749,28 @@ function Dashboard(props) {
         </View>
 
         <View style={{ flexDirection: 'row' }}>
-          <TouchableOpacity onPress={handleNotificationShow} style={{marginRight:10}}>
+          <TouchableOpacity onPress={handleNotificationShow} style={{ marginRight: 10 }}>
             <Image source={require("../../assets/Images/notification.png")} style={{ height: 50, width: 50 }} />
           </TouchableOpacity>
           <TouchableOpacity onPress={handleProfile} style={{ marginRight: 10 }}>
-                    {context.getCustomerDetail?.profilePic ? (
-                    <Image
-                      source={{ uri: context.getCustomerDetail?.profilePic }}
-                      style={style.hostelImage}/>
-                  ) : (
-                    <View style={[style.hostelImage, style.initialContainer]}>
-                      <Text style={style.initialText}>
-                        {context.getCustomerDetail?.initials?.charAt(0).toUpperCase()}
-                      </Text>
-                    </View>
-                  )}
+            {context.getCustomerDetail?.profilePic ? (
+              <Image
+                source={{ uri: context.getCustomerDetail?.profilePic }}
+                style={style.hostelImage} />
+            ) : (
+              <View style={[style.hostelImage, style.initialContainer]}>
+                <Text style={style.initialText}>
+                  {context.getCustomerDetail?.initials?.charAt(0).toUpperCase()}
+                </Text>
+              </View>
+            )}
           </TouchableOpacity>
         </View>
       </View>
 
     </LinearGradient>
 
-    <View style={{ flex: 1, paddingLeft: 20, paddingRight: 20 }}>
+    <View style={{ flex: 1, paddingLeft: 20, paddingRight: 20, }}>
       <TabView navigationState={{ index: index, routes }}
         commonOptions={{
           icon: ({ route, color }) => (<Image source={route.icon} style={{ width: 21.12, height: 21.12, tintColor: color }} />)
@@ -717,7 +779,7 @@ function Dashboard(props) {
         renderScene={renderScene}
         onIndexChange={setindex}
         initialLayout={{ width: Dimensions.get('window').width }}
-        style={{ flex: 1, justifyContent: 'center', marginTop: 10 }} />
+        style={{ flex: 1, justifyContent: 'center' }} />
 
     </View>
 
@@ -774,7 +836,7 @@ function Dashboard(props) {
               </View>
             ) : (
               <View style={{ flex: 1 }}>
-                {selectedComplaint && (
+                {complaintContext.getComplaintDetail && (
                   <ScrollView style={{ flex: 1 }}
                     showsVerticalScrollIndicator={false} >
                     <View style={{ justifyContent: 'flex-end', flex: 1 }}>
@@ -782,15 +844,15 @@ function Dashboard(props) {
                         <View style={{ flexDirection: "row", justifyContent: "space-between", paddingLeft: 5, paddingRight: 8, marginBottom: 10, paddingTop: 10, }}>
                           <View>
                             <Text style={{ fontSize: 18, fontWeight: "500", fontFamily: "gilroy-semibold", }} >
-                              {selectedComplaint.complaintTypeName}
+                              {complaintContext.getComplaintDetail?.complaintTypeName}
                             </Text>
                             <Text style={{ fontSize: 12.8, fontWeight: "400", color: "#424242", marginTop: 6 }}>
-                              {selectedComplaint.complaintDate}
+                              {complaintContext.getComplaintDetail?.complaintDate}
                             </Text>
                           </View>
 
                           <View style={{ flexDirection: "row", alignItems: "center" }}>
-                            <TouchableOpacity onPress={() => { setShowEditComplaint(true) }} style={{ paddingRight: 10 }}>
+                            <TouchableOpacity onPress={() => { setEditCompliantBottomSheet(true) }} style={{ paddingRight: 10 }}>
                               <Image source={Edit} style={{ width: 17.72, height: 17.72 }} />
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => deleteClick(selectedComplaint.complaintId)} style={{ paddingLeft: 10 }}>
@@ -806,7 +868,7 @@ function Dashboard(props) {
                         <View style={{ paddingTop: 5 }}>
                           <Text style={{ fontSize: 12, fontWeight: "400", color: "#4B4B4B" }}>Description </Text>
                           <Text style={{ fontSize: 16, fontWeight: "400", marginTop: 9 }}>
-                            {selectedComplaint.description}
+                            {complaintContext.getComplaintDetail?.description}
                           </Text>
                         </View>
 
@@ -815,16 +877,16 @@ function Dashboard(props) {
                           <Text style={{ fontSize: 12, fontWeight: "400", color: "#4B4B4B" }}> Assigned to</Text>
 
                           <View style={{ flexDirection: "row", justifyContent: "space-between", paddingTop: 8, }}>
-                            {selectedComplaint.assigneeName != "Unassigned" ? <Text style={{ fontSize: 15, fontWeight: "500" }}>
-                              {selectedComplaint.assigneeName}</Text>
+                            {complaintContext.getComplaintDetail?.assigneeName != "Unassigned" ? <Text style={{ fontSize: 15, fontWeight: "500" }}>
+                              {complaintContext.getComplaintDetail?.assigneeName}</Text>
                               : <Text style={{ fontSize: 14, fontWeight: "500", color: "#FF3B30", }}>
                                 Not Assigned Yet
                               </Text>
                             }
 
-                            {selectedComplaint.PhoneNO != null ?
+                            {complaintContext.getComplaintDetail?.assigneeMobileNumber != null ?
                               <Text style={{ fontSize: 12, color: "#1E45E1", fontWeight: "400" }}>
-                                {selectedComplaint.PhoneNO}
+                                {complaintContext.getComplaintDetail?.assigneeMobileNumber}
                               </Text> : null}
                           </View>
                         </View>
@@ -836,7 +898,7 @@ function Dashboard(props) {
                           <FlatList horizontal
                             style={{ paddingTop: 15 }}
                             keyExtractor={(item) => item.id.toString()}
-                            data={selectedComplaint.images}
+                            data={complaintContext.getComplaintDetail?.images}
                             renderItem={({ item }) => {
                               return <View key={item.id}
                                 style={{ paddingLeft: 10, position: "relative" }}>
@@ -856,10 +918,46 @@ function Dashboard(props) {
                         </View>
                       </View>
 
+
+                      {complaintContext.getComplaintDetail?.status == "ASSIGNED" ?
+                        <View style={{ borderWidth: 1, borderRadius: 10, borderColor: '#DCDCDC', paddingVertical: 10, paddingHorizontal: 15, marginTop: 15 }}>
+                          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <Text style={{ fontSize: 15, fontWeight: 600 }}>Complaint Assigned</Text>
+
+                            <View style={{
+                              flexDirection: 'row', borderRadius: 10, paddingVertical: 5, paddingHorizontal: 10, justifyContent: 'center', alignItems: 'center',
+                              backgroundColor: complaintContext.getComplaintDetail?.status === "PENDING" ? "#FFEEEEA3" : complaintContext.getComplaintDetail?.status === "Inpogress" ? "#FFF6E7" : "lightgreen",
+                            }}>
+                              <Image source={Group}
+                                style={{
+                                  width: 12.95, height: 13, marginTop: 2,
+                                  tintColor: complaintContext.getComplaintDetail?.status === "PENDING" ? "#FF3B30" : complaintContext.getComplaintDetail?.status === "Inpogress" ? "#FF9500" : "green",
+                                }} />
+
+                              <Text style={{
+                                fontSize: 12, fontWeight: 600, marginLeft: 5,
+                                color: complaintContext.getComplaintDetail?.status === "PENDING" ? "#FFEEEEA3" : complaintContext.getComplaintDetail?.status === "Inpogress" ? "#FFF6E7" : "green"
+                              }}>
+                                inprogress</Text>
+                            </View>
+
+                          </View>
+
+                          <View style={{ height: 1, backgroundColor: "#eee", marginVertical: 15 }} />
+
+                          <TouchableOpacity 
+                            style={{ justifyContent: 'center', alignItems: 'center', paddingBottom: 10 }}>
+                            <Text style={{ color: "#00A1FF", fontSize: 14, fontWeight: 600 }}>
+                              See all updates
+                            </Text>
+                          </TouchableOpacity>
+
+                        </View> : null}
+
                       <View style={{ marginTop: 10 }} >
                         {/* COMMENT INPUT */}
                         <View style={{ paddingTop: 22 }}>
-                          <View style={{ padding: 4, borderRadius: 10, borderWidth: 1, justifyContent: "space-between", flexDirection: "row", alignItems: "center", }} >
+                          <View style={{ padding: 4, borderRadius: 10, borderWidth: 1, justifyContent: "space-between", flexDirection: "row", alignItems: "center", borderColor: '#DCDCDC' }} >
                             <TextInput value={sendComment} placeholder="Add your Comment" onChangeText={setSendComment} />
                             <TouchableOpacity onPress={sendComment ? sendclick : commentclick}>
                               <Image
@@ -874,20 +972,20 @@ function Dashboard(props) {
                           <View
                             style={{
                               padding: 13, borderRadius: 10, borderWidth: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: 15, marginBottom: 20,
-                              backgroundColor: selectedComplaint.status === "PENDING" ? "#FFEEEEA3" : selectedComplaint.status === "Inpogress" ? "#FFF6E7" : "lightgreen",
-                              borderColor: selectedComplaint.status === "PENDING" ? "#FFD5D5" : selectedComplaint.status === "Inpogress" ? "#FFE7C6" : "lightgreen",
+                              backgroundColor: complaintContext.getComplaintDetail?.status === "PENDING" ? "#FFEEEEA3" : complaintContext.getComplaintDetail?.status === "Inpogress" ? "#FFF6E7" : "lightgreen",
+                              borderColor: complaintContext.getComplaintDetail?.status === "PENDING" ? "#FFD5D5" : complaintContext.getComplaintDetail?.status === "Inpogress" ? "#FFE7C6" : "lightgreen",
                             }}>
                             <Image source={Group}
                               style={{
                                 width: 17.93, height: 18, marginTop: 4,
-                                tintColor: selectedComplaint.status === "PENDING" ? "#FF3B30" : selectedComplaint.status === "Inpogress" ? "#FF9500" : "green",
+                                tintColor: complaintContext.getComplaintDetail?.status === "PENDING" ? "#FF3B30" : complaintContext.getComplaintDetail?.status === "Inpogress" ? "#FF9500" : "green",
                               }} />
                             <Text
                               style={{
-                                color: selectedComplaint.status === "PENDING" ? "#FF3B30" : selectedComplaint.status === "Inpogress" ? "#FF9500" : "green",
+                                color: complaintContext.getComplaintDetail?.status === "PENDING" ? "#FF3B30" : complaintContext.getComplaintDetail?.status === "Inpogress" ? "#FF9500" : "green",
                                 fontSize: 14.11, fontWeight: "600", marginLeft: 10,
                               }}>
-                              {selectedComplaint.status}
+                              {complaintContext.getComplaintDetail?.status}
                             </Text>
                           </View>
                         </TouchableOpacity>
@@ -906,115 +1004,24 @@ function Dashboard(props) {
 
     {/* -----Edit complaint-------- */}
 
-    {editCompliant && (
-      <View style={style.sheetOverlay}>
-        <TouchableWithoutFeedback onPress={onClose}>
-          <View style={StyleSheet.absoluteFill} />
-        </TouchableWithoutFeedback>
+    <EditComplaintSheet
+      visible={editCompliantBottomsheet}
+      onClose={closeEdit}
+      complaintType={complaintType}
+      selectedComplaint={selectedComplaint}
+      selectedComplaintTypeId={selectedComplaintTypeId}
+      setSelectedComplaintTypeId={setSelectedComplaintTypeId}
+      mediaimage={mediaimage}
+      uploadimage={uploadimage}
+      isFocus={isFocus}
+      setIsFocus={setIsFocus}
+      panResponder={panResponder}
+      sheetY={sheetY}
+      loading={loading}
+      showSuccessModal={showSuccessModal}
+      setShowSuccessModal={setShowSuccessModal}
+    />
 
-        <Animated.View style={[style.bottomsheets, { transform: [{ translateY: sheetY }] }]}
-          {...panResponder.panHandlers}>
-
-          <View style={{ flex: 1 }}>
-
-            <View {...panResponder.panHandlers}>
-              <View style={style.dragindictor} />
-            </View>
-
-            <AppLoader visible={loading} />
-            <SuccessModal
-              visible={showSuccessModal}
-              onClose={() => setShowSuccessModal(false)}
-              message="Complaint Added Successfully!"
-              type="sucess"
-            />
-
-            <View style={{ paddingLeft: 5, paddingRight: 5, paddingTop: 20, justifyContent: 'space-between', flex: 1 }}>
-              <View>
-                <Text style={{ fontSize: 20, fontWeight: 600 }}>Edit complaint</Text>
-
-                <View style={{ paddingTop: 20 }}>
-                  <Text>Complaint type</Text>
-
-                  <Dropdown style={{ borderWidth: 1, borderRadius: 10, paddingVertical: 10, marginTop: 10, borderColor: '#e5e5e5' }}
-                    onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
-                    data={complaintType}
-                    containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
-                    placeholderStyle={{ fontSize: 14, paddingLeft: 10 }}
-                    placeholder="Select a type"
-                    labelField="complaintTypeName"
-                    valueField="complaintTypeId"
-                    value={selectedComplaintTypeId}
-
-                    onChange={item => {
-                      setSelectedComplaintTypeId(item.complaintTypeId)
-                      setSelectedValue(item.value)
-                    }}
-                    renderRightIcon={() => (
-                      <Ionicons name={isFocus ? "chevron-up" : "chevron-down"}
-                        size={22}
-                        color="#000"
-                        style={{ paddingRight: 10 }}
-                      />
-                    )} />
-                </View>
-
-                <View style={{ paddingTop: 16 }}>
-                  <Text style={{ fontSize: 14, fontWeight: 400 }}>Complaint message</Text>
-                  <View style={{ borderWidth: 1, borderRadius: 10, marginTop: 8, paddingTop: 7, paddingLeft: 10, borderColor: '#e5e5e5' }}>
-                    <TextInput placeholder="Enter message" />
-                  </View>
-                </View>
-
-                <View style={{ paddingTop: 16 }}>
-                  <Text>Add Proof</Text>
-                  <View >
-                    <TouchableOpacity onPress={uploadimage} style={{
-                      borderWidth: 1, borderRadius: 9, paddingTop: 22, paddingBottom: 22,
-                      paddingLeft: 24, paddingRight: 24, borderColor: '#e5e5e5', marginTop: 8, flexDirection: 'row', alignItems: 'center'
-                    }}>
-                      <View>
-                        <Image source={CameraPic} style={{ width: 32.77, height: 32.77 }} />
-                      </View>
-                      <View style={{ paddingLeft: 22 }}>
-                        <View style={{ flexDirection: 'row' }}>
-                          <Text style={{ color: '#1E45E1', fontSize: 12, fontWeight: 500 }}>Choose file</Text>
-                          <Text style={{ fontSize: 12, fontWeight: 500 }}> to Upload</Text>
-                        </View>
-                        <Text style={{ fontSize: 11, fontWeight: 400, marginTop: 5 }}>Must be in PNG, JPG Format </Text>
-                      </View>
-                    </TouchableOpacity>
-
-                  </View>
-                </View>
-
-                <View>
-                  {mediaimage.length > 0 ? <FlatList horizontal showsHorizontalScrollIndicator={true} style={{ paddingTop: 20 }} key={(item) => item.id}
-                    data={mediaimage}
-                    renderItem={({ item }) => {
-                      console.log(item)
-                      return <View style={{ padding: 5 }}>
-                        <Image source={{ uri: item }} style={{ width: 80, height: 70, borderRadius: 5 }} />
-                      </View>
-                    }} /> : null}
-                </View>
-
-              </View>
-
-
-              <View style={{ paddingBottom: 20 }}>
-                <TouchableOpacity style={{ paddingTop: 12, paddingBottom: 12, borderWidth: 1, borderRadius: 22, justifyContent: 'center', alignItems: 'center', backgroundColor: '#1E45E1', borderColor: '#1E45E1' }}>
-                  <Text style={{ fontSize: 14, fontWeight: 600, color: '#ffffff' }}>Submit</Text>
-                </TouchableOpacity>
-              </View>
-
-            </View>
-
-          </View>
-
-        </Animated.View>
-      </View>
-    )}
 
 
     {/* -----Delete complaint----- */}
@@ -1143,7 +1150,7 @@ function Dashboard(props) {
                   <Dropdown style={{ borderWidth: 1, borderRadius: 10, paddingVertical: 10, marginTop: 10, borderColor: '#e5e5e5', paddingLeft: 15 }}
                     onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
                     data={complaintType}
-                    containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
+                    containerStyle={{ borderRadius: 10 }}
                     placeholderStyle={{ fontSize: 14 }}
                     placeholder="Select a type"
                     labelField="complaintTypeName"
@@ -1246,13 +1253,14 @@ function Dashboard(props) {
               <View style={style.dragindictor} />
             </View>
 
+            <AppLoader visible={loading} />
             <SuccessModal
               visible={showSuccessModal}
               onClose={() => setShowSuccessModal(false)}
-              message="Complaint Added Successfully!"
-              type="sucess"
+              message={toastMessage}
+              type={modelType}
             />
-
+            <ScrollView contentContainerStyle={{flexGrow:1}}>
             <View style={{ paddingLeft: 10, paddingRight: 15, flex: 1 }}>
               {tag == 'My-Amenities' ? (<View>
                 <View style={{ paddingTop: 12 }}>
@@ -1368,6 +1376,7 @@ function Dashboard(props) {
 
 
             </View>
+            </ScrollView>
 
           </View>
 
@@ -1654,7 +1663,7 @@ function Dashboard(props) {
           <ScrollView showsVerticalScrollIndicator={false}>
             {paymentContext.getInvoiceDetail && (
               <>
-                <View style={{flexDirection:'row',justifyContent:'space-between'}}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                   <Text style={style.modalTitle}>{paymentContext.getInvoiceDetail.title}</Text>
 
                   <View style={{ flexDirection: "row" }}>
@@ -1719,7 +1728,7 @@ function Dashboard(props) {
                 <View style={style.detailsSection}>
                   <View style={style.row}>
                     <Text style={style.detailLabel}>Actual Rent</Text>
-                    <Text style={style.detailValue}>₹{}</Text>
+                    <Text style={style.detailValue}>₹{ }</Text>
                   </View>
 
                   <View style={style.row}>
@@ -1757,7 +1766,7 @@ function Dashboard(props) {
                 {/* Paid / Due Date */}
                 <View style={style.Billbottom}>
                   <Text style={style.paiddetailLabel}>
-                    {selectedPayment.status === "Pending" ? "Due Date" : "Paid Date"}
+                    {paymentContext.getInvoiceDetail.status === "Pending" ? "Due Date" : "Paid Date"}
                   </Text>
                   <Text style={style.paiddetailValue}>{paymentContext.getInvoiceDetail.dueDate}</Text>
                 </View>
@@ -1801,7 +1810,7 @@ function Dashboard(props) {
                     <>
                       <TouchableOpacity
                         style={style.shareBtn}
-                        onPress={handleDownload}
+                        onPress={downloadOption}
                       >
                         <Text style={{ fontWeight: "600", color: "#071C70" }}>
                           Download Bill
@@ -1850,12 +1859,122 @@ function Dashboard(props) {
       </View>
     )}
 
-  </View>
+    {showDownloadOption && (
+      <View style={style.sheetOverlay}>
+
+        {/* Tap outside to close */}
+        <TouchableWithoutFeedback onPress={onClose}>
+          <View style={StyleSheet.absoluteFill} />
+        </TouchableWithoutFeedback>
+
+        <Animated.View
+          style={[style.bottomSheetoption, { transform: [{ translateY: sheetY }] }]}
+          {...panResponder.panHandlers}
+        >
+          <View {...panResponder.panHandlers}>
+            <View style={style.dragindictor} />
+          </View>
+
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <Text style={style.title}>Select option</Text>
+
+            <TouchableOpacity
+              activeOpacity={0.9}
+              onPress={() => setSelected('invoice')}
+              style={
+                selected === 'invoice'
+                  ? [style.card, style.cardSelected]
+                  : style.card
+              }
+              accessibilityRole="radio"
+              accessibilityState={{ selected: selected === 'invoice' }}
+            >
+              <View style={style.cardInner}>
+                <View style={style.cardTextContainer}>
+                  <Text style={style.cardTitle}>Invoice Bill Summary</Text>
+                  <Text style={style.cardSubtitle}>
+                    Brief summary of total bill with taxes.
+                  </Text>
+                </View>
+
+
+                <View style={selected === 'invoice' ? [style.radioOuter, style.radioOuterSelected] :
+                  style.radioOuter}>
+                  <View
+                    style={
+                      selected === 'invoice'
+                        ? [style.radioInner, style.radioInnerSelected]
+                        : style.radioInner
+                    }
+                  />
+                </View>
+              </View>
+            </TouchableOpacity>
+
+
+            <View style={style.secondOptionContainer}>
+              <TouchableOpacity
+                activeOpacity={0.9}
+                onPress={() => setSelected('receipt')}
+                style={
+                  selected === 'receipt'
+                    ? [style.card, style.cardSelected]
+                    : style.card
+                }
+                accessibilityRole="radio"
+                accessibilityState={{ selected: selected === 'receipt' }}
+              >
+                <View style={style.cardInner}>
+                  <View style={style.cardTextContainer}>
+                    <Text style={style.cardTitle}>Payment Receipt</Text>
+                    <Text style={style.cardSubtitle}>
+                      Receipt of payments made for the bill
+                    </Text>
+                  </View>
+
+
+                  <View style={selected === 'receipt' ? [style.radioOuter, style.radioOuterSelected] :
+                    style.radioOuter}>
+                    <View
+                      style={
+                        selected === 'receipt'
+                          ? [style.radioInner, style.radioInnerSelected]
+                          : style.radioInner
+                      }
+                    />
+                  </View>
+                </View>
+              </TouchableOpacity>
+
+            </View>
+
+
+            <View style={style.footer}>
+              <TouchableOpacity
+                onPress={handleDownload}
+                activeOpacity={0.9}
+
+              >
+
+                <View style={style.downloadContent}>
+                  <Image source={DownloadSide} style={{width:20,height:20}}/>
+                  <Text style={style.downloadText}> Download</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+        </Animated.View>
+      </View >
+    )
+    }
+
+
+  </View >
 
 }
 
 const style = StyleSheet.create({
-  mainDashb: { flex: 1, backgroundColor: '#ffffff', position: 'relative' },
+  mainDashb: { flex: 1, backgroundColor: '#FFFFFF', position: 'relative' },
   container: { flexDirection: 'row', paddingTop: 10, paddingLeft: 16, paddingRight: 16, justifyContent: 'space-between', paddingLeft: 10, alignItems: 'center' },
   sheetOverlay: {
     position: "absolute",
@@ -1996,7 +2115,7 @@ const style = StyleSheet.create({
     paddingHorizontal: 5,
     paddingVertical: 2,
     marginTop: 6,
-    alignItems:'center'
+    alignItems: 'center'
   },
   statusText: { fontSize: 12, fontWeight: "500" },
   hostelImage: {
@@ -2006,15 +2125,146 @@ const style = StyleSheet.create({
     marginRight: 15,
   },
   initialText: {
-  color: '#788fed',
-  fontSize: 20,
-  fontWeight: 'bold',
-},
+    color: '#788fed',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
 
-initialContainer: {
-  backgroundColor: '#eef1ff',
-  justifyContent: 'center',
-  alignItems: 'center',
-},
+  initialContainer: {
+    backgroundColor: '#eef1ff',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  bottomSheetoption: {
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    height: "50%",
+  },
+
+
+  backdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(12,12,13,0.45)',
+    justifyContent: 'flex-end',
+  },
+  fullFill: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
+  sheet: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    paddingHorizontal: 22,
+    paddingBottom: Platform.OS === 'ios' ? 36 : 24,
+    paddingTop: 12,
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: -6 },
+  },
+  grabberContainer: {
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  grabber: {
+    width: 44,
+    height: 4,
+    borderRadius: 4,
+    backgroundColor: '#E6E9EE',
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#0E1726',
+    marginBottom: 18,
+  },
+  card: {
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 18,
+  },
+  cardSelected: {
+    borderWidth: 1.5,
+    borderColor: '#2E44FF',
+    backgroundColor: '#F8FAFB',
+    shadowColor: '#2E44FF',
+    shadowOpacity: 0.07,
+    shadowRadius: 12,
+    elevation: 3,
+  },
+  cardInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  cardTextContainer: { flex: 1 },
+  cardTitle: { fontSize: 16, fontWeight: '700', color: '#0E1726' },
+  cardSubtitle: { fontSize: 14, color: '#8A97A8', marginTop: 8 },
+  radioOuter: {
+    width: 28,
+    height: 28,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: '#CFD8E6',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  radioOuterSelected: { borderColor: '#2E44FF' },
+  radioInner: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: 'transparent',
+  },
+  radioInnerSelected: {
+    backgroundColor: '#2E44FF',
+    borderRadius: 20,
+
+  },
+  secondOptionContainer: { marginBottom: 26 },
+  rowOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+
+  },
+  rowLeft: { flex: 1 },
+  rowTitle: { fontSize: 18, fontWeight: '700', color: '#0E1726' },
+  rowSubtitle: { fontSize: 14, color: '#8A97A8', marginTop: 6 },
+  radioOutline: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 2,
+    borderColor: '#C4CBD9',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  radioInnerSmall: { width: 8, height: 8, borderRadius: 4, backgroundColor: 'transparent' },
+  radioInnerSmallSelected: { backgroundColor: '#2E44FF' },
+
+
+  footer: {
+    marginTop: 4,
+    alignItems: 'center',
+    width: '100%',
+    borderRadius: 28,
+    paddingVertical: 14,
+    backgroundColor: '#2E44FF',
+
+  },
+  downloadbutton: {
+    width: '100%',
+    borderRadius: 28,
+    paddingVertical: 14,
+    shadowColor: '#2E44FF',
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+
+  downloadContent: { alignItems: 'center', justifyContent: 'center',flexDirection:'row' },
+  downloadText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
 })
 export default Dashboard;

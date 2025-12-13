@@ -47,7 +47,7 @@ const RentalAgreement = () => {
         }
       };
 
-      const handleBack = () => navigation.goBack();
+      const handleBack = () => {navigation.goBack()};
 
 
     return <View style={{ flex: 1,backgroundColor:'#ffffff',paddingTop:30,paddingHorizontal:20,paddingBottom:20 }}>
@@ -59,7 +59,7 @@ const RentalAgreement = () => {
                       style={{ height: 25, width: 25 }}
                     />
                   </TouchableOpacity>
-                  <Text style={styles.header}>Customer Profile</Text>
+                  <Text style={styles.header}>Rental Agreement</Text>
                 </View>
 
         <View style={styles.card}>
