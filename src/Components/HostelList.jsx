@@ -112,7 +112,7 @@ const HostelList = (route) => {
 
         <View>
           <Text style={styles.hostelName}>{item.hostelName}</Text>
-          <View style={styles.locationRow}>
+          <View style={styles.locationRow}> 
             <Ionicons name="location-outline" size={16} color="#0057FF" />
             <Text style={styles.locationText}>{item.city}</Text>
           </View>
@@ -120,9 +120,13 @@ const HostelList = (route) => {
       </View>
 
       {selectedHostel?.hostelId === item.hostelId ? (
-        <Ionicons name="radio-button-on" size={22} color="#0057FF" />
+        <View style={{width: 18, height: 18, backgroundColor: '#FFFFFF', borderRadius: 9, borderWidth: 1.5, borderColor: '#0057FF', borderStyle: 'solid', padding: 4}}>
+            <View style={{backgroundColor: '#0057FF', width: '100%', height: '100%', borderRadius: 500, borderWidth: 1, borderColor: '#000000', borderStyle: 'solid'}}></View>
+        </View>
       ) : (
-        <Ionicons name="radio-button-off" size={22} color="#aaa" />
+         <View style={{width: 18, height: 18, backgroundColor: '#FFFFFF', borderRadius: 9, borderWidth: 1.5, borderColor: '#0057FF', borderStyle: 'solid', alignItems: 'center', justifyContent: 'center', padding: 4}}>
+            
+        </View>
       )}
     </TouchableOpacity>
   }

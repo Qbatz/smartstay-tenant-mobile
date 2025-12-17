@@ -1,5 +1,5 @@
 import React, { useContext, useRef, useState, useEffect } from "react";
-import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity, Animated } from "react-native";
+import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity, Animated, KeyboardAvoidingView, Platform } from "react-native";
 import Sm_logo from '../../assets/Images/Sm_logo.png'
 import { useNavigation } from "@react-navigation/native";
 import { UsersContext } from "../../Context/UserContext";
@@ -115,75 +115,84 @@ const EnterMPin = (props) => {
         navigation.navigate('EnterNumber')
     }
 
-    return <View style={{ paddingHorizontal: 20, flex: 1 }}>
-        <SuccessModal
-            visible={showSuccessModal}
-            onClose={() => setShowSuccessModal(false)}
-            message={showModelMessage}
-            type={modelType}
-        />
-        <View style={{ paddingTop: 70 }} >
-            <Image source={Sm_logo} style={style.logo} />
+    return <KeyboardAvoidingView style={{ flex: 1 }}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}>
+        <View style={{ paddingHorizontal: 20, flex: 1 }}>
+            <SuccessModal
+                visible={showSuccessModal}
+                onClose={() => setShowSuccessModal(false)}
+                message={showModelMessage}
+                type={modelType}
+            />
+            <View style={{ paddingTop: 70 }} >
+                <Image source={Sm_logo} style={style.logo} />
 
-            <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 15 }}>
-                <Text style={style.title}>Welcome Back</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 15 }}>
+                    <Text style={style.title}>Welcome Back</Text>
 
-                <Animated.Image
-                    source={WaveIcon}
-                    style={[
-                        style.hand,
-                        {
-                            width: 25,
-                            height: 25,
-                            marginTop: 8,
-                            marginLeft: 5,
-                            transform: [{ rotate: rotateInterpolate }],
-                        },
-                    ]}
-                />
-
-            </View>
-
-            <Text style={style.createText}>Enter mPIN</Text>
-
-            <Text style={style.subtitle}>Please enter the mPIN </Text>
-
-            <View style={style.pinContainer}>
-                {createMpin.map((digit, index) => (
-                    <TextInput
-                        key={index}
-                        ref={(ref) => (inputs.current[index] = ref)}
-                        keyboardType="number-pad"
-                        style={style.pinBox}
-                        maxLength={1}
-                        value={digit}
-                        onChangeText={(text) => handlePinChange(text, index)}
-                        onKeyPress={(e) => handleKeyPress(e, index)}
+                    <Animated.Image
+                        source={WaveIcon}
+                        style={[
+                            style.hand,
+                            {
+                                width: 25,
+                                height: 25,
+                                marginTop: 8,
+                                marginLeft: 5,
+                                transform: [{ rotate: rotateInterpolate }],
+                            },
+                        ]}
                     />
-                ))}
+
+                </View>
+
+                <Text style={style.createText}>Enter mPIN</Text>
+
+                <Text style={style.subtitle}>Please enter the mPIN </Text>
+
+                <View style={style.pinContainer}>
+                    {createMpin.map((digit, index) => {
+                        console.log(index);
+                        return <TextInput
+                            key={index}
+                            ref={(ref) => (inputs.current[index] = ref)}
+                            keyboardType="number-pad"
+                            showSoftInputOnFocus
+                            returnKeyType={(index +1) === createMpin.length ? 'done': 'next'}
+                            style={style.pinBox}
+                            maxLength={1}
+                            value={digit}
+                            onSubmitEditing={enterPinClick}
+                            onChangeText={(text) => handlePinChange(text, index)}
+                            onKeyPress={(e) => handleKeyPress(e, index)}
+                        />
+                    }
+                    )}
+                </View>
+                <View style={{ alignItems: 'flex-end', paddingTop: 20, paddingRight: 20 }}>
+                    <TouchableOpacity onPress={forgotMpinClick}
+                    >
+                        <Text style={{ color: '#1E45E1', fontSize: 14, fontWeight: 400, textDecorationLine: 'underline', }}>
+                            Forgot Mpin</Text>
+                    </TouchableOpacity>
+                </View>
+
+
+
             </View>
-            <View  style={{ alignItems: 'flex-end', paddingTop: 20, paddingRight: 20 }}> 
-                <TouchableOpacity onPress={forgotMpinClick}
-                   >
-                    <Text style={{ color: '#1E45E1', fontSize: 14, fontWeight: 400, textDecorationLine: 'underline', }}>
-                        Forgot Mpin</Text>
+
+
+            <View style={{ paddingBottom: 20}}>
+                <TouchableOpacity onPress={enterPinClick} style={style.nextButton}>
+                    <Text style={style.nextText}>Enter mPIN</Text>
                 </TouchableOpacity>
             </View>
 
 
 
         </View>
-
-
-        <View style={{ flex: 1, justifyContent: "center", }}>
-            <TouchableOpacity onPress={enterPinClick} style={style.nextButton}>
-                <Text style={style.nextText}>Enter mPIN</Text>
-            </TouchableOpacity>
-        </View>
-
-
-
-    </View>
+    </KeyboardAvoidingView>
 
 }
 
@@ -193,8 +202,14 @@ const style = StyleSheet.create({
     subtitle: { fontSize: 14, fontWeight: 400, color: '#4B4B4B', marginTop: 15 },
     pinContainer: { flexDirection: 'row', justifyContent: 'space-between', paddingTop: 20, paddingLeft: 20, paddingRight: 60 },
     pinBox: {
-        width: 50, heiht: 70, borderWidth: 1, borderColor: "#ccc", borderRadius: 8, textAlign: "center",
-        fontSize: 20, color: "#000"
+        width: 50,
+        borderWidth: 1,
+        borderColor: "#ccc",
+        borderRadius: 8,
+        textAlign: "center",
+        fontSize: 20,
+        color: "#000",
+        paddingVertical: 10
     },
     nextButton: { backgroundColor: '#1A73E8', borderRadius: 8, paddingVertical: 20, alignItems: 'center' },
     nextText: { color: '#ffffff', fontSize: 16, fontWeight: 600 },

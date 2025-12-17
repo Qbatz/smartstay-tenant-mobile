@@ -160,6 +160,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: "#000",
+    height: 50,
   },
   centerButtonContainer: {
     flex: 1,
