@@ -151,9 +151,8 @@ const EnterMPin = (props) => {
 
                 <Text style={style.subtitle}>Please enter the mPIN </Text>
 
-                <View style={style.pinContainer}>
+                <View stylse={style.pinContainer}>
                     {createMpin.map((digit, index) => {
-                        console.log(index);
                         return <TextInput
                             key={index}
                             ref={(ref) => (inputs.current[index] = ref)}
