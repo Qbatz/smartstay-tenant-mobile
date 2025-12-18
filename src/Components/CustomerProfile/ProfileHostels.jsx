@@ -21,13 +21,12 @@ const ProfileHostels = () => {
   const userContext=useContext(UsersContext)
   const loginContext=useContext(LoginContexts)
   const [dropdownVisible, setDropdownVisible] = useState(false);
-  const [selectedHostel, setSelectedHostel] = useState(userContext.getHostelDetail);
+  const [selectedHostel, setSelectedHostel] = useState();
   const [rentDetails,setRentalDetails]=useState();
   const[hostelRental,setHostelRental]=useState([])
   const [hostelList,setHostelList]=useState([])
 
-  console.log(selectedHostel)
-  console.log(rentDetails)
+  console.log(selectedHostel?.rentalDetails)
 
 
   const hostels = [
@@ -36,15 +35,14 @@ const ProfileHostels = () => {
     { id: 3, name: "ComfortNest", location: "Thoraipakkam" },
   ];
 
-  console.log(userContext.getHostelList)
-
   useEffect(()=>{
 
     getHostelRentalDetails(loginContext.getUserId,loginContext.getToken).then(r=>{
-
+      setHostelList(r.data)
         console.log(r)
-        // const newRentals=r.data.filter(i => i.hostelId === userContext?.getHostelDetail?.hostelId)
-        // console.log(newRentals)
+        const newRentals=r.data.find(i => i.hostelId === userContext?.getHostelDetail?.hostelId)
+        setSelectedHostel(newRentals)
+        console.log(newRentals)
 
     })
 
@@ -64,12 +62,7 @@ const ProfileHostels = () => {
     setDropdownVisible(false);
 
     console.log(hostel.hostelId)
-    getRentalDetials(hostel.hostelId, loginContext.getToken)
-    .then(res => {
-      setRentalDetails(res.data);
-      console.log(res)
-    })
-    .catch(err => console.log("Error:", err));
+   
 
   };
 
@@ -129,7 +122,7 @@ const ProfileHostels = () => {
       {dropdownVisible && (
         <View style={styles.dropdown}>
           <ScrollView>
-            {userContext.getHostelList.map((item) => (
+            {hostelList.map((item) => (
               <TouchableOpacity
                 key={item.hostelId}
                 style={styles.dropdownItem}
@@ -155,7 +148,7 @@ const ProfileHostels = () => {
             source={DateIcon}
             resizeMode="contain" style={{ width: 20, height: 20 }}
           />
-          <Text style={styles.detailValue}>{rentDetails?.joiningDate}</Text>
+          <Text style={styles.detailValue}>{selectedHostel?.rentalDetails?.joiningDate}</Text>
         </View>
       </View>
 
@@ -167,7 +160,7 @@ const ProfileHostels = () => {
             source={MoneyIcon}
             resizeMode="contain" style={{ width: 20, height: 20 }}
           />
-          <Text style={styles.detailValue}>{!rentDetails?.advancePaidAmount ? rentDetails?.advancePaidAmount:'N/A'}</Text>
+          <Text style={styles.detailValue}>{selectedHostel?.rentalDetails?.advancePaidAmount !=0? selectedHostel?.rentalDetails?.advancePaidAmount:'N/A'}</Text>
         </View>
       </View>
 
@@ -179,7 +172,7 @@ const ProfileHostels = () => {
             source={RentAmountIcon}
             resizeMode="contain" style={{ width: 20, height: 20 }}
           />
-          <Text style={styles.detailValue}>₹{rentDetails?.rentAmount}</Text>
+          <Text style={styles.detailValue}>₹{selectedHostel?.rentalDetails?.rentAmount}</Text>
         </View>
       </View>
 
@@ -191,7 +184,7 @@ const ProfileHostels = () => {
             source={DateIcon}
             resizeMode="contain" style={{ width: 20, height: 20 }}
           />
-          <Text style={styles.detailValue}>{rentDetails?.dueDate}</Text>
+          <Text style={styles.detailValue}>{selectedHostel?.rentalDetails?.dueDate}</Text>
         </View>
       </View>
     </View>
@@ -352,6 +345,7 @@ const styles = StyleSheet.create({
     borderColor: "#ddd",
     borderWidth: 1,
     overflow: "hidden",
+    maxHeight: 60 * 3,
   },
   dropdownItem: {
     padding: 12,

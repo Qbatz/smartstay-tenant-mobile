@@ -1,12 +1,27 @@
-import React from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from "react-native";
+import React, { useEffect } from "react";
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, BackHandler } from "react-native";
 import RoomSerach from '../../assets/Images/roomsearch_logo.png';
 import Qr from '../../assets/Images/pdfImage/QRimg.png';
 import paytm from '../../assets/Images/pdfImage/Paytmimg.png';
 import phonepe from '../../assets/Images/pdfImage/PhonepeImg.png'
 import gpay from '../../assets/Images/pdfImage/GPayimg.png'
 import signature from '../../assets/Images/signature.png'
+import { useNavigation } from "@react-navigation/native";
 const InvoiceDesign = () => {
+
+  const navigation=useNavigation();
+
+  useEffect(()=>{
+    const onBackPress=()=>{
+      navigation.goBack();
+      return true;
+    }
+
+    BackHandler.addEventListener('hardwareBackPress',onBackPress);
+
+    return()=>BackHandler.addEventListener('hardwareBackPress',onBackPress);
+  },[navigation])
+
   return (
     <ScrollView style={styles.container}>
     
@@ -25,7 +40,7 @@ const InvoiceDesign = () => {
 
      
       <View style={styles.receiptTitleContainer}>
-        <Text style={styles.receiptTitle}>Payment Receipt</Text>
+        <Text style={styles.receiptTitle}>Payment Invoice</Text>
       </View>
 
       

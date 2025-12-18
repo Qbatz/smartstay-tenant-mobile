@@ -5,7 +5,8 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image, Linking, Alert
+  Image, Linking, Alert,
+  BackHandler
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -44,8 +45,16 @@ const CustomerProfile = (route) => {
   const navigation = useNavigation();
   const [customer, setCustomers] = useState()
 
-  console.log(context.getCustomerDetail)
+  useEffect(()=>{
+      const onBackPress=()=>{
+        navigation.goBack();
+        return true;
+      }
 
+      BackHandler.addEventListener('hardwareBackPress',onBackPress);
+
+      return()=>BackHandler.addEventListener('hardwareBackPress',onBackPress);
+  },[navigation])
 
 
   useEffect(() => {
@@ -365,6 +374,7 @@ initialContainer: {
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
+    flex:1
   },
   infoText: {
     color: "#555",

@@ -1,190 +1,245 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
-  Image,
-  TouchableOpacity,
-  ActivityIndicator,
-  TextInput,
   FlatList,
-  KeyboardAvoidingView,
-  Platform
-} from "react-native";
-// import dayjs from "dayjs";
-import DateIcon from "../../assets/Images/calendar.png";
+  TextInput,
+  TouchableOpacity,
+  Image,
+  SafeAreaView,
+  BackHandler,
+} from 'react-native';
+import SingleTickPic from '../../assets/Images/singleTick.png'
+import DoubleTick from '../../assets/Images/doubleTick.png'
+import InprogressLogo from '../../assets/Images/inprogresspic.png'
+import PersonLogo from '../../assets/Images/personlogo.png'
+import LeftArrow from "../../assets/Images/LeftArrow.png"
+import { useFocusEffect } from '@react-navigation/native';
 
 
-export default function ComplaintUpdatesScreen({ route, navigation }) {
-  const { complaintId } = route.params.complaintId;
-  const [updates, setUpdates] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [comment, setComment] = useState("");
-  const [posting, setPosting] = useState(false);
+const UPDATES = [
+  {
+    id: '1',
+    type: 'RESOLVED',
+    title: 'Complaint Resolved',
+    description: 'Tenant confirmed the complaint is resolved.',
+    time: '25 Oct 2025, 1:00 PM',
+  },
+  {
+    id: '2',
+    type: 'COMPLETED',
+    title: 'Work Completed',
+    description: 'Staff marked complaint as Completed.',
+    time: '25 Oct 2025, 12:30 PM',
+  },
+  {
+    id: '3',
+    type: 'IN_PROGRESS',
+    title: 'Complaint In Progress',
+    description: 'Staff marked complaint as In Progress.',
+    time: '24 Oct 2025, 11:00 AM',
+    comment: 'Complaint will resolve by tomorrow',
+    user: 'Nagarajan - Admin',
+  },
+  {
+    id: '4',
+    type: 'ASSIGNED',
+    title: 'Complaint Assigned',
+    description: 'Complaint assigned to Maintenance Staff - Rajesh',
+    time: '23 Oct 2025, 9:30 AM',
+  },
+];
 
-  const inputRef = useRef(null);
+/* ---------- STATUS CONFIG ---------- */
+const STATUS = {
+  ASSIGNED: { color: '#CBD5E1', icon: PersonLogo },
+  IN_PROGRESS: { color: '#FDBA74', icon: InprogressLogo },
+  COMPLETED: { color: '#86EFAC', icon: SingleTickPic },
+  RESOLVED: { color: '#22C55E', icon: DoubleTick },
+};
 
-  useEffect(() => {
-    fetchUpdates();
-  }, []);
+ 
 
-  async function fetchUpdates() {
-    try {
-      setLoading(true);
-      const res = await fetch(
-        `https://your-api.com/complaints/${complaintId}/updates`
-      );
-      const data = await res.json();
-      setUpdates(data?.updates || []);
-    } catch (e) {
-      console.log("ERROR →", e);
-    } finally {
-      setLoading(false);
-    }
-  }
+  const HistoryCommentsScreen=({ navigation }) =>{
 
-  async function submitComment() {
-    if (!comment.trim()) return;
-    setPosting(true);
+  const [comment, setComment] = useState('');
+  const isResolved = UPDATES[0]?.type === 'RESOLVED';
 
-    const optimistic = {
-      id: "temp-" + Date.now(),
-      actorName: "You",
-      message: comment,
-      createdAt: new Date().toISOString(),
-      isLocal: true
-    };
+    useFocusEffect(
+      useCallback(()=>{
+        const onBackPress=()=>{
+          navigation.goBack();
+          return true;
+        };
 
-    setUpdates([optimistic, ...updates]);
-    setComment("");
+        BackHandler.addEventListener('hardwareBackPress',onBackPress);
 
-    try {
-      await fetch(`https://your-api.com/complaints/${complaintId}/updates`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ comment }),
-      });
-      fetchUpdates();
-    } catch (e) {
-      console.log(e);
-    }
-    setPosting(false);
-  }
+        return ()=>
+            BackHandler.addEventListener('hardwareBackPress', onBackPress)
+      },[navigation])
+    )
 
-  const renderUpdate = ({ item }) => (
-    <View style={styles.updateItem}>
-      <View style={styles.iconCircle}>
-        <Image
-          source={DateIcon}
-          style={{ width: 20, height: 20, tintColor: "#4B74FF" }}
-        />
-      </View>
+  const renderItem = ({ item, index }) => {
+    const isLast = index === UPDATES.length - 1;
+    const config = STATUS[item.type];
 
-      <View style={{ flex: 1 }}>
-        <Text style={styles.updateTitle}>
-          {item.title || "Complaint Update"}
-        </Text>
-
-        <Text style={styles.updateDesc}>{item.message}</Text>
-
-        <Text style={styles.timeText}>
-          {/* {dayjs(item.createdAt).format("DD MMM YYYY, hh:mm A")} */}
-        </Text>
-
-        {/* Avatar & Actor */}
-        {item.actorName && (
-          <View style={styles.actorRow}>
-            <Image
-              source={{
-                uri:
-                  item.actorAvatar ||
-                  "https://cdn-icons-png.flaticon.com/512/149/149071.png",
-              }}
-              style={styles.avatar}
-            />
-            <Text style={styles.actorName}>{item.actorName}</Text>
+    return (
+      <View style={styles.row}>
+        <View style={styles.timeline}>
+          <View style={[styles.circle, { backgroundColor: config.color }]}>
+            <Image source={config.icon} style={{width:35,height:35,resizeMode:'contain'}}/>
           </View>
-        )}
+          {!isLast && <View style={styles.line} />}
+        </View>
 
-        {/* Images */}
-        {item.images?.length > 0 && (
-          <FlatList
-            horizontal
-            data={item.images}
-            renderItem={({ item }) => (
-              <Image source={{ uri: item }} style={styles.attachment} />
-            )}
-            keyExtractor={(i, idx) => idx.toString()}
-            style={{ marginTop: 10 }}
-          />
-        )}
+        <View style={styles.content}>
+          <Text style={styles.title}>{item.title}</Text>
+          <Text style={styles.desc}>{item.description}</Text>
+          <Text style={styles.time}>{item.time}</Text>
+
+          {item.comment && (
+            <View style={styles.commentBox}>
+              <View style={styles.commentHeader}>
+                <Image
+                  source={{ uri: 'https://i.pravatar.cc/100' }}
+                  style={styles.avatarSmall}
+                />
+                <Text style={styles.commentUser}>{item.user}</Text>
+              </View>
+              <Text style={styles.commentText}>{item.comment}</Text>
+            </View>
+          )}
+        </View>
       </View>
-    </View>
-  );
+    );
+  };
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Image
-            source={DateIcon}
-            style={{ width: 22, height: 22 }}
-          />
+        <TouchableOpacity
+          style={styles.backRow}
+          onPress={() => navigation?.goBack()}
+        >
+         <Image source={LeftArrow} style={{ height: 25, width: 25 }}/>
+          <Text style={styles.headerTitle}>History & Comments</Text>
         </TouchableOpacity>
 
-        <Text style={styles.headerTitle}>
-          Plumbing <Text style={{ color: "#4B74FF" }}>(#{complaintId})</Text>
-        </Text>
+        <Text style={styles.complaintId}>Complaint Id - #CMP674</Text>
       </View>
 
-      {loading ? (
-        <ActivityIndicator size="large" color="#4B74FF" style={{ marginTop: 50 }} />
-      ) : (
-        <ScrollView style={{ flex: 1 }}>
-          <Text style={styles.allUpdatesTitle}>All Updates</Text>
-
-          <FlatList
-            data={updates}
-            renderItem={renderUpdate}
-            keyExtractor={(item) => item.id.toString()}
-            scrollEnabled={false}
-          />
-
-          <View style={{ height: 40 }} />
-        </ScrollView>
-      )}
-
-      {/* Comment Box */}
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-      >
-        <View style={styles.commentBar}>
-          <TextInput
-            ref={inputRef}
-            style={styles.input}
-            placeholder="Add your comment..."
-            value={comment}
-            onChangeText={setComment}
-          />
-
-          <TouchableOpacity
-            style={styles.sendBtn}
-            onPress={submitComment}
-            disabled={posting}
-          >
+      {/* ---------- COMMENT INPUT (ONLY AFTER RESOLVED) ---------- */}
+      {isResolved && (
+        <View style={styles.inputWrapper}>
+          <View style={styles.inputRow}>
             <Image
-              source={DateIcon}
-              style={{
-                width: 24,
-                height: 24,
-                tintColor: posting ? "#999" : "#4B74FF",
-              }}
+              source={{ uri: 'https://i.pravatar.cc/100' }}
+              style={styles.avatar}
             />
+            <TextInput
+              placeholder="Add new comment"
+              value={comment}
+              onChangeText={setComment}
+              multiline
+              style={styles.input}
+            />
+          </View>
+
+          <TouchableOpacity style={styles.addButton}>
+            <Text style={styles.addButtonText}>Add Comment</Text>
           </TouchableOpacity>
         </View>
-      </KeyboardAvoidingView>
-    </View>
+      )}
+
+      <FlatList
+        data={UPDATES}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        contentContainerStyle={{ padding: 16 }}
+      />
+    </SafeAreaView>
   );
 }
+
+export default HistoryCommentsScreen;
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#FFFFFF' },
+
+  header: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderColor: '#E5E7EB',
+    marginTop:15
+  },
+  backRow: { flexDirection: 'row', alignItems: 'center' },
+  backArrow: { fontSize: 20, marginRight: 8 },
+  headerTitle: { fontSize: 18, fontWeight: '600' },
+  complaintId: { color: '#2563EB', marginTop: 6 },
+
+  inputWrapper: {
+    padding: 16,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  inputRow: { flexDirection: 'row', alignItems: 'flex-start' },
+  avatar: { width: 40, height: 40, borderRadius: 20, marginRight: 10 },
+  input: {
+    flex: 1,
+    minHeight: 80,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 10,
+    padding: 10,
+    textAlignVertical: 'top',
+    backgroundColor: '#fff',
+  },
+  addButton: {
+    alignSelf: 'flex-end',
+    marginTop: 10,
+    backgroundColor: '#2563EB',
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  addButtonText: { color: '#fff', fontWeight: '600' },
+
+  row: { flexDirection: 'row', marginBottom: 24 },
+  timeline: { width: 40, alignItems: 'center' },
+  circle: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  icon: { fontSize: 12, color: '#fff' },
+  line: {
+    flex: 1,
+    width: 2,
+    backgroundColor: '#E5E7EB',
+    marginTop: 4,
+  },
+
+  content: {
+    flex: 1,
+    backgroundColor: '#fff',
+    paddingLeft: 12,
+  },
+  title: { fontSize: 15, fontWeight: '600', color: '#0F172A' },
+  desc: { fontSize: 14, color: '#334155', marginTop: 4 },
+  time: { fontSize: 12, color: '#64748B', marginTop: 6 },
+
+  commentBox: {
+    marginTop: 10,
+    backgroundColor: '#F1F5F9',
+    padding: 10,
+    borderRadius: 10,
+  },
+  commentHeader: { flexDirection: 'row', alignItems: 'center' },
+  avatarSmall: { width: 24, height: 24, borderRadius: 12, marginRight: 6 },
+  commentUser: { fontSize: 12, fontWeight: '600' },
+  commentText: { fontSize: 13, marginTop: 6 },
+});

@@ -77,17 +77,20 @@ function Services(props) {
         })
     };
 
-    useFocusEffect(
-        useCallback(() => {
-            fetchServiceData();
+    useEffect(()=>{
+        fetchServiceData();
+    },[])
+    // useFocusEffect(
+    //     useCallback(() => {
+    //         fetchServiceData();
 
-            const intervalId = setInterval(() => {
-                fetchServiceData();
-            }, 6000)
+    //         const intervalId = setInterval(() => {
+    //             fetchServiceData();
+    //         }, 6000)
 
-            return () => clearInterval(intervalId)
-        }, [])
-    )
+    //         return () => clearInterval(intervalId)
+    //     }, [])
+    // )
 
 
     useEffect(() => {

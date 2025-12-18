@@ -1,5 +1,9 @@
 import React, { useState, useMemo, useCallback, useRef, useEffect, useContext } from "react";
-import { View, Text, Dimensions, Image, TouchableOpacity, Button, FlatList, TextInput, StyleSheet, BackHandler, TouchableWithoutFeedback, Platform, PanResponder, Animated, ScrollView, Alert } from "react-native";
+import {
+  View, Text, Dimensions, Image, TouchableOpacity, Button, FlatList,
+  TextInput, StyleSheet, BackHandler, TouchableWithoutFeedback, Platform, PanResponder,
+  Animated, ScrollView, Alert, KeyboardAvoidingView, Keyboard
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import MyStay from '../DashboardPage/MyStay';
@@ -45,6 +49,9 @@ import LinearGradient from "react-native-linear-gradient";
 import { compliantContexts } from "../../Context/ComplaintContext";
 import { paymentContexts } from "../../Context/PaymentContext";
 import EditComplaintSheet from "./BottomSheet/EditComplaint";
+import FilterPayments from "./BottomSheet/filterPayments";
+import RequestBedChange from "./BottomSheet/RequestBed";
+import AddComplaint from "./BottomSheet/AddComplaint";
 
 const { width, height } = Dimensions.get("window");
 
@@ -101,11 +108,17 @@ function Dashboard(props) {
   const [editCompliantBottomsheet, setEditCompliantBottomSheet] = useState(false);
   const [showDownloadOption, setShowOption] = useState(false)
   const [selected, setSelected] = useState("invoice");
+  const [keyboardOpen, setKeyboardOpen] = useState(false)
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [filterBottomsheet, setFilterBottomSheet] = useState(false)
+  const screenHeight = Dimensions.get('window').height;
+
+  //   const sheetY = useRef(new Animated.Value(700)).current;
+  //   const keyboardOffset = useRef(0);
+  // const keyboardY = useRef(new Animated.Value(0)).current;
 
   const sheetY = useRef(new Animated.Value(700)).current;
-
-  console.log(focusReason)
-  console.log(selectedComplaintTypeId)
+  const keyboardY = useRef(new Animated.Value(0)).current;
 
   const bed = [{ label: 'Disturbance in current room', value: 'Disturbance in current room' }, { label: 'Roommate issues', value: 'Roommate issues' }, { label: 'Need more privacy/space', value: 'Need more privacy/space' },
   { label: 'Maintanence issues', value: 'Maintanence issues' }, { label: 'Prefer other sharing type', value: 'Prefer other sharing type' }, { label: 'Others', value: 'Others' }]
@@ -143,8 +156,8 @@ function Dashboard(props) {
   };
 
   useEffect(() => {
-    if (showSheet || addComplaints || showBedChange || editCompliantBottomsheet || showAmenities || 
-        modalVisible || showDownloadOption) {
+    if (showSheet || addComplaints || showBedChange || editCompliantBottomsheet || showAmenities ||
+      modalVisible || showDownloadOption || filterBottomsheet) {
       setTimeout(() => {
         sheetY.setValue(700)
         Animated.timing(sheetY, {
@@ -154,13 +167,13 @@ function Dashboard(props) {
         }).start();
       }, 10);
     }
-  }, [showSheet, addComplaints, showBedChange, editCompliantBottomsheet, 
-    showAmenities, modalVisible, showDownloadOption]);
+  }, [showSheet, addComplaints, showBedChange, editCompliantBottomsheet,
+    showAmenities, modalVisible, showDownloadOption, filterBottomsheet]);
 
   useEffect(() => {
     const backAction = () => {
 
-      if (showBedChange || addComplaints || showSheet || editCompliantBottomsheet|| showDownloadOption || showAmenities || modalVisible) {
+      if (showBedChange || addComplaints || showSheet || editCompliantBottomsheet || showDownloadOption || showAmenities || modalVisible) {
         setShowBedChange(false);
         setAddComplaint(false);
         setShowSheet(false);
@@ -168,6 +181,7 @@ function Dashboard(props) {
         setModalVisible(false);
         setShowOption(false)
         setEditCompliantBottomSheet(false)
+        setComment(false)
         return true;
       }
 
@@ -195,10 +209,12 @@ function Dashboard(props) {
     showDownloadOption,
     showAmenities,
     modalVisible,
+    comment,
   ]);
 
 
   function onClose() {
+    Keyboard.dismiss();
     Animated.timing(sheetY, {
       toValue: 700,
       duration: 230,
@@ -214,7 +230,8 @@ function Dashboard(props) {
       setSendComment(null); setChangeBed(null)
       setBedType(null); setUrgencyType(null)
       setSelectedComplaintTypeId(0); setPlan(null)
-      setShowOption(false); setEditCompliantBottomSheet(false)
+      setShowOption(false); setEditCompliantBottomSheet(false);
+      setFilterBottomSheet(false)
     });
   }
 
@@ -236,6 +253,96 @@ function Dashboard(props) {
       },
     })
   ).current;
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener("keyboardDidShow", (e) => {
+      let keyboardHeight = e.endCoordinates?.height ?? 0;
+
+      const MAX_KEYBOARD_HEIGHT = screenHeight * 0.45;
+
+      if (keyboardHeight > MAX_KEYBOARD_HEIGHT) {
+        keyboardHeight = MAX_KEYBOARD_HEIGHT;
+      }
+
+      Animated.timing(keyboardY, {
+        toValue: keyboardHeight,
+        duration: 220,
+        useNativeDriver: true,
+      }).start();
+    });
+
+    const hideSub = Keyboard.addListener("keyboardDidHide", () => {
+      Animated.timing(keyboardY, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }).start();
+    });
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+  const MAX_UP = screenHeight * 0.55;
+
+  const translateY = Animated.add(
+    Animated.multiply(sheetY, 1),
+    Animated.multiply(keyboardY, -1)
+  );
+
+  const clampedTranslateY = translateY.interpolate({
+    inputRange: [-MAX_UP, 0],
+    outputRange: [-MAX_UP, 0],
+    extrapolate: "clamp",
+  });
+
+
+
+  // useEffect(() => {
+  //   const showSub = Keyboard.addListener(
+  //     Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+  //     (e) => {
+  //       Animated.timing(keyboardY, {
+  //         toValue: e.endCoordinates.height,
+  //         duration: 250,
+  //         useNativeDriver: true,
+  //       }).start();
+  //     }
+  //   );
+
+  //   const hideSub = Keyboard.addListener(
+  //     Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+  //     () => {
+  //       Animated.timing(keyboardY, {
+  //         toValue: 0,
+  //         duration: 250,
+  //         useNativeDriver: true,
+  //       }).start();
+  //     }
+  //   );
+
+  //   return () => {
+  //     showSub.remove();
+  //     hideSub.remove();
+  //   };
+  // }, []);
+
+
+  //     useEffect(() => {
+  //   const showSub = Keyboard.addListener('keyboardDidShow', e => {
+  //     setKeyboardHeight(e.endCoordinates.height -20);
+  //   });
+
+  //   const hideSub = Keyboard.addListener('keyboardDidHide', () => {
+  //     setKeyboardHeight(0);
+  //   });
+
+  //   return () => {
+  //     showSub.remove();
+  //     hideSub.remove();
+  //   };
+  // }, []);
 
 
 
@@ -278,7 +385,7 @@ function Dashboard(props) {
       setSelectComplaint(r.data)
       console.log(r.data)
       complaintContext.updateComplaint(r.data)
-      complaintContext.updateComments(r.data.comments)
+      complaintContext.updateComments(r.data?.comments)
     })
   }
 
@@ -302,14 +409,15 @@ function Dashboard(props) {
       hostelId: context.getHostelDetail.hostelId
     }
 
+    console.log(selectedComplaint)
 
-
-    addComment(selectedComplaint.complaintId, loginContext.getToken, data).then(r => {
+    addComment(selectedComplaint?.complaintId, loginContext.getToken, data).then(r => {
+      console.log(r)
       setSendComment(null)
 
       getComplaints(context.getHostelDetail.hostelId, selectedComplaint?.complaintId, loginContext.getToken).then(r => {
         setSelectComplaint(r.data)
-        complaintContext.updateComments(r.data.comments)
+        complaintContext.updateComments(r.data?.comments)
       })
 
     })
@@ -322,6 +430,10 @@ function Dashboard(props) {
   const addComplaint = () => {
     setAddComplaint(true)
 
+  }
+
+  const onCloseAddComplaint = () => {
+    setAddComplaint(false)
   }
 
   const uploadimage = async () => {
@@ -340,115 +452,7 @@ function Dashboard(props) {
     }
   }
 
-  const submitClick = () => {
-    const payloads = {
-      complaintTypeId: selectedComplaintTypeId,
-      description: complaintDescription,
-    }
 
-    console.log(payloads)
-
-    const formData = new FormData();
-
-    const jsonBase64 = btoa(JSON.stringify(payloads));
-
-    formData.append("payloads", {
-      uri: "data:application/json;base64," + jsonBase64,
-      type: "application/json",
-      name: "payload.json",
-    });
-
-    if (imageuri) {
-
-      console.log(imageuri)
-      // let complaitImages = []
-      // imageuri.forEach(img => {
-      //   complaitImages.push({
-      //     uri: img.uri,
-      //     type: img.type,
-      //     name: img.fileName
-      //   })
-      // })
-      // console.log(complaitImages)
-
-
-      formData.append("complaintImage", imageuri)
-
-      imageuri.forEach((img, index) => {
-        formData.append("complaintImage", {
-          uri: img.uri,
-          type: img.type,
-          name: img.fileName,
-        })
-
-      })
-    }
-    if (selectedComplaintTypeId === 0) {
-      setShowSuccessModal(true);
-      setToastMessage('Select complaint type');
-      setModelType('error');
-      setTimeout(() => setShowSuccessModal(false), 2000);
-      return;
-    }
-
-    const desc = complaintDescription?.trim() ?? "";
-
-    if (!desc) {
-      setShowSuccessModal(true);
-      setToastMessage("Comment cannot be empty");
-      setModelType('error');
-      setTimeout(() => setShowSuccessModal(false), 2000);
-      return;
-    }
-
-    if (desc.length < 15) {
-      setShowSuccessModal(true);
-      setToastMessage("Comment should be above 15 letters");
-      setModelType('error');
-      setTimeout(() => setShowSuccessModal(false), 2000);
-      return;
-    }
-
-    postComplaint(context.getHostelDetail.hostelId, loginContext.getToken, formData).then(r => {
-      setLoading(true);
-
-      setTimeout(() => {
-        setLoading(false);
-
-        if (r.status === 201) {
-          setShowSuccessModal(true);
-          setToastMessage("Complaint Added Successfully!");
-          setModelType('success');
-
-          setTimeout(() => {
-            setShowSuccessModal(false);
-            setShowSheet(false);
-            setSelectedComplaintTypeId(0);
-            setDespriction('');
-            setAddComplaint(false);
-
-            complaints(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
-              complaintContext.updateComplaintList(r?.data?.content);
-            });
-
-          }, 2000);
-        }
-        else {
-          setShowSuccessModal(true);
-          setToastMessage(r.message || "Something went wrong");
-          setModelType('error');
-          setTimeout(() => {
-            setShowSuccessModal(false);
-            setAddComplaint(false);
-          }, 2000);
-        }
-
-      }, 2000);
-    });
-
-
-
-  }
 
   // ----Delete complaint click-----
 
@@ -502,53 +506,7 @@ function Dashboard(props) {
     setShowBedChange(true)
   }
 
-  const bedRequestSubmit = () => {
-
-    const data = {
-      title: changeBed,
-      description: bedType,
-    }
-
-    if (changeBed != null && bedType != null && urgencyType != null) {
-      postRequestBedChange(context.getHostelDetail.hostelId, data, loginContext.getToken).then(r => {
-        setLoading(true)
-        console.log(r)
-
-        setTimeout(() => {
-          setLoading(false)
-
-          if (r.status == 200) {
-            setShowSuccessModal(true)
-            setToastMessage('Request raised')
-            setModelType('success')
-
-            setTimeout(() => {
-              setShowBedChange(false)
-              setShowSuccessModal(false)
-              setBedType(null)
-              setChangeBed(null)
-              setUrgencyType(null)
-            }, 2000);
-          }
-          else if (r.status == 400) {
-            setShowSuccessModal(true)
-          }
-
-        }, 2000);
-      })
-
-    }
-    else {
-      setShowSuccessModal(true)
-      setToastMessage('Fill all Fields')
-      setModelType('error')
-
-      setTimeout(() => {
-        setShowSuccessModal(false)
-      }, 2000);
-    }
-
-  }
+  const onCloseBedChange = () => { setShowBedChange(false) }
 
   // ---------Amenities----------
 
@@ -674,11 +632,15 @@ function Dashboard(props) {
 
   const handleReceiptPdfDownload = () => {
     setModalVisible(false);
-    navigation.navigate("ReceiptPdfView");
+    navigation.navigate("InvoiceDesign");
   };
 
   const downloadOption = () => {
     setShowOption(true)
+  }
+
+  const filterpay = () => {
+    setFilterBottomSheet(true)
   }
 
   // ---------------------------
@@ -698,13 +660,15 @@ function Dashboard(props) {
       case 'services':
         return <Services onOpen={handle} onSheet={addComplaint} onAmenities={handleAmenity} jumpTo={jumpTo} hostel={props?.route?.params?.hostel} />;
       case 'payment':
-        return <Payment onPayment={viewPay} hostel={props?.route?.params?.hostel} jumpTo={jumpTo} />;
+        return <Payment onPayment={viewPay} onFilterPayment={filterpay} hostel={props?.route?.params?.hostel} jumpTo={jumpTo} />;
       default:
         return null;
     }
   };
 
   // ----------
+
+  console.log(paymentContext.getInvoiceDetail)
 
 
 
@@ -789,8 +753,10 @@ function Dashboard(props) {
           <View style={StyleSheet.absoluteFill} />
         </TouchableWithoutFeedback>
 
-        <Animated.View style={[selectedComplaint?.images?.length > 0 ? style.bottomSheetwithimage : style.bottomSheet, { transform: [{ translateY: sheetY }] }]}
+        <Animated.View style={[selectedComplaint?.images?.length > 0 ? style.bottomSheetwithimage : style.bottomSheet, { transform: [{ translateY: clampedTranslateY }] }]}
           {...panResponder.panHandlers}>
+
+          {/* { transform: [{ translateY: sheetY }] } */}
 
           <View style={{ flex: 1 }}>
             <View {...panResponder.panHandlers}>
@@ -804,31 +770,56 @@ function Dashboard(props) {
                   {/* Divider */}
                   <View style={{ height: 1, backgroundColor: "#eee", marginVertical: 10 }} />
 
-                  <FlatList keyExtractor={(item) => item.commentId} showsVerticalScrollIndicator={false}
-                    data={complaintContext.getComplaintComments} style={{ marginBottom: 20 }}
-                    renderItem={({ item }) => {
-                      return <View style={{ paddingTop: 15, flexDirection: 'row', flex: 1 }}>
-                        <View>
-                          <Image source={Customer} style={{ width: 35, height: 35 }} />
-                        </View>
-                        <View style={{ paddingLeft: 10, flex: 1 }}>
-                          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                            <Text style={{ fontSize: 12, color: '#4B4B4B', fontWeight: 400 }}>{item.userName}</Text>
-                            <Text style={{ fontSize: 10, fontWeight: 400, color: '#6E6E6E' }}>{item.commentDate}</Text>
+                  {complaintContext?.getComplaintComments?.length > 0 ?
+                    <FlatList keyExtractor={(item) => item.commentId} showsVerticalScrollIndicator={false}
+                      keyboardShouldPersistTaps="handled"
+                      data={complaintContext?.getComplaintComments} style={{ marginBottom: 20 }}
+                      renderItem={({ item }) => {
+                        return <View style={{ paddingTop: 15, flexDirection: 'row', flex: 1 }}>
+                          <View>
+                            {item.profileUrl != null ? (
+                              <Image source={{ uri: item.profileUrl }} style={{ width: 35, height: 35 }} />
+                            ) : (
+                              <View style={{
+                                width: 36,
+                                height: 36, borderRadius: 18, backgroundColor: '#eef1ff', justifyContent: 'center',
+                                alignItems: 'center',
+                              }}>
+                                <Text style={{ color: '#788fed', fontSize: 14, fontWeight: 'bold', }}>
+                                  {item.initial}</Text>
+                              </View>
+                            )}
+                            {/* <Image source={Customer} style={{ width: 35, height: 35 }} /> */}
                           </View>
-                          <Text style={{ fontSize: 14, fontWeight: 400, marginTop: 5 }}>{item.comment}</Text>
+                          <View style={{ paddingLeft: 10, flex: 1 }}>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                              <Text style={{ fontSize: 12, color: '#4B4B4B', fontWeight: 400 }}>{item.userName}</Text>
+                              <Text style={{ fontSize: 10, fontWeight: 400, color: '#6E6E6E' }}>{item.commentDate}</Text>
+                            </View>
+                            <Text style={{ fontSize: 14, fontWeight: 400, marginTop: 5 }}>{item.comment}</Text>
+                          </View>
                         </View>
-                      </View>
-                    }} />
+                      }} /> 
+                       : 
+                      <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+                         <Text style={{fontSize:16,fontWeight:600}}>No Comments Yet</Text>
+                         <Text style={{fontSize:14,fontWeight:400,color:'#8E8E93',marginTop:5}}>
+                             Start Your Conversation
+                          </Text>
+                      </View>}
                 </View>
 
 
                 <View style={{ paddingBottom: 20 }}>
-                  <View style={{ paddingTop: 3, paddingBottom: 4, borderWidth: 1, borderRadius: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <TextInput value={sendComment} placeholder="Post your Reply here" onChangeText={setSendComment} />
-                    <TouchableOpacity onPress={sendclick} style={{ paddingRight: 10 }}>
-                      <Image source={SendButton} style={{ width: 34, height: 34 }} />
-                    </TouchableOpacity>
+                  <View style={{ paddingTop: 3, paddingBottom: 4, borderWidth: 1, borderColor: '#C3CFFF29', backgroundColor: '#f4f7fe', borderRadius: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <TextInput value={sendComment} placeholder="Post your Reply here" onChangeText={setSendComment}
+                      style={{ flex: 1 }} />
+                    {
+                      sendComment && <TouchableOpacity onPress={sendclick} style={{ paddingRight: 10 }}>
+                        <Image source={SendButton} style={{ width: 34, height: 34 }} />
+                      </TouchableOpacity>
+                    }
+
                   </View>
 
                 </View>
@@ -838,7 +829,9 @@ function Dashboard(props) {
               <View style={{ flex: 1 }}>
                 {complaintContext.getComplaintDetail && (
                   <ScrollView style={{ flex: 1 }}
-                    showsVerticalScrollIndicator={false} >
+                    showsVerticalScrollIndicator={false}
+                    keyboardShouldPersistTaps="handled"
+                    contentContainerStyle={{ paddingBottom: 20 }} >
                     <View style={{ justifyContent: 'flex-end', flex: 1 }}>
                       <View>
                         <View style={{ flexDirection: "row", justifyContent: "space-between", paddingLeft: 5, paddingRight: 8, marginBottom: 10, paddingTop: 10, }}>
@@ -945,7 +938,7 @@ function Dashboard(props) {
 
                           <View style={{ height: 1, backgroundColor: "#eee", marginVertical: 15 }} />
 
-                          <TouchableOpacity 
+                          <TouchableOpacity onPress={() => navigation.navigate('Updates')}
                             style={{ justifyContent: 'center', alignItems: 'center', paddingBottom: 10 }}>
                             <Text style={{ color: "#00A1FF", fontSize: 14, fontWeight: 600 }}>
                               See all updates
@@ -958,7 +951,9 @@ function Dashboard(props) {
                         {/* COMMENT INPUT */}
                         <View style={{ paddingTop: 22 }}>
                           <View style={{ padding: 4, borderRadius: 10, borderWidth: 1, justifyContent: "space-between", flexDirection: "row", alignItems: "center", borderColor: '#DCDCDC' }} >
-                            <TextInput value={sendComment} placeholder="Add your Comment" onChangeText={setSendComment} />
+                            <TextInput value={sendComment} placeholder="Add your Comment" onChangeText={setSendComment} multiline
+                              blurOnSubmit={false}
+                              style={{ flex: 1 }} />
                             <TouchableOpacity onPress={sendComment ? sendclick : commentclick}>
                               <Image
                                 source={sendComment ? SendButton : CommentMesg}
@@ -1017,9 +1012,6 @@ function Dashboard(props) {
       setIsFocus={setIsFocus}
       panResponder={panResponder}
       sheetY={sheetY}
-      loading={loading}
-      showSuccessModal={showSuccessModal}
-      setShowSuccessModal={setShowSuccessModal}
     />
 
 
@@ -1116,125 +1108,11 @@ function Dashboard(props) {
     </View>}
     {/* -------Add complaint----- */}
 
-    {addComplaints && (
-      <View style={style.sheetOverlay}>
-        <TouchableWithoutFeedback onPress={onClose}>
-          <View style={StyleSheet.absoluteFill} />
-        </TouchableWithoutFeedback>
-
-        <Animated.View style={[style.bottomsheets, { transform: [{ translateY: sheetY }] }]}
-          {...panResponder.panHandlers}>
-
-          <View style={{ flex: 1 }}>
-
-            <View {...panResponder.panHandlers}>
-              <View style={style.dragindictor} />
-            </View>
-
-            <AppLoader visible={loading} />
-            <SuccessModal
-              visible={showSuccessModal}
-              onClose={() => setShowSuccessModal(false)}
-              message={toastMessage}
-              type={modelType}
-            />
-            <View style={{ paddingTop: 10, justifyContent: 'space-between', flex: 1 }}>
-              <View>
-                <Text style={{ fontSize: 20, fontWeight: 600 }}>Add complaint</Text>
-
-                <View style={{ paddingTop: 20 }}>
-                  <Text>Complaint type
-                    <Text style={{ color: 'red' }}> *</Text>
-                  </Text>
-
-                  <Dropdown style={{ borderWidth: 1, borderRadius: 10, paddingVertical: 10, marginTop: 10, borderColor: '#e5e5e5', paddingLeft: 15 }}
-                    onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
-                    data={complaintType}
-                    containerStyle={{ borderRadius: 10 }}
-                    placeholderStyle={{ fontSize: 14 }}
-                    placeholder="Select a type"
-                    labelField="complaintTypeName"
-                    valueField="complaintTypeId"
-                    value={selectedComplaintTypeId}
-
-                    onChange={item => {
-                      setSelectedComplaintTypeId(item.complaintTypeId)
-                      setSelectedValue(item.value)
-                    }}
-                    renderRightIcon={() => (
-                      <Ionicons name={isFocus ? "chevron-up" : "chevron-down"}
-                        size={22}
-                        color="#000"
-                        style={{ paddingRight: 10 }}
-                      />
-                    )} />
-                </View>
-
-                <View style={{ paddingTop: 16 }}>
-                  <Text style={{ fontSize: 14, fontWeight: 400 }}>Complaint message
-                    <Text style={{ color: 'red' }}> *</Text>
-                  </Text>
-                  <View style={{ borderWidth: 1, borderRadius: 10, marginTop: 8, paddingTop: 7, paddingLeft: 10, borderColor: '#e5e5e5', height: 80 }}>
-                    <TextInput value={complaintDescription} placeholder="Enter message" onChangeText={(value) => setDespriction(value)} />
-                  </View>
-                </View>
-
-                <View style={{ paddingTop: 16 }}>
-                  <Text>Add Proof</Text>
-                  <View >
-                    <TouchableOpacity onPress={uploadimage} style={{
-                      borderWidth: 1, borderRadius: 9, paddingTop: 22, paddingBottom: 22,
-                      paddingLeft: 24, paddingRight: 24, borderColor: '#e5e5e5', marginTop: 8, flexDirection: 'row', alignItems: 'center'
-                    }}>
-                      <View>
-                        <Image source={CameraPic} style={{ width: 32.77, height: 32.77 }} />
-                      </View>
-                      <View style={{ paddingLeft: 22 }}>
-                        <View style={{ flexDirection: 'row' }}>
-                          <Text style={{ color: '#1E45E1', fontSize: 12, fontWeight: 500 }}>Choose file</Text>
-                          <Text style={{ fontSize: 12, fontWeight: 500 }}> to Upload</Text>
-                        </View>
-                        <Text style={{ fontSize: 11, fontWeight: 400, marginTop: 5 }}>Must be in PNG, JPG Format </Text>
-                      </View>
-                    </TouchableOpacity>
-
-                  </View>
-                </View>
-
-
-                <View>
-                  {mediaimage.length > 0 ? <FlatList horizontal showsHorizontalScrollIndicator={true} style={{ paddingTop: 20 }} key={(item) => item.id}
-                    data={mediaimage}
-                    // keyExtractor={(item, index) => index.toString()}
-                    renderItem={({ item }) => {
-                      console.log(item)
-                      return <View style={{ padding: 5 }}>
-                        <Image source={{ uri: item }} style={{ width: 80, height: 70, borderRadius: 5 }} />
-                      </View>
-                    }} /> : null}
-                </View>
-
-              </View>
-
-              <View style={{ paddingBottom: 20 }}>
-                <TouchableOpacity onPress={submitClick}
-
-                  style={{
-                    paddingTop: 12, paddingBottom: 12, borderRadius: 22, justifyContent: 'center',
-                    backgroundColor: selectedComplaintTypeId === 0 || !complaintDescription || complaintDescription.trim().length < 15 ? '#9EB3FF' : '#1E45E1',
-                    alignItems: 'center'
-                  }}>
-                  <Text style={{ fontSize: 14, fontWeight: 600, color: '#ffffff' }}>Submit</Text>
-                </TouchableOpacity>
-              </View>
-
-            </View>
-
-          </View>
-
-        </Animated.View>
-      </View>
-    )}
+    <AddComplaint
+      visible={addComplaints}
+      onClose={onCloseAddComplaint}
+      panResponder={panResponder}
+      sheetY={sheetY} />
 
     {/* ------show Amenities-------- */}
 
@@ -1260,122 +1138,122 @@ function Dashboard(props) {
               message={toastMessage}
               type={modelType}
             />
-            <ScrollView contentContainerStyle={{flexGrow:1}}>
-            <View style={{ paddingLeft: 10, paddingRight: 15, flex: 1 }}>
-              {tag == 'My-Amenities' ? (<View>
-                <View style={{ paddingTop: 12 }}>
-                  {myAmenitis && <View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                      <Text style={{ fontSize: 23, fontWeight: 500, fontStyle: 'Gilroy-Semibold' }}>{myAmenitis.amenityName}</Text>
-                      <View style={{ justifyContent: 'center', paddingTop: 7 }}>
-                        <Image source={Dot} style={{ width: 30.85, height: 30.85 }} />
-
-                      </View>
-
-                    </View>
-
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 5 }}>
-                      <View style={{ width: '58%', height: 1, backgroundColor: "#eee", marginTop: 10 }} />
-                      <View >
-                        <TouchableOpacity style={{
-                          borderWidth: 1, borderColor: '#eee', paddingTop: 9, paddingBottom: 14, paddingHorizontal: 20,
-                          borderRadius: 5, flexDirection: 'row', justifyContent: 'center'
-                        }}>
-                          <Image source={calenderTick} style={{ width: 16, height: 16, marginTop: 3 }} />
-                          <Text style={{ marginLeft: 5, fontSize: 14, fontWeight: 400 }}>Make Deactive</Text>
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-
-                    <View>
-                      <Text style={{ fontSize: 12, fontWeight: 40, color: '#4B4B4B' }}>Description</Text>
-                      <Text style={{ marginTop: 13, fontSize: 16, fontWeight: 400 }}>
-                        Airtel Fiber 5G/100mpb
-                      </Text>
-                    </View>
-
-                    <View style={{ paddingTop: 18 }}>
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>
+              <View style={{ paddingLeft: 10, paddingRight: 15, flex: 1 }}>
+                {tag == 'My-Amenities' ? (<View>
+                  <View style={{ paddingTop: 12 }}>
+                    {myAmenitis && <View>
                       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                        <Text style={{ fontSize: 12, fontWeight: 400, color: '#4B4B4B' }}>Price plans</Text>
-                        <TouchableOpacity>
-                          <Text style={{ fontSize: 12, color: '#1E45E1' }}>Change Plan</Text>
-                        </TouchableOpacity>
-                      </View>
-                      <Text style={{ fontSize: 16, fontWeight: 600, marginTop: 9 }}>{'\u20B9'}{myAmenitis.amenityAmount} /month</Text>
-                    </View>
+                        <Text style={{ fontSize: 23, fontWeight: 500, fontStyle: 'Gilroy-Semibold' }}>{myAmenitis.amenityName}</Text>
+                        <View style={{ justifyContent: 'center', paddingTop: 7 }}>
+                          <Image source={Dot} style={{ width: 30.85, height: 30.85 }} />
 
-                    <View style={{ paddingTop: 15 }}>
-                      <Text style={{ fontSize: 12, fontWeight: 400, color: '#4B4B4B' }}>Next Bill</Text>
-                      <Text style={{ fontSize: 16, fontWeight: 600, marginTop: 9 }}>10 sept Bill</Text>
-                    </View>
-
-                    <TouchableOpacity style={{ paddingVertical: 13, borderWidth: 1, borderRadius: 10, alignItems: 'center', backgroundColor: '#F5FFF8', borderColor: '#77D391', marginTop: 30 }}>
-                      <Text style={{ fontSize: 14.11, fontWeight: 600, color: '#00A32E' }}>Active</Text>
-                    </TouchableOpacity>
-
-
-                  </View>}
-
-
-                </View>
-              </View>) : tag == null ? (<View style={{ flex: 1 }}>
-
-                {available && <View style={{ paddingTop: 10, flex: 1, paddingBottom: 20 }}>
-                  <Text style={{ fontSize: 23, fontWeight: 500 }}>{available.amenityName}</Text>
-                  <View style={{ width: '100%', height: 1, backgroundColor: "#eee", marginTop: 18 }} />
-                  <View style={{ justifyContent: 'space-between', flex: 1 }}>
-                    <View style={{ paddingTop: 10 }}>
-                      <Text style={{ fontSize: 12, fontWeight: 400, color: '#4B4B4B' }}>Description</Text>
-
-                      <View style={{ paddingTop: 14 }}>
-                        <Text style={{ fontSize: 16, fontWeight: 400, marginBottom: 2 }}>Gear,Non Gear</Text>
-                        <Text style={{ fontSize: 16, fontWeight: 400, marginTop: 2 }}>24/7 Access, pickup lopp from lobby</Text>
-                      </View>
-
-                      <View style={{ paddingTop: 20 }}>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                          <Text style={{ fontSize: 12, fontWeight: 400, color: '#4B4B4B' }}>Price Plans</Text>
-                          <TouchableOpacity>
-                            <Text style={{ fontSize: 12, fontWeight: 400, color: '#1E45E1', textDecorationLine: 'underline' }}>Select plan</Text>
-                          </TouchableOpacity>
                         </View>
 
+                      </View>
+
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 5 }}>
+                        <View style={{ width: '58%', height: 1, backgroundColor: "#eee", marginTop: 10 }} />
+                        <View >
+                          <TouchableOpacity style={{
+                            borderWidth: 1, borderColor: '#eee', paddingTop: 9, paddingBottom: 14, paddingHorizontal: 20,
+                            borderRadius: 5, flexDirection: 'row', justifyContent: 'center'
+                          }}>
+                            <Image source={calenderTick} style={{ width: 16, height: 16, marginTop: 3 }} />
+                            <Text style={{ marginLeft: 5, fontSize: 14, fontWeight: 400 }}>Make Deactive</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+
+                      <View>
+                        <Text style={{ fontSize: 12, fontWeight: 40, color: '#4B4B4B' }}>Description</Text>
+                        <Text style={{ marginTop: 13, fontSize: 16, fontWeight: 400 }}>
+                          Airtel Fiber 5G/100mpb
+                        </Text>
+                      </View>
+
+                      <View style={{ paddingTop: 18 }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                          <View style={{ paddingTop: 10, flexDirection: 'row' }}>
-                            <Text style={{ fontSize: 16, fontWeight: 600 }}>{'\u20B9'}{available.amenityAmount}</Text>
-                            <Text style={{ fontSize: 16, fontWeight: 400, color: '#4B4B4B' }}>/month</Text>
+                          <Text style={{ fontSize: 12, fontWeight: 400, color: '#4B4B4B' }}>Price plans</Text>
+                          <TouchableOpacity>
+                            <Text style={{ fontSize: 12, color: '#1E45E1' }}>Change Plan</Text>
+                          </TouchableOpacity>
+                        </View>
+                        <Text style={{ fontSize: 16, fontWeight: 600, marginTop: 9 }}>{'\u20B9'}{myAmenitis.amenityAmount} /month</Text>
+                      </View>
+
+                      <View style={{ paddingTop: 15 }}>
+                        <Text style={{ fontSize: 12, fontWeight: 400, color: '#4B4B4B' }}>Next Bill</Text>
+                        <Text style={{ fontSize: 16, fontWeight: 600, marginTop: 9 }}>10 sept Bill</Text>
+                      </View>
+
+                      <TouchableOpacity style={{ paddingVertical: 13, borderWidth: 1, borderRadius: 10, alignItems: 'center', backgroundColor: '#F5FFF8', borderColor: '#77D391', marginTop: 30 }}>
+                        <Text style={{ fontSize: 14.11, fontWeight: 600, color: '#00A32E' }}>Active</Text>
+                      </TouchableOpacity>
+
+
+                    </View>}
+
+
+                  </View>
+                </View>) : tag == null ? (<View style={{ flex: 1 }}>
+
+                  {available && <View style={{ paddingTop: 10, flex: 1, paddingBottom: 20 }}>
+                    <Text style={{ fontSize: 23, fontWeight: 500 }}>{available.amenityName}</Text>
+                    <View style={{ width: '100%', height: 1, backgroundColor: "#eee", marginTop: 18 }} />
+                    <View style={{ justifyContent: 'space-between', flex: 1 }}>
+                      <View style={{ paddingTop: 10 }}>
+                        <Text style={{ fontSize: 12, fontWeight: 400, color: '#4B4B4B' }}>Description</Text>
+
+                        <View style={{ paddingTop: 14 }}>
+                          <Text style={{ fontSize: 16, fontWeight: 400, marginBottom: 2 }}>Gear,Non Gear</Text>
+                          <Text style={{ fontSize: 16, fontWeight: 400, marginTop: 2 }}>24/7 Access, pickup lopp from lobby</Text>
+                        </View>
+
+                        <View style={{ paddingTop: 20 }}>
+                          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <Text style={{ fontSize: 12, fontWeight: 400, color: '#4B4B4B' }}>Price Plans</Text>
+                            <TouchableOpacity>
+                              <Text style={{ fontSize: 12, fontWeight: 400, color: '#1E45E1', textDecorationLine: 'underline' }}>Select plan</Text>
+                            </TouchableOpacity>
                           </View>
 
-                          <TouchableOpacity onPress={() => plan('plan')} style={{
-                            borderWidth: 2, width: 20, height: 20, borderRadius: 10,
-                            borderColor: plan == 'plan' ? borderColor : monthlyplan == 'plan' ? "#1E45E1" : "#ccc", justifyContent: 'center', marginTop: 12
-                          }}>
-
-                            <View style={{ justifyContent: 'center', alignItems: 'center' }}  >
-
-                              {monthlyplan === 'plan' && (
-                                <View style={{ height: 10, width: 10, borderRadius: 5, backgroundColor: "#1E45E1" }} />
-                              )}
+                          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <View style={{ paddingTop: 10, flexDirection: 'row' }}>
+                              <Text style={{ fontSize: 16, fontWeight: 600 }}>{'\u20B9'}{available.amenityAmount}</Text>
+                              <Text style={{ fontSize: 16, fontWeight: 400, color: '#4B4B4B' }}>/month</Text>
                             </View>
-                          </TouchableOpacity>
+
+                            <TouchableOpacity onPress={() => plan('plan')} style={{
+                              borderWidth: 2, width: 20, height: 20, borderRadius: 10,
+                              borderColor: plan == 'plan' ? borderColor : monthlyplan == 'plan' ? "#1E45E1" : "#ccc", justifyContent: 'center', marginTop: 12
+                            }}>
+
+                              <View style={{ justifyContent: 'center', alignItems: 'center' }}  >
+
+                                {monthlyplan === 'plan' && (
+                                  <View style={{ height: 10, width: 10, borderRadius: 5, backgroundColor: "#1E45E1" }} />
+                                )}
+                              </View>
+                            </TouchableOpacity>
+
+                          </View>
 
                         </View>
-
+                      </View>
+                      <View >
+                        <TouchableOpacity onPress={() => onRequestAmenities(available.amenityId)}
+                          style={{ backgroundColor: '#1d41d5', paddingVertical: 12, alignItems: 'center', borderRadius: 20 }}>
+                          <Text style={{ fontSize: 14.11, fontWeight: 600, color: '#ffffff' }}>Request Amenity</Text>
+                        </TouchableOpacity>
                       </View>
                     </View>
-                    <View >
-                      <TouchableOpacity onPress={() => onRequestAmenities(available.amenityId)}
-                        style={{ backgroundColor: '#1d41d5', paddingVertical: 12, alignItems: 'center', borderRadius: 20 }}>
-                        <Text style={{ fontSize: 14.11, fontWeight: 600, color: '#ffffff' }}>Request Amenity</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
 
-                </View>}
-              </View>) : null}
+                  </View>}
+                </View>) : null}
 
 
-            </View>
+              </View>
             </ScrollView>
 
           </View>
@@ -1386,261 +1264,11 @@ function Dashboard(props) {
 
     {/* -----Request bed change--------- */}
 
-    {showBedChange && (
-      <View style={style.sheetOverlay}>
-        <TouchableWithoutFeedback onPress={onClose}>
-          <View style={StyleSheet.absoluteFill} />
-        </TouchableWithoutFeedback>
-
-        <Animated.View style={[style.bottomsheets, { transform: [{ translateY: sheetY }] }]}
-          {...panResponder.panHandlers}>
-
-          <View style={{ flex: 1 }}>
-
-            <View {...panResponder.panHandlers}>
-              <View style={style.dragindictor} />
-            </View>
-
-            <AppLoader visible={loading} />
-            <SuccessModal
-              visible={showSuccessModal}
-              onClose={() => setShowSuccessModal(false)}
-              message={toastMessage}
-              type={modelType}
-            />
-
-            <View style={{ paddingTop: 15, justifyContent: 'space-between', flex: 1 }}>
-              <View>
-                <Text style={{ fontSize: 20, fontWeight: 600 }}>Request Bed Change</Text>
-
-                <View style={{ paddingTop: 20 }}>
-                  <Text style={{ fontSize: 12, fontWeight: 400 }}>Current Bed</Text>
-
-                  <View style={{
-                    backgroundColor: '#F6F8FF', borderRadius: 10, paddingVertical: 17,
-                    paddingHorizontal: 8, marginTop: 10, flexDirection: 'row'
-                  }}>
-                    <View style={{ backgroundColor: '#F9D796', paddingVertical: 4.64, paddingHorizontal: 9.28, alignSelf: 'flex-start', borderRadius: 46.38 }}>
-                      <Text style={{ color: '#642B00', fontSize: 10.82, fontWeight: 400 }}>
-                        {context.getCustomerDetail?.bookingDetails?.floorName}</Text>
-                    </View>
-
-                    <View style={{ flexDirection: 'row', paddingLeft: 20, alignItems: 'center' }}>
-                      <Image source={Room} style={{ width: 21.17, height: 21.17 }} />
-                      <Text style={{ marginLeft: 10, fontSize: 15.97, fontWeight: 400 }}>
-                        {context.getCustomerDetail?.bookingDetails?.roomName}
-                      </Text>
-                    </View>
-
-                    <View style={{ flexDirection: 'row', paddingLeft: 10, alignItems: 'center' }}>
-                      <Image source={Bed} style={{ width: 21.17, height: 21.17 }} />
-                      <Text style={{ marginLeft: 10, fontSize: 15.97, fontWeight: 400 }}>
-                        {context.getCustomerDetail?.bookingDetails?.bedName}
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-
-                <View style={{ paddingTop: 15 }}>
-                  <Text style={{ fontSize: 14, fontWeight: 400 }}>Reason for Bed change
-                    <Text style={{ color: 'red' }}> *</Text>
-                  </Text>
-
-                  <Dropdown ref={bedDropdownRef}
-                    style={{
-                      borderWidth: 1,
-                      borderRadius: 10,
-                      paddingVertical: 15,
-                      marginTop: 10,
-                      borderColor: '#e5e5e5',
-                      paddingLeft: 10,
-                    }}
-                    onClose={focusReason}
-                    data={bed}
-                    labelField="label"
-                    valueField="value"
-                    value={changeBed}
-                    placeholder="Select Reason"
-                    placeholderStyle={{ fontSize: 14, paddingRight: 10 }}
-                    selectedTextStyle={{ fontSize: 15, fontWeight: '400' }}
-                    containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
-
-                    onFocus={() => setFocusReason(true)}
-                    onBlur={() => setFocusReason(false)}
-
-                    onChange={item => {
-                      setChangeBed(item.value);
-                    }}
-
-                    renderRightIcon={() => (
-                      <Ionicons
-                        name={focusReason ? 'chevron-up' : 'chevron-down'}
-                        size={22}
-                        color="#000"
-                        style={{ paddingRight: 10 }}
-                      />
-                    )}
-
-                    renderItem={(item) => {
-                      const isSelected = item.value === changeBed;
-                      return (
-                        <TouchableOpacity
-                          onPress={() => {
-                            setChangeBed(item.value);
-                            setFocusReason(false); // Close dropdown on item press
-                            bedDropdownRef.current?.close();
-                          }}
-                          style={{
-                            paddingVertical: 14,
-                            paddingHorizontal: 14,
-                            borderRadius: 10,
-                            marginVertical: 5,
-                            marginRight: 10,
-                            marginTop: 10,
-                            backgroundColor: isSelected ? '#1D4ED8' : '#F5F5F5',
-                          }}
-                        >
-                          <Text style={{ color: isSelected ? '#fff' : '#000', fontSize: 15 }}>
-                            {item.label}
-                          </Text>
-                        </TouchableOpacity>
-                      );
-                    }}
-                  />
-
-
-                </View>
-
-                <View style={{ paddingTop: 15 }}>
-                  <Text style={{ fontSize: 14, fontWeight: 400 }}>Preffered Bed Type
-                    <Text style={{ color: 'red' }}> *</Text>
-                  </Text>
-
-                  <Dropdown ref={bedTypeDropdow}
-                    style={{
-                      borderWidth: 1, borderRadius: 10, paddingVertical: 15,
-                      marginTop: 10, borderColor: '#e5e5e5', paddingLeft: 10
-                    }}
-                    onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
-                    data={selectBed}
-                    containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
-                    placeholderStyle={{ fontSize: 14, paddingRight: 10 }}
-                    selectedTextStyle={{ fontSize: 15, fontWeight: 400 }}
-                    placeholder="Select Reason"
-                    labelField='label'
-                    valueField='value'
-                    value={bedType}
-
-                    onChange={item => {
-                      setBedType(item.value)
-                    }}
-
-                    renderRightIcon={() => (
-                      <Ionicons name={isFocus ? "chevron-up" : "chevron-down"} size={22} color="#000"
-                        style={{ paddingRight: 10 }} />
-                    )}
-
-                    renderItem={(item, index) => {
-                      const isSelected = item.value === bedType;
-
-                      return (
-                        <TouchableOpacity onPress={() => {
-                          setBedType(item.value)
-                          setFocusReason(false)
-                          bedTypeDropdow.current?.close();
-                        }}
-                          style={{
-                            paddingVertical: 14,
-                            paddingHorizontal: 14,
-                            borderRadius: 10,
-                            marginVertical: 5,
-                            marginRight: 10,
-                            marginTop: 10,
-                            backgroundColor: isSelected ? "#1D4ED8" : "#F5F5F5",
-                          }}
-                        >
-                          <Text
-                            style={{ color: isSelected ? "#fff" : "#000", fontSize: 15, }}>
-                            {item.label}
-                          </Text>
-                        </TouchableOpacity>
-                      );
-                    }}
-
-                  />
-                </View>
-
-                <View style={{ paddingTop: 15 }}>
-                  <Text>Bed Change Urgency
-                    <Text style={{ color: 'red' }}> *</Text>
-                  </Text>
-
-                  <Dropdown ref={urgencyDropdown}
-                    style={{
-                      borderWidth: 1, borderRadius: 10, paddingVertical: 15, borderColor: '#e5e5e5',
-                      marginTop: 10, paddingLeft: 10
-                    }}
-                    onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
-                    data={urgency}
-                    containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
-                    placeholderStyle={{ fontSize: 14, paddingRight: 10 }}
-                    selectedTextStyle={{ fontSize: 15, fontWeight: 400 }}
-                    placeholder="Select Reason"
-                    labelField="label"
-                    valueField="value"
-                    value={urgencyType}
-
-                    onChange={item => {
-                      setUrgencyType(item.value)
-                    }}
-
-                    renderRightIcon={() => (
-                      <Ionicons name={focusReason ? "chevron-up" : "chevron-down"} size={22} color="#000"
-                        style={{ paddingRight: 10 }} />
-                    )}
-
-                    renderItem={(item, index) => {
-                      const isSelected = item.value === urgencyType;
-
-                      return (
-                        <TouchableOpacity onPress={() => {
-                          setUrgencyType(item.value)
-                          setFocusReason(false)
-                          urgencyDropdown.current?.close();
-                        }}
-                          style={{
-                            paddingVertical: 14, paddingHorizontal: 14, borderRadius: 10,
-                            marginVertical: 5, marginRight: 10, marginTop: 10,
-                            backgroundColor: isSelected ? "#1D4ED8" : "#F5F5F5",
-                          }}
-                        >
-                          <Text
-                            style={{ color: isSelected ? "#fff" : "#000", fontSize: 15, fontWeight: 400 }}>
-                            {item.label}
-                          </Text>
-                        </TouchableOpacity>
-                      );
-                    }}
-                  />
-                </View>
-
-              </View>
-
-              <TouchableOpacity onPress={bedRequestSubmit}
-                style={{
-                  paddingVertical: 16, paddingHorizontal: 32, borderRadius: 50,
-                  backgroundColor: changeBed != null && bedType != null && urgencyType != null ? '#1E45E1' : '#788fed',
-                  alignItems: 'center', marginBottom: 15
-                }} disabled={changeBed == null && bedType == null && urgencyType == null ? true : false}>
-                <Text style={{ fontSize: 14, fontWeight: 600, color: '#FFFFFF' }}>Submit Request</Text>
-              </TouchableOpacity>
-
-            </View>
-          </View>
-        </Animated.View>
-
-      </View>
-    )}
+    <RequestBedChange
+      visible={showBedChange}
+      onClose={onCloseBedChange}
+      panResponder={panResponder}
+      sheetY={sheetY} />
 
     {/* ----------Payment------ */}
 
@@ -1661,13 +1289,15 @@ function Dashboard(props) {
           </View>
 
           <ScrollView showsVerticalScrollIndicator={false}>
-            {paymentContext.getInvoiceDetail && (
+            {paymentContext.getInvoiceDetail && ["Partially Paid", "Pending", "Paid"].includes(
+              paymentContext.getInvoiceDetail.status
+            ) ? (
               <>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <Text style={style.modalTitle}>{paymentContext.getInvoiceDetail.title}</Text>
+                  <Text style={style.modalTitle}>{paymentContext.getInvoiceDetail?.invoiceType}</Text>
 
                   <View style={{ flexDirection: "row" }}>
-                    <Text style={style.invoiceId}>{paymentContext.getInvoiceDetail.invoiceNumber}</Text>
+                    <Text style={style.invoiceId}>{paymentContext.getInvoiceDetail?.invoiceNumber}</Text>
                     <TouchableOpacity
                       onPress={() => handleReceiptPdfDownload(staticReceiptData)}
                     >
@@ -1684,12 +1314,12 @@ function Dashboard(props) {
                 <View style={style.amountSection}>
                   <Text style={style.label}>Total Amount</Text>
 
-                  <View>
+                  <View style={{ alignItems: 'flex-end' }}>
                     <Text style={style.totalAmount}>
-                      ₹{paymentContext.getInvoiceDetail.totalAmount.toFixed(2)}
+                      ₹{paymentContext.getInvoiceDetail?.totalAmount.toFixed(2)}
                     </Text>
 
-                    {paymentContext.getInvoiceDetail.status === "Pending" && (
+                    {paymentContext.getInvoiceDetail?.status === "Pending" && (
                       <View
                         style={[
                           style.statusBadge,
@@ -1707,22 +1337,24 @@ function Dashboard(props) {
                       </View>
                     )}
 
-                    {(paymentContext.getInvoiceDetail.status === "Partially Paid to" ||
-                      paymentContext.getInvoiceDetail.status === "Paid to") && (
+                    {(paymentContext.getInvoiceDetail?.status === "Partially Paid" ||
+                      paymentContext.getInvoiceDetail?.status === "Paid") && (
                         <View style={{ flexDirection: "row", marginTop: 6 }}>
                           <Image
                             source={PaidIcon}
                             style={{ width: 20, height: 20 }}
                           />
                           <Text style={{ fontSize: 14, marginLeft: 6 }}>
-                            {paymentContext.getInvoiceDetail.status === "Partially Paid to"
-                              ? "Partially Paid"
-                              : "Full Paid"}
+                            {paymentContext.getInvoiceDetail.status === "Paid"
+                              ? "Full Paid"
+                              : "Partially Paid"}
                           </Text>
                         </View>
                       )}
                   </View>
                 </View>
+
+
 
                 {/* Details */}
                 <View style={style.detailsSection}>
@@ -1736,19 +1368,19 @@ function Dashboard(props) {
                     <Text style={style.detailValue}>₹{paymentContext.getInvoiceDetail.gst}</Text>
                   </View>
 
-                  {paymentContext.getInvoiceDetail.paid === "partial" && (
+                  {paymentContext.getInvoiceDetail.status === "Partially Paid" && (
                     <>
                       <View style={style.row}>
                         <Text style={style.detailLabel}>Paid Amount</Text>
-                        <Text style={style.detailValue}>₹3500.00</Text>
+                        <Text style={style.detailValue}>₹{paymentContext.getInvoiceDetail?.paidAmount}</Text>
                       </View>
 
                       <View style={style.row}>
                         <Text style={style.detailLabel}>Remain</Text>
-                        <View>
-                          <Text style={style.detailValue}>₹2500.00</Text>
-                          <Text style={style.payBillText}>Pay Bill</Text>
-                        </View>
+                      </View>
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <Text style={style.payBillText}>Pay Bill</Text>
+                        <Text style={style.detailValue}>₹{paymentContext.getInvoiceDetail?.dueAmount}</Text>
                       </View>
                     </>
                   )}
@@ -1768,7 +1400,10 @@ function Dashboard(props) {
                   <Text style={style.paiddetailLabel}>
                     {paymentContext.getInvoiceDetail.status === "Pending" ? "Due Date" : "Paid Date"}
                   </Text>
-                  <Text style={style.paiddetailValue}>{paymentContext.getInvoiceDetail.dueDate}</Text>
+                  <Text style={style.paiddetailValue}>
+                    {paymentContext.getInvoiceDetail.status === "Pending" ? paymentContext.getInvoiceDetail.dueDate
+                      : paymentContext.getInvoiceDetail.lastPaidDate}
+                  </Text>
                 </View>
 
                 {/* Notes */}
@@ -1794,12 +1429,25 @@ function Dashboard(props) {
                   <View style={{ marginTop: 10 }}>
                     <View style={style.Billbottom}>
                       <Text style={style.paiddetailLabel}>Payment Mode</Text>
-                      <Text style={style.paiddetailValue}>UPI</Text>
+                      {paymentContext.getInvoiceDetail.receipts.map(i => {
+                        console.log(i)
+                        return (
+
+                          <Text key={i.transactionId} style={style.paiddetailValue}>{i.paymentMode}</Text>
+                        )
+
+                      })}
+
                     </View>
 
                     <View style={style.Billbottom}>
                       <Text style={style.paiddetailLabel}>Reference number</Text>
-                      <Text style={style.paiddetailValue}>#RSIN001</Text>
+                      {paymentContext.getInvoiceDetail.receipts.map(i => {
+                        return (
+                          <Text key={i.transactionId} style={style.paiddetailValue}>{i.referenceNumber}</Text>
+                        )
+
+                      })}
                     </View>
                   </View>
                 )}
@@ -1841,7 +1489,8 @@ function Dashboard(props) {
 
                       <TouchableOpacity
                         style={style.downloadBtn}
-                        onPress={handleDownload}
+                        onPress={downloadOption}
+                      // handleDownload
                       >
                         <Text style={style.downloadText}>Download</Text>
                         <Image
@@ -1853,7 +1502,10 @@ function Dashboard(props) {
                   )}
                 </View>
               </>
-            )}
+            ) : <View>
+
+              {/* <Text>Hii</Text> */}
+            </View>}
           </ScrollView>
         </Animated.View>
       </View>
@@ -1957,7 +1609,7 @@ function Dashboard(props) {
               >
 
                 <View style={style.downloadContent}>
-                  <Image source={DownloadSide} style={{width:20,height:20}}/>
+                  <Image source={DownloadSide} style={{ width: 20, height: 20 }} />
                   <Text style={style.downloadText}> Download</Text>
                 </View>
               </TouchableOpacity>
@@ -1967,6 +1619,11 @@ function Dashboard(props) {
       </View >
     )
     }
+    <FilterPayments
+      visible={filterBottomsheet}
+      onClose={() => { setFilterBottomSheet(false) }}
+      sheetY={sheetY}
+      panResponder={panResponder} />
 
 
   </View >
@@ -2052,11 +1709,11 @@ const style = StyleSheet.create({
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginVertical: 3,
+    marginVertical: 5,
   },
   detailLabel: { fontSize: 13, color: "rgba(31, 38, 51, 1)" },
   detailValue: { fontSize: 15, fontWeight: "600", color: "rgba(31, 38, 51, 1)" },
-  payBillText: { fontSize: 13, color: "#0057FF", fontWeight: "600", marginLeft: 10, marginTop: 5 },
+  payBillText: { fontSize: 13, color: "#0057FF", fontWeight: "600" },
   paiddetailLabel: { fontSize: 13, color: "rgba(60, 60, 67, 0.6)" },
   paiddetailValue: { fontSize: 13, color: "black", fontWeight: "600", },
   Billbottom: { display: 'flex', flexDirection: 'row', justifyContent: "space-between", },
@@ -2264,7 +1921,7 @@ const style = StyleSheet.create({
     elevation: 4,
   },
 
-  downloadContent: { alignItems: 'center', justifyContent: 'center',flexDirection:'row' },
+  downloadContent: { alignItems: 'center', justifyContent: 'center', flexDirection: 'row' },
   downloadText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
 })
 export default Dashboard;

@@ -30,7 +30,8 @@ export const editProfile=async(token,formData)=>{
 }
 
 export const postComplaint=async(hostelId,token,formData)=>{
-
+    console.log(hostelId)
+    console.log(token)
     console.log(formData)
     try{
          const response=await AxiosConfig.post('/v2/complaints/' + hostelId, formData,   {

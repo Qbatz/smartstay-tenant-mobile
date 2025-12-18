@@ -25,9 +25,6 @@ const EditComplaintSheet = ({
     //   setIsFocus,
     panResponder,
     sheetY,
-    //   loading,
-    //   showSuccessModal,
-    //   setShowSuccessModal
 }) => {
     const context = useContext(UsersContext)
     const loginContext = useContext(LoginContexts)
@@ -203,7 +200,6 @@ const EditComplaintSheet = ({
                         <View style={styles.dragindictor} />
                     </View>
 
-                    {/* Loader, Success */}
                     <AppLoader visible={loading} />
                     <SuccessModal
                         visible={showSuccessModal}
