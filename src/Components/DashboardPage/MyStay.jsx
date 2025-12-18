@@ -24,7 +24,7 @@ function MyStay(props) {
 
     const [complaints, setComplaints] = useState([])
     const [rentBill, setRentBill] = useState([])
-    const [request,setRequest]=useState([])
+    const [request, setRequest] = useState([])
 
 
     console.log(context.getRequestRaised)
@@ -35,31 +35,34 @@ function MyStay(props) {
         { id: 3, text: 'field3' }
     ];
 
-    const fetchMystayData=()=>{
-         hostelDetails(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
-         console.log(r.data)
+    const fetchMystayData = () => {
+        hostelDetails(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
+            console.log(r.data)
             setComplaints(r.data.complaints)
             setRentBill(r.data.currentMonthBills)
-           context.updateCurrentMonthBills(r.data.currentMonthBills)
-           context.updatePreviousMonth(r.data.previousMonthBills)
+            context.updateCurrentMonthBills(r.data.currentMonthBills)
+            context.updatePreviousMonth(r.data.previousMonthBills)
         })
 
-        getRequestRaised(context.getHostelDetail.hostelId, loginContext.getToken).then(r=>{
+        getRequestRaised(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
             console.log(r)
             context.updateRequestRaised(r.data)
         })
     }
+    useEffect(() => {
+        fetchMystayData();
+    }, [])
 
-    useFocusEffect(
-        useCallback(()=>{
-            fetchMystayData();
+    // useFocusEffect(
+    //     useCallback(()=>{
+    //         fetchMystayData();
 
-            const intervalId=setInterval(()=>{
-                fetchMystayData();
-            },6000)
-            return ()=>clearInterval(intervalId)
-        },[])
-    )
+    //         const intervalId=setInterval(()=>{
+    //             fetchMystayData();
+    //         },6000)
+    //         return ()=>clearInterval(intervalId)
+    //     },[])
+    // )
 
 
     const getStatusColor = (status) => {
@@ -120,8 +123,103 @@ function MyStay(props) {
             </View>
         </View> */}
 
+        <View style={style.wrapper}>
+            <View style={style.row}>
 
-        <View style={{marginTop:30}}>
+                <View style={style.cardboc}>
+                    <View style={style.content}>
+                        <Text style={style.amount} numberOfLines={1}>
+                            ₹ {context.getPreviousMonthBills?.eb ?? 'N/A'}
+                        </Text>
+
+                        <Text style={style.subText}>
+                            Last Month EB Bill
+                        </Text>
+
+                        <View style={style.inlineRow}>
+                            <Text style={style.label}>Paid On:</Text>
+                            <Text style={style.value} numberOfLines={1}>
+                                {context.getPreviousMonthBills?.invoiceGeneratedDate ?? 'N/A'}
+                            </Text>
+                        </View>
+                    </View>
+
+                    <Image source={Electricity} style={style.icon} />
+                </View>
+
+                <View style={style.cardboc}>
+                    <View style={style.content}>
+                        <Text style={style.amount} numberOfLines={1}>
+                            ₹ {context.getPreviousMonthBills?.rent ?? 'N/A'}
+                        </Text>
+
+                        <Text style={style.subText}>
+                            Last Month Rent
+                        </Text>
+
+                        <View style={style.inlineRow}>
+                            <Text style={style.label}>Paid On:</Text>
+                            <Text style={style.value} numberOfLines={1}>
+                                {context.getPreviousMonthBills?.invoiceGeneratedDate ?? 'N/A'}
+                            </Text>
+                        </View>
+                    </View>
+
+                    <Image source={Frame} style={style.icon} />
+                </View>
+
+            </View>
+
+            <View style={style.row}>
+
+                <View style={style.cardboc}>
+                    <View style={style.content}>
+                        <Text style={style.amount} numberOfLines={1}>
+                            ₹ {context.getCurrentMonthBills?.eb ?? 'N/A'}
+                        </Text>
+
+                        <Text style={style.highlightText}>
+                            New Bill Generated
+                        </Text>
+
+                        <View style={style.inlineRow}>
+                            <Text style={style.label}>Due date:</Text>
+                            <Text style={style.value} numberOfLines={1}>
+                                {context.getCurrentMonthBills?.invoiceDueDate ?? 'N/A'}
+                            </Text>
+                        </View>
+                    </View>
+
+                    <Image source={Electricity} style={style.icon} />
+                </View>
+
+                <View style={style.cardboc}>
+                    <View style={style.content}>
+                        <Text style={style.amount} numberOfLines={1}>
+                            ₹ {context.getCurrentMonthBills?.paidAmount ?? 'N/A'}
+                        </Text>
+
+                        <Text style={style.highlightText}>
+                            New Bill Generated
+                        </Text>
+
+                        <View style={style.inlineRow}>
+                            <Text style={style.label}>Due date:</Text>
+                            <Text style={style.value} numberOfLines={1}>
+                                {context.getCurrentMonthBills?.invoiceDueDate ?? 'N/A'}
+                            </Text>
+                        </View>
+                    </View>
+
+                    <Image source={Frame} style={style.icon} />
+                </View>
+
+            </View>
+        </View>
+
+
+
+        {/* <View style={{marginTop:30}}>
             <View style={{ flexDirection: 'row',flex:1}}>
 
                 <View style={style.EbContainer}>
@@ -179,7 +277,7 @@ function MyStay(props) {
                 <View style={style.EbContainer}>
                     <View>
                         <Text style={{ fontSize: 22, fontWeight: '700', color: '#1C1C1E' }}>
-                            {'\u20B9'} {context.getCurrentMonthBills?.eb !=0?context.getCurrentMonthBills?.eb:'N/A'}
+                            {'\u20B9'} {context.getCurrentMonthBills?.eb !=null?context.getCurrentMonthBills?.eb:'N/A'}
                         </Text>
 
                         <Text style={{ fontSize: 13, fontWeight: '500', color: '#FF9500', marginTop: 5 }}>
@@ -200,7 +298,7 @@ function MyStay(props) {
                 <View style={style.container}>
                     <View>
                         <Text style={{ fontSize: 22, fontWeight: '700', color: '#1C1C1E' }}>
-                            {'\u20B9'} {context.getCurrentMonthBills?.paidAmount !=0?context.getCurrentMonthBills?.paidAmount:'N/A'}
+                            {'\u20B9'} {context.getCurrentMonthBills?.paidAmount !=null?context.getCurrentMonthBills?.paidAmount:'N/A'}
                         </Text>
 
                         <Text style={{ fontSize: 13, fontWeight: '500', color: '#FF9500', marginTop: 5 }}>
@@ -219,7 +317,7 @@ function MyStay(props) {
                 </View>
 
             </View>
-        </View>
+        </View> */}
 
 
 
@@ -256,59 +354,62 @@ function MyStay(props) {
 
         </View>
 
-        <View style={{paddingTop:15}}>
-            <Text style={{fontSize:16,fontWeight:600}}>Request</Text>
+        <View style={{ paddingTop: 15 }}>
+            <Text style={{ fontSize: 16, fontWeight: 600 }}>Request</Text>
 
 
-            {context.getRequestRaised && context.getRequestRaised.length > 0? 
+            {context.getRequestRaised && context.getRequestRaised.length > 0 ?
 
-            context.getRequestRaised.map(i=>{
-                 return  <View key={i?.requestId}
-                      style={{borderWidth:1,borderRadius:10,flexDirection:'row',paddingVertical:15,
-                        borderColor:'#EFF2FF', justifyContent:'space-between',marginTop:10               
-                     }}>
-                 <View style={{paddingLeft:12,paddingRight:10}}>
-                    <Text style={{fontSize:16,fontWeight:600,marginBottom:5}}>
-                       {i.type}
-                    </Text>
+                context.getRequestRaised.map(i => {
+                    return <View key={i?.requestId}
+                        style={{
+                            borderWidth: 1, borderRadius: 10, flexDirection: 'row', paddingVertical: 15,
+                            borderColor: '#EFF2FF', justifyContent: 'space-between', marginTop: 10
+                        }}>
+                        <View style={{ paddingLeft: 12, paddingRight: 10 }}>
+                            <Text style={{ fontSize: 16, fontWeight: 600, marginBottom: 5 }}>
+                                {i.type}
+                            </Text>
 
-                    <View style={{flexDirection:'row',alignItems:'center',marginTop:5}}>
-                         <Image source={Clippath} style={{width:20,height:20}}/>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
+                                <Image source={Clippath} style={{ width: 20, height: 20 }} />
 
-                         <Text style={{fontSize:14,fontWeight:400,marginLeft:10}}>
-                            {i.title}</Text>                    
+                                <Text style={{ fontSize: 14, fontWeight: 400, marginLeft: 10 }}>
+                                    {i.title}</Text>
+                            </View>
+
+                        </View>
+
+                        <View style={{ paddingRight: 10 }}>
+                            <Text style={{ color: '#9C9C9C', fontSize: 11, fontWeight: 400, marginBottom: 5 }}>
+                                {i.requestedDate}
+                            </Text>
+
+                            <Text style={{
+                                fontSize: 12, fontWeight: 400, paddingHorizontal: 8, paddingVertical: 4, backgroundColor: '#FFF8EC',
+                                color: '#FF9500', borderRadius: 28, textAlign: 'center', textAlignVertical: 'center', marginTop: 8
+                            }}>
+                                {i.status}
+                            </Text>
+                        </View>
                     </View>
-                    
-                </View>
+                })
+                :
+                <View style={{
+                    borderWidth: 1, borderRadius: 10, flexDirection: 'row', paddingVertical: 15, borderColor: '#EFF2FF',
+                    justifyContent: 'space-between', marginTop: 10
+                }}>
+                    <View style={{ paddingLeft: 12, paddingRight: 10 }}>
+                        <Text style={{ fontSize: 16, fontWeight: 600, marginBottom: 5 }}>
+                            No Request yet
+                        </Text>
+                        <Text style={{ fontSize: 14, fontWeight: 400, color: '#4B4B4B', marginTop: 5 }}>
+                            You have'nt raised any request</Text>
+                    </View>
 
-                <View style={{paddingRight:10}}>
-                    <Text style={{color:'#9C9C9C',fontSize:11,fontWeight:400,marginBottom:5}}>
-                        {i.requestedDate}
-                    </Text>
+                    <Image source={requestProfile} style={{ width: 44, height: 44, marginRight: 12, marginTop: 5 }} />
+                </View>}
 
-                    <Text style={{fontSize:12,fontWeight:400,paddingHorizontal:8,paddingVertical:4,backgroundColor:'#FFF8EC',
-                        color:'#FF9500',borderRadius:28,textAlign:'center',textAlignVertical:'center',marginTop:8
-                    }}>
-                        {i.status}
-                    </Text>
-                </View>
-            </View>
-            })
-           :
-            <View style={{borderWidth:1,borderRadius:10,flexDirection:'row',paddingVertical:15,borderColor:'#EFF2FF',
-                        justifyContent:'space-between',marginTop:10
-            }}>
-                <View style={{paddingLeft:12,paddingRight:10}}>
-                    <Text style={{fontSize:16,fontWeight:600,marginBottom:5}}>
-                        No Request yet
-                    </Text>
-                    <Text style={{fontSize:14,fontWeight:400,color:'#4B4B4B',marginTop:5}}>
-                        You have'nt raised any request</Text>
-                </View>
-                
-                <Image source={requestProfile} style={{width:44,height:44,marginRight:12,marginTop:5}}/>
-            </View>}
-           
         </View>
 
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 12 }}>
@@ -319,9 +420,8 @@ function MyStay(props) {
 
         </View>
 
-        <ScrollView showsVerticalScrollIndicator={false}>
-
-            {complaints.map(i => {
+        {complaints && complaints?.length > 0 ?
+            complaints?.map(i => {
                 const { backgroundColor, textColor } = getStatusColor(i.status)
 
                 return (
@@ -382,12 +482,22 @@ function MyStay(props) {
 
                     </View>
                 )
-            })}
+            }) : <View style={{
+                borderWidth: 1, borderRadius: 10, flexDirection: 'row', paddingVertical: 15, borderColor: '#EFF2FF',
+                justifyContent: 'space-between', marginTop: 10
+            }}>
+                <View style={{ paddingLeft: 12, paddingRight: 10 }}>
+                    <Text style={{ fontSize: 16, fontWeight: 600, marginBottom: 5 }}>
+                        No Complaints yet
+                    </Text>
+                    <Text style={{ fontSize: 14, fontWeight: 400, color: '#4B4B4B', marginTop: 5 }}>
+                        You have'nt raised any Complaints</Text>
+                </View>
 
-        </ScrollView>
+                <Image source={requestProfile} style={{ width: 44, height: 44, marginRight: 12, marginTop: 5 }} />
+            </View>
 
-
-
+        }
 
     </ScrollView>
 
@@ -412,7 +522,77 @@ const style = StyleSheet.create({
         borderWidth: 1, flex: 1, paddingTop: 14, paddingLeft: 15, paddingBottom: 16, borderRadius: 12, marginLeft: 7,
         borderColor: '#E5E5EA', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#FFFFFF'
     },
-    card: { marginTop: 10, paddingTop: 12, paddingLeft: 20, borderRadius: 10, height: "70%" }
+    card: { marginTop: 10, paddingTop: 12, paddingLeft: 20, borderRadius: 10, height: "70%" },
+    wrapper: {
+        marginTop: 30,
+    },
+
+    row: {
+        flexDirection: 'row',
+        gap: 12,
+        marginBottom: 15,
+    },
+
+    cardboc: {
+        flex: 1,
+        backgroundColor: '#FFFFFF',
+        borderRadius: 14,
+        padding: 14,
+        flexDirection: 'row',
+        alignItems: 'center',
+        minHeight: 110,
+        borderWidth:1,
+         borderColor: '#E5E5EA',
+    },
+
+    content: {
+        flex: 1,
+    },
+
+    amount: {
+        fontSize: 20,
+        fontWeight: '700',
+        color: '#1C1C1E',
+    },
+
+    subText: {
+        fontSize: 13,
+        color: '#AEAEB2',
+        marginTop: 4,
+    },
+
+    highlightText: {
+        fontSize: 13,
+        color: '#FF9500',
+        marginTop: 4,
+        fontWeight: '500',
+    },
+
+    inlineRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 8,
+        flexWrap: 'wrap',
+    },
+
+    label: {
+        fontSize: 11,
+        color: '#8E8E93',
+    },
+
+    value: {
+        fontSize: 12,
+        fontWeight: '600',
+        marginLeft: 4,
+        flexShrink: 1,
+    },
+
+    icon: {
+        width: 26,
+        height: 26,
+        marginLeft: 8,
+        resizeMode: 'contain',
+    },
 })
 
 

@@ -27,18 +27,22 @@ import { getPaymentList } from "../Action/HostelAction";
 import { UsersContext } from "../Context/UserContext";
 import { LoginContexts } from "../Context/LoginContext";
 import { paymentContexts } from "../Context/PaymentContext";
+import FilterPayments from "./DashboardPage/BottomSheet/filterPayments";
 
 
 
 const Payment = (props) => {
   console.log(props)
-
+     const sheetY = useRef(new Animated.Value(700)).current;
      const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState(null);
   const context=useContext(UsersContext)
   const loginContext=useContext(LoginContexts)
   const paymentContext=useContext(paymentContexts)
+ 
+
+
 
 
   const fetchPaymentData=()=>{
@@ -430,13 +434,14 @@ const handleReceiptPdfDownload =  () => {
 )}
 
 
-      <TouchableOpacity style={styles.filterFab} >
+      <TouchableOpacity onPress={props.onFilterPayment} style={styles.filterFab} >
  <Image 
  source={FilterIcon} 
  resizeMode="contain" 
  style={styles.filterIcon}
  />
  </TouchableOpacity>
+
     </>
   );
 };
