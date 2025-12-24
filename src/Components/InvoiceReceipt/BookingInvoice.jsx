@@ -11,7 +11,7 @@ import { getPaymentInvoiceDetail } from "../../Action/PaymentAction";
 import { paymentContexts } from "../../Context/PaymentContext";
 import { UsersContext } from "../../Context/UserContext";
 import { LoginContexts } from "../../Context/LoginContext";
-const InvoiceDesign = () => {
+const BookingInvoice = () => {
 
   const navigation = useNavigation();
   const paymentContext = useContext(paymentContexts)
@@ -60,7 +60,7 @@ const InvoiceDesign = () => {
 
 
       <View style={styles.receiptTitleContainer}>
-        <Text style={[styles.receiptTitle,{color: selectedInvoiceDetail?.configurations?.templateColor}]}>Payment Invoice</Text>
+        <Text style={[styles.receiptTitle,{color: selectedInvoiceDetail?.configurations?.templateColor}]}>Booking Invoice</Text>
       </View>
 
 
@@ -100,23 +100,13 @@ const InvoiceDesign = () => {
             <Text style={[styles.sectionTitle,{color: selectedInvoiceDetail?.configurations?.templateColor}]}>Bill to</Text>
             <Text style={styles.label}>Name</Text>
             <Text style={styles.label}>Phone</Text>
-            <Text style={styles.label}>RoomNo</Text>
-            <Text style={styles.label}>Address</Text>
           </View>
           <View style={styles.valueColumn}>
             <Text style={styles.sectionTitle}>:</Text>
             <Text style={styles.name}>: {selectedInvoiceDetail?.customerInfo?.fullName}</Text>
             <Text style={styles.info}>:
               +{selectedInvoiceDetail?.customerInfo?.countryCode} {selectedInvoiceDetail?.customerInfo?.customerMobileNo}</Text>
-            <Text style={styles.info}>: {selectedInvoiceDetail?.stayInfo?.floorName},
-              {selectedInvoiceDetail?.stayInfo?.roomName} - {selectedInvoiceDetail?.stayInfo?.bedName}</Text>
-            <View>
-              {addressLine?.map((line, index) => (
-                <Text key={index} style={styles.info}>
-                  :  {line.split()}
-                </Text>
-              ))}
-            </View>
+           
             {/* <Text style={styles.info}>: 8th Main Rd,{"\n"}   Sameeshwar Nagar,{"\n"}   Bengaluru, Karnataka 560071</Text> */}
           </View>
         </View>
@@ -133,7 +123,7 @@ const InvoiceDesign = () => {
             <Text style={styles.bold}>{selectedInvoiceDetail?.invoiceDate}</Text>
           </Text>
 
-          <Text style={styles.invSty}>
+          {/* <Text style={styles.invSty}>
             Joining Date: {' '}
             <Text style={styles.bold}>{selectedInvoiceDetail?.customerInfo?.joiningDate}</Text>
           </Text>
@@ -146,7 +136,66 @@ const InvoiceDesign = () => {
           <Text style={styles.invSty}>
             Rental Period: {' '}
             <Text style={styles.bold}>{selectedInvoiceDetail?.invoiceInfo?.invoicePeriod}</Text>
+          </Text> */}
+        </View>
+      </View>
+
+
+       {/* QR + Account Details */}
+      <View style={styles.accountSection}>
+        <View style={styles.accountLeft}>
+          <Text style={[styles.accountTitle,{color: selectedInvoiceDetail?.configurations?.templateColor}]}>
+            ACCOUNT DETAILS</Text>
+          <Text style={styles.accountText}>Account No: 
+            <Text style={styles.bold}>{selectedInvoiceDetail?.accountDetails?.accountNo !=null?selectedInvoiceDetail?.accountDetails?.accountNo : "N/A"}</Text></Text>
+          <Text style={styles.accountText}>IFSC Code: <Text style={styles.bold}>
+            {selectedInvoiceDetail?.accountDetails?.ifscCode !=null?selectedInvoiceDetail?.accountDetails?.ifscCode : "N/A"}</Text></Text>
+          <Text style={styles.accountText}>Bank Name: <Text style={styles.bold}>
+             {selectedInvoiceDetail?.accountDetails?.bankName !=null?selectedInvoiceDetail?.accountDetails?.bankName : "N/A"}</Text></Text>
+          <Text style={styles.accountText}>UPI ID: <Text style={styles.bold}>
+            {selectedInvoiceDetail?.accountDetails?.upiId !=null?selectedInvoiceDetail?.accountDetails?.upiId : "N/A"}</Text></Text>
+        </View>
+
+        <View style={styles.accountRight}>
+          <Image
+            source={{uri:selectedInvoiceDetail?.accountDetails?.qrCode}}
+            style={styles.qr}
+          />
+          <Text style={styles.qrText}>Scan QR for payment</Text>
+          <View style={styles.paymentLogos}>
+            <Image
+              source={gpay}
+              style={styles.payIcon}
+            />
+            <Image
+              source={paytm}
+              style={styles.payIcon}
+            />
+            <Image
+              source={phonepe}
+              style={styles.payIcon}
+            />
+          </View>
+        </View>
+      </View>
+
+
+       {/* Terms and Conditions & Signature in same line */}
+      <View style={styles.termsAndSignatureRow}>
+        <View style={styles.termsSection}>
+          <Text style={[styles.termsTitle,{color: selectedInvoiceDetail?.configurations?.templateColor}]}>
+            Terms and Conditions</Text>
+          <Text style={styles.termsText}>
+            Booking confirms your stay. Advanvce is non-refundable. Room is allotted based on availablity. Provide correct details. Follow property guildlines always. 
           </Text>
+        </View>
+
+        <View style={styles.signatureSection}>
+          <Image
+            source={{uri:selectedInvoiceDetail?.configurations?.signatureUrl}}
+            style={styles.signature}
+          />
+          <Text style={styles.authText} numberOfLines={1}>Authorized Signature</Text>
         </View>
       </View>
 
@@ -223,62 +272,9 @@ const InvoiceDesign = () => {
       
       </View> */}
 
-      {/* QR + Account Details */}
-      <View style={styles.accountSection}>
-        <View style={styles.accountLeft}>
-          <Text style={[styles.accountTitle,{color: selectedInvoiceDetail?.configurations?.templateColor}]}>
-            ACCOUNT DETAILS</Text>
-          <Text style={styles.accountText}>Account No: 
-            <Text style={styles.bold}>{selectedInvoiceDetail?.accountDetails?.accountNo !=null?selectedInvoiceDetail?.accountDetails?.accountNo : "N/A"}</Text></Text>
-          <Text style={styles.accountText}>IFSC Code: <Text style={styles.bold}>
-            {selectedInvoiceDetail?.accountDetails?.ifscCode !=null?selectedInvoiceDetail?.accountDetails?.ifscCode : "N/A"}</Text></Text>
-          <Text style={styles.accountText}>Bank Name: <Text style={styles.bold}>
-             {selectedInvoiceDetail?.accountDetails?.bankName !=null?selectedInvoiceDetail?.accountDetails?.bankName : "N/A"}</Text></Text>
-          <Text style={styles.accountText}>UPI ID: <Text style={styles.bold}>
-            {selectedInvoiceDetail?.accountDetails?.upiId !=null?selectedInvoiceDetail?.accountDetails?.upiId : "N/A"}</Text></Text>
-        </View>
+     
 
-        <View style={styles.accountRight}>
-          <Image
-            source={{uri:selectedInvoiceDetail?.accountDetails?.qrCode}}
-            style={styles.qr}
-          />
-          <Text style={styles.qrText}>Scan QR for payment</Text>
-          <View style={styles.paymentLogos}>
-            <Image
-              source={gpay}
-              style={styles.payIcon}
-            />
-            <Image
-              source={paytm}
-              style={styles.payIcon}
-            />
-            <Image
-              source={phonepe}
-              style={styles.payIcon}
-            />
-          </View>
-        </View>
-      </View>
-
-      {/* Terms and Conditions & Signature in same line */}
-      <View style={styles.termsAndSignatureRow}>
-        <View style={styles.termsSection}>
-          <Text style={[styles.termsTitle,{color: selectedInvoiceDetail?.configurations?.templateColor}]}>
-            Terms and Conditions</Text>
-          <Text style={styles.termsText}>
-            Tenants must pay all dues on or before the due date, maintain cleanliness, and follow PG rules; failure may lead to penalties or termination of stay.
-          </Text>
-        </View>
-
-        <View style={styles.signatureSection}>
-          <Image
-            source={{uri:selectedInvoiceDetail?.configurations?.signatureUrl}}
-            style={styles.signature}
-          />
-          <Text style={styles.authText} numberOfLines={1}>Authorized Signature</Text>
-        </View>
-      </View>
+     
 
       {/* Footer */}
       <View style={styles.footer}>
@@ -456,9 +452,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: "#eee",
     alignItems: "flex-start",
+    flex:1
   },
   termsSection: {
-    flex: 2,
+    flex: 1,
     paddingRight: 15,
   },
   termsTitle: {
@@ -472,10 +469,9 @@ const styles = StyleSheet.create({
     lineHeight: 18
   },
   signatureSection: {
-    flex: 1,
     alignItems: "center",
     justifyContent: "flex-start",
-    paddingLeft: 70
+    paddingLeft: 70,
   },
   signature: {
     width: 100,
@@ -588,4 +584,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default InvoiceDesign;
+export default BookingInvoice;

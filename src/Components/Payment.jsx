@@ -11,7 +11,7 @@ import {
   TouchableWithoutFeedback,  Linking, Alert, Animated,
     PanResponder,
 } from "react-native";
-import { useNavigation,useFocusEffect } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import SideArrow from "../assets/Images/arrow-up.png";
 import HostelImage from "../assets/Images/Group 1.png";
 import ElectrictyIcon from "../assets/Images/electricity.png";
@@ -52,16 +52,9 @@ const Payment = (props) => {
       })
   }
 
-  useFocusEffect(
-    useCallback(()=>{
-      fetchPaymentData();
-
-      const intervalId=setInterval(()=>{
-          fetchPaymentData()
-      },6000)
-      return ()=>clearInterval(intervalId)
-    },[])
-  )
+  useEffect(()=>{
+       fetchPaymentData();
+  },[])
 
 
 
@@ -159,7 +152,7 @@ const handleReceiptPdfDownload =  () => {
   return (
     <>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        {paymentContext.getInvoiceList?.map((item, index) => (
+        {paymentContext.getInvoiceList?.invoices?.map((item, index) => (
           <TouchableOpacity key={index} onPress={() => props.onPayment(item)} style={styles.card}>
             <View style={{flexDirection: "row",}}>
               <View style={styles.iconContainer}>
@@ -197,20 +190,26 @@ const handleReceiptPdfDownload =  () => {
                       },
                     ]}
                   >
-                    <View style={{ flexDirection: "row" }}>
+                    <View style={{ flexDirection: "row",alignItems:'center' }}>
                       <Text
                         style={[styles.statusText, { color: item.statusColor }]}
                       >
                         {item.status}
                       </Text>
-                      {item.status === "Pay Now" ?
-                       (<Image  source={PaYBillIcon} resizeMode="contain" style={{ width: 20, height: 20 , marginLeft:8 }}/>)
-                      : (<Image
-                        source={HostelImage}
+                      {item.hostelUrl !=null ?
+                       (<Image
+                        source={{uri:paymentContext.getInvoiceList.hostelUrl}}
                         style={{ width: 14, height: 14, marginLeft: 6 }}
                         resizeMode="contain"
                       />)
+                      : (<View style={{width:18,height:18,borderRadius:9,backgroundColor:'#788fed',marginLeft:5,
+                                      alignItems:'center',justifyContent:'center'}}>
+                                    <Text style={{fontSize:9,fontWeight:600}}>
+                                      {paymentContext.getInvoiceList.initials}
+                                    </Text>
+                                  </View>)
                       }
+                       
                       
 
                     </View>

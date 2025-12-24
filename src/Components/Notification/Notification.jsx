@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Image,
+  BackHandler,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import NotificationItem from "./NotificationItem";
@@ -72,7 +73,6 @@ const notifications = [
 ];
 
 const Notification = (props) => {
-  console.log(props)
   const context=useContext(UsersContext)
   const loginContext=useContext(LoginContexts)
   const notificationContext=useContext(notificationContexts)
@@ -81,6 +81,17 @@ const Notification = (props) => {
   const handleBack = () => navigation.goBack();
 
   const [listData, setListData] = useState([]);
+
+  useEffect(()=>{
+    const onBackPress=()=>{
+      navigation.goBack();
+      return true;
+    }
+
+    BackHandler.addEventListener('hardwareBackPress',onBackPress);
+
+    return ()=> BackHandler.addEventListener('hardwareBackPress',onBackPress);
+  },[navigation])
 
   useEffect(()=>{
     console.log(context.getHostelDetail.hostelId)

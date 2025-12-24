@@ -79,7 +79,6 @@ const RequestBedChange = ({ visible,
                         setModelType('success')
 
                         setTimeout(() => {
-                            setShowBedChange(false)
                             setShowSuccessModal(false)
                             setBedType(null)
                             setChangeBed(null)

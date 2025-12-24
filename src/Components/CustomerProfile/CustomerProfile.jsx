@@ -34,6 +34,7 @@ import buildings from '../../assets/Images/buildings.png'
 import paperclip from '../../assets/Images/paperclip.png'
 import sideframe from '../../assets/Images/sideframe.png'
 import { LoginContexts } from "../../Context/LoginContext";
+import logoutSetup from '../../Action/LogoutAction'
 
 
 
@@ -45,16 +46,16 @@ const CustomerProfile = (route) => {
   const navigation = useNavigation();
   const [customer, setCustomers] = useState()
 
-  useEffect(()=>{
-      const onBackPress=()=>{
-        navigation.goBack();
-        return true;
-      }
+  useEffect(() => {
+    const onBackPress = () => {
+      navigation.goBack();
+      return true;
+    }
 
-      BackHandler.addEventListener('hardwareBackPress',onBackPress);
+    BackHandler.addEventListener('hardwareBackPress', onBackPress);
 
-      return()=>BackHandler.addEventListener('hardwareBackPress',onBackPress);
-  },[navigation])
+    return () => BackHandler.addEventListener('hardwareBackPress', onBackPress);
+  }, [navigation])
 
 
   useEffect(() => {
@@ -67,7 +68,7 @@ const CustomerProfile = (route) => {
   }, [])
 
 
-  
+
 
 
   const handleDownload = async () => {
@@ -118,11 +119,21 @@ const CustomerProfile = (route) => {
   }
 
   const handleLogout = () => {
+
+    const data= {
+      xuid: loginContext.getUserId,
+    }
+
+     logoutSetup(data,loginContext.getToken).then(r=>{
+      console.log(r)
+    })
     loginContext.logout('false')
     remoteData(ACCESS_TOKEN)
     remoteData(PHONE_NO)
     storeData(LOGGEDIN, "false")
     loginContext.updateToken(null)
+
+   
     // navigation.navigate("SplashScreen");
   }
 
@@ -132,8 +143,8 @@ const CustomerProfile = (route) => {
 
 
 
- 
-   const handleBack = () => navigation.goBack();
+
+  const handleBack = () => navigation.goBack();
 
 
   return (
@@ -173,25 +184,29 @@ const CustomerProfile = (route) => {
 
               <View style={styles.infoRow}>
                 <View style={styles.FloorBadgePending}>
-                  <Text style={{ color: 'black' }}>{context.getCustomerDetail?.bookingDetails?.floorName}</Text>
+                  <Text style={{ color: 'black',textAlign:'center' }}>{context.getCustomerDetail?.bookingDetails?.floorName}</Text>
                 </View>
 
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center',flex:1}}>
                   <Image
                     source={RoomIcon}
                     style={{ height: 16, width: 16, marginRight: 4 }}
                     resizeMode="contain"
                   />
-                  <Text>{context.getCustomerDetail?.bookingDetails?.roomName}</Text>
+                  <Text style={{ flexShrink: 1 }}
+                    numberOfLines={2}
+                    ellipsizeMode="tail">{context.getCustomerDetail?.bookingDetails?.roomName}</Text>
                 </View>
 
-                <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center',flex:1}}>
                   <Image
                     source={BedIcon}
                     style={{ height: 16, width: 16, marginRight: 4 }}
                     resizeMode="contain"
                   />
-                  <Text>{context.getCustomerDetail?.bookingDetails?.bedName}</Text>
+                  <Text style={{ flexShrink: 1 }}
+                    numberOfLines={2}
+                    ellipsizeMode="tail">{context.getCustomerDetail?.bookingDetails?.bedName}</Text>
                 </View>
 
 
@@ -211,7 +226,7 @@ const CustomerProfile = (route) => {
           <Text style={styles.warningText}>
             Enter your Aadhar/PAN card documents and Complete the status
           </Text>
-          <TouchableOpacity style={styles.primaryButton} onPress={() => navigation.navigate("VerifyKYC")}>
+          <TouchableOpacity style={styles.primaryButton} onPress={() => navigation.navigate("ComingSoonPage")}>
             <Text style={styles.primaryButtonText}>Verify Now</Text>
           </TouchableOpacity>
         </View>
@@ -339,42 +354,44 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#eee",
     marginBottom: 12,
+    flex:1
   },
   profileRow: {
     flexDirection: "row",
+    flex:1
   },
   profileImage: {
     width: 60,
     height: 60,
     borderRadius: 30,
   },
-   initialText: {
-  color: '#788fed',
-  fontSize: 20,
-  fontWeight: 'bold',
-},
+  initialText: {
+    color: '#788fed',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
 
-initialContainer: {
-  backgroundColor: '#eef1ff',
-  justifyContent: 'center',
-  alignItems: 'center',
-},
+  initialContainer: {
+    backgroundColor: '#eef1ff',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   profileName: {
     fontSize: 18,
     fontWeight: "700",
     color: "#000",
   },
-   lastName: {
+  lastName: {
     fontSize: 18,
     fontWeight: "700",
     color: "#000",
-    marginLeft:5,
+    marginLeft: 5,
   },
   infoRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
-    flex:1
+    flex: 1,
   },
   infoText: {
     color: "#555",
@@ -407,8 +424,10 @@ initialContainer: {
   FloorBadgePending: {
     backgroundColor: "rgba(255, 239, 207, 1)",
     paddingVertical: 4,
-    paddingHorizontal: 10,
+    paddingHorizontal: 5,
     borderRadius: 20,
+    alignItems:'center',
+    flex:1
   },
   statusText: {
     color: "white",

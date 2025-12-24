@@ -97,11 +97,19 @@ const ProfileHostels = () => {
         onPress={() => setDropdownVisible(!dropdownVisible)}
         activeOpacity={0.8}
       >
-        <Image
-          source={HostelImage}
-          style={styles.hostelImage}
-        />
-        <View style={{ flex: 1 }}>
+        {selectedHostel?.hostelPic ? (
+                      <Image
+                        source={{ uri:selectedHostel?.hostelPic }}
+                        style={styles.profileImage} />
+                    ) : (
+                      <View style={[styles.profileImage, styles.initialContainer]}>
+                        <Text style={styles.initialText}>
+                          {selectedHostel?.hostelInitial}
+                        </Text>
+                      </View>
+                    )}
+       
+        <View style={{ flex: 1,paddingLeft:5 }}>
           <Text style={styles.hostelTitle}>{selectedHostel?.hostelName}</Text>
           <View style={styles.locationRow}>
             <Image
@@ -231,6 +239,17 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
+  },
+  initialText: {
+    color: '#788fed',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+
+  initialContainer: {
+    backgroundColor: '#eef1ff',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   profileName: {
     fontSize: 18,

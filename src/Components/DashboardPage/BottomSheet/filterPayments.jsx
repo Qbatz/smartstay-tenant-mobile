@@ -19,7 +19,6 @@ const FilterPayments = ({
     const [showPicker, setShowPicker] = useState(false);
     const [activeField, setActiveField] = useState(null);
 
-    // 🔑 TEMP STATE (important fix)
     const [tempDate, setTempDate] = useState(new Date());
 
     const openPicker = (field) => {
@@ -41,7 +40,6 @@ const FilterPayments = ({
     }
 
     if (event.type === 'set' && selectedDate) {
-        // ✅ store selected date
         setTempDate(selectedDate);
 
         if (activeField === 'from') {
@@ -199,7 +197,7 @@ const FilterPayments = ({
                             <View style={{flexDirection:'row',flex:1}}>
                                 <View style={{paddingRight:5,flex:1}}>
                                     <TouchableOpacity style={{borderWidth:1,borderRadius:8, justifyContent: 'center', alignItems: 'center', padding: 10}}>
-                                        <Text>Reset alll</Text>
+                                        <Text>Reset all</Text>
                                     </TouchableOpacity>
                                 </View>
 
@@ -228,7 +226,7 @@ export default FilterPayments;
 
 const styles = StyleSheet.create({
     bottomSheet: {
-        height: '60%', backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingHorizontal: 5,
+        height: '50%', backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingHorizontal: 5,
         paddingTop: 20, paddingBottom: 10
     },
     sheetOverlay: {
