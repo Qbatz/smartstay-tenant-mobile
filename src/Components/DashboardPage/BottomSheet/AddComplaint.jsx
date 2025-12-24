@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { View, Text, Image, TouchableOpacity, Animated, StyleSheet, TouchableWithoutFeedback, ScrollView,TextInput } from "react-native";
+import { View, Text, Image, TouchableOpacity, Animated, StyleSheet, TouchableWithoutFeedback, ScrollView,TextInput,FlatList } from "react-native";
 import { launchImageLibrary } from "react-native-image-picker";
 import AppLoader from "../../ToastFile/LoaderPage";
 import SuccessModal from "../../ToastFile/TostFilePage";
@@ -37,12 +37,14 @@ const AddComplaint = ({
      const [complaintType, setComplaintTypes] = useState([])
 
     useEffect(() => {
-
-        getComplaintTypes(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
+        if(visible){
+             getComplaintTypes(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
             console.log(r)
             setComplaintTypes(r.data)
         })
-    }, [])
+        }
+       
+    }, [visible])
 
     useEffect(() => {
         if (!visible) {
@@ -247,8 +249,11 @@ const AddComplaint = ({
                                     <Text style={{ fontSize: 14, fontWeight: 400 }}>Complaint message
                                         <Text style={{ color: 'red' }}> *</Text>
                                     </Text>
-                                    <View style={{ borderWidth: 1, borderRadius: 10, marginTop: 8, paddingTop: 7, paddingLeft: 10, borderColor: '#e5e5e5', height: 80 }}>
-                                        <TextInput value={complaintDescription} placeholder="Enter message" onChangeText={(value) => setDespriction(value)} />
+                                    <View style={{ borderWidth: 1, borderRadius: 10, marginTop: 8,paddingTop: 7, paddingLeft: 10, borderColor: '#e5e5e5', height: 80 }}>
+                                        <TextInput value={complaintDescription} placeholder="Enter message" onChangeText={(value) => setDespriction(value)} 
+                                        multiline
+                                        textAlignVertical="top"
+                                        style={{flex:1,padding:0}} />
                                     </View>
                                 </View>
 

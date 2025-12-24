@@ -73,10 +73,9 @@ const STATUS = {
           return true;
         };
 
-        BackHandler.addEventListener('hardwareBackPress',onBackPress);
+       const subcription= BackHandler.addEventListener('hardwareBackPress',onBackPress);
 
-        return ()=>
-            BackHandler.addEventListener('hardwareBackPress', onBackPress)
+        return ()=>subcription.remove();
       },[navigation])
     )
 

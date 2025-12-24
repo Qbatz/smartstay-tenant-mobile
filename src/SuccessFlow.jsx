@@ -27,6 +27,8 @@ import ForgotMpinOtp from "./Components/ForgotMpin/ForgotMpinOtp";
 import ResetNewMpin from "./Components/ForgotMpin/ResetNewMpin";
 import ComingSoon from "./Components/RentalAggreements/ComingSoon";
 import ComplaintUpdatesScreen from "./Components/ComplaintUpdates/Updates";
+import BookingInvoice from "./Components/InvoiceReceipt/BookingInvoice";
+import BookingReceipt from "./Components/InvoiceReceipt/BookingReceipt";
 
 const SuccessFlow = (props) => {
 
@@ -65,6 +67,8 @@ const SuccessFlow = (props) => {
           <Navigation.Screen name="NocBillPdf" component={NOCBillPdf} />
           <Navigation.Screen name="NocReceiptPdf" component={NocReciptPdf} />
           <Navigation.Screen name="InvoiceDesign" component={InvoiceDesign} />
+          <Navigation.Screen name="BookingInvoice" component={BookingInvoice}/>
+          <Navigation.Screen name="BookingReceipt" component={BookingReceipt}/>
         </Navigation.Navigator>
 
       </NavigationContainer>

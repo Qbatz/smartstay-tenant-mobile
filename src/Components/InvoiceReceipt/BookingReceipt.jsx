@@ -1,16 +1,15 @@
 import React, { useEffect,useContext, useState, useCallback } from "react";
 import { View, Text, Image, ScrollView, StyleSheet, BackHandler } from "react-native";
-import HostelImage from "../assets/Images/Group 1.png";
-import PaymentReceivedIcon from "../assets/Images/paymentreceived.png";
-import SigantureIcon from "../assets/Images/signature.png";
-import { getPaymentReceiptDetails } from "../Action/PaymentAction";
-import { UsersContext } from "../Context/UserContext";
-import { LoginContexts } from "../Context/LoginContext";
-import { paymentContexts } from "../Context/PaymentContext";
+import HostelImage from "../../assets/Images/Group 1.png";
+import PaymentReceivedIcon from "../../assets/Images/paymentreceived.png";
+import { getPaymentReceiptDetails } from "../../Action/PaymentAction";
+import { UsersContext } from "../../Context/UserContext";
+import { LoginContexts } from "../../Context/LoginContext";
+import { paymentContexts } from "../../Context/PaymentContext";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 // import Pdf from "react-native-pdf";
 
-const ReceiptPdfViewer = ({ route }) => {
+const BookingReceipt = ({ route }) => {
   console.log(route)
 
   const navigation = useNavigation();
@@ -67,7 +66,7 @@ const ReceiptPdfViewer = ({ route }) => {
               ? "Security Deposit Receipt"
               : "Final Settlement Receipt"} */}
 
-           {receiptname === "SecurityDeposit" ?  "Security Deposit Receipt":"Payment Receipt"}  
+           {receiptname === "SecurityDeposit" ?  "Security Deposit Receipt":"Booking Payment Receipt"}  
           </Text>
         </View>
 
@@ -83,19 +82,6 @@ const ReceiptPdfViewer = ({ route }) => {
     <View style={styles.detailRow}>
       <Text style={styles.label}>Mobile No :</Text>
       <Text style={styles.value}>{selectedReceiptDetail?.customerInfo?.customerMobileNo}</Text>
-    </View>
-
-    <View style={styles.detailRow}>
-      <Text style={styles.label}>Room No :</Text>
-      <Text style={styles.value}>
-        {selectedReceiptDetail?.stayInfo?.floorName}, {selectedReceiptDetail?.stayInfo?.roomName}-{selectedReceiptDetail?.stayInfo?.bedName}</Text>
-    </View>
-
-    <View style={styles.detailRow}>
-      <Text style={styles.label}>Address :</Text>
-      <Text style={[styles.value, { flex: 1 }]}>
-        {selectedReceiptDetail?.customerInfo?.fullAddress}
-      </Text>
     </View>
   </View>
 
@@ -118,6 +104,11 @@ const ReceiptPdfViewer = ({ route }) => {
     <View style={styles.detailRow}>
       <Text style={styles.label}>Payment Mode :</Text>
       <Text style={[styles.value, { color: "#1E45E1" }]}>UPI / Net Banking</Text>
+    </View>
+
+    <View style={styles.detailRow}>
+      <Text style={styles.label}>Transaction Id :</Text>
+      <Text style={styles.value}>{route?.params?.transcationId}</Text>
     </View>
   </View>
 </View>
@@ -145,8 +136,7 @@ const ReceiptPdfViewer = ({ route }) => {
   <View style={{flex:1}}>
     <Text style={styles.ackTitle}>Acknowledgement</Text>
     <Text style={styles.ackDescription}>
-      This payment confirms your dues till the mentioned period. Final settlement
-      during checkout will be calculated based on services utilized and advance paid.
+       Booking amount will tally with your future Advance/Rental amount.
     </Text>
   </View>
 
@@ -520,4 +510,4 @@ totalRow: {
 
 });
 
-export default ReceiptPdfViewer;
+export default BookingReceipt;

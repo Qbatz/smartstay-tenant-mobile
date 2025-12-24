@@ -25,7 +25,7 @@ const OtpDesign = ({ route }) => {
   // const { verifyOtp , resendOtp } = useContext(LoginContext); 
 
   const handleOtpChange = async (text, index) => {
-     const cleanText = text.replace(/[^0-9]/g, "");
+    const cleanText = text.replace(/[^0-9]/g, "");
     const newOtp = [...otp];
     newOtp[index] = cleanText;
     setOtp(newOtp);
@@ -87,7 +87,7 @@ const OtpDesign = ({ route }) => {
         setTimeout(() => {
           setShowSuccessModal(false)
         }, 4000);
-      }else{
+      } else {
         setShowSuccessModal(true)
         setShowModelMessage('Invalid Otp')
         setModelType('error')
@@ -129,11 +129,15 @@ const OtpDesign = ({ route }) => {
         ))}
       </View>
 
-      <Text style={styles.resendText}>
-        Didn’t receive OTP?
+
+      <View style={{flexDirection:'row',alignItems:'center'}}>
+        <Text style={styles.resendText}>
+          Didn’t receive OTP?
+        </Text>
         <TouchableOpacity onPress={resendOtp} >
           <Text style={styles.resendLink}>Resend</Text></TouchableOpacity>
-      </Text>
+      </View>
+
 
     </View>
   );
@@ -158,8 +162,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: "#000",
   },
-  resendText: { color: "#555" },
-  resendLink: { color: "#0057FF", fontWeight: "600" },
+  resendText: { color: "#555", alignItems: 'center', justifyContent: 'center' },
+  resendLink: { color: "#0057FF", fontWeight: "600",marginLeft:3 },
 });
 
 export default OtpDesign;

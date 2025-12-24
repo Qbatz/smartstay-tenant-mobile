@@ -14,7 +14,6 @@ import Dashboard from './src/Components/DashboardPage/Dashboard'
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import HostelList from './src/Components/HostelList'
-import MystayPage from './src/Components/MystayPage';
 import CreateAccount from "./src/Components/CreateAccount/CreateAccount";
 import OtpDesign from './src/Components/CreateAccount/OtpDesign';
 import SplashScreen from "./src/Components/WelComePage/SplashScreen";

@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     alignItems: "center",
-    paddingTop: height * 0.08,
+    paddingTop: height * 0.03,
   },
 
   /* LOGO */

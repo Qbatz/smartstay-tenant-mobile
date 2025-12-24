@@ -59,7 +59,7 @@ const EditComplaintSheet = ({
                 mediaTypes: 'photo',
                 allowsEditing: true,
                 aspect: [1, 1],
-                quality: 1,
+                quality: 0.5,
             });
             setMediaimage([...mediaimage, result.assets[0].uri])
             setImageuri([...imageuri, result.assets[0]])
@@ -72,8 +72,34 @@ const EditComplaintSheet = ({
     console.log(imageuri)
     const submitBtn = () => {
 
+         if (selectedComplaintTypeId === 0) {
+            setShowSuccessModal(true);
+            setToastMessage('Select complaint type');
+            setModelType('error');
+            setTimeout(() => setShowSuccessModal(false), 2000);
+            return;
+        }
+
+        const desc = description?.trim() ?? "";
+
+        if (!desc) {
+            setShowSuccessModal(true);
+            setToastMessage("Comment cannot be empty");
+            setModelType('error');
+            setTimeout(() => setShowSuccessModal(false), 2000);
+            return;
+        }
+
+        if (desc.length < 15) {
+            setShowSuccessModal(true);
+            setToastMessage("Comment should be above 15 letters");
+            setModelType('error');
+            setTimeout(() => setShowSuccessModal(false), 2000);
+            return;
+        }
+
         const noChanges = selectedComplaint.complaintTypeId === selectedComplaintTypeId &&
-            selectedComplaint.description === description
+            selectedComplaint.description === description && mediaimage.length ===(selectedComplaint?.images?.length || 0)
 
         if (noChanges) {
             setShowSuccessModal(true)
@@ -215,7 +241,9 @@ const EditComplaintSheet = ({
                                 <Text style={{ fontSize: 20, fontWeight: 600 }}>Edit complaint</Text>
 
                                 <View style={{ paddingTop: 20 }}>
-                                    <Text>Complaint type</Text>
+                                    <Text>Complaint type
+                                        <Text style={{ color: 'red' }}> *</Text>
+                                    </Text>
 
                                     <Dropdown
                                         style={styles.dropdown}
@@ -240,7 +268,9 @@ const EditComplaintSheet = ({
                                 </View>
 
                                 <View style={{ paddingTop: 16 }}>
-                                    <Text>Complaint message</Text>
+                                    <Text>Complaint message
+                                        <Text style={{ color: 'red' }}> *</Text>
+                                    </Text>
                                     <View style={styles.textInputBox}>
                                         <TextInput value={description} placeholder="Enter message" onChangeText={setDespriction}
                                             multiline={true}

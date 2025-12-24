@@ -136,8 +136,8 @@ function Services(props) {
 
                     <Text style={{ color: selectedfield == 'Complaint' ? "white" : 'black', fontSize: 16, fontWeight: '400', marginLeft: 10 }}>Complaints</Text>
                 </View>
-
             </TouchableOpacity>
+            
             <TouchableOpacity onPress={() => secondclick('Amenities')} style={{
                 backgroundColor: selectedfield === 'Amenities' ? '#1E45E1' : 'white',
                 flex: 1,

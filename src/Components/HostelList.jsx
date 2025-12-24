@@ -69,7 +69,7 @@ const HostelList = (route) => {
         fetchFCMToken(r.data);
         loginContext.updateToken(r.data)
         context.updateHostelDetail(selectedHostel)
-        navigation.navigate("VerifyKYC");
+        navigation.navigate("Dashboard");
       
 
 

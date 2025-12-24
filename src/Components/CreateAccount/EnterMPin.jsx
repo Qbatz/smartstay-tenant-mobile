@@ -191,9 +191,9 @@ const style = StyleSheet.create({
     logo: { width: 151, height: 28.22 },
     createText: { fontSize: 27, fontWeight: 600, color: '#222222', marginTop: 20 },
     subtitle: { fontSize: 14, fontWeight: 400, color: '#4B4B4B', marginTop: 15 },
-    pinContainer: { flexDirection: 'row', justifyContent: 'space-between', paddingTop: 20, paddingLeft: 20, paddingRight: 60 },
+    pinContainer: { flexDirection: 'row', justifyContent: 'space-between', paddingTop: 20, paddingLeft: 10, paddingRight: 10 },
     pinBox: {
-        width: 50, heiht: 70, borderWidth: 1, borderColor: "#ccc", borderRadius: 8, textAlign: "center",
+        width: 60, heiht: 70, borderWidth: 1, borderColor: "#ccc", borderRadius: 8, textAlign: "center",
         fontSize: 20, color: "#000"
     },
     nextButton: { backgroundColor: '#1A73E8', borderRadius: 8, paddingVertical: 20, alignItems: 'center' },
