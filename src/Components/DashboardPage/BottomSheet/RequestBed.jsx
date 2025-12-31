@@ -13,6 +13,7 @@ import { postRequestBedChange } from "../../../Action/HostelAction";
 import Room from '../../../assets/Images/Room.png'
 import Bed from '../../../assets/Images/Bed_Icon.png'
 import { Dropdown } from "react-native-element-dropdown";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 
 
@@ -127,7 +128,7 @@ const RequestBedChange = ({ visible,
             <Animated.View style={[style.bottomsheets, { transform: [{ translateY: sheetY }] }]}
                 {...panResponder.panHandlers}>
 
-                <View style={{ flex: 1 }}>
+                <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
 
                     <View {...panResponder.panHandlers}>
                         <View style={style.dragindictor} />
@@ -153,19 +154,19 @@ const RequestBedChange = ({ visible,
                                         backgroundColor: '#F6F8FF', borderRadius: 10, paddingVertical: 17,
                                         paddingHorizontal: 8, marginTop: 10, flexDirection: 'row'
                                     }}>
-                                        <View style={{ backgroundColor: '#F9D796', paddingVertical: 4.64, paddingHorizontal: 9.28, alignSelf: 'flex-start', borderRadius: 46.38 }}>
-                                            <Text style={{ color: '#642B00', fontSize: 10.82, fontWeight: 400 }}>
+                                        <View style={{ backgroundColor: '#F9D796',flex:1, paddingVertical: 4.64, paddingHorizontal: 9.28, alignSelf: 'flex-start', borderRadius: 46.38 }}>
+                                            <Text style={{ color: '#642B00', fontSize: 10.82, fontWeight: 400,textAlign:'center' }}>
                                                 {context.getCustomerDetail?.bookingDetails?.floorName}</Text>
                                         </View>
 
-                                        <View style={{ flexDirection: 'row', paddingLeft: 20, alignItems: 'center' }}>
+                                        <View style={{ flexDirection: 'row', paddingLeft: 20,flex:1, alignItems: 'center' }}>
                                             <Image source={Room} style={{ width: 21.17, height: 21.17 }} />
                                             <Text style={{ marginLeft: 10, fontSize: 15.97, fontWeight: 400 }}>
                                                 {context.getCustomerDetail?.bookingDetails?.roomName}
                                             </Text>
                                         </View>
 
-                                        <View style={{ flexDirection: 'row', paddingLeft: 10, alignItems: 'center' }}>
+                                        <View style={{ flexDirection: 'row', paddingLeft: 10, alignItems: 'center',flex:1 }}>
                                             <Image source={Bed} style={{ width: 21.17, height: 21.17 }} />
                                             <Text style={{ marginLeft: 10, fontSize: 15.97, fontWeight: 400 }}>
                                                 {context.getCustomerDetail?.bookingDetails?.bedName}
@@ -370,7 +371,7 @@ const RequestBedChange = ({ visible,
 
                         </View>
                     </ScrollView>
-                </View>
+                </SafeAreaView>
             </Animated.View>
 
         </View>

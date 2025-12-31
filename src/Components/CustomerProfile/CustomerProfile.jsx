@@ -170,21 +170,27 @@ const CustomerProfile = (route) => {
             ) : (
               <View style={[styles.profileImage, styles.initialContainer]}>
                 <Text style={styles.initialText}>
-                  {context.getCustomerDetail?.initials?.charAt(0).toUpperCase()}
+                  {context.getCustomerDetail?.initials}
                 </Text>
               </View>
             )}
             <View style={{ flex: 1, marginLeft: 10 }}>
-              <View style={{ display: 'flex', flexDirection: 'row' }}>
-                <Text style={styles.profileName}>{context.getCustomerDetail?.firstName}</Text>
+              <View style={{ display: 'flex', flexDirection: 'row',flex:1 }}>
+                <Text style={[styles.profileName,{flexShrink:1}]}
+                numberOfLines={1} 
+                ellipsizeMode="tail">
+                  {context.getCustomerDetail?.firstName}
+                  {" "}{context.getCustomerDetail?.lastName}
+                </Text>
 
-                <Text style={styles.lastName}>{context.getCustomerDetail?.lastName}</Text>
+                {/* <Text style={styles.lastName}>{context.getCustomerDetail?.lastName}</Text> */}
                 <Image source={VerifyIcon} resizeMode="contain" style={{ marginTop: 2, marginLeft: 4, height: 20, width: 20 }} />
               </View>
 
               <View style={styles.infoRow}>
                 <View style={styles.FloorBadgePending}>
-                  <Text style={{ color: 'black',textAlign:'center' }}>{context.getCustomerDetail?.bookingDetails?.floorName}</Text>
+                  <Text numberOfLines={1} ellipsizeMode="clip"
+                   style={{ color: 'black',textAlign:'center' }}>{context.getCustomerDetail?.bookingDetails?.floorName}</Text>
                 </View>
 
                 <View style={{ flexDirection: 'row', alignItems: 'center',flex:1}}>

@@ -42,15 +42,22 @@ const handleGetOtp = async () => {
     setOtp(dat.data.otp)
     setModelType('success')
       setShowSuccessModal(true)
-      setTimeout(() => {
+
+      if(dat?.data?.otp){
+           setTimeout(() => {
             setShowSuccessModal(false);
               navigation.navigate("OtpDesign", { phone: phoneNumber });
             
-            }, 4000);       
+            }, 4000);  
+      }
+      else{
+         navigation.navigate("OtpDesign", { phone: phoneNumber });
+      }
+          
     }
-    else if(dat.status==403) {
+    else if(dat.status==dat.status) {
       setShowSuccessModal(true)
-      setOtp('Invalid number')
+      setOtp(dat.message)
       setModelType('error')
 
       setTimeout(() => {

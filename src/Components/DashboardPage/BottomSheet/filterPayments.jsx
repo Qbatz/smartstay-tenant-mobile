@@ -111,7 +111,7 @@ const FilterPayments = ({
                                     style={styles.input}
                                     onPress={() => openPicker('from')}
                                 >
-                                    <Text
+                                    <Text numberOfLines={1} ellipsizeMode="clip"
                                         style={[
                                             styles.text,
                                             fromDate && styles.selectedText,
@@ -140,7 +140,7 @@ const FilterPayments = ({
                                     disabled={!fromDate}
                                     onPress={() => openPicker('to')}
                                 >
-                                    <Text
+                                    <Text numberOfLines={1} ellipsizeMode="clip"
                                         style={[
                                             styles.text,
                                             toDate && styles.selectedText,
@@ -226,7 +226,7 @@ export default FilterPayments;
 
 const styles = StyleSheet.create({
     bottomSheet: {
-        height: '50%', backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingHorizontal: 5,
+        height: '45%', backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingHorizontal: 5,
         paddingTop: 20, paddingBottom: 10
     },
     sheetOverlay: {
@@ -266,6 +266,7 @@ const styles = StyleSheet.create({
         paddingLeft: 14,
         fontSize: 15,
         color: '#B0B4BB',
+        includeFontPadding:false,
     },
     selectedText: {
         color: '#3C4043',

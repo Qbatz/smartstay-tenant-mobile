@@ -123,7 +123,7 @@ const Notification = (props) => {
       </View>
 
       <SwipeListView
-        data={notificationContext.getNotificationList}
+        data={notificationContext.getNotificationList} showsVerticalScrollIndicator={false}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.listContainer}

@@ -11,6 +11,7 @@ import { complaints, getComplaintTypes } from "../../../Action/HostelAction";
 import { postComplaint } from "../../../Action/CustomerAction";
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import CameraPic from '../../../assets/Images/cameraPic.png'
+import { SafeAreaView } from "react-native-safe-area-context";
 
 
 const AddComplaint = ({
@@ -194,7 +195,7 @@ const AddComplaint = ({
             <Animated.View style={[style.bottomsheets, { transform: [{ translateY: sheetY }] }]}
                 {...panResponder.panHandlers}>
 
-                <View style={{ flex: 1 }}>
+                <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
 
                     <View {...panResponder.panHandlers}>
                         <View style={style.dragindictor} />
@@ -309,7 +310,7 @@ const AddComplaint = ({
                         </View>
                     </ScrollView>
 
-                </View>
+                </SafeAreaView>
 
 
             </Animated.View>
