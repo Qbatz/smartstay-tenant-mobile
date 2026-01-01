@@ -8,9 +8,12 @@ export const verifyPhoneNo = async (phoneNo) => {
         const data = {
             mobile: phoneNo
         }
+        console.log(data)
         const response = await AxiosConfig.post("/v2/tenant/user/verify-mobile", data)
+        console.log(response)
         return response;
     } catch (error) {
+        console.log(error.message)
         return { status: error.response.status, message: error.response.data }
     }
 }
@@ -59,6 +62,7 @@ export const postMPin = async (data) => {
 }
 
 export const postResendOtp = async (userId) => {
+    console.log("******")
     console.log(userId)
     try {
         const response = await AxiosConfig.post('/v2/tenant/user/resend-otp/' + userId)

@@ -38,6 +38,7 @@ const handleGetOtp = async () => {
     
 
     if(dat.status==200){
+      
       loginContext.userId(dat.data.xuid)
     setOtp(dat.data.otp)
     setModelType('success')
