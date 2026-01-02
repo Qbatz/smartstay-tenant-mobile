@@ -34,7 +34,8 @@ import buildings from '../../assets/Images/buildings.png'
 import paperclip from '../../assets/Images/paperclip.png'
 import sideframe from '../../assets/Images/sideframe.png'
 import { LoginContexts } from "../../Context/LoginContext";
-import logoutSetup from '../../Action/LogoutAction'
+import logoutSetup from '../../Action/LogoutAction';
+import { NativeModules } from "react-native";
 
 
 
@@ -45,6 +46,7 @@ const CustomerProfile = (route) => {
 
   const navigation = useNavigation();
   const [customer, setCustomers] = useState()
+  const {NotificationModule}=NativeModules;
 
   useEffect(() => {
     const onBackPress = () => {
@@ -132,6 +134,7 @@ const CustomerProfile = (route) => {
     remoteData(PHONE_NO)
     storeData(LOGGEDIN, "false")
     loginContext.updateToken(null)
+    NotificationModule.logout();
 
    
     // navigation.navigate("SplashScreen");
@@ -170,21 +173,27 @@ const CustomerProfile = (route) => {
             ) : (
               <View style={[styles.profileImage, styles.initialContainer]}>
                 <Text style={styles.initialText}>
-                  {context.getCustomerDetail?.initials?.charAt(0).toUpperCase()}
+                  {context.getCustomerDetail?.initials}
                 </Text>
               </View>
             )}
             <View style={{ flex: 1, marginLeft: 10 }}>
-              <View style={{ display: 'flex', flexDirection: 'row' }}>
-                <Text style={styles.profileName}>{context.getCustomerDetail?.firstName}</Text>
+              <View style={{ display: 'flex', flexDirection: 'row',flex:1 }}>
+                <Text style={[styles.profileName,{flexShrink:1}]}
+                numberOfLines={1} 
+                ellipsizeMode="tail">
+                  {context.getCustomerDetail?.firstName}
+                  {" "}{context.getCustomerDetail?.lastName}
+                </Text>
 
-                <Text style={styles.lastName}>{context.getCustomerDetail?.lastName}</Text>
+                {/* <Text style={styles.lastName}>{context.getCustomerDetail?.lastName}</Text> */}
                 <Image source={VerifyIcon} resizeMode="contain" style={{ marginTop: 2, marginLeft: 4, height: 20, width: 20 }} />
               </View>
 
               <View style={styles.infoRow}>
                 <View style={styles.FloorBadgePending}>
-                  <Text style={{ color: 'black',textAlign:'center' }}>{context.getCustomerDetail?.bookingDetails?.floorName}</Text>
+                  <Text numberOfLines={1} ellipsizeMode="clip"
+                   style={{ color: 'black',textAlign:'center' }}>{context.getCustomerDetail?.bookingDetails?.floorName}</Text>
                 </View>
 
                 <View style={{ flexDirection: 'row', alignItems: 'center',flex:1}}>

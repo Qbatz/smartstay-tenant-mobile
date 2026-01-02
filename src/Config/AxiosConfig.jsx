@@ -1,6 +1,8 @@
 import axios from "axios";
 import { retriveData } from "../Utils/Storage"
 
+  // baseURL: "https://tenentdevapi.qbatz.com",
+
 const AxiosConfig = axios.create({
   baseURL: "https://tenentdevapi.qbatz.com",
   headers: {

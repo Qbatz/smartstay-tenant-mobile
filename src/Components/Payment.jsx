@@ -174,11 +174,20 @@ const handleReceiptPdfDownload =  () => {
               <View style={styles.infoContainer}>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.title}>{item.invoiceType}</Text>
-                  <Text style={styles.date}>{item.invoiceGeneratedDate}</Text>
+
+                  {item.status === "Pending" ?
+                   <Text style={styles.date}> Due: {item.disPlayDate}</Text> :
+                  <Text style={styles.date}> Paid: {item.disPlayDate}</Text>
+                 }
+                  {/* // <Text style={styles.date}>{item.invoiceDueDate}</Text> */}
                 </View>
 
                 <View style={styles.amountContainer}>
+                   <Text style={styles.amount}>₹{item.amount}</Text>
+                  {/* {item.status === "Pending" ? 
                   <Text style={styles.amount}>₹{item.amount}</Text>
+                :
+                <Text style={styles.amount}>{item.paidAmount}</Text>} */}
                   <View
                     style={[
                       styles.statusBadge,
@@ -196,10 +205,10 @@ const handleReceiptPdfDownload =  () => {
                       >
                         {item.status}
                       </Text>
-                      {item.hostelUrl !=null ?
+                      {paymentContext?.getInvoiceList?.hostelUrl !=null ?
                        (<Image
-                        source={{uri:paymentContext.getInvoiceList.hostelUrl}}
-                        style={{ width: 14, height: 14, marginLeft: 6 }}
+                        source={{uri:paymentContext.getInvoiceList?.hostelUrl}}
+                        style={{ width: 16, height: 16,borderRadius:8, marginLeft: 6 }}
                         resizeMode="contain"
                       />)
                       : (<View style={{width:18,height:18,borderRadius:9,backgroundColor:'#788fed',marginLeft:5,

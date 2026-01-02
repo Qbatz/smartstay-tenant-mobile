@@ -20,12 +20,8 @@ import CommentMesg from '../../assets/Images/commentMessage.png'
 import Group from '../../assets/Images/Group.png'
 import Customer from "../../assets/Images/Customer_Icon.png"
 import SendButton from '../../assets/Images/Send.png'
-import { Dropdown } from "react-native-element-dropdown";
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import CameraPic from '../../assets/Images/cameraPic.png'
-import File from '../../assets/Images/files.png'
-import Dot from '../../assets/Images/dot.png'
-import calenderTick from '../../assets/Images/calendar-tick.png'
 import { launchImageLibrary } from "react-native-image-picker";
 import Exclamation from '../../assets/Images/exclamation.png'
 import DeleteIcon from '../../assets/Images/deleteIcon.png'
@@ -34,10 +30,7 @@ import { addComment, complaints, deleteComplaint, getAmenties, getComplaints, ge
 import { customerDetails, postComplaint } from "../../Action/CustomerAction";
 import { UsersContext } from "../../Context/UserContext";
 import { LoginContexts } from '../../Context/LoginContext'
-import Room from '../../assets/Images/Room.png'
-import Bed from '../../assets/Images/Bed_Icon.png'
 import SuccessModal from "../ToastFile/TostFilePage";
-import AppLoader from "../ToastFile/LoaderPage";
 import DownloadSide from "../../assets/Images/downloadSide.png"
 import DownloadIcon from "../../assets/Images/download.png"
 import DownloadBlueIcon from "../../assets/Images/download_Blue.png";
@@ -54,6 +47,8 @@ import RequestBedChange from "./BottomSheet/RequestBed";
 import AddComplaint from "./BottomSheet/AddComplaint";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ReceiptPic from "../../assets/Images/ReceiptPic.png"
+import AmenitiesBottomSheet from "./BottomSheet/AmenitiesSheet";
+import ReopennComplaint from "./Popup/ReopenComplaint";
 
 const { width, height } = Dimensions.get("window");
 
@@ -64,10 +59,6 @@ function Dashboard(props) {
   const complaintContext = useContext(compliantContexts)
   const paymentContext = useContext(paymentContexts)
   const { width } = Dimensions.get('window');
-  const bedDropdownRef = useRef(null)
-  const bedTypeDropdow = useRef(null)
-  const urgencyDropdown = useRef(null)
-  console.log(props)
 
   const navigation = useNavigation();
   const [index, setindex] = useState(0);
@@ -111,6 +102,7 @@ function Dashboard(props) {
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [filterBottomsheet, setFilterBottomSheet] = useState(false)
   const [showVisible, setShowVisible] = useState(false);
+  const[reopenComplaint,setReopenComplaint]=useState(false)
 
 
 
@@ -118,33 +110,6 @@ function Dashboard(props) {
   const keyboardY = useRef(new Animated.Value(0)).current;
 
 
-  const staticReceiptData = {
-    configurations: {
-      hostelLogo: "https://example.com/logo.png",
-      receiptType: "Rent",
-      address: "123, Main Road, Chennai",
-      signatureUrl: "https://example.com/signature.png",
-    },
-    stayInfo: {
-      hostelName: "Smart Stay Hostel",
-      floorName: "2nd Floor",
-      roomName: "Room 202",
-      bedName: "B2",
-    },
-    customerInfo: {
-      fullName: "Pon Allwin",
-      customerMobileNo: "9876543210",
-      countryCode: "91",
-      fullAddress: "No. 45, Anna Nagar, Chennai",
-    },
-    receiptInfo: {
-      paidAmount: 5500,
-      receiptNumber: "RCP-1023",
-      transactionDate: "03/11/2025",
-      transactionTime: "10:45 AM",
-    },
-    accountDetails: { bankName: "Cash" },
-  };
 
   const refundable = [{ list: "Last Rent paid(30 days", amount: "2400" }, { list: "Actual stay days", amount: "4000" }]
 
@@ -170,7 +135,7 @@ function Dashboard(props) {
     const backAction = () => {
 
       if (showBedChange || addComplaints || showSheet || editCompliantBottomsheet || showDownloadOption ||
-        showAmenities || modalVisible || filterBottomsheet) {
+        showAmenities || modalVisible || filterBottomsheet || reopenComplaint) {
         setShowBedChange(false);
         setAddComplaint(false);
         setShowSheet(false);
@@ -181,6 +146,7 @@ function Dashboard(props) {
         setComment(false)
         setSendComment(null)
         setFilterBottomSheet(false)
+        setReopenComplaint(false)
         return true;
       }
 
@@ -209,7 +175,8 @@ function Dashboard(props) {
     showAmenities,
     modalVisible,
     comment,
-    filterBottomsheet
+    filterBottomsheet,
+    reopenComplaint,
   ]);
 
 
@@ -452,53 +419,6 @@ function Dashboard(props) {
 
     }
   }
-  const plan = (id) => {
-    setPlan(id)
-  }
-
-  const onRequestAmenities = (amenityId) => {
-
-    if (monthlyplan == null) {
-      setShowSuccessModal(true)
-      setToastMessage('Select plan')
-      setModelType('error')
-      setTimeout(() => setShowSuccessModal(false), 2000);
-      return;
-
-    }
-    postRquestAmenties(context.getHostelDetail.hostelId, loginContext.getToken, amenityId).then(r => {
-
-
-      console.log(r)
-      setLoading(true)
-
-      setTimeout(() => {
-        setLoading(false)
-        if (r.status == 200) {
-          setShowSuccessModal(true)
-          setToastMessage('Request Raised')
-          setModelType('success')
-
-          setTimeout(() => {
-            setShowSuccessModal(false)
-            setPlan(null)
-            setShowAmenities(false)
-          }, 2000);
-        } else {
-          setShowSuccessModal(true)
-          setToastMessage(r.message || 'Something went wrong')
-          setModelType('error')
-
-          setTimeout(() => {
-            setShowSuccessModal(false)
-            setPlan(null); setShowAmenities(false)
-          }, 2000);
-        }
-      }, 2000);
-
-
-    })
-  }
 
   // ------Payment---------
 
@@ -550,13 +470,26 @@ function Dashboard(props) {
     }
   };
 
-  const handleReceiptPdfDownload = () => {
-    navigation.navigate("InvoiceDesign");
+  const handleReceiptPdfDownload = (invoiceType) => {
+    if(invoiceType === "Booking"){
+      navigation.navigate("BookingInvoice");
+    }
+    else{
+        navigation.navigate("InvoiceDesign");
+    }
+    
   };
 
-  const handlePaymentReceipt = (transcationId) => {
+  const handlePaymentReceipt = (transcationId,invoiceType) => {
+
     console.log(transcationId)
-    navigation.navigate('ReceiptPdfView', { transcationId: transcationId })
+    if(invoiceType === "Booking"){
+         navigation.navigate('BookingReceipt', { transcationId: transcationId })
+    }
+    else{
+        navigation.navigate('ReceiptPdfView', { transcationId: transcationId })
+    }
+    
   }
 
   const downloadOption = () => {
@@ -649,7 +582,7 @@ function Dashboard(props) {
               ) : (
                 <View style={[style.hostelImage, style.initialContainer]}>
                   <Text style={style.initialText}>
-                    {context.getCustomerDetail?.initials?.charAt(0).toUpperCase()}
+                    {context.getCustomerDetail?.initials}
                   </Text>
                 </View>
               )}
@@ -684,7 +617,7 @@ function Dashboard(props) {
 
           {/* { transform: [{ translateY: sheetY }] } */}
 
-          <View style={{ flex: 1 }}>
+          <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
             <View {...panResponder.panHandlers}>
               <View style={style.dragindictor} />
             </View>
@@ -760,8 +693,8 @@ function Dashboard(props) {
                     showsVerticalScrollIndicator={false}
                     keyboardShouldPersistTaps="handled"
                   >
-                    <View >
-                      <View>
+                    <View style={{marginBottom:10}} >
+                      <View >
                         <View style={{ flexDirection: "row", justifyContent: "space-between", paddingLeft: 5, paddingRight: 8, marginBottom: 10, paddingTop: 10, }}>
                           <View>
                             <Text style={{ fontSize: 18, fontWeight: "500", fontFamily: "gilroy-semibold", }} >
@@ -837,7 +770,7 @@ function Dashboard(props) {
                       </View>
 
 
-                      {complaintContext.getComplaintDetail?.status == "ASSIGNED" ?
+                      {["ASSIGNED", "assigned"].includes(complaintContext.getComplaintDetail?.status) ?
                         <View style={{ borderWidth: 1, borderRadius: 10, borderColor: '#DCDCDC', paddingVertical: 10, paddingHorizontal: 15, marginTop: 15 }}>
                           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                             <Text style={{ fontSize: 15, fontWeight: 600 }}>Complaint Assigned</Text>
@@ -866,6 +799,49 @@ function Dashboard(props) {
                           <TouchableOpacity onPress={() => navigation.navigate('Updates')}
                             style={{ justifyContent: 'center', alignItems: 'center', paddingBottom: 10 }}>
                             <Text style={{ color: "#00A1FF", fontSize: 14, fontWeight: 600 }}>
+                              See all updates
+                            </Text>
+                          </TouchableOpacity>
+
+                        </View> : null}
+
+                        {complaintContext.getComplaintDetail?.status == "resolved" ?
+                        <View style={{ borderWidth: 1, borderRadius: 10, borderColor: '#DCDCDC', paddingVertical: 10, paddingHorizontal: 15, marginTop: 15 }}>
+                          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <Text style={{ fontSize: 15, fontWeight: 600 }}>Your complaint was Resolved</Text>
+
+                            <View style={{
+                              flexDirection: 'row', borderRadius: 10, paddingVertical: 5, paddingHorizontal: 10, justifyContent: 'center', alignItems: 'center',
+                              backgroundColor: complaintContext.getComplaintDetail?.status === "PENDING" ? "#FFEEEEA3" : complaintContext.getComplaintDetail?.status === "Inpogress" ? "#FFF6E7" : "lightgreen",
+                            }}>
+                              <Image source={Group}
+                                style={{
+                                  width: 12.95, height: 13, marginTop: 2,
+                                  tintColor: complaintContext.getComplaintDetail?.status === "PENDING" ? "#FF3B30" : complaintContext.getComplaintDetail?.status === "Inpogress" ? "#FF9500" : "green",
+                                }} />
+
+                              <Text style={{
+                                fontSize: 12, fontWeight: 600, marginLeft: 5,
+                                color: complaintContext.getComplaintDetail?.status === "PENDING" ? "#FFEEEEA3" : complaintContext.getComplaintDetail?.status === "Inpogress" ? "#FFF6E7" : "green"
+                              }}>
+                                {complaintContext.getComplaintDetail?.status}</Text>
+                            </View>
+
+                          </View>
+
+                          <View style={{ height: 1, backgroundColor: "#eee", marginVertical: 15 }} />
+
+                          <TouchableOpacity onPress={() => setReopenComplaint(true)}
+                            style={{ justifyContent: 'center', alignItems: 'center', paddingBottom: 10 }}>
+                            <Text style={{ color: "#2E70E8", fontSize: 14, fontWeight: 600 }}>
+                              Want to Reopen
+                            </Text>
+                          </TouchableOpacity>
+
+                          <TouchableOpacity onPress={() => navigation.navigate('Updates')}
+                            style={{ justifyContent: 'center', alignItems: 'center',backgroundColor:'#1E45E1',
+                                    padding:10,borderRadius:8 }}>
+                            <Text style={{ color: "#FFFFFF", fontSize: 14, fontWeight: 600 }}>
                               See all updates
                             </Text>
                           </TouchableOpacity>
@@ -920,11 +896,18 @@ function Dashboard(props) {
                 )}
               </View>
             )}
-          </View>
+          </SafeAreaView>
 
         </Animated.View>
       </View>
     )}
+
+
+    {/* ------ReopenComplaint----- */}
+
+    <ReopennComplaint 
+    visible={reopenComplaint}
+    onClose={()=>setReopenComplaint(false)}/>
 
     {/* -----Edit complaint-------- */}
 
@@ -1046,151 +1029,15 @@ function Dashboard(props) {
 
     {/* ------show Amenities-------- */}
 
-    {showAmenities && (
-      <View style={style.sheetOverlay}>
-        <TouchableWithoutFeedback onPress={onClose}>
-          <View style={StyleSheet.absoluteFill} />
-        </TouchableWithoutFeedback>
-
-        <Animated.View style={[style.amenitiesBottomSheet, { transform: [{ translateY: sheetY }] }]}
-          {...panResponder.panHandlers}>
-
-          <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
-
-            <View {...panResponder.panHandlers}>
-              <View style={style.dragindictor} />
-            </View>
-
-            <AppLoader visible={loading} />
-            <SuccessModal
-              visible={showSuccessModal}
-              onClose={() => setShowSuccessModal(false)}
-              message={toastMessage}
-              type={modelType}
-            />
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>
-              <View style={{ paddingLeft: 10, paddingRight: 15, flex: 1 }}>
-                {tag == 'My-Amenities' ? (<View>
-                  <View style={{ paddingTop: 12 }}>
-                    {myAmenitis && <View>
-                      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                        <Text style={{ fontSize: 23, fontWeight: 500, fontStyle: 'Gilroy-Semibold' }}>{myAmenitis.amenityName}</Text>
-                        <View style={{ justifyContent: 'center', paddingTop: 7 }}>
-                          <Image source={Dot} style={{ width: 30.85, height: 30.85 }} />
-
-                        </View>
-
-                      </View>
-
-                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 5 }}>
-                        <View style={{ width: '58%', height: 1, backgroundColor: "#eee", marginTop: 10 }} />
-                        <View >
-                          <TouchableOpacity style={{
-                            borderWidth: 1, borderColor: '#eee', paddingTop: 9, paddingBottom: 14, paddingHorizontal: 15,
-                            borderRadius: 5, flexDirection: 'row', justifyContent: 'center'
-                          }}>
-                            <Image source={calenderTick} style={{ width: 16, height: 16, marginTop: 3 }} />
-                            <Text style={{ marginLeft: 5, fontSize: 14, fontWeight: 400 }}>Make Deactive</Text>
-                          </TouchableOpacity>
-                        </View>
-                      </View>
-
-                      <View>
-                        <Text style={{ fontSize: 12, fontWeight: 40, color: '#4B4B4B' }}>Description</Text>
-                        <Text style={{ marginTop: 13, fontSize: 16, fontWeight: 400 }}>
-                          Airtel Fiber 5G/100mpb
-                        </Text>
-                      </View>
-
-                      <View style={{ paddingTop: 18 }}>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                          <Text style={{ fontSize: 12, fontWeight: 400, color: '#4B4B4B' }}>Price plans</Text>
-                          <TouchableOpacity>
-                            <Text style={{ fontSize: 12, color: '#1E45E1' }}>Change Plan</Text>
-                          </TouchableOpacity>
-                        </View>
-                        <Text style={{ fontSize: 16, fontWeight: 600, marginTop: 9 }}>{'\u20B9'}{myAmenitis.amenityAmount} /month</Text>
-                      </View>
-
-                      <View style={{ paddingTop: 15 }}>
-                        <Text style={{ fontSize: 12, fontWeight: 400, color: '#4B4B4B' }}>Next Bill</Text>
-                        <Text style={{ fontSize: 16, fontWeight: 600, marginTop: 9 }}>10 sept Bill</Text>
-                      </View>
-
-                      <TouchableOpacity style={{ paddingVertical: 13, borderWidth: 1, borderRadius: 10, alignItems: 'center', backgroundColor: '#F5FFF8', borderColor: '#77D391', marginTop: 30 }}>
-                        <Text style={{ fontSize: 14.11, fontWeight: 600, color: '#00A32E' }}>Active</Text>
-                      </TouchableOpacity>
-
-
-                    </View>}
-
-
-                  </View>
-                </View>) : tag == null ? (<View style={{ flex: 1 }}>
-
-                  {available && <View style={{ paddingTop: 10, flex: 1, paddingBottom: 10 }}>
-                    <Text style={{ fontSize: 23, fontWeight: 500 }}>{available.amenityName}</Text>
-                    <View style={{ width: '100%', height: 1, backgroundColor: "#eee", marginTop: 18 }} />
-                    <View style={{ justifyContent: 'space-between', flex: 1 }}>
-                      <View style={{ paddingTop: 10 }}>
-                        <Text style={{ fontSize: 12, fontWeight: 400, color: '#4B4B4B' }}>Description</Text>
-
-                        <View style={{ paddingTop: 14 }}>
-                          <Text style={{ fontSize: 16, fontWeight: 400, marginBottom: 2 }}>Gear,Non Gear</Text>
-                          <Text style={{ fontSize: 16, fontWeight: 400, marginTop: 2 }}>24/7 Access, pickup lopp from lobby</Text>
-                        </View>
-
-                        <View style={{ paddingTop: 20 }}>
-                          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                            <Text style={{ fontSize: 12, fontWeight: 400, color: '#4B4B4B' }}>Price Plans</Text>
-                            <TouchableOpacity>
-                              <Text style={{ fontSize: 12, fontWeight: 400, color: '#1E45E1', textDecorationLine: 'underline' }}>Select plan</Text>
-                            </TouchableOpacity>
-                          </View>
-
-                          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                            <View style={{ paddingTop: 10, flexDirection: 'row' }}>
-                              <Text style={{ fontSize: 16, fontWeight: 600 }}>{'\u20B9'}{available.amenityAmount}</Text>
-                              <Text style={{ fontSize: 16, fontWeight: 400, color: '#4B4B4B' }}>/month</Text>
-                            </View>
-
-                            <TouchableOpacity onPress={() => plan('plan')} style={{
-                              borderWidth: 2, width: 20, height: 20, borderRadius: 10,
-                              borderColor: plan == 'plan' ? borderColor : monthlyplan == 'plan' ? "#1E45E1" : "#ccc", justifyContent: 'center', marginTop: 12
-                            }}>
-
-                              <View style={{ justifyContent: 'center', alignItems: 'center' }}  >
-
-                                {monthlyplan === 'plan' && (
-                                  <View style={{ height: 10, width: 10, borderRadius: 5, backgroundColor: "#1E45E1" }} />
-                                )}
-                              </View>
-                            </TouchableOpacity>
-
-                          </View>
-
-                        </View>
-                      </View>
-                      <View >
-                        <TouchableOpacity onPress={() => onRequestAmenities(available.amenityId)}
-                          style={{ backgroundColor: '#1d41d5', paddingVertical: 12, alignItems: 'center', borderRadius: 20 }}>
-                          <Text style={{ fontSize: 14.11, fontWeight: 600, color: '#ffffff' }}>Request Amenity</Text>
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-
-                  </View>}
-                </View>) : null}
-
-
-              </View>
-            </ScrollView>
-
-          </SafeAreaView>
-
-        </Animated.View>
-      </View>
-    )}
+    <AmenitiesBottomSheet
+      visible={showAmenities}
+      onClose={()=>setShowAmenities(false)}
+      tag={tag}
+      myAmenitis={myAmenitis}
+      available={available}
+      panResponder={panResponder}
+      sheetY={sheetY}
+      />
 
     {/* -----Request bed change--------- */}
 
@@ -1211,7 +1058,7 @@ function Dashboard(props) {
         </TouchableWithoutFeedback>
 
         <Animated.View
-          style={[(paymentContext.getInvoiceDetail?.status === "Partially Paid" ||
+          style={[(paymentContext.getInvoiceDetail?.status === "Partial Payment" ||
             paymentContext.getInvoiceDetail?.status === "Paid") ? style.bottomSheetPaid : style.bottomSheetPay,
           { transform: [{ translateY: sheetY }] }]}
           {...panResponder.panHandlers}
@@ -1221,7 +1068,7 @@ function Dashboard(props) {
           </View>
 
           <ScrollView showsVerticalScrollIndicator={false}>
-            {paymentContext.getInvoiceDetail && ["Rent", "Advance", "Booking"].includes(
+            {paymentContext.getInvoiceDetail && ["Rent", "Advance", "Booking", "Reassign_rent"].includes(
               paymentContext.getInvoiceDetail.invoiceType
             ) ? (
               <>
@@ -1231,7 +1078,7 @@ function Dashboard(props) {
                   <View style={{ flexDirection: "row" }}>
                     <Text style={style.invoiceId}>{paymentContext.getInvoiceDetail?.invoiceNumber}</Text>
                     <TouchableOpacity
-                      onPress={handleReceiptPdfDownload}
+                      onPress={()=>handleReceiptPdfDownload(paymentContext.getInvoiceDetail.invoiceType)}
                     >
                       <Image
                         source={ViewIcon}
@@ -1269,7 +1116,7 @@ function Dashboard(props) {
                       </View>
                     )}
 
-                    {(paymentContext.getInvoiceDetail?.status === "Partially Paid" ||
+                    {(paymentContext.getInvoiceDetail?.status === "Partial Payment" ||
                       paymentContext.getInvoiceDetail?.status === "Paid") && (
                         <View style={{ flexDirection: "row", marginTop: 6 }}>
                           <Image
@@ -1279,7 +1126,7 @@ function Dashboard(props) {
                           <Text style={{ fontSize: 14, marginLeft: 6 }}>
                             {paymentContext.getInvoiceDetail.status === "Paid"
                               ? "Full Paid"
-                              : "Partially Paid"}
+                              : "Partial Payment"}
                           </Text>
                         </View>
                       )}
@@ -1290,7 +1137,7 @@ function Dashboard(props) {
 
                 {/* Details */}
                 <View style={style.detailsSection}>
-                  {(paymentContext.getInvoiceDetail?.status === "Partially Paid" ||
+                  {(paymentContext.getInvoiceDetail?.status === "Partial Payment" ||
                     paymentContext.getInvoiceDetail?.status === "Paid") && (
                       paymentContext.getInvoiceDetail?.invoiceItems.map(i => {
                         return (
@@ -1313,14 +1160,14 @@ function Dashboard(props) {
                     <Text style={style.detailValue}>₹{paymentContext.getInvoiceDetail.gst}</Text>
                   </View> */}
 
-                  {(paymentContext.getInvoiceDetail?.status === "Partially Paid" ||
+                  {(paymentContext.getInvoiceDetail?.status === "Partial Payment" ||
                     paymentContext.getInvoiceDetail?.status === "Paid") && (
                       <>
-                        <Text style={style.detailLabel}>Paid Amount</Text>
+                        <Text style={[style.detailLabel,{marginTop:10}]}>Paid Amount</Text>
                         {paymentContext.getInvoiceDetail?.receipts.map(i => {
                           return (
                             <View key={i.transactionId} style={style.row}>
-                              <TouchableOpacity onPress={() => handlePaymentReceipt(i.transactionId)}>
+                              <TouchableOpacity onPress={() => handlePaymentReceipt(i.transactionId,paymentContext.getInvoiceDetail.invoiceType)}>
                                 <Text style={{ fontSize: 8, color: "#1e45e2" }}>{i.transactionId}</Text>
                               </TouchableOpacity>
                               <Text style={style.detailValue}>₹{i.paidAmount}</Text>
@@ -1331,7 +1178,7 @@ function Dashboard(props) {
                       </>
                     )}
 
-                  {paymentContext.getInvoiceDetail.status === "Partially Paid" && (
+                  {paymentContext.getInvoiceDetail.status === "Partial Payment" && (
                     <>
                       <View style={style.row}>
                         <Text style={style.detailLabel}>Remain</Text>
@@ -1388,7 +1235,7 @@ function Dashboard(props) {
                   <View style={{ marginTop: 10 }}>
                     <View style={style.Billbottom}>
                       <Text style={style.paiddetailLabel}>Payment Mode</Text>
-                      <Text style={style.paiddetailValue}>{paymentContext.getInvoiceDetail.receipts[0].paymentMode}</Text>
+                      <Text style={style.paiddetailValue}>{paymentContext?.getInvoiceDetail?.receipts[0]?.paymentMode}</Text>
                       {/* {paymentContext.getInvoiceDetail.receipts.map(i => {
                         console.log(i)
                         return (
@@ -1400,14 +1247,15 @@ function Dashboard(props) {
 
                     </View>
                     {console.log(paymentContext.getInvoiceDetail.receipts)}
-                    <View style={style.Billbottom}>
+                    <View style={[style.Billbottom, { paddingTop: 10 }]}>
                       <Text style={style.paiddetailLabel}>Reference number</Text>
-                      {paymentContext.getInvoiceDetail.receipts.map(i => {
+                      <Text>{paymentContext?.getInvoiceDetail?.lastReferenceId}</Text>
+                      {/* {paymentContext.getInvoiceDetail.receipts.map(i => {
                         return (
                           <Text key={i.transactionId} style={style.paiddetailValue}>{i.referenceNumber}</Text>
                         )
 
-                      })}
+                      })} */}
                     </View>
                   </View>
                 )}
@@ -1630,73 +1478,39 @@ function Dashboard(props) {
           style={[style.bottomSheetoption, { transform: [{ translateY: sheetY }] }]}
           {...panResponder.panHandlers}
         >
-          <View {...panResponder.panHandlers}>
-            <View style={style.dragindictor} />
-          </View>
+          <SafeAreaView style={{flex:1}} edges={['bottom']}>
+            <View {...panResponder.panHandlers}>
+              <View style={style.dragindictor} />
+            </View>
 
-          <ScrollView showsVerticalScrollIndicator={false}>
-            <Text style={style.title}>Select option</Text>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <Text style={style.title}>Select option</Text>
 
-            <TouchableOpacity
-              activeOpacity={0.9}
-              onPress={() => setSelected('invoice')}
-              style={
-                selected === 'invoice'
-                  ? [style.card, style.cardSelected]
-                  : style.card
-              }
-              accessibilityRole="radio"
-              accessibilityState={{ selected: selected === 'invoice' }}
-            >
-              <View style={style.cardInner}>
-                <View style={style.cardTextContainer}>
-                  <Text style={style.cardTitle}>Invoice Bill Summary</Text>
-                  <Text style={style.cardSubtitle}>
-                    Brief summary of total bill with taxes.
-                  </Text>
-                </View>
-
-
-                <View style={selected === 'invoice' ? [style.radioOuter, style.radioOuterSelected] :
-                  style.radioOuter}>
-                  <View
-                    style={
-                      selected === 'invoice'
-                        ? [style.radioInner, style.radioInnerSelected]
-                        : style.radioInner
-                    }
-                  />
-                </View>
-              </View>
-            </TouchableOpacity>
-
-
-            <View style={style.secondOptionContainer}>
               <TouchableOpacity
                 activeOpacity={0.9}
-                onPress={() => setSelected('receipt')}
+                onPress={() => setSelected('invoice')}
                 style={
-                  selected === 'receipt'
+                  selected === 'invoice'
                     ? [style.card, style.cardSelected]
                     : style.card
                 }
                 accessibilityRole="radio"
-                accessibilityState={{ selected: selected === 'receipt' }}
+                accessibilityState={{ selected: selected === 'invoice' }}
               >
                 <View style={style.cardInner}>
                   <View style={style.cardTextContainer}>
-                    <Text style={style.cardTitle}>Payment Receipt</Text>
+                    <Text style={style.cardTitle}>Invoice Bill Summary</Text>
                     <Text style={style.cardSubtitle}>
-                      Receipt of payments made for the bill
+                      Brief summary of total bill with taxes.
                     </Text>
                   </View>
 
 
-                  <View style={selected === 'receipt' ? [style.radioOuter, style.radioOuterSelected] :
+                  <View style={selected === 'invoice' ? [style.radioOuter, style.radioOuterSelected] :
                     style.radioOuter}>
                     <View
                       style={
-                        selected === 'receipt'
+                        selected === 'invoice'
                           ? [style.radioInner, style.radioInnerSelected]
                           : style.radioInner
                       }
@@ -1705,23 +1519,59 @@ function Dashboard(props) {
                 </View>
               </TouchableOpacity>
 
-            </View>
+
+              <View style={style.secondOptionContainer}>
+                <TouchableOpacity
+                  activeOpacity={0.9}
+                  onPress={() => setSelected('receipt')}
+                  style={
+                    selected === 'receipt'
+                      ? [style.card, style.cardSelected]
+                      : style.card
+                  }
+                  accessibilityRole="radio"
+                  accessibilityState={{ selected: selected === 'receipt' }}
+                >
+                  <View style={style.cardInner}>
+                    <View style={style.cardTextContainer}>
+                      <Text style={style.cardTitle}>Payment Receipt</Text>
+                      <Text style={style.cardSubtitle}>
+                        Receipt of payments made for the bill
+                      </Text>
+                    </View>
 
 
-            <View style={style.footer}>
-              <TouchableOpacity
-                onPress={handleDownload}
-                activeOpacity={0.9}
+                    <View style={selected === 'receipt' ? [style.radioOuter, style.radioOuterSelected] :
+                      style.radioOuter}>
+                      <View
+                        style={
+                          selected === 'receipt'
+                            ? [style.radioInner, style.radioInnerSelected]
+                            : style.radioInner
+                        }
+                      />
+                    </View>
+                  </View>
+                </TouchableOpacity>
 
-              >
+              </View>
 
-                <View style={style.downloadContent}>
-                  <Image source={DownloadSide} style={{ width: 20, height: 20 }} />
-                  <Text style={style.downloadText}> Download</Text>
-                </View>
-              </TouchableOpacity>
-            </View>
-          </ScrollView>
+
+              <View style={style.footer}>
+                <TouchableOpacity
+                  onPress={handleDownload}
+                  activeOpacity={0.9}
+
+                >
+
+                  <View style={style.downloadContent}>
+                    <Image source={DownloadSide} style={{ width: 20, height: 20 }} />
+                    <Text style={style.downloadText}> Download</Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </SafeAreaView>
         </Animated.View>
       </View >
     )
@@ -1774,7 +1624,7 @@ const style = StyleSheet.create({
   },
   dragindictor: { width: 50, height: 4, backgroundColor: "#ccc", borderRadius: 2, alignSelf: "center", marginBottom: 10 },
   amenitiesBottomSheet: {
-    height: '50%', backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingHorizontal: 20,
+    height: '50%', backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingHorizontal: 18,
     paddingTop: 20, paddingBottom: 10
   },
   modalBackground: {
