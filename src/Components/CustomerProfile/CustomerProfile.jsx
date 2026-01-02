@@ -34,7 +34,8 @@ import buildings from '../../assets/Images/buildings.png'
 import paperclip from '../../assets/Images/paperclip.png'
 import sideframe from '../../assets/Images/sideframe.png'
 import { LoginContexts } from "../../Context/LoginContext";
-import logoutSetup from '../../Action/LogoutAction'
+import logoutSetup from '../../Action/LogoutAction';
+import { NativeModules } from "react-native";
 
 
 
@@ -45,6 +46,7 @@ const CustomerProfile = (route) => {
 
   const navigation = useNavigation();
   const [customer, setCustomers] = useState()
+  const {NotificationModule}=NativeModules;
 
   useEffect(() => {
     const onBackPress = () => {
@@ -132,6 +134,7 @@ const CustomerProfile = (route) => {
     remoteData(PHONE_NO)
     storeData(LOGGEDIN, "false")
     loginContext.updateToken(null)
+    NotificationModule.logout();
 
    
     // navigation.navigate("SplashScreen");

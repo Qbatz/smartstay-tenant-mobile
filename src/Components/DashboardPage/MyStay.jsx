@@ -196,7 +196,7 @@ function MyStay(props) {
                 <View style={style.cardboc}>
                     <View style={style.content}>
                         <Text style={style.amount} numberOfLines={1}>
-                            ₹ {context.getCurrentMonthBills?.paidAmount ?? 'N/A'}
+                            ₹ {context.getCurrentMonthBills?.rent ?? 'N/A'}
                         </Text>
 
                         <Text style={style.highlightText}>

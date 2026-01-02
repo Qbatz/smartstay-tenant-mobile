@@ -123,9 +123,11 @@ const AmenitiesBottomSheet = ({
                         </View>
 
                       </View>
+                      
 
-                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 5 }}>
-                        <View style={{ width: '58%', height: 1, backgroundColor: "#eee", marginTop: 10 }} />
+                      <View style={{ flexDirection: 'row',justifyContent:'flex-end', paddingTop: 5 }}>
+                        {/* <View style={{height: 1, backgroundColor: "#eee", marginTop: 10}} /> */}
+                       
                         <View >
                           <TouchableOpacity style={{
                             borderWidth: 1, borderColor: '#eee', paddingTop: 9, paddingBottom: 14, paddingHorizontal: 15,

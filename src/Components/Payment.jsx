@@ -176,8 +176,8 @@ const handleReceiptPdfDownload =  () => {
                   <Text style={styles.title}>{item.invoiceType}</Text>
 
                   {item.status === "Pending" ?
-                   <Text style={styles.date}> Due: {item.invoiceDueDate}</Text> :
-                  <Text style={styles.date}> Paid: {item.invoiceStartDate}</Text>
+                   <Text style={styles.date}> Due: {item.disPlayDate}</Text> :
+                  <Text style={styles.date}> Paid: {item.disPlayDate}</Text>
                  }
                   {/* // <Text style={styles.date}>{item.invoiceDueDate}</Text> */}
                 </View>

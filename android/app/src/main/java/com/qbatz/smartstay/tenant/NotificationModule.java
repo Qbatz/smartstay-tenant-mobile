@@ -80,6 +80,20 @@ public class NotificationModule extends ReactContextBaseJavaModule {
 
     }
 
+    /**
+     *
+     * should be triggered at the time of logging from the app.
+     *
+     */
+    @ReactMethod
+    public void logout() {
+        SharedPreferences mpref = context.getSharedPreferences("user_details", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = mpref.edit();
+        editor.putBoolean("is_token_set", false);
+        editor.apply();;
+
+    }
+
 
 
 

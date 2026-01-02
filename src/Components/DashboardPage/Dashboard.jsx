@@ -48,6 +48,7 @@ import AddComplaint from "./BottomSheet/AddComplaint";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ReceiptPic from "../../assets/Images/ReceiptPic.png"
 import AmenitiesBottomSheet from "./BottomSheet/AmenitiesSheet";
+import ReopennComplaint from "./Popup/ReopenComplaint";
 
 const { width, height } = Dimensions.get("window");
 
@@ -101,6 +102,7 @@ function Dashboard(props) {
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [filterBottomsheet, setFilterBottomSheet] = useState(false)
   const [showVisible, setShowVisible] = useState(false);
+  const[reopenComplaint,setReopenComplaint]=useState(false)
 
 
 
@@ -108,33 +110,6 @@ function Dashboard(props) {
   const keyboardY = useRef(new Animated.Value(0)).current;
 
 
-  const staticReceiptData = {
-    configurations: {
-      hostelLogo: "https://example.com/logo.png",
-      receiptType: "Rent",
-      address: "123, Main Road, Chennai",
-      signatureUrl: "https://example.com/signature.png",
-    },
-    stayInfo: {
-      hostelName: "Smart Stay Hostel",
-      floorName: "2nd Floor",
-      roomName: "Room 202",
-      bedName: "B2",
-    },
-    customerInfo: {
-      fullName: "Pon Allwin",
-      customerMobileNo: "9876543210",
-      countryCode: "91",
-      fullAddress: "No. 45, Anna Nagar, Chennai",
-    },
-    receiptInfo: {
-      paidAmount: 5500,
-      receiptNumber: "RCP-1023",
-      transactionDate: "03/11/2025",
-      transactionTime: "10:45 AM",
-    },
-    accountDetails: { bankName: "Cash" },
-  };
 
   const refundable = [{ list: "Last Rent paid(30 days", amount: "2400" }, { list: "Actual stay days", amount: "4000" }]
 
@@ -160,7 +135,7 @@ function Dashboard(props) {
     const backAction = () => {
 
       if (showBedChange || addComplaints || showSheet || editCompliantBottomsheet || showDownloadOption ||
-        showAmenities || modalVisible || filterBottomsheet) {
+        showAmenities || modalVisible || filterBottomsheet || reopenComplaint) {
         setShowBedChange(false);
         setAddComplaint(false);
         setShowSheet(false);
@@ -171,6 +146,7 @@ function Dashboard(props) {
         setComment(false)
         setSendComment(null)
         setFilterBottomSheet(false)
+        setReopenComplaint(false)
         return true;
       }
 
@@ -199,7 +175,8 @@ function Dashboard(props) {
     showAmenities,
     modalVisible,
     comment,
-    filterBottomsheet
+    filterBottomsheet,
+    reopenComplaint,
   ]);
 
 
@@ -854,7 +831,7 @@ function Dashboard(props) {
 
                           <View style={{ height: 1, backgroundColor: "#eee", marginVertical: 15 }} />
 
-                          <TouchableOpacity onPress={() => navigation.navigate('Updates')}
+                          <TouchableOpacity onPress={() => setReopenComplaint(true)}
                             style={{ justifyContent: 'center', alignItems: 'center', paddingBottom: 10 }}>
                             <Text style={{ color: "#2E70E8", fontSize: 14, fontWeight: 600 }}>
                               Want to Reopen
@@ -924,6 +901,13 @@ function Dashboard(props) {
         </Animated.View>
       </View>
     )}
+
+
+    {/* ------ReopenComplaint----- */}
+
+    <ReopennComplaint 
+    visible={reopenComplaint}
+    onClose={()=>setReopenComplaint(false)}/>
 
     {/* -----Edit complaint-------- */}
 
