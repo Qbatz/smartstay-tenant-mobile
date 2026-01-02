@@ -4,7 +4,7 @@ import { retriveData } from "../Utils/Storage"
   // baseURL: "https://tenentdevapi.qbatz.com",
 
 const AxiosConfig = axios.create({
-  baseURL: "https://tenantapi.qbatz.com/",
+  baseURL: "https://tenantapi.qbatz.com",
   headers: {
     "Content-Type": "application/json",
   },

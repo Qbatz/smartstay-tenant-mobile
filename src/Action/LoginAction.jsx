@@ -59,6 +59,7 @@ export const postMPin = async (data) => {
 }
 
 export const postResendOtp = async (userId) => {
+    console.log("******")
     console.log(userId)
     try {
         const response = await AxiosConfig.post('/v2/tenant/user/resend-otp/' + userId)
