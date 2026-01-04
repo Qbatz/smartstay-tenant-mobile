@@ -1,5 +1,4 @@
 import React, { createContext, useState } from "react";
-import AxiosConfig from "../Config/AxiosConfig";
 
 export const LoginContexts = createContext();
 

@@ -1,8 +1,9 @@
-import AxiosConfig from "../Config/AxiosConfig";
+import { getAxios } from "../Config/AxiosConfig";
 
 export const customerDetails=async(token)=>{
     try{
-        const response=await AxiosConfig.get("/v2/customer/details", {
+        const axios = getAxios()
+        const response=await axios.get("/v2/customer/details", {
         headers: {
             Authorization: 'Bearer ' + token
         }
@@ -15,7 +16,8 @@ export const customerDetails=async(token)=>{
 
 export const editProfile=async(token,formData)=>{
     try{
-        const response=await AxiosConfig.put('/v2/customer/', formData, {
+        const axios = getAxios()
+        const response=await axios.put('/v2/customer/', formData, {
         headers: {
             Authorization: 'Bearer ' + token,
             "Content-Type": "multipart/form-data",
@@ -34,7 +36,8 @@ export const postComplaint=async(hostelId,token,formData)=>{
     console.log(token)
     console.log(formData)
     try{
-         const response=await AxiosConfig.post('/v2/complaints/' + hostelId, formData,   {
+        const axios = getAxios()
+         const response=await axios.post('/v2/complaints/' + hostelId, formData,   {
             headers: {
                 Authorization: 'Bearer ' + token,
                  "Content-Type": "multipart/form-data",
@@ -50,7 +53,8 @@ export const postComplaint=async(hostelId,token,formData)=>{
 export const getRequestRaised=async(hostelId, token)=>{
     console.log(token)
    try{
-    const response=await AxiosConfig.get('/v2/tenant/hostels/requests/' + hostelId, {
+    const axios = getAxios()
+    const response=await axios.get('/v2/tenant/hostels/requests/' + hostelId, {
         headers: {
             Authorization: 'Bearer ' + token,
         }
@@ -63,7 +67,8 @@ export const getRequestRaised=async(hostelId, token)=>{
 
 export const getRentalDetials=async(hostelId,token)=>{
     try{
-        const response=await AxiosConfig.get('/v2/customer/rentDetails/' + hostelId , {
+        const axios = getAxios()
+        const response=await axios.get('/v2/customer/rentDetails/' + hostelId , {
             headers: {
                 Authorization: 'Bearer ' + token
             }
@@ -82,7 +87,8 @@ export const putComplaint = async (hostelId, complaintId, token, formData) => {
     console.log(formData);
 
     try {
-        const response = await AxiosConfig.put(
+        const axios = getAxios()
+        const response = await axios.put(
             `/v2/complaints/${hostelId}/${complaintId}`,
             formData,
             {
@@ -150,7 +156,8 @@ export const getHostelRentalDetails=async(userId,token)=>{
     console.log(userId)
     console.log(token)
     try{
-        const response=await AxiosConfig.get('/v2/tenant/login/hostels-list/' + userId, {
+        const axios = getAxios()
+        const response=await axios.get('/v2/tenant/login/hostels-list/' + userId, {
             headers: {
                 Authorization: "Bearer " + token
             }
