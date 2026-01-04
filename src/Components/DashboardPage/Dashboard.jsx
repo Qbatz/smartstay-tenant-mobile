@@ -1410,7 +1410,7 @@ function Dashboard(props) {
                     Paid Date
                   </Text>
                   <Text style={style.paiddetailValue}>
-                    10/12/2015
+                   {paymentContext?.getInvoiceDetail?.lastPaidDate}
                   </Text>
                 </View>
 

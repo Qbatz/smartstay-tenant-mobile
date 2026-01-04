@@ -46,13 +46,20 @@ const ReceiptPdfViewer = ({ route }) => {
     <ScrollView style={styles.container}>
       <View style={styles.receiptCard}>
         <View style={styles.header}>
-          <Image
-            source={HostelImage}
-            style={styles.logo}
-          />
+          {selectedReceiptDetail?.configurations?.hostelLogo ? (
+                                  <Image
+                                    source={{ uri: selectedReceiptDetail?.configurations?.hostelLogo }}
+                                    style={styles.hostelImage} />
+                                ) : (
+                                  <View style={[styles.hostelImage, styles.initialContainer]}>
+                                    <Text style={styles.initialText}>
+                                      {selectedReceiptDetail?.stayInfo?.initials}
+                                    </Text>
+                                  </View>
+                                )}
           
           <View style={{ }}>
-               <Text style={styles.hostelName}>Annai Hostel</Text>
+               <Text style={styles.hostelName}>{selectedReceiptDetail?.stayInfo?.hostelName}</Text>
             <Text style={styles.address}>{selectedReceiptDetail?.configurations?.address}</Text>
           </View>
         </View>
@@ -67,7 +74,7 @@ const ReceiptPdfViewer = ({ route }) => {
               ? "Security Deposit Receipt"
               : "Final Settlement Receipt"} */}
 
-           {receiptname === "SecurityDeposit" ?  "Security Deposit Receipt":"Payment Receipt"}  
+           {selectedReceiptDetail?.configurations?.invoiceType === "Rent" ? "Rental Payment Receipt" : "Security Deposit Receipt"}
           </Text>
         </View>
 
@@ -515,6 +522,22 @@ totalRow: {
   highlight: {
     fontWeight: "600",
     color: "#000",
+  },
+   hostelImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 10,
+  },
+  initialContainer: {
+    backgroundColor: '#eef1ff',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+   initialText: {
+    color: '#788fed',
+    fontSize: 20,
+    fontWeight: 'bold',
   },
 
 

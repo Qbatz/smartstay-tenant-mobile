@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { View, Text, Image, TouchableOpacity, Animated, StyleSheet, TouchableWithoutFeedback, ScrollView,TextInput,FlatList } from "react-native";
+import { View, Text, Image, TouchableOpacity, Animated, StyleSheet, TouchableWithoutFeedback, ScrollView, TextInput, FlatList } from "react-native";
 import { launchImageLibrary } from "react-native-image-picker";
 import AppLoader from "../../ToastFile/LoaderPage";
 import SuccessModal from "../../ToastFile/TostFilePage";
@@ -35,16 +35,16 @@ const AddComplaint = ({
     const [loading, setLoading] = useState(false);
     const [selectedValue, setSelectedValue] = useState(null);
     const [isFocus, setIsFocus] = useState(false);
-     const [complaintType, setComplaintTypes] = useState([])
+    const [complaintType, setComplaintTypes] = useState([])
 
     useEffect(() => {
-        if(visible){
-             getComplaintTypes(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
-            console.log(r)
-            setComplaintTypes(r.data)
-        })
+        if (visible) {
+            getComplaintTypes(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
+                console.log(r)
+                setComplaintTypes(r.data)
+            })
         }
-       
+
     }, [visible])
 
     useEffect(() => {
@@ -84,7 +84,18 @@ const AddComplaint = ({
 
         const formData = new FormData();
 
-        const jsonBase64 = btoa(JSON.stringify(payloads));
+
+        const base64EncodeUnicode = (str) => {
+            return btoa(
+                encodeURIComponent(str).replace(
+                    /%([0-9A-F]{2})/g,  
+                    (_, p1) => String.fromCharCode('0x' + p1)
+                )
+            );
+        };
+
+
+        const jsonBase64 = base64EncodeUnicode(JSON.stringify(payloads));
 
         formData.append("payloads", {
             uri: "data:application/json;base64," + jsonBase64,
@@ -159,7 +170,7 @@ const AddComplaint = ({
                         setShowSuccessModal(false);
                         setSelectedComplaintTypeId(0);
                         setDespriction('');
-                       onClose();
+                        onClose();
 
                         complaints(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
                             complaintContext.updateComplaintList(r?.data?.content);
@@ -173,7 +184,7 @@ const AddComplaint = ({
                     setModelType('error');
                     setTimeout(() => {
                         setShowSuccessModal(false);
-                       onClose();
+                        onClose();
                     }, 2000);
                 }
 
@@ -250,11 +261,11 @@ const AddComplaint = ({
                                     <Text style={{ fontSize: 14, fontWeight: 400 }}>Complaint message
                                         <Text style={{ color: 'red' }}> *</Text>
                                     </Text>
-                                    <View style={{ borderWidth: 1, borderRadius: 10, marginTop: 8,paddingTop: 7, paddingLeft: 10, borderColor: '#e5e5e5', height: 80 }}>
-                                        <TextInput value={complaintDescription} placeholder="Enter message" onChangeText={(value) => setDespriction(value)} 
-                                        multiline
-                                        textAlignVertical="top"
-                                        style={{flex:1,padding:0}} />
+                                    <View style={{ borderWidth: 1, borderRadius: 10, marginTop: 8, paddingTop: 7, paddingLeft: 10, borderColor: '#e5e5e5', height: 80 }}>
+                                        <TextInput value={complaintDescription} placeholder="Enter message" onChangeText={(value) => setDespriction(value)}
+                                            multiline
+                                            textAlignVertical="top"
+                                            style={{ flex: 1, padding: 0 }} />
                                     </View>
                                 </View>
 
@@ -333,7 +344,7 @@ const style = StyleSheet.create({
     },
     dragindictor: { width: 50, height: 4, backgroundColor: "#ccc", borderRadius: 2, alignSelf: "center", marginBottom: 10 },
     bottomsheets: {
-    height: '90%', backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingHorizontal: 20,
-    paddingTop: 20, paddingBottom: 10
-  },
+        height: '90%', backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingHorizontal: 20,
+        paddingTop: 20, paddingBottom: 10
+    },
 })

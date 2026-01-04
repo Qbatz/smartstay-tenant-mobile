@@ -34,9 +34,6 @@ public class FireBaseServices extends FirebaseMessagingService {
         edt.apply();
 
 
-        Intent intent=new Intent("com.smartstay.token");
-        intent.putExtra("token",token);
-        sendBroadcast(intent);
 
     }
 

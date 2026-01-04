@@ -42,19 +42,32 @@ const InvoiceDesign = () => {
 
   const addressLine = selectedInvoiceDetail?.customerInfo?.fullAddress?.split(',');
 
+  const hostelAddress=selectedInvoiceDetail?.configurations?.address?.split(',')
+
   return (
     <ScrollView style={styles.container}>
 
       <View style={styles.header}>
         <View>
-          <Image
-            source={RoomSerach}
-            style={styles.logo}
-          />
+           {selectedInvoiceDetail?.configurations?.hostelLogo ? (
+                        <Image
+                          source={{ uri: selectedInvoiceDetail?.configurations?.hostelLogo }}
+                          style={styles.hostelImage} />
+                      ) : (
+                        <View style={[styles.hostelImage, styles.initialContainer]}>
+                          <Text style={styles.initialText}>
+                            {selectedInvoiceDetail?.stayInfo?.initials}
+                          </Text>
+                        </View>
+                      )}
         </View>
         <View style={styles.invoiceMonth}>
-          <Text style={styles.headerText}>roomsearch.in</Text>
-          <Text style={styles.headerSub}>{selectedInvoiceDetail?.configurations?.address}</Text>
+          <Text style={styles.headerText}>{selectedInvoiceDetail?.stayInfo?.hostelName}</Text>
+           {hostelAddress?.map((line, index) => (
+                <Text key={index} style={styles.info}>
+                  {line.split()}
+                </Text>
+              ))}
         </View>
       </View>
 
@@ -702,6 +715,22 @@ const styles = StyleSheet.create({
     fontSize: 10,
     flexShrink: 1,
     fontWeight: 600
+  },
+  hostelImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 10,
+  },
+  initialContainer: {
+    backgroundColor: '#eef1ff',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+   initialText: {
+    color: '#788fed',
+    fontSize: 20,
+    fontWeight: 'bold',
   },
 
 });
