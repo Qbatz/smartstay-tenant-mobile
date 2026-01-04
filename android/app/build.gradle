@@ -112,6 +112,25 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
+
+    flavorDimensions "env"
+
+
+    productFlavors {
+        dev {
+            applicationIdSuffix ".dev"
+            signingConfig signingConfigs.debug
+
+        }
+        prod {
+//            applicationId "com.qbatz.smartstay.tenant"
+        }
+        local {
+            applicationIdSuffix ".dev"
+            signingConfig signingConfigs.debug
+        }
+    }
+
 }
 
 dependencies {

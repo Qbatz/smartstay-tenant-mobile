@@ -1,5 +1,6 @@
 import AxiosConfig from "../Config/AxiosConfig"
 import { LoginContexts } from "../Context/LoginContext";
+import { BASE_URL } from "../Utils/Constant";
 
 
 
@@ -11,6 +12,8 @@ export const verifyPhoneNo = async (phoneNo) => {
         const response = await AxiosConfig.post("/v2/tenant/user/verify-mobile", data)
         return response;
     } catch (error) {
+        console.log(error)
+        console.log(error.message)
         return { status: error.response.status, message: error.response.data }
     }
 }

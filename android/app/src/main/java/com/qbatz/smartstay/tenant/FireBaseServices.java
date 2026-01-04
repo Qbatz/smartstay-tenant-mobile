@@ -15,7 +15,7 @@ import androidx.core.app.NotificationManagerCompat;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-import com.qbatz.smartstay.tenant.debug.R;
+import com.qbatz.smartstay.tenant.R;
 
 import org.jspecify.annotations.NonNull;
 

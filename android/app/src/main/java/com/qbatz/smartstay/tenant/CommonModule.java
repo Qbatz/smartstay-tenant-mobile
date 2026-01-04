@@ -13,6 +13,7 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.qbatz.smartstay.utils.Constant;
 
 public class CommonModule extends ReactContextBaseJavaModule {
 
@@ -45,6 +46,11 @@ public class CommonModule extends ReactContextBaseJavaModule {
 
         System.out.println(connected);
         promise.resolve(connected);
+    }
+
+    @ReactMethod
+    public void fetchBaseUrl(Promise promise) {
+        promise.resolve(Constant.BASE_URL);
     }
 
 

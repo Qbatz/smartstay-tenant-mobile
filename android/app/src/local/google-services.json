@@ -45,9 +45,9 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:251194789789:android:2cba9932951d8396272974",
+        "mobilesdk_app_id": "1:251194789789:android:c3e1ae057bb4298c272974",
         "android_client_info": {
-          "package_name": "com.qbatz.smartstay.tenant.debug"
+          "package_name": "com.qbatz.smartstay.tenant.dev"
         }
       },
       "oauth_client": [],

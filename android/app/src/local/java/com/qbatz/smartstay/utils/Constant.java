@@ -1,7 +1,7 @@
 package com.qbatz.smartstay.utils;
 
-import com.qbatz.smartstay.tenant.debug.BuildConfig;
 
 public final class Constant {
-    public static final String BASE_URL = BuildConfig.BASE_URL;
+
+    public static final String BASE_URL = "http://10.0.2.2:8082";
 }
