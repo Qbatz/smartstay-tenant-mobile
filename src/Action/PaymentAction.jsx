@@ -1,8 +1,9 @@
-import AxiosConfig from "../Config/AxiosConfig";
+import {getAxios} from "../Config/AxiosConfig";
 
 export const getPaymentInvoiceDetail=async(hostelId,token,invoiceId)=>{
         try{
-            const response=await AxiosConfig.get('/v2/invoices/invoice-details/' + hostelId + "/" + invoiceId, {
+            const axios = getAxios()
+            const response=await axios.get('/v2/invoices/invoice-details/' + hostelId + "/" + invoiceId, {
                 headers: {
                     Authorization: ' Bearer ' + token
                 }
@@ -15,7 +16,8 @@ export const getPaymentInvoiceDetail=async(hostelId,token,invoiceId)=>{
 
 export const getPaymentReceiptDetails=async(hostelId,token,transactionId)=>{
     try{
-        const response= await AxiosConfig.get('/v2/invoices/receipt-details/' + hostelId + "/" + transactionId, {
+        const axios = getAxios()
+        const response= await axios.get('/v2/invoices/receipt-details/' + hostelId + "/" + transactionId, {
             headers: {
                 Authorization: 'Bearer ' + token
             }
