@@ -8,21 +8,20 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.qbatz.smartstay.tenant.debug.R;
 
-import java.util.HashMap;
+import org.jspecify.annotations.NonNull;
+
 import java.util.Map;
 
 public class FireBaseServices extends FirebaseMessagingService {
-
     @Override
     public void onNewToken(@NonNull String token) {
         super.onNewToken(token);
@@ -46,7 +45,7 @@ public class FireBaseServices extends FirebaseMessagingService {
 
         Intent intent=new Intent(FireBaseServices.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent= PendingIntent.getActivity(FireBaseServices.this,0,intent,PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pendingIntent= PendingIntent.getActivity(FireBaseServices.this,0,intent, PendingIntent.FLAG_IMMUTABLE);
 
         if (message.getData() != null) {
             Map<String, String> data = message.getData();
