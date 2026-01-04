@@ -1,10 +1,11 @@
-import AxiosConfig from "../Config/AxiosConfig";
+import  { getAxios } from "../Config/AxiosConfig";
 
 export const getNotification=async(hostelId,token)=>{
     console.log(hostelId)
     console.log(token)
     try{
-        const response=await AxiosConfig.get('/v2/notifications/all-notifications/' + hostelId, {
+        const axios = getAxios()
+        const response=await axios.get('/v2/notifications/all-notifications/' + hostelId, {
             headers: {
                 Authorization: 'Bearer ' + token
             }

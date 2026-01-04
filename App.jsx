@@ -6,7 +6,7 @@
  */
 
 import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View,Text,Image, TouchableOpacity,Dimensions, Platform } from 'react-native';
+import { StatusBar, StyleSheet, useColorScheme, View,Text,Image, TouchableOpacity,Dimensions, Platform, NativeModules } from 'react-native';
 import {
   SafeAreaProvider,
 } from 'react-native-safe-area-context';
@@ -26,7 +26,6 @@ import { LoginProvider } from "./src/Context/LoginContext";
 import VerifyKYC from './src/Components/KycDocuments/VerifyKYC';
 import SuccessModal from './src/Components/ToastFile/TostFilePage'
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { NativeModules } from 'react-native';
 
 
 // import VerifyKYC from './src/Components/KycDocuments/VerifyKYC'
@@ -62,6 +61,7 @@ import { storeData, retriveData } from './src/Utils/Storage';
 import PaymentContext from './src/Context/PaymentContext';
 import SuccessFlow from './src/SuccessFlow';
 import NotificationContext from './src/Context/NotificationContext';
+import { initBaseUrl } from './src/Utils/Constant';
 
 
 
@@ -70,6 +70,8 @@ const { width, height } = Dimensions.get("window");
 function App() {
 
   const isDarkMode = useColorScheme() === 'dark';
+
+  const { CommonModule } = NativeModules;
 
 
   const [loggedIn, setloggein] = useState()
@@ -85,6 +87,14 @@ function App() {
     })
   }, [])
 
+  CommonModule.fetchBaseUrl().then(result => {
+    console.log(result)
+    initBaseUrl(result)
+
+  }).
+  catch(error => {
+    console.log(error)
+  })
 
 
 

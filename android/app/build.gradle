@@ -89,8 +89,8 @@ android {
         applicationId "com.qbatz.smartstay.tenant"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 3
+        versionName "1.0.3"
     }
     signingConfigs {
         debug {
@@ -112,6 +112,25 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
+
+    flavorDimensions "env"
+
+
+    productFlavors {
+        dev {
+            applicationIdSuffix ".dev"
+            signingConfig signingConfigs.debug
+
+        }
+        prod {
+//            applicationId "com.qbatz.smartstay.tenant"
+        }
+        local {
+            applicationIdSuffix ".dev"
+            signingConfig signingConfigs.debug
+        }
+    }
+
 }
 
 dependencies {

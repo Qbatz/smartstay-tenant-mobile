@@ -1,10 +1,11 @@
-import AxiosConfig from "../Config/AxiosConfig";
+import  { getAxios } from "../Config/AxiosConfig";
 
 export default logoutSetup=async(data,token)=>{
     console.log(data)
     console.log(token)
     try{
-        const response =await AxiosConfig.post('/v2/tenant/login/log-out', data, {
+        const axios = getAxios()
+        const response =await axios.post('/v2/tenant/login/log-out', data, {
             headers: {
                 Authorization: 'Bearer ' + token
             }

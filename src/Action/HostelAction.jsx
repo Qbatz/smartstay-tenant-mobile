@@ -1,8 +1,9 @@
-import AxiosConfig from "../Config/AxiosConfig";
+import {getAxios} from "../Config/AxiosConfig";
 
 export const hostelList=async(token)=>{
     try{
-         const response= await AxiosConfig.get("/v2/tenant/hostels", {
+        const axios = getAxios()
+         const response= await axios.get("/v2/tenant/hostels", {
         headers: {
             Authorization: 'Bearer ' + token
         }
@@ -15,7 +16,8 @@ export const hostelList=async(token)=>{
 
 export const hostelDetails=async(hostelId,token)=>{
     try{
-        const response=await AxiosConfig.get("/v2/tenant/hostels/" + hostelId, {
+        const axios = getAxios()
+        const response=await axios.get("/v2/tenant/hostels/" + hostelId, {
         headers: {
             Authorization: 'Bearer ' + token
         }
@@ -28,7 +30,8 @@ export const hostelDetails=async(hostelId,token)=>{
 
 export const complaints=async(hostelId,token)=>{
     try{
-        const response=await AxiosConfig.get('/v2/complaints/' + hostelId, {
+        const axios = getAxios()
+        const response=await axios.get('/v2/complaints/' + hostelId, {
         headers: {
             Authorization: 'Bearer ' + token
         }
@@ -45,7 +48,8 @@ export const complaints=async(hostelId,token)=>{
 
 export const getComplaints=async(hostelId,complaintId,token)=>{
     try{
-        const response=await AxiosConfig.get('/v2/complaints/' + hostelId + "/" + complaintId, {
+        const axios = getAxios()
+        const response=await axios.get('/v2/complaints/' + hostelId + "/" + complaintId, {
         headers: {
             Authorization: 'Bearer ' + token
         }
@@ -58,7 +62,8 @@ export const getComplaints=async(hostelId,complaintId,token)=>{
 
 export const getAmenitiesList=async(hostelId,token)=>{
     try{
-        const response =await AxiosConfig.get('/v2/amenities/' + hostelId, {
+        const axios = getAxios()
+        const response =await axios.get('/v2/amenities/' + hostelId, {
         headers: {
             Authorization: 'Bearer ' + token
         }
@@ -71,7 +76,8 @@ export const getAmenitiesList=async(hostelId,token)=>{
 }
 
 export const getAmenties=async(hostelId,amenityId,token)=>{
-    const response=await AxiosConfig.get('/v2/amenities/' + hostelId + "/" +amenityId, {
+    const axios = getAxios()
+    const response=await axios.get('/v2/amenities/' + hostelId + "/" +amenityId, {
         headers: {
             Authorization: 'Bearer ' + token
         }
@@ -87,8 +93,9 @@ export const deleteComplaint=async(hostelId,complaintId,token, reason)=>{
     }
     console.log(data)
     try{
+        const axios = getAxios()
         console.log('/v2/complaints/' + hostelId + "/" + complaintId)
-        const response=await AxiosConfig.delete('/v2/complaints/' + hostelId + "/" + complaintId, {
+        const response=await axios.delete('/v2/complaints/' + hostelId + "/" + complaintId, {
         headers: {
             Authorization: 'Bearer ' + token
         },
@@ -104,7 +111,8 @@ export const deleteComplaint=async(hostelId,complaintId,token, reason)=>{
 }
 
 export const addComment=async(complaintId,token,data)=>{
-    const response=await AxiosConfig.post('/v2/complaints/comment/' + complaintId, data, {
+    const axios = getAxios()
+    const response=await axios.post('/v2/complaints/comment/' + complaintId, data, {
         headers: {
             Authorization: 'Bearer ' + token
         }
@@ -115,7 +123,8 @@ export const addComment=async(complaintId,token,data)=>{
 
 export const postRequestBedChange=async(hostelId,data,token)=>{
     try{
-        const response=await AxiosConfig.post('/v2/bed/request-bedChange/' + hostelId, data, {
+        const axios = getAxios()
+        const response=await axios.post('/v2/bed/request-bedChange/' + hostelId, data, {
         headers: {
             Authorization: 'Bearer ' + token
         }
@@ -128,7 +137,8 @@ export const postRequestBedChange=async(hostelId,data,token)=>{
 
 export const postRquestAmenties=async(hostelId,token,amenityId)=>{
     try{
-        const response=await AxiosConfig.post('/v2/amenities/request-amenity/' + hostelId + "/" + amenityId, {}, {
+        const axios = getAxios()
+        const response=await axios.post('/v2/amenities/request-amenity/' + hostelId + "/" + amenityId, {}, {
         headers: {
             Authorization: 'Bearer ' + token
         }
@@ -143,7 +153,8 @@ export const postRquestAmenties=async(hostelId,token,amenityId)=>{
 export const getPaymentList=async(hostelId,token)=>{
 
     try{
-        const response=await AxiosConfig.get('/v2/invoices/' + hostelId, {
+        const axios = getAxios()
+        const response=await axios.get('/v2/invoices/' + hostelId, {
             headers: {
                 Authorization: 'Bearer ' + token
             }
@@ -156,7 +167,8 @@ export const getPaymentList=async(hostelId,token)=>{
 
 export const getInvoices=async(hostelId,invoiceId,token)=>{
     try{
-        const response=await AxiosConfig.get('/v2/invoices/' +hostelId + "/" + invoiceId  ,{
+        const axios = getAxios()
+        const response=await axios.get('/v2/invoices/' +hostelId + "/" + invoiceId  ,{
             headers: {
                 Authorization: 'Bearer ' + token
             }
@@ -169,7 +181,8 @@ export const getInvoices=async(hostelId,invoiceId,token)=>{
 
 export const getComplaintTypes=async(hostelId,token)=>{
     try{
-        const response=await AxiosConfig('/v2/ComplaintType/all-complaintTypes/' + hostelId, {
+        const axios = getAxios()
+        const response=await axios('/v2/ComplaintType/all-complaintTypes/' + hostelId, {
             headers: {
                 Authorization: 'Bearer ' + token
             }

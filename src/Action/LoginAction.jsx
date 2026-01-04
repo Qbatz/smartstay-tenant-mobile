@@ -1,5 +1,6 @@
-import AxiosConfig from "../Config/AxiosConfig"
+import { getAxios } from "../Config/AxiosConfig"
 import { LoginContexts } from "../Context/LoginContext";
+import { BASE_URL } from "../Utils/Constant";
 
 
 
@@ -8,9 +9,13 @@ export const verifyPhoneNo = async (phoneNo) => {
         const data = {
             mobile: phoneNo
         }
-        const response = await AxiosConfig.post("/v2/tenant/user/verify-mobile", data)
-        return response;
+        // const response = await AxiosConfig.post("/v2/tenant/user/verify-mobile", data)
+        const axios = getAxios();
+        const res = await axios.post("/v2/tenant/user/verify-mobile", data)
+        return res;
     } catch (error) {
+        console.log(error)
+        console.log(error.message)
         return { status: error.response.status, message: error.response.data }
     }
 }
@@ -21,7 +26,8 @@ export const verifyOtp = async (phoneNo, otp, ) => {
         otp: otp,
     }
     try {
-        const response = await AxiosConfig.post("/v2/tenant/user/verify-otp", data)
+        const axios = getAxios();
+        const response = await axios.post("/v2/tenant/user/verify-otp", data)
         return response;
     } catch (error) {
         return { status: error.response.status, message: error.response.data }
@@ -31,7 +37,8 @@ export const verifyOtp = async (phoneNo, otp, ) => {
 
 export const getToken = async (data) => {
     try {
-        const response = await AxiosConfig.post('/v2/tenant/login/request-token', data)
+        const axios = getAxios();
+        const response = await axios.post('/v2/tenant/login/request-token', data)
         return response;
     } catch (error) {
         return { status: error.response.status, message: error.response.data }
@@ -42,7 +49,8 @@ export const getToken = async (data) => {
 
 export const verifyMPin = async (data) => {
     try {
-        const response = await AxiosConfig.post('/v2/tenant/login/verify-Mpin', data)
+        const axios = getAxios();
+        const response = await axios.post('/v2/tenant/login/verify-Mpin', data)
         return response;
     } catch (error) {
         return { status: error.response.status, message: error.response.data }
@@ -51,7 +59,8 @@ export const verifyMPin = async (data) => {
 
 export const postMPin = async (data) => {
     try {
-        const response = await AxiosConfig.post('/v2/tenant/login/set-Mpin', data)
+        const axios = getAxios();
+        const response = await axios.post('/v2/tenant/login/set-Mpin', data)
         return response;
     } catch (error) {
         return { status: error.response.status, message: error.response.data }
@@ -59,9 +68,11 @@ export const postMPin = async (data) => {
 }
 
 export const postResendOtp = async (userId) => {
+    console.log("******")
     console.log(userId)
     try {
-        const response = await AxiosConfig.post('/v2/tenant/user/resend-otp/' + userId)
+        const axios = getAxios();
+        const response = await axios.post('/v2/tenant/user/resend-otp/' + userId)
         return response;
     } catch (error) {
         return { status: error.response.status, message: error.response.data }
@@ -78,7 +89,8 @@ export const updateFCMToken = async (xuid, token, authToken) => {
     console.log("data", data)
 
     try {
-        const response = await AxiosConfig.post('/v2/config/update-fcm', data, {
+        const axios = getAxios();
+        const response = await axios.post('/v2/config/update-fcm', data, {
             headers: {
                 Authorization: 'Bearer ' + authToken
             }
