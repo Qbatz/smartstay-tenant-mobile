@@ -24,11 +24,22 @@ const HostelList = (route) => {
   const context = useContext(UsersContext)
   const loginContext = useContext(LoginContexts)
   const [hostels, setHostelList] = useState([]);
-  const [selectedHostel, setSelectedHostel] = useState();
+  const [selectedHostel, setSelectedHostel] = useState(null);
   const [showVerifyKyc,setShowVerifyKyc]=useState(false)
   const navigation = useNavigation()
   const [fcmToken, setFcmToken] = useState();
   const { NotificationModule } = NativeModules;
+
+  console.log(context?.getHostelList[0].hostelId)
+    console.log(context?.getHostelList)
+    console.log(selectedHostel)
+
+    useEffect(() => {
+  if (context?.getHostelList?.length > 0) {
+    setSelectedHostel(context.getHostelList[0]);
+  }
+}, [context?.getHostelList]);
+
 
   const fetchFcmTokenAsync = () => {
       NotificationModule.fetchFcmToken().then(r => {

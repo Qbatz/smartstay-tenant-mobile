@@ -20,18 +20,18 @@ const BookingInvoice = () => {
 
   const [selectedInvoiceDetail, setSelectedInvoiceDetail] = useState()
 
- useFocusEffect(
-         useCallback(()=>{
-           const onBackPress=()=>{
-             navigation.goBack();
-             return true;
-           };
-   
-           const subsription= BackHandler.addEventListener('hardwareBackPress',onBackPress);
-   
-           return ()=>subsription.remove();
-         },[navigation])
-       )
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        navigation.goBack();
+        return true;
+      };
+
+      const subsription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () => subsription.remove();
+    }, [navigation])
+  )
 
   useEffect(() => {
     getPaymentInvoiceDetail(userContext.getHostelDetail.hostelId, loginContext.getToken, paymentContext.getInvoiceDetail.invoiceId).then(r => {
@@ -60,7 +60,7 @@ const BookingInvoice = () => {
 
 
       <View style={styles.receiptTitleContainer}>
-        <Text style={[styles.receiptTitle,{color: selectedInvoiceDetail?.configurations?.templateColor}]}>Booking Invoice</Text>
+        <Text style={[styles.receiptTitle, { color: selectedInvoiceDetail?.configurations?.templateColor }]}>Booking Invoice</Text>
       </View>
 
 
@@ -94,71 +94,78 @@ const BookingInvoice = () => {
           <Text style={styles.invSty}>Rental Period: Mar 02 - Apr 01</Text>
         </View>
       </View> */}
-      <View style={styles.invoiceInfo}>
-        <View style={styles.billToSection}>
-          <View style={styles.labelColumn}>
-            <Text style={[styles.sectionTitle,{color: selectedInvoiceDetail?.configurations?.templateColor}]}>Bill to</Text>
+
+      <View style={{ flexDirection: 'row', padding: 20 }}>
+        <View style={{ flex: 1 }}>
+          <Text style={[styles.sectionTitle, { color: selectedInvoiceDetail?.configurations?.templateColor }]}>Bill to:</Text>
+
+          <View style={styles.row}>
             <Text style={styles.label}>Name</Text>
+            <Text style={styles.colon}>:</Text>
+            <View style={styles.valueContainer}>
+              <Text style={styles.value}>
+                {selectedInvoiceDetail?.customerInfo?.fullName}
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.row}>
             <Text style={styles.label}>Phone</Text>
+            <Text style={styles.colon}>:</Text>
+            <View style={styles.valueContainer}>
+              <Text style={styles.value}>
+                +{selectedInvoiceDetail?.customerInfo?.countryCode}{" "}
+                {selectedInvoiceDetail?.customerInfo?.customerMobileNo}
+              </Text>
+            </View>
           </View>
-          <View style={styles.valueColumn}>
-            <Text style={styles.sectionTitle}>:</Text>
-            <Text style={styles.name}>: {selectedInvoiceDetail?.customerInfo?.fullName}</Text>
-            <Text style={styles.info}>:
-              +{selectedInvoiceDetail?.customerInfo?.countryCode} {selectedInvoiceDetail?.customerInfo?.customerMobileNo}</Text>
-           
-            {/* <Text style={styles.info}>: 8th Main Rd,{"\n"}   Sameeshwar Nagar,{"\n"}   Bengaluru, Karnataka 560071</Text> */}
+
+        </View>
+
+        <View style={{ flex: 1, alignItems: 'flex-end' }}>
+          <View style={styles.invStyle}>
+
+            <Text style={styles.invSty}>
+              Invoice : {' '}
+              <Text style={styles.bold}>{selectedInvoiceDetail?.invoiceNumber}</Text>
+            </Text>
+
+            <Text style={styles.invSty}>
+              Date : {' '}
+              <Text style={styles.bold}>{selectedInvoiceDetail?.invoiceDate}</Text>
+            </Text>
+
+          
           </View>
         </View>
 
-        <View style={styles.invStyle}>
-
-          <Text style={styles.invSty}>
-            Invoice : {' '}
-            <Text style={styles.bold}>{selectedInvoiceDetail?.invoiceNumber}</Text>
-          </Text>
-
-          <Text style={styles.invSty}>
-            Date : {' '}
-            <Text style={styles.bold}>{selectedInvoiceDetail?.invoiceDate}</Text>
-          </Text>
-
-          {/* <Text style={styles.invSty}>
-            Joining Date: {' '}
-            <Text style={styles.bold}>{selectedInvoiceDetail?.customerInfo?.joiningDate}</Text>
-          </Text>
-
-          <Text style={styles.invSty}>
-            Time: {' '}
-            <Text style={styles.bold}>11:56:24 AM</Text>
-          </Text>
-
-          <Text style={styles.invSty}>
-            Rental Period: {' '}
-            <Text style={styles.bold}>{selectedInvoiceDetail?.invoiceInfo?.invoicePeriod}</Text>
-          </Text> */}
-        </View>
       </View>
 
+       
 
-       {/* QR + Account Details */}
+
+
+    
+
+
+      {/* QR + Account Details */}
       <View style={styles.accountSection}>
         <View style={styles.accountLeft}>
-          <Text style={[styles.accountTitle,{color: selectedInvoiceDetail?.configurations?.templateColor}]}>
+          <Text style={[styles.accountTitle, { color: selectedInvoiceDetail?.configurations?.templateColor }]}>
             ACCOUNT DETAILS</Text>
-          <Text style={styles.accountText}>Account No: 
-            <Text style={styles.bold}>{selectedInvoiceDetail?.accountDetails?.accountNo !=null?selectedInvoiceDetail?.accountDetails?.accountNo : "N/A"}</Text></Text>
+          <Text style={styles.accountText}>Account No:
+            <Text style={styles.bold}>{selectedInvoiceDetail?.accountDetails?.accountNo != null ? selectedInvoiceDetail?.accountDetails?.accountNo : "N/A"}</Text></Text>
           <Text style={styles.accountText}>IFSC Code: <Text style={styles.bold}>
-            {selectedInvoiceDetail?.accountDetails?.ifscCode !=null?selectedInvoiceDetail?.accountDetails?.ifscCode : "N/A"}</Text></Text>
+            {selectedInvoiceDetail?.accountDetails?.ifscCode != null ? selectedInvoiceDetail?.accountDetails?.ifscCode : "N/A"}</Text></Text>
           <Text style={styles.accountText}>Bank Name: <Text style={styles.bold}>
-             {selectedInvoiceDetail?.accountDetails?.bankName !=null?selectedInvoiceDetail?.accountDetails?.bankName : "N/A"}</Text></Text>
+            {selectedInvoiceDetail?.accountDetails?.bankName != null ? selectedInvoiceDetail?.accountDetails?.bankName : "N/A"}</Text></Text>
           <Text style={styles.accountText}>UPI ID: <Text style={styles.bold}>
-            {selectedInvoiceDetail?.accountDetails?.upiId !=null?selectedInvoiceDetail?.accountDetails?.upiId : "N/A"}</Text></Text>
+            {selectedInvoiceDetail?.accountDetails?.upiId != null ? selectedInvoiceDetail?.accountDetails?.upiId : "N/A"}</Text></Text>
         </View>
 
         <View style={styles.accountRight}>
           <Image
-            source={{uri:selectedInvoiceDetail?.accountDetails?.qrCode}}
+            source={{ uri: selectedInvoiceDetail?.accountDetails?.qrCode }}
             style={styles.qr}
           />
           <Text style={styles.qrText}>Scan QR for payment</Text>
@@ -180,19 +187,19 @@ const BookingInvoice = () => {
       </View>
 
 
-       {/* Terms and Conditions & Signature in same line */}
+      {/* Terms and Conditions & Signature in same line */}
       <View style={styles.termsAndSignatureRow}>
         <View style={styles.termsSection}>
-          <Text style={[styles.termsTitle,{color: selectedInvoiceDetail?.configurations?.templateColor}]}>
+          <Text style={[styles.termsTitle, { color: selectedInvoiceDetail?.configurations?.templateColor }]}>
             Terms and Conditions</Text>
           <Text style={styles.termsText}>
-            Booking confirms your stay. Advanvce is non-refundable. Room is allotted based on availablity. Provide correct details. Follow property guildlines always. 
+            Booking confirms your stay. Advanvce is non-refundable. Room is allotted based on availablity. Provide correct details. Follow property guildlines always.
           </Text>
         </View>
 
         <View style={styles.signatureSection}>
           <Image
-            source={{uri:selectedInvoiceDetail?.configurations?.signatureUrl}}
+            source={{ uri: selectedInvoiceDetail?.configurations?.signatureUrl }}
             style={styles.signature}
           />
           <Text style={styles.authText} numberOfLines={1}>Authorized Signature</Text>
@@ -201,7 +208,7 @@ const BookingInvoice = () => {
 
 
       <View style={styles.paymentSummarySection}>
-        <Text style={[styles.paymentSummaryTitle,{color: selectedInvoiceDetail?.configurations?.templateColor}]}>
+        <Text style={[styles.paymentSummaryTitle, { color: selectedInvoiceDetail?.configurations?.templateColor }]}>
           Payment Summary</Text>
         <View style={styles.table}>
 
@@ -214,7 +221,7 @@ const BookingInvoice = () => {
 
           {selectedInvoiceDetail?.invoiceInfo?.invoiceItems.map(i => {
             return (
-              <View  style={styles.tableRow}>
+              <View style={styles.tableRow}>
                 <Text style={[styles.tableCell, styles.colInvNo]}>{i.invoiceNo}</Text>
                 <Text style={[styles.tableCell, styles.colDesc]}>{i.description}</Text>
                 <Text style={[styles.tableCell, styles.colAmount]}>₹ {i.amount}</Text>
@@ -272,9 +279,9 @@ const BookingInvoice = () => {
       
       </View> */}
 
-     
 
-     
+
+
 
       {/* Footer */}
       <View style={styles.footer}>
@@ -313,12 +320,34 @@ const styles = StyleSheet.create({
     fontSize: 11,
     marginTop: 4,
     textAlign: 'right',
-    flexShrink:1
+    flexShrink: 1
   },
   label: {
     fontSize: 12,
     fontFamily: "Gilroy",
     fontWeight: 500
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 4,
+    justifyContent: 'center'
+  },
+  valueContainer: {
+    flex: 1,
+    marginTop: 2
+  },
+  colon: {
+    marginHorizontal: 3,
+    fontSize: 12,
+    fontWeight: 600
+  },
+
+  value: {
+    flex: 1,
+    fontSize: 10,
+    flexShrink: 1,
+    fontWeight: 600
   },
   invoiceMonth: {
     alignItems: "flex-end",
@@ -452,7 +481,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: "#eee",
     alignItems: "flex-start",
-    flex:1
+    flex: 1
   },
   termsSection: {
     flex: 1,

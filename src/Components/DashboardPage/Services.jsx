@@ -12,6 +12,7 @@ import { LoginContexts } from "../../Context/LoginContext";
 import { compliantContexts } from "../../Context/ComplaintContext";
 import { amenitiesContexts } from "../../Context/AmenitiesContext";
 import { useFocusEffect } from "@react-navigation/native";
+import ComplaintsPic from '../../assets/Images/ComplaintsPic.png'
 
 function Services(props) {
 
@@ -131,7 +132,7 @@ function Services(props) {
             }}>
                 <View style={{ flexDirection: 'row' }}>
                     <View style={{ borderWidth: 1, borderRadius: 4, paddingTop: 4, paddingBottom: 4, paddingLeft: 4, paddingRight: 4, backgroundColor: '#ffff', borderColor: '#ffffff' }}>
-                        <Image source={AmenitiesPic} style={{ tintColor: selectedfield === 'Complaint' ? '#1E45E1' : "#4B4B4B", width: 18.67, height: 17.8 }} />
+                        <Image source={ComplaintsPic} style={{ tintColor: selectedfield === 'Complaint' ? '#1E45E1' : "#4B4B4B", width: 18.67, height: 17.8 }} />
                     </View>
 
                     <Text style={{ color: selectedfield == 'Complaint' ? "white" : 'black', fontSize: 16, fontWeight: '400', marginLeft: 10 }}>Complaints</Text>

@@ -124,7 +124,7 @@ const ReceiptPdfViewer = ({ route }) => {
 
     <View style={styles.detailRow}>
       <Text style={styles.label}>Payment Mode :</Text>
-      <Text style={[styles.value, { color: "#1E45E1" }]}>UPI / Net Banking</Text>
+      <Text style={[styles.value, { color: "#1E45E1" }]}>{selectedReceiptDetail?.receiptInfo?.paymentMode}</Text>
     </View>
   </View>
 </View>

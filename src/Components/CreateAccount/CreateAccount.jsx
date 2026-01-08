@@ -66,6 +66,14 @@ const CreateAccount = ({ navigation }) => {
         }, 2000);
       }
     }
+    else{
+      setShowSuccessModal(true)
+      setOtp("Please enter Valid Number")
+      setModelType('error')
+      setTimeout(() => {
+        setShowSuccessModal(false)
+      }, 1500);
+    }
   };
 
 
@@ -109,7 +117,7 @@ const CreateAccount = ({ navigation }) => {
             styles.button,
             isButtonDisabled ? styles.buttonDisabled : styles.buttonEnabled,
           ]}
-          disabled={isButtonDisabled}
+          // disabled={isButtonDisabled}
           onPress={handleGetOtp}
         >
           <Text style={styles.buttonText}>Get OTP →</Text>
