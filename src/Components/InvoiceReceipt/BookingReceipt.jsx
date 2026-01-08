@@ -45,13 +45,20 @@ const BookingReceipt = ({ route }) => {
     <ScrollView style={styles.container}>
       <View style={styles.receiptCard}>
         <View style={styles.header}>
-          <Image
-            source={HostelImage}
-            style={styles.logo}
-          />
+          {selectedReceiptDetail?.configurations?.hostelLogo ? (
+                                            <Image
+                                              source={{ uri: selectedReceiptDetail?.configurations?.hostelLogo }}
+                                              style={styles.hostelImage} />
+                                          ) : (
+                                            <View style={[styles.hostelImage, styles.initialContainer]}>
+                                              <Text style={styles.initialText}>
+                                                {selectedReceiptDetail?.stayInfo?.initials}
+                                              </Text>
+                                            </View>
+                                          )}
           
           <View style={{ }}>
-               <Text style={styles.hostelName}>Annai Hostel</Text>
+               <Text style={styles.hostelName}>{selectedReceiptDetail?.stayInfo?.hostelName}</Text>
             <Text style={styles.address}>{selectedReceiptDetail?.configurations?.address}</Text>
           </View>
         </View>
@@ -103,7 +110,7 @@ const BookingReceipt = ({ route }) => {
 
     <View style={styles.detailRow}>
       <Text style={styles.label}>Payment Mode :</Text>
-      <Text style={[styles.value, { color: "#1E45E1" }]}>UPI / Net Banking</Text>
+      <Text style={[styles.value, { color: "#1E45E1" }]}>{selectedReceiptDetail?.receiptInfo?.paymentMode}</Text>
     </View>
 
     <View style={styles.detailRow}>
@@ -505,6 +512,22 @@ totalRow: {
   highlight: {
     fontWeight: "600",
     color: "#000",
+  },
+  hostelImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 10,
+  },
+  initialContainer: {
+    backgroundColor: '#eef1ff',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+   initialText: {
+    color: '#788fed',
+    fontSize: 20,
+    fontWeight: 'bold',
   },
 
 

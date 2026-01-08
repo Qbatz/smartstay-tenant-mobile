@@ -293,6 +293,8 @@ function Dashboard(props) {
 
   const sendclick = () => {
 
+    if(!sendComment?.trim()) return;
+
     const data = {
       message: sendComment,
       hostelId: context.getHostelDetail.hostelId
@@ -676,9 +678,9 @@ function Dashboard(props) {
                       blurOnSubmit={false}
                       style={{ flex: 1 }} />
                     {
-                      sendComment && <TouchableOpacity onPress={sendclick} style={{ paddingRight: 10 }}>
+                      sendComment?.trim().length>0 && (<TouchableOpacity onPress={sendclick} style={{ paddingRight: 10 }}>
                         <Image source={SendButton} style={{ width: 34, height: 34 }} />
-                      </TouchableOpacity>
+                      </TouchableOpacity>)
                     }
 
                   </View>
@@ -857,7 +859,7 @@ function Dashboard(props) {
                               style={{ flex: 1 }} />
                             <TouchableOpacity onPress={sendComment ? sendclick : commentclick}>
                               <Image
-                                source={sendComment ? SendButton : CommentMesg}
+                                source={sendComment?.trim().length>0  ? SendButton : CommentMesg}
                                 style={{ width: 23, height: 23, marginRight: 15, }} />
                             </TouchableOpacity>
                           </View>
@@ -865,7 +867,7 @@ function Dashboard(props) {
 
                         {/* STATUS BUTTON */}
 
-                        {complaintContext.getComplaintDetail?.status === "PENDING" &&
+                        {["OPENED", "PENDING"].includes(complaintContext.getComplaintDetail?.status) &&
                           <TouchableOpacity>
                             <View
                               style={{
@@ -1410,7 +1412,7 @@ function Dashboard(props) {
                     Paid Date
                   </Text>
                   <Text style={style.paiddetailValue}>
-                    10/12/2015
+                   {paymentContext?.getInvoiceDetail?.lastPaidDate}
                   </Text>
                 </View>
 

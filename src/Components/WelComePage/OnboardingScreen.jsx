@@ -12,6 +12,7 @@ import Swiper from "react-native-swiper";
 
 import onboardImg from "../../assets/Images/image 6345209.png";
 import Logo from "../../assets/Images/Logo.png";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const { width, height } = Dimensions.get("window");
 
@@ -21,64 +22,66 @@ export default function OnboardingScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      {/* SCROLLABLE CONTENT */}
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* LOGO */}
-        <View style={styles.logoContainer}>
-          <Image source={Logo} style={styles.logo} />
-          <Text style={styles.logoText}>Smartstay</Text>
+    <SafeAreaView style={{flex:1}} edges={['top','bottom']}>
+      <View style={styles.container}>
+        {/* SCROLLABLE CONTENT */}
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* LOGO */}
+          <View style={styles.logoContainer}>
+            <Image source={Logo} style={styles.logo} />
+            <Text style={styles.logoText}>Smartstay</Text>
+          </View>
+
+          <View style={styles.tag}>
+            <Text style={styles.tagText}>TENANT APP</Text>
+          </View>
+
+          {/* SWIPER */}
+          <View style={styles.swiperContainer}>
+            <Swiper
+              loop
+              showsPagination
+              activeDot={<View style={styles.activeDot} />}
+              dot={<View style={styles.dot} />}
+              paginationStyle={{ bottom: height * 0.1 }}
+            >
+              {/* SLIDE 1 */}
+              <View style={styles.card}>
+                <Image source={onboardImg} style={styles.image} />
+                <Text style={styles.title}>Manage Your Stay</Text>
+                <Text style={styles.title}>Smartly</Text>
+
+                <Text style={styles.desc}>
+                  Access your room info, stay duration, and announcements anytime
+                  with just a tap. Stay updated and connected with your property.
+                </Text>
+              </View>
+
+              {/* SLIDE 2 */}
+              <View style={styles.card}>
+                <Image source={onboardImg} style={styles.image} />
+                <Text style={styles.title}>Quick Access</Text>
+                <Text style={styles.title}>To Everything</Text>
+
+                <Text style={styles.desc}>
+                  Stay aware of payments, services, and hostel updates easily.
+                </Text>
+              </View>
+            </Swiper>
+          </View>
+        </ScrollView>
+
+        {/* FIXED BOTTOM BUTTON */}
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.button} onPress={goNext}>
+            <Text style={styles.buttonText}>Get Started →</Text>
+          </TouchableOpacity>
         </View>
-
-        <View style={styles.tag}>
-          <Text style={styles.tagText}>TENANT APP</Text>
-        </View>
-
-        {/* SWIPER */}
-        <View style={styles.swiperContainer}>
-          <Swiper
-            loop
-            showsPagination
-            activeDot={<View style={styles.activeDot} />}
-            dot={<View style={styles.dot} />}
-            paginationStyle={{ bottom: height*0.1 }}
-          >
-            {/* SLIDE 1 */}
-            <View style={styles.card}>
-              <Image source={onboardImg} style={styles.image} />
-              <Text style={styles.title}>Manage Your Stay</Text>
-              <Text style={styles.title}>Smartly</Text>
-
-              <Text style={styles.desc}>
-                Access your room info, stay duration, and announcements anytime
-                with just a tap. Stay updated and connected with your property.
-              </Text>
-            </View>
-
-            {/* SLIDE 2 */}
-            <View style={styles.card}>
-              <Image source={onboardImg} style={styles.image} />
-              <Text style={styles.title}>Quick Access</Text>
-              <Text style={styles.title}>To Everything</Text>
-
-              <Text style={styles.desc}>
-                Stay aware of payments, services, and hostel updates easily.
-              </Text>
-            </View>
-          </Swiper>
-        </View>
-      </ScrollView>
-
-      {/* FIXED BOTTOM BUTTON */}
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={goNext}>
-          <Text style={styles.buttonText}>Get Started →</Text>
-        </TouchableOpacity>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -133,7 +136,7 @@ const styles = StyleSheet.create({
   swiperContainer: {
     flex: 1,
     width: width,
-    height:height*0.3,
+    height: height * 0.3,
     justifyContent: "center",
     alignItems: "center",
     marginTop: width * 0.2,

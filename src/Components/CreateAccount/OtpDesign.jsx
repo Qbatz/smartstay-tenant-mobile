@@ -111,7 +111,7 @@ const OtpDesign = ({ route }) => {
       <Image source={require("../../assets/Images/Sm_logo.png")} />
       <Text style={styles.title}>Otp Validation</Text>
       <Text style={styles.subtitle}>
-        Enter the 4 digit otp sent on +91 {phone} to proceed
+        Enter the 6 digit otp sent on +91 {phone} to proceed
       </Text>
 
       <View style={styles.otpContainer}>

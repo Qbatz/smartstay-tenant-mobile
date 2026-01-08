@@ -123,7 +123,17 @@ const EditComplaintSheet = ({
 
         const formData = new FormData();
 
-        const jsonBase64 = btoa(JSON.stringify(payloads));
+        const base64EncodeUnicode = (str) => {
+            return btoa(
+                encodeURIComponent(str).replace(
+                    /%([0-9A-F]{2})/g,  
+                    (_, p1) => String.fromCharCode('0x' + p1)
+                )
+            );
+        };
+
+
+        const jsonBase64 = base64EncodeUnicode(JSON.stringify(payloads));
 
         formData.append("payloads", {
             uri: "data:application/json;base64," + jsonBase64,
