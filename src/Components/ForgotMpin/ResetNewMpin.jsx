@@ -9,6 +9,7 @@ import { postMPin } from "../../Action/LoginAction";
 import { storeData } from "../../Utils/Storage";
 import { ACCESS_TOKEN, LOGGEDIN } from "../../Utils/Constant";
 import AppLoader from "../ToastFile/LoaderPage";
+import ErrorMessage from "../ToastFile/ErrorMessage";
 
 
 
@@ -26,6 +27,7 @@ const ResetNewMpin = (props) => {
     const [showModelMessage, setShowModelMessage] = useState()
     const [modelType, setModelType] = useState();
     const [loading, setLoading] = useState(false)
+      const [enterPinError, setEnterPinError] = useState()
 
     console.log(context.getUserId)
 
@@ -42,6 +44,7 @@ const ResetNewMpin = (props) => {
         if (newPin.every((digit) => digit !== "")) {
             const pinNumber = newPin.join("");
             setmPinNumber(pinNumber)
+            setEnterPinError("")
             console.log(pinNumber)
         }
     }
@@ -52,7 +55,22 @@ const ResetNewMpin = (props) => {
         }
     };
 
+       const validateForm=()=>{
+        let valid=true;
+
+        setEnterPinError("")
+
+        const isValid = createMpin.every(digit => digit !== "");
+
+        if (!isValid) {
+            setEnterPinError("Please enter a valid 4-digit MPIN");
+            return false;
+        }
+        return valid;        
+    }
+
     const savePinClick = () => {
+        if(!validateForm()) return;
 
         if (mPinNumber) {
             const data = {
@@ -134,6 +152,7 @@ const ResetNewMpin = (props) => {
                     />
                 ))}
             </View>
+            {enterPinError && <ErrorMessage message={enterPinError} type="error"/>}
 
         </View>
 
@@ -152,9 +171,9 @@ const style = StyleSheet.create({
     logo: { width: 151, height: 28.22, marginTop: 70, },
     createText: { fontSize: 27, fontWeight: 600, color: '#222222', marginTop: 20 },
     subtitle: { fontSize: 14, fontWeight: 400, color: '#4B4B4B', marginTop: 15 },
-    pinContainer: { flexDirection: 'row', justifyContent: 'space-between', paddingTop: 20, paddingLeft: 20, paddingRight: 80 },
+    pinContainer: { flexDirection: 'row', justifyContent: 'space-between', paddingTop: 20, paddingLeft: 10, paddingRight: 10,marginBottom:5 },
     pinBox: {
-        width: 50, heiht: 50, borderWidth: 1, borderColor: "#ccc", borderRadius: 8, textAlign: "center",
+        width: 60, heiht: 60, borderWidth: 1, borderColor: "#ccc", borderRadius: 8, textAlign: "center",
         fontSize: 20, color: "#000"
     },
     nextButton: { backgroundColor: '#00A32E', borderRadius: 8, paddingVertical: 20, alignItems: 'center', marginTop: 250 },

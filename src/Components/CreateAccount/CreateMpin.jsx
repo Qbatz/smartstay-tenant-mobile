@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity,Dimensions } from "react-native";
 import Sm_logo from '../../assets/Images/Sm_logo.png'
 import { useNavigation } from "@react-navigation/native";
+import ErrorMessage from "../ToastFile/ErrorMessage";
 
 const { width } = Dimensions.get("window");
 
@@ -13,6 +14,7 @@ const CreateMpin = (props) => {
     const [mPinNo,setmPinNo]=useState(null);
     const inputs = useRef([])
     const isFilled = createMpin.every((n) => n !== "");
+    const [enterPinError, setEnterPinError] = useState()
 
     console.log(createMpin)
 
@@ -28,6 +30,7 @@ const CreateMpin = (props) => {
         if(newPin.every((digit)=>digit !== "")){
             const pinNumber=newPin.join("");
             setmPinNo(pinNumber)
+            setEnterPinError("")
             console.log(pinNumber)
         }
     }
@@ -38,7 +41,23 @@ const CreateMpin = (props) => {
         }
     };
 
+    const validateForm=()=>{
+        let valid=true;
+
+        setEnterPinError("")
+
+        const isValid = createMpin.every(digit => digit !== "");
+
+        if (!isValid) {
+            setEnterPinError("Please enter a valid 4-digit MPIN");
+            return false;
+        }
+        return valid;        
+    }
+
     const nextClick=()=>{
+        if(!validateForm()) return;
+
         navigation.navigate('ConfirmMPin',{mPinNumber:mPinNo})
     }
 
@@ -64,13 +83,14 @@ const CreateMpin = (props) => {
                 />
             ))}
         </View>
+        {enterPinError && <ErrorMessage message={enterPinError} type="error"/>}
 
         </View>
 
        
 
         <TouchableOpacity onPress={nextClick} style={[style.nextButton, !isFilled && style.disabledButton]}
-        disabled={!isFilled}>
+        >
             <Text style={style.nextText}>Next</Text>
         </TouchableOpacity>
 
@@ -83,9 +103,9 @@ const style = StyleSheet.create({
     logo: { width: 151, height: 28.22, marginTop: 70, },
     createText: { fontSize: 27, fontWeight: 600, color: '#222222', marginTop: 20 },
     subtitle: { fontSize: 14, fontWeight: 400, color: '#4B4B4B', marginTop: 15 },
-    pinContainer: { flexDirection: 'row',justifyContent:'space-between',paddingTop:20,paddingLeft:20,paddingRight:80 },
+    pinContainer: { flexDirection: 'row',justifyContent:'space-between',paddingTop:20,paddingLeft:10,paddingRight:10,marginBottom:5 },
     pinBox: {
-        width: 50, heiht: 50, borderWidth: 1, borderColor: "#ccc", borderRadius: 8, textAlign: "center",
+        width: 60, height: 60, borderWidth: 1, borderColor: "#ccc", borderRadius: 8, textAlign: "center",
         fontSize: 20, color: "#000"
     },
     nextButton:{backgroundColor: "#1A73E8",

@@ -63,11 +63,22 @@ export default function OnboardingScreen({ navigation }) {
               {/* SLIDE 2 */}
               <View style={styles.card}>
                 <Image source={onboardImg} style={styles.image} />
-                <Text style={styles.title}>Quick Access</Text>
-                <Text style={styles.title}>To Everything</Text>
+                <Text style={styles.title}>Raise Services &</Text>
+                <Text style={styles.title}>Track Easily</Text>
 
                 <Text style={styles.desc}>
-                  Stay aware of payments, services, and hostel updates easily.
+                  Report maintanence issue or request amenities effortlessly. Track your service status in real time - no waiting, no confusion
+                </Text>
+              </View>
+
+              {/* {--slide 3--} */}
+               <View style={styles.card}>
+                <Image source={onboardImg} style={styles.image} />
+                <Text style={styles.title}>View & Pay Bills</Text>
+                <Text style={styles.title}>Seamlessly</Text>
+
+                <Text style={styles.desc}>
+                  Check your rent, electricity and other bills in one screen. Future ready for instant online payments and payment history tracking
                 </Text>
               </View>
             </Swiper>

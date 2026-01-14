@@ -12,6 +12,7 @@ import { postComplaint } from "../../../Action/CustomerAction";
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import CameraPic from '../../../assets/Images/cameraPic.png'
 import { SafeAreaView } from "react-native-safe-area-context";
+import ErrorMessage from "../../ToastFile/ErrorMessage";
 
 
 const AddComplaint = ({
@@ -36,6 +37,8 @@ const AddComplaint = ({
     const [selectedValue, setSelectedValue] = useState(null);
     const [isFocus, setIsFocus] = useState(false);
     const [complaintType, setComplaintTypes] = useState([])
+    const [compliantTypeError, setComplaintTypeError]=useState();
+    const [commentError, setCommentError]=useState()
 
     useEffect(() => {
         if (visible) {
@@ -53,6 +56,8 @@ const AddComplaint = ({
             setDespriction(null)
             setImageuri([])
             setmediaImage([])
+            setComplaintTypeError('')
+            setCommentError("")
         }
     }, [visible])
 
@@ -64,17 +69,53 @@ const AddComplaint = ({
                 mediaTypes: 'photo',
                 allowsEditing: true,
                 aspect: [1, 1],
-                quality: 1,
+                quality: 0.6,
+                selectionLimit: 0,
             });
-            setmediaImage([...mediaimage, result.assets[0].uri])
-            setImageuri([...imageuri, result.assets[0]])
+             if (!result.canceled) {
+            setmediaImage(result.assets.map(item => item.uri));
+            setImageuri(result.assets);
+        }
+            // setmediaImage([...mediaimage, result.assets[0].uri])
+            // setImageuri([...imageuri, result.assets[0]])
         } catch (error) {
             console.log(error)
 
         }
     }
 
+    console.log(imageuri)
+
+    const validateForm=()=>{
+        let valid =true;
+
+        setComplaintTypeError("")
+        setCommentError("")
+
+          if(selectedComplaintTypeId ===0){
+                setComplaintTypeError("Select Complaint Type");
+                valid = false;
+        }
+
+         const desc = complaintDescription?.trim() ?? "";
+
+        if (!desc) {
+          setCommentError("Enter comment && above 15 letters");
+          valid =false;
+        }
+
+        if (desc.length < 15) {
+              setCommentError("Enter comment && above 15 letters");
+              valid =false;     
+        }
+
+        return valid;
+    }
+
     const submitClick = () => {
+
+        if(!validateForm()) return;
+        
         const payloads = {
             complaintTypeId: selectedComplaintTypeId,
             description: complaintDescription,
@@ -117,7 +158,7 @@ const AddComplaint = ({
             // console.log(complaitImages)
 
 
-            formData.append("complaintImage", imageuri)
+            // formData.append("complaintImage", imageuri)
 
             imageuri.forEach((img, index) => {
                 formData.append("complaintImage", {
@@ -128,31 +169,33 @@ const AddComplaint = ({
 
             })
         }
-        if (selectedComplaintTypeId === 0) {
-            setShowSuccessModal(true);
-            setToastMessage('Select complaint type');
-            setModelType('error');
-            setTimeout(() => setShowSuccessModal(false), 2000);
-            return;
-        }
 
-        const desc = complaintDescription?.trim() ?? "";
+      
+        // if (selectedComplaintTypeId === 0) {
+        //     setShowSuccessModal(true);
+        //     setToastMessage('Select complaint type');
+        //     setModelType('error');
+        //     setTimeout(() => setShowSuccessModal(false), 2000);
+        //     return;
+        // }
 
-        if (!desc) {
-            setShowSuccessModal(true);
-            setToastMessage("Comment cannot be empty");
-            setModelType('error');
-            setTimeout(() => setShowSuccessModal(false), 2000);
-            return;
-        }
+        // const desc = complaintDescription?.trim() ?? "";
 
-        if (desc.length < 15) {
-            setShowSuccessModal(true);
-            setToastMessage("Comment should be above 15 letters");
-            setModelType('error');
-            setTimeout(() => setShowSuccessModal(false), 2000);
-            return;
-        }
+        // if (!desc) {
+        //     setShowSuccessModal(true);
+        //     setToastMessage("Comment cannot be empty");
+        //     setModelType('error');
+        //     setTimeout(() => setShowSuccessModal(false), 2000);
+        //     return;
+        // }
+
+        // if (desc.length < 15) {
+        //     setShowSuccessModal(true);
+        //     setToastMessage("Comment should be above 15 letters");
+        //     setModelType('error');
+        //     setTimeout(() => setShowSuccessModal(false), 2000);
+        //     return;
+        // }
 
         postComplaint(context.getHostelDetail.hostelId, loginContext.getToken, formData).then(r => {
             setLoading(true);
@@ -247,6 +290,10 @@ const AddComplaint = ({
                                         onChange={item => {
                                             setSelectedComplaintTypeId(item.complaintTypeId)
                                             setSelectedValue(item.value)
+
+                                            if(compliantTypeError){
+                                                setComplaintTypeError("")
+                                            }
                                         }}
                                         renderRightIcon={() => (
                                             <Ionicons name={isFocus ? "chevron-up" : "chevron-down"}
@@ -256,18 +303,26 @@ const AddComplaint = ({
                                             />
                                         )} />
                                 </View>
+                                {compliantTypeError && <ErrorMessage message={compliantTypeError} type="error"/>}
 
                                 <View style={{ paddingTop: 16 }}>
                                     <Text style={{ fontSize: 14, fontWeight: 400 }}>Complaint message
                                         <Text style={{ color: 'red' }}> *</Text>
                                     </Text>
                                     <View style={{ borderWidth: 1, borderRadius: 10, marginTop: 8, paddingTop: 7, paddingLeft: 10, borderColor: '#e5e5e5', height: 80 }}>
-                                        <TextInput value={complaintDescription} placeholder="Enter message" onChangeText={(value) => setDespriction(value)}
+                                        <TextInput value={complaintDescription} placeholder="Enter message" 
+                                        onChangeText={(value) => {setDespriction(value);
+                                            if(value.trim().length >=15){
+                                                setCommentError("")
+                                            }
+                                        }}
                                             multiline
                                             textAlignVertical="top"
                                             style={{ flex: 1, padding: 0 }} />
                                     </View>
                                 </View>
+
+                                 {commentError && <ErrorMessage message={commentError} type="error"/>}
 
                                 <View style={{ paddingTop: 16 }}>
                                     <Text>Add Proof</Text>

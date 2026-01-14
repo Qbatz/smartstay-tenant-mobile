@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useContext } from "react";
 import { View, Text, StyleSheet, Image } from "react-native";
-
+import { notificationContexts } from "../../Context/NotificationContext";
 const NotificationItem = ({ item }) => {
   const iconMap = {
     alert: require("../../assets/Images/money-check.png"),
@@ -11,10 +11,20 @@ const NotificationItem = ({ item }) => {
     resolved: require("../../assets/Images/money-check.png"),
   };
 
+  const notificatioContext=useContext(notificationContexts)
+
   return (
     <View style={styles.card}>
       <View style={styles.iconContainer}>
-        <Image source={iconMap[item.notificationType]} style={styles.iconImage} />
+        {/* <Image source={iconMap[item.notificationType]} style={styles.iconImage} /> */}
+        {notificatioContext?.getNotificationList?.hostelLogoUrl != null ?
+        <Image source={{uri:notificatioContext?.getNotificationList?.hostelLogoUrl}} style={styles.hostelImage} /> 
+        :
+        <View style={[styles.hostelImage, styles.initialContainer]}>
+                        <Text style={styles.initialText}>
+                          {notificatioContext?.getNotificationList?.hostelInitials}
+                        </Text>
+                      </View> }
       </View>
 
       <View style={styles.contentContainer}>
@@ -73,5 +83,22 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 5,
     alignSelf: "flex-end",
+  },
+   hostelImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 10,
+  },
+  initialText: {
+    color: '#788fed',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+
+  initialContainer: {
+    backgroundColor: '#eef1ff',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

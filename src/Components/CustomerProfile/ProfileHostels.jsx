@@ -156,7 +156,7 @@ const ProfileHostels = () => {
             source={DateIcon}
             resizeMode="contain" style={{ width: 20, height: 20 }}
           />
-          <Text style={styles.detailValue}>{selectedHostel?.rentalDetails?.joiningDate}</Text>
+          <Text style={styles.detailValue}>{selectedHostel?.rentalDetails?.joiningDate !=null ? selectedHostel?.rentalDetails?.joiningDate : "N/A"}</Text>
         </View>
       </View>
 
@@ -186,13 +186,13 @@ const ProfileHostels = () => {
 
       <View style={styles.detailRow}>
 
-        <Text style={styles.detailLabel}>Due Date</Text>
+        <Text style={styles.detailLabel}>Billing Date</Text>
         <View style={{ display: 'flex', flexDirection: 'row' }}>
           <Image
             source={DateIcon}
             resizeMode="contain" style={{ width: 20, height: 20 }}
           />
-          <Text style={styles.detailValue}>{selectedHostel?.rentalDetails?.dueDate}</Text>
+          <Text style={styles.detailValue}>{selectedHostel?.currentStatus !="INACTIVE" ? selectedHostel?.rentalDetails?.dueDate : "N/A"}</Text>
         </View>
       </View>
     </View>

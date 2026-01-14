@@ -10,6 +10,7 @@ import {
 import { verifyPhoneNo } from "../../Action/LoginAction";
 import SuccessModal from "../ToastFile/TostFilePage";
 import { LoginContexts } from "../../Context/LoginContext";
+import ErrorMessage from "../ToastFile/ErrorMessage";
 
 const CreateAccount = ({ navigation }) => {
 
@@ -19,17 +20,34 @@ const CreateAccount = ({ navigation }) => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [otp, setOtp] = useState();
   const [modelTpe, setModelType] = useState()
+  const [phoneNoError, setPhoneNoError]=useState()
 
 
   const handlePhoneChange = (text) => {
     const numericText = text.replace(/[^0-9]/g, '');
     setPhoneNumber(numericText);
+    setPhoneNoError("")
     setIsButtonDisabled(numericText.length < 10);
 
   };
 
+  const validateForm=()=>{
+    let valid= true
+
+    setPhoneNoError("")
+
+    if(phoneNumber.length != 10){
+       setPhoneNoError("Please enter valid mobile Number")
+       valid =false;
+    }
+
+    return valid;
+  }
+
 
   const handleGetOtp = async () => {
+    if(!validateForm()) return;
+
     if (phoneNumber.length === 10) {
 
       const dat = await verifyPhoneNo(phoneNumber)
@@ -109,6 +127,7 @@ const CreateAccount = ({ navigation }) => {
             maxLength={10}
           />
         </View>
+        {phoneNoError && <ErrorMessage message={phoneNoError} type="error"/>}
       </View>
 
       <View style={styles.centerButtonContainer}>
@@ -164,7 +183,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 10,
     alignItems: "center",
-    marginBottom: 25,
+    marginBottom: 5,
   },
   countryCode: {
     fontWeight: "600",

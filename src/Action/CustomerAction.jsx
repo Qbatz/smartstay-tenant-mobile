@@ -41,7 +41,7 @@ export const postComplaint=async(hostelId,token,formData)=>{
             headers: {
                 Authorization: 'Bearer ' + token,
                  "Content-Type": "multipart/form-data",
-            }
+            },
         })
         console.log(response)
         return response;

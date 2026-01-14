@@ -10,6 +10,7 @@ import { putComplaint } from "../../../Action/CustomerAction";
 import { UsersContext } from "../../../Context/UserContext";
 import { LoginContexts } from "../../../Context/LoginContext";
 import { compliantContexts } from "../../../Context/ComplaintContext";
+import ErrorMessage from "../../ToastFile/ErrorMessage";
 
 
 const EditComplaintSheet = ({
@@ -38,7 +39,9 @@ const EditComplaintSheet = ({
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [toastMessage, setToastMessage] = useState()
     const [modelType, setModelType] = useState()
-
+     const [compliantTypeError, setComplaintTypeError]=useState();
+    const [commentError, setCommentError]=useState()
+    const [commentNoChanges,setCommentNoChanges]=useState()
 
     console.log(selectedComplaintTypeId)
     console.log(selectedComplaint)
@@ -65,38 +68,74 @@ const EditComplaintSheet = ({
             setImageuri([...imageuri, result.assets[0]])
         } catch (error) {
             console.log(error)
-
         }
     }
 
     console.log(imageuri)
-    const submitBtn = () => {
 
-         if (selectedComplaintTypeId === 0) {
-            setShowSuccessModal(true);
-            setToastMessage('Select complaint type');
-            setModelType('error');
-            setTimeout(() => setShowSuccessModal(false), 2000);
-            return;
+    const validateForm=()=>{
+        let valid=true;
+
+          setComplaintTypeError("")
+            setCommentError("")
+            setCommentNoChanges("")
+
+        if(selectedComplaintTypeId === 0){
+            setComplaintTypeError("Select complaint type");
+            valid =false;
         }
+
 
         const desc = description?.trim() ?? "";
 
         if (!desc) {
-            setShowSuccessModal(true);
-            setToastMessage("Comment cannot be empty");
-            setModelType('error');
-            setTimeout(() => setShowSuccessModal(false), 2000);
-            return;
+            setCommentError("Enter comment && above 15 letters")
+            valid =false;
         }
 
         if (desc.length < 15) {
-            setShowSuccessModal(true);
-            setToastMessage("Comment should be above 15 letters");
-            setModelType('error');
-            setTimeout(() => setShowSuccessModal(false), 2000);
-            return;
+             setCommentError("Enter comment && above 15 letters")
+             valid =false;
         }
+
+        // const noChanges = selectedComplaint.complaintTypeId === selectedComplaintTypeId &&
+        //     selectedComplaint.description === description && mediaimage.length ===(selectedComplaint?.images?.length || 0)
+
+        // if (noChanges) {
+        //    setCommentNoChanges("No changes made in comment")
+        //    valid =false;
+        // }
+
+        return valid;
+    }
+    const submitBtn = () => {
+        if(!validateForm()) return;
+
+        //  if (selectedComplaintTypeId === 0) {
+        //     setShowSuccessModal(true);
+        //     setToastMessage('Select complaint type');
+        //     setModelType('error');
+        //     setTimeout(() => setShowSuccessModal(false), 2000);
+        //     return;
+        // }
+
+        // const desc = description?.trim() ?? "";
+
+        // if (!desc) {
+        //     setShowSuccessModal(true);
+        //     setToastMessage("Comment cannot be empty");
+        //     setModelType('error');
+        //     setTimeout(() => setShowSuccessModal(false), 2000);
+        //     return;
+        // }
+
+        // if (desc.length < 15) {
+        //     setShowSuccessModal(true);
+        //     setToastMessage("Comment should be above 15 letters");
+        //     setModelType('error');
+        //     setTimeout(() => setShowSuccessModal(false), 2000);
+        //     return;
+        // }
 
         const noChanges = selectedComplaint.complaintTypeId === selectedComplaintTypeId &&
             selectedComplaint.description === description && mediaimage.length ===(selectedComplaint?.images?.length || 0)
@@ -213,6 +252,10 @@ const EditComplaintSheet = ({
             setImageuri([])
             setMediaimage(selectedComplaint?.images || []);
             setIsFocus(false);
+
+            setComplaintTypeError("")
+            setCommentError("")
+            setCommentNoChanges("")
         }
     }, [visible]);
 
@@ -265,7 +308,11 @@ const EditComplaintSheet = ({
                                         labelField="complaintTypeName"
                                         valueField="complaintTypeId"
                                         value={selectedComplaintTypeId}
-                                        onChange={(item) => setSelectedComplaintTypeId(item.complaintTypeId)}
+                                        onChange={(item) => {setSelectedComplaintTypeId(item.complaintTypeId)
+                                            if(compliantTypeError){
+                                                setComplaintTypeError("")
+                                            }
+                                        }}
                                         renderRightIcon={() => (
                                             <Ionicons
                                                 name={isFocus ? "chevron-up" : "chevron-down"}
@@ -276,17 +323,25 @@ const EditComplaintSheet = ({
                                         )}
                                     />
                                 </View>
+                                {compliantTypeError && <ErrorMessage message={compliantTypeError} type="error"/>}
 
                                 <View style={{ paddingTop: 16 }}>
                                     <Text>Complaint message
                                         <Text style={{ color: 'red' }}> *</Text>
                                     </Text>
                                     <View style={styles.textInputBox}>
-                                        <TextInput value={description} placeholder="Enter message" onChangeText={setDespriction}
+                                        <TextInput value={description} placeholder="Enter message" onChangeText={(value)=>{setDespriction(value)
+                                            if(commentError){
+                                                setCommentError("")     
+                                            }
+                                            if(commentNoChanges){setCommentNoChanges("")}
+                                        }}
                                             multiline={true}
                                             numberOfLines={4}
                                             style={{ textAlignVertical: "top" }} />
                                     </View>
+                                     {commentError && <ErrorMessage message={commentError} type="error"/>}
+                                      {commentNoChanges && <ErrorMessage message={commentNoChanges} type="error"/>}
                                 </View>
 
                                 <View style={{ paddingTop: 16 }}>

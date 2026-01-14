@@ -121,11 +121,12 @@ const HostelList = (route) => {
         )}
 
 
-        <View>
-          <Text style={styles.hostelName}>{item.hostelName}</Text>
+        <View style={{flex:1}}>
+          <Text style={styles.hostelName} numberOfLines={1}>
+            {item.hostelName}</Text>
           <View style={styles.locationRow}>
             <Ionicons name="location-outline" size={16} color="#0057FF" />
-            <Text style={styles.locationText}>{item.city}</Text>
+            <Text style={styles.locationText} numberOfLines={1}>{item.city}</Text>
           </View>
         </View>
       </View>
@@ -203,6 +204,7 @@ const styles = StyleSheet.create({
   cardLeft: {
     flexDirection: "row",
     alignItems: "center",
+    flex:1
   },
   hostelImage: {
     width: 50,
