@@ -17,6 +17,7 @@ import { UsersContext } from "../../Context/UserContext";
 import { getNotification } from "../../Action/NotificationAction";
 import { LoginContexts } from "../../Context/LoginContext";
 import { notificationContexts } from "../../Context/NotificationContext";
+import NoResultPic from "../../assets/Images/NoResultPic.png"
 
 const notifications = [
   {
@@ -122,8 +123,9 @@ const Notification = (props) => {
        <Text style={styles.header}>Notifications</Text>
       </View>
 
-      <SwipeListView
-        data={notificationContext.getNotificationList} showsVerticalScrollIndicator={false}
+
+      {notificationContext?.getNotificationList?.notifications?.length>0 ? <SwipeListView
+        data={notificationContext?.getNotificationList?.notifications} showsVerticalScrollIndicator={false}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.listContainer}
@@ -141,7 +143,22 @@ const Notification = (props) => {
   )}
         rightOpenValue={-75}
         disableRightSwipe
-      />
+      /> : <View style={styles.noResult}>
+                  <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                      <Image
+                          source={NoResultPic}
+                          style={{ width: 324, height: 221, resizeMode: 'contain', marginBottom: 20, }}
+                      />
+                      <Text style={{ fontSize: 22, fontWeight: '700', color: '#000', marginBottom: 8, }}>
+                          No Results Found!
+                      </Text>
+                      <Text style={{ fontSize: 15, color: '#555', textAlign: 'center', width: 260, lineHeight: 18, }}>
+                          Try adjusting your search or filters to see more options.
+                      </Text>
+                  </View>
+              </View> }
+
+      
     </SafeAreaView>
   );
 };
@@ -191,4 +208,6 @@ const styles = StyleSheet.create({
     backgroundColor: "red",
     right: 0,
   },
+   noResult: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: 20 }
+
 });

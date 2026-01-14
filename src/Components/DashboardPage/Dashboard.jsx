@@ -49,6 +49,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import ReceiptPic from "../../assets/Images/ReceiptPic.png"
 import AmenitiesBottomSheet from "./BottomSheet/AmenitiesSheet";
 import ReopennComplaint from "./Popup/ReopenComplaint";
+import ErrorMessage from "../ToastFile/ErrorMessage";
 
 const { width, height } = Dimensions.get("window");
 
@@ -102,7 +103,8 @@ function Dashboard(props) {
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [filterBottomsheet, setFilterBottomSheet] = useState(false)
   const [showVisible, setShowVisible] = useState(false);
-  const[reopenComplaint,setReopenComplaint]=useState(false)
+  const [reopenComplaint, setReopenComplaint] = useState(false)
+  const [deletComplaintError, setDeleteComplaintError]=useState()
 
 
 
@@ -293,7 +295,7 @@ function Dashboard(props) {
 
   const sendclick = () => {
 
-    if(!sendComment?.trim()) return;
+    if (!sendComment?.trim()) return;
 
     const data = {
       message: sendComment,
@@ -313,6 +315,8 @@ function Dashboard(props) {
 
     })
   }
+
+  const messageCount = complaintContext?.getComplaintComments?.length || 0;
 
 
   // ------Add complaint
@@ -353,6 +357,7 @@ function Dashboard(props) {
 
     setShowPopUp(false)
     setSelectedReason(null)
+     setDeleteComplaintError("")
   }
 
   const reasons = [
@@ -366,8 +371,21 @@ function Dashboard(props) {
   const cancel = () => {
     setShowPopUp(false)
     setSelectedReason(null)
+    setDeleteComplaintError("")
+  }
+
+  const validateForm=()=>{
+    let valid=true;
+
+    if(!selectedReason){
+      setDeleteComplaintError("Select Reason to delete complaint");
+      valid=false;
+    }
+    return valid;
   }
   const deleteItem = (complaintiId) => {
+
+    if(!validateForm()) return;
 
     deleteComplaint(context.getHostelDetail.hostelId, complaintiId, loginContext.getToken, selectedReason).then(r => {
       console.log(r)
@@ -473,25 +491,25 @@ function Dashboard(props) {
   };
 
   const handleReceiptPdfDownload = (invoiceType) => {
-    if(invoiceType === "Booking"){
+    if (invoiceType === "Booking") {
       navigation.navigate("BookingInvoice");
     }
-    else{
-        navigation.navigate("InvoiceDesign");
+    else {
+      navigation.navigate("InvoiceDesign");
     }
-    
+
   };
 
-  const handlePaymentReceipt = (transcationId,invoiceType) => {
+  const handlePaymentReceipt = (transcationId, invoiceType) => {
 
     console.log(transcationId)
-    if(invoiceType === "Booking"){
-         navigation.navigate('BookingReceipt', { transcationId: transcationId })
+    if (invoiceType === "Booking") {
+      navigation.navigate('BookingReceipt', { transcationId: transcationId })
     }
-    else{
-        navigation.navigate('ReceiptPdfView', { transcationId: transcationId })
+    else {
+      navigation.navigate('ReceiptPdfView', { transcationId: transcationId })
     }
-    
+
   }
 
   const downloadOption = () => {
@@ -653,11 +671,18 @@ function Dashboard(props) {
                             {/* <Image source={Customer} style={{ width: 35, height: 35 }} /> */}
                           </View>
                           <View style={{ paddingLeft: 10, flex: 1 }}>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                              <Text style={{ fontSize: 12, color: '#4B4B4B', fontWeight: 400 }}>{item.userName}</Text>
-                              <Text style={{ fontSize: 10, fontWeight: 400, color: '#6E6E6E' }}>{item.commentDate}</Text>
+                            <View style={{ flexDirection: 'row' }}>
+                              <Text style={{ flex: 1, fontSize: 12,color: '#4B4B4B',
+                                    fontWeight: '400',textAlign: 'left', }}
+                                    numberOfLines={1}>
+                                      {item.userName}
+                                </Text>
+                              <Text style={{flex: 1,fontSize: 10,fontWeight: '400',color: '#6E6E6E',textAlign: 'right', }}
+                               numberOfLines={1}>
+                                {item.commentDate}
+                              </Text>
                             </View>
-                            <Text style={{ fontSize: 14, fontWeight: 400, marginTop: 5 }}>{item.comment}</Text>
+                            <Text style={{ fontSize: 14, fontWeight: 400, marginTop: 5,marginRight:10 }}>{item.comment}</Text>
                           </View>
                         </View>
                       }} />
@@ -678,7 +703,7 @@ function Dashboard(props) {
                       blurOnSubmit={false}
                       style={{ flex: 1 }} />
                     {
-                      sendComment?.trim().length>0 && (<TouchableOpacity onPress={sendclick} style={{ paddingRight: 10 }}>
+                      sendComment?.trim().length > 0 && (<TouchableOpacity onPress={sendclick} style={{ paddingRight: 10 }}>
                         <Image source={SendButton} style={{ width: 34, height: 34 }} />
                       </TouchableOpacity>)
                     }
@@ -695,7 +720,7 @@ function Dashboard(props) {
                     showsVerticalScrollIndicator={false}
                     keyboardShouldPersistTaps="handled"
                   >
-                    <View style={{marginBottom:10}} >
+                    <View style={{ marginBottom: 10 }} >
                       <View >
                         <View style={{ flexDirection: "row", justifyContent: "space-between", paddingLeft: 5, paddingRight: 8, marginBottom: 10, paddingTop: 10, }}>
                           <View>
@@ -807,7 +832,7 @@ function Dashboard(props) {
 
                         </View> : null}
 
-                        {complaintContext.getComplaintDetail?.status == "resolved" ?
+                      {complaintContext.getComplaintDetail?.status == "resolved" ?
                         <View style={{ borderWidth: 1, borderRadius: 10, borderColor: '#DCDCDC', paddingVertical: 10, paddingHorizontal: 15, marginTop: 15 }}>
                           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                             <Text style={{ fontSize: 15, fontWeight: 600 }}>Your complaint was Resolved</Text>
@@ -841,8 +866,10 @@ function Dashboard(props) {
                           </TouchableOpacity>
 
                           <TouchableOpacity onPress={() => navigation.navigate('Updates')}
-                            style={{ justifyContent: 'center', alignItems: 'center',backgroundColor:'#1E45E1',
-                                    padding:10,borderRadius:8 }}>
+                            style={{
+                              justifyContent: 'center', alignItems: 'center', backgroundColor: '#1E45E1',
+                              padding: 10, borderRadius: 8
+                            }}>
                             <Text style={{ color: "#FFFFFF", fontSize: 14, fontWeight: 600 }}>
                               See all updates
                             </Text>
@@ -857,10 +884,16 @@ function Dashboard(props) {
                             <TextInput value={sendComment} placeholder="Add your Comment" onChangeText={setSendComment} multiline
                               blurOnSubmit={false}
                               style={{ flex: 1 }} />
-                            <TouchableOpacity onPress={sendComment ? sendclick : commentclick}>
+                            <TouchableOpacity onPress={sendComment ? sendclick : commentclick} style={{flexDirection:'row',marginRight:14}}>
                               <Image
-                                source={sendComment?.trim().length>0  ? SendButton : CommentMesg}
-                                style={{ width: 23, height: 23, marginRight: 15, }} />
+                                source={sendComment?.trim().length > 0 ? SendButton : CommentMesg}
+                                style={{ width: 23, height: 23,marginRight:3 }} />
+                                {sendComment?.trim().length > 0 ? null : complaintContext?.getComplaintComments?.length > 0 && (
+                                <Text style={{color:'#2E70E8'}}>
+                                  {complaintContext.getComplaintComments.length}
+                                </Text>
+                              )}
+                              
                             </TouchableOpacity>
                           </View>
                         </View>
@@ -907,9 +940,9 @@ function Dashboard(props) {
 
     {/* ------ReopenComplaint----- */}
 
-    <ReopennComplaint 
-    visible={reopenComplaint}
-    onClose={()=>setReopenComplaint(false)}/>
+    <ReopennComplaint
+      visible={reopenComplaint}
+      onClose={() => setReopenComplaint(false)} />
 
     {/* -----Edit complaint-------- */}
 
@@ -937,7 +970,7 @@ function Dashboard(props) {
         visible={showSuccessModal}
         onClose={() => setShowSuccessModal(false)}
         message="Complaint Deleted Successfully!"
-        type="sucess"
+        type="success"
       />
       <View style={{ width: '90%', backgroundColor: '#ffffff', borderWidth: 1, borderRadius: 8, borderColor: '#E5E7EB', paddingBottom: 15 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 18, paddingVertical: 13, }}>
@@ -958,11 +991,15 @@ function Dashboard(props) {
           <Text style={{ flexWrap: 'wrap', width: "80%", color: '#4B4B4B', flexShrink: 1, lineHeight: 24 }}>
             Please let us know the reason before deleting.</Text>
 
+            {deletComplaintError && <ErrorMessage message={deletComplaintError} type="error"/>}
+
           <View style={{ paddingTop: 15 }}>
             {reasons.map((item, index) => (
               <TouchableOpacity
                 key={index}
-                onPress={() => setSelectedReason(item)}
+                onPress={() =>{setSelectedReason(item)
+                  setDeleteComplaintError("")
+                }}
                 style={{
                   flexDirection: "row", alignItems: "center",
                   backgroundColor:
@@ -1009,7 +1046,7 @@ function Dashboard(props) {
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => deleteItem(complaintId)}
-            disabled={selectedReason == null ? true : false} style={{
+            style={{
               backgroundColor: selectedReason != null ? '#1E45E1' : '#788fed',
               borderWidth: 2, borderRadius: 8, paddingVertical: 8, paddingHorizontal: 15, borderColor: '#C3DDFD'
             }}>
@@ -1033,13 +1070,13 @@ function Dashboard(props) {
 
     <AmenitiesBottomSheet
       visible={showAmenities}
-      onClose={()=>setShowAmenities(false)}
+      onClose={() => setShowAmenities(false)}
       tag={tag}
       myAmenitis={myAmenitis}
       available={available}
       panResponder={panResponder}
       sheetY={sheetY}
-      />
+    />
 
     {/* -----Request bed change--------- */}
 
@@ -1080,7 +1117,7 @@ function Dashboard(props) {
                   <View style={{ flexDirection: "row" }}>
                     <Text style={style.invoiceId}>{paymentContext.getInvoiceDetail?.invoiceNumber}</Text>
                     <TouchableOpacity
-                      onPress={()=>handleReceiptPdfDownload(paymentContext.getInvoiceDetail.invoiceType)}
+                      onPress={() => handleReceiptPdfDownload(paymentContext.getInvoiceDetail.invoiceType)}
                     >
                       <Image
                         source={ViewIcon}
@@ -1097,7 +1134,12 @@ function Dashboard(props) {
 
                   <View style={{ alignItems: 'flex-end' }}>
                     <Text style={style.totalAmount}>
-                      ₹{paymentContext.getInvoiceDetail?.totalAmount.toFixed(2)}
+                      ₹{new Intl.NumberFormat('en-IN', {
+                           minimumFractionDigits: 2,
+                           maximumFractionDigits: 2,
+                      }).format(
+                         paymentContext.getInvoiceDetail?.totalAmount
+                      )   }
                     </Text>
 
                     {paymentContext.getInvoiceDetail?.status === "Pending" && (
@@ -1147,7 +1189,7 @@ function Dashboard(props) {
                             <TouchableOpacity >
                               <Text style={style.detailLabel}>{i.invoiceItem}</Text>
                             </TouchableOpacity>
-                            <Text style={style.detailValue}>₹{i.amount}</Text>
+                            <Text style={style.detailValue}>₹{new Intl.NumberFormat('en-IN').format( i.amount)}</Text>
                           </View>
                         )
                       })
@@ -1165,14 +1207,14 @@ function Dashboard(props) {
                   {(paymentContext.getInvoiceDetail?.status === "Partial Payment" ||
                     paymentContext.getInvoiceDetail?.status === "Paid") && (
                       <>
-                        <Text style={[style.detailLabel,{marginTop:10}]}>Paid Amount</Text>
+                        <Text style={[style.detailLabel, { marginTop: 10 }]}>Paid Amount</Text>
                         {paymentContext.getInvoiceDetail?.receipts.map(i => {
                           return (
                             <View key={i.transactionId} style={style.row}>
-                              <TouchableOpacity onPress={() => handlePaymentReceipt(i.transactionId,paymentContext.getInvoiceDetail.invoiceType)}>
+                              <TouchableOpacity onPress={() => handlePaymentReceipt(i.transactionId, paymentContext.getInvoiceDetail.invoiceType)}>
                                 <Text style={{ fontSize: 8, color: "#1e45e2" }}>{i.transactionId}</Text>
                               </TouchableOpacity>
-                              <Text style={style.detailValue}>₹{i.paidAmount}</Text>
+                              <Text style={style.detailValue}>₹{new Intl.NumberFormat('en-IN').format(i.paidAmount)}</Text>
                             </View>
                           )
                         })}
@@ -1187,7 +1229,7 @@ function Dashboard(props) {
                       </View>
                       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                         <Text style={style.payBillText}>Pay Bill</Text>
-                        <Text style={style.detailValue}>₹{paymentContext.getInvoiceDetail?.dueAmount}</Text>
+                        <Text style={style.detailValue}>₹{new Intl.NumberFormat('en-IN').format(paymentContext.getInvoiceDetail?.dueAmount)}</Text>
                       </View>
                     </>
                   )
@@ -1213,6 +1255,18 @@ function Dashboard(props) {
                       : paymentContext.getInvoiceDetail.lastPaidDate}
                   </Text>
                 </View>
+
+                {paymentContext.getInvoiceDetail.status === "Partial Payment" &&
+                  <View style={[style.Billbottom, {paddingTop:7}]}>
+                  <Text style={style.paiddetailLabel}>
+                    Due Date
+                  </Text>
+                  <Text style={style.paiddetailValue}>
+                    {paymentContext.getInvoiceDetail.dueDate}
+                  </Text>
+                </View>
+                }
+
 
                 {/* Notes */}
                 {paymentContext.getInvoiceDetail.status === "Pending" && (
@@ -1317,20 +1371,19 @@ function Dashboard(props) {
                 <View style={style.row}>
                   <Text style={style.modalTitle}>{paymentContext?.getInvoiceDetail?.invoiceType}</Text>
 
-                  <View style={{
+                  <TouchableOpacity 
+                   onPress={() => handleReceiptPdfDownload(paymentContext.getInvoiceDetail.invoiceType)}
+                  style={{
                     flexDirection: "row", backgroundColor: '#F1F4FF', paddingVertical: 3, paddingHorizontal: 5,
                     borderRadius: 5, alignItems: 'center'
                   }}>
                     <Text style={{ fontSize: 13, color: "#0057FF", fontWeight: "600" }}>{paymentContext?.getInvoiceDetail?.invoiceNumber}</Text>
-                    <TouchableOpacity
-
-                    >
+                    
                       <Image
                         source={ViewIcon}
                         style={{ width: 15, height: 15, marginLeft: 5, marginTop: 2 }}
                       />
-                    </TouchableOpacity>
-                  </View>
+                  </TouchableOpacity>
                 </View>
 
                 <View
@@ -1385,7 +1438,7 @@ function Dashboard(props) {
                     return (
                       <View style={style.row}>
                         <Text style={{ fontSize: 14, fontWeight: 300, color: '#2F2F2F' }}>{i.list}</Text>
-                        <Text style={{ fontSize: 14, fontWeight: 300, color: '#2F2F2F' }}>₹ {i.amount}</Text>
+                        <Text style={{ fontSize: 14, fontWeight: 300, color: '#2F2F2F' }}>₹ {new Intl.NumberFormat('en-IN').format(i.amount)}</Text>
                       </View>
                     )
                   })
@@ -1412,7 +1465,7 @@ function Dashboard(props) {
                     Paid Date
                   </Text>
                   <Text style={style.paiddetailValue}>
-                   {paymentContext?.getInvoiceDetail?.lastPaidDate}
+                    {paymentContext?.getInvoiceDetail?.lastPaidDate}
                   </Text>
                 </View>
 
@@ -1480,7 +1533,7 @@ function Dashboard(props) {
           style={[style.bottomSheetoption, { transform: [{ translateY: sheetY }] }]}
           {...panResponder.panHandlers}
         >
-          <SafeAreaView style={{flex:1}} edges={['bottom']}>
+          <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
             <View {...panResponder.panHandlers}>
               <View style={style.dragindictor} />
             </View>

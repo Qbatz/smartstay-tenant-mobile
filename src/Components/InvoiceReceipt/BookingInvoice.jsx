@@ -11,6 +11,7 @@ import { getPaymentInvoiceDetail } from "../../Action/PaymentAction";
 import { paymentContexts } from "../../Context/PaymentContext";
 import { UsersContext } from "../../Context/UserContext";
 import { LoginContexts } from "../../Context/LoginContext";
+import { SafeAreaView } from "react-native-safe-area-context";
 const BookingInvoice = () => {
 
   const navigation = useNavigation();
@@ -43,28 +44,36 @@ const BookingInvoice = () => {
   const addressLine = selectedInvoiceDetail?.customerInfo?.fullAddress?.split(',');
 
   return (
-    <ScrollView style={styles.container}>
+    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+      <ScrollView style={styles.container}>
 
-      <View style={styles.header}>
-        <View>
-          <Image
-            source={RoomSerach}
-            style={styles.logo}
-          />
+        <View style={styles.header}>
+          <View style={{ flex: 1, justifyContent: 'flex-start' }}>
+            {selectedInvoiceDetail?.configurations?.hostelLogo ? (
+              <Image
+                source={{ uri: selectedInvoiceDetail?.configurations?.hostelLogo }}
+                style={styles.hostelImage} />
+            ) : (
+              <View style={[styles.hostelImage, styles.initialContainer]}>
+                <Text style={styles.initialText}>
+                  {selectedInvoiceDetail?.stayInfo?.initials}
+                </Text>
+              </View>
+            )}
+          </View>
+          <View style={styles.invoiceMonth}>
+            <Text style={styles.headerText}>{selectedInvoiceDetail?.stayInfo?.hostelName}</Text>
+            <Text style={styles.headerSub}>{selectedInvoiceDetail?.configurations?.address}</Text>
+          </View>
         </View>
-        <View style={styles.invoiceMonth}>
-          <Text style={styles.headerText}>roomsearch.in</Text>
-          <Text style={styles.headerSub}>{selectedInvoiceDetail?.configurations?.address}</Text>
+
+
+        <View style={styles.receiptTitleContainer}>
+          <Text style={[styles.receiptTitle, { color: selectedInvoiceDetail?.configurations?.templateColor }]}>Booking Invoice</Text>
         </View>
-      </View>
 
 
-      <View style={styles.receiptTitleContainer}>
-        <Text style={[styles.receiptTitle, { color: selectedInvoiceDetail?.configurations?.templateColor }]}>Booking Invoice</Text>
-      </View>
-
-
-      {/* <View style={styles.invoiceInfo}>
+        {/* <View style={styles.invoiceInfo}>
         <View style={styles.billToSection}>
          <View>
              <Text style={styles.sectionTitle}>Bill to:</Text>
@@ -94,163 +103,169 @@ const BookingInvoice = () => {
           <Text style={styles.invSty}>Rental Period: Mar 02 - Apr 01</Text>
         </View>
       </View> */}
-
-      <View style={{ flexDirection: 'row', padding: 20 }}>
-        <View style={{ flex: 1 }}>
+        <View style={{ paddingHorizontal: 20 }}>
           <Text style={[styles.sectionTitle, { color: selectedInvoiceDetail?.configurations?.templateColor }]}>Bill to:</Text>
-
-          <View style={styles.row}>
-            <Text style={styles.label}>Name</Text>
-            <Text style={styles.colon}>:</Text>
-            <View style={styles.valueContainer}>
-              <Text style={styles.value}>
-                {selectedInvoiceDetail?.customerInfo?.fullName}
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.row}>
-            <Text style={styles.label}>Phone</Text>
-            <Text style={styles.colon}>:</Text>
-            <View style={styles.valueContainer}>
-              <Text style={styles.value}>
-                +{selectedInvoiceDetail?.customerInfo?.countryCode}{" "}
-                {selectedInvoiceDetail?.customerInfo?.customerMobileNo}
-              </Text>
-            </View>
-          </View>
-
         </View>
 
-        <View style={{ flex: 1, alignItems: 'flex-end' }}>
-          <View style={styles.invStyle}>
 
-            <Text style={styles.invSty}>
-              Invoice : {' '}
-              <Text style={styles.bold}>{selectedInvoiceDetail?.invoiceNumber}</Text>
-            </Text>
+        <View style={{ flexDirection: 'row', paddingHorizontal: 20 }}>
+          <View style={{ flex: 1, paddingTop: 5 }}>
+            {/* <Text style={[styles.sectionTitle, { color: selectedInvoiceDetail?.configurations?.templateColor }]}>Bill to:</Text> */}
 
-            <Text style={styles.invSty}>
-              Date : {' '}
-              <Text style={styles.bold}>{selectedInvoiceDetail?.invoiceDate}</Text>
-            </Text>
-
-          
-          </View>
-        </View>
-
-      </View>
-
-       
-
-
-
-    
-
-
-      {/* QR + Account Details */}
-      <View style={styles.accountSection}>
-        <View style={styles.accountLeft}>
-          <Text style={[styles.accountTitle, { color: selectedInvoiceDetail?.configurations?.templateColor }]}>
-            ACCOUNT DETAILS</Text>
-          <Text style={styles.accountText}>Account No:
-            <Text style={styles.bold}>{selectedInvoiceDetail?.accountDetails?.accountNo != null ? selectedInvoiceDetail?.accountDetails?.accountNo : "N/A"}</Text></Text>
-          <Text style={styles.accountText}>IFSC Code: <Text style={styles.bold}>
-            {selectedInvoiceDetail?.accountDetails?.ifscCode != null ? selectedInvoiceDetail?.accountDetails?.ifscCode : "N/A"}</Text></Text>
-          <Text style={styles.accountText}>Bank Name: <Text style={styles.bold}>
-            {selectedInvoiceDetail?.accountDetails?.bankName != null ? selectedInvoiceDetail?.accountDetails?.bankName : "N/A"}</Text></Text>
-          <Text style={styles.accountText}>UPI ID: <Text style={styles.bold}>
-            {selectedInvoiceDetail?.accountDetails?.upiId != null ? selectedInvoiceDetail?.accountDetails?.upiId : "N/A"}</Text></Text>
-        </View>
-
-        <View style={styles.accountRight}>
-          <Image
-            source={{ uri: selectedInvoiceDetail?.accountDetails?.qrCode }}
-            style={styles.qr}
-          />
-          <Text style={styles.qrText}>Scan QR for payment</Text>
-          <View style={styles.paymentLogos}>
-            <Image
-              source={gpay}
-              style={styles.payIcon}
-            />
-            <Image
-              source={paytm}
-              style={styles.payIcon}
-            />
-            <Image
-              source={phonepe}
-              style={styles.payIcon}
-            />
-          </View>
-        </View>
-      </View>
-
-
-      {/* Terms and Conditions & Signature in same line */}
-      <View style={styles.termsAndSignatureRow}>
-        <View style={styles.termsSection}>
-          <Text style={[styles.termsTitle, { color: selectedInvoiceDetail?.configurations?.templateColor }]}>
-            Terms and Conditions</Text>
-          <Text style={styles.termsText}>
-            Booking confirms your stay. Advanvce is non-refundable. Room is allotted based on availablity. Provide correct details. Follow property guildlines always.
-          </Text>
-        </View>
-
-        <View style={styles.signatureSection}>
-          <Image
-            source={{ uri: selectedInvoiceDetail?.configurations?.signatureUrl }}
-            style={styles.signature}
-          />
-          <Text style={styles.authText} numberOfLines={1}>Authorized Signature</Text>
-        </View>
-      </View>
-
-
-      <View style={styles.paymentSummarySection}>
-        <Text style={[styles.paymentSummaryTitle, { color: selectedInvoiceDetail?.configurations?.templateColor }]}>
-          Payment Summary</Text>
-        <View style={styles.table}>
-
-          <View style={styles.tableHeader}>
-            <Text style={[styles.tableHeaderText, styles.colInvNo]}>INV NO</Text>
-            <Text style={[styles.tableHeaderText, styles.colDesc]}>DESCRIPTION</Text>
-            <Text style={[styles.tableHeaderText, styles.colAmount]}>AMOUNT / INR</Text>
-          </View>
-
-
-          {selectedInvoiceDetail?.invoiceInfo?.invoiceItems.map(i => {
-            return (
-              <View style={styles.tableRow}>
-                <Text style={[styles.tableCell, styles.colInvNo]}>{i.invoiceNo}</Text>
-                <Text style={[styles.tableCell, styles.colDesc]}>{i.description}</Text>
-                <Text style={[styles.tableCell, styles.colAmount]}>₹ {i.amount}</Text>
+            <View style={styles.row}>
+              <Text style={styles.label}>Name</Text>
+              <Text style={styles.colon}>:</Text>
+              <View style={styles.valueContainer}>
+                <Text style={styles.value}>
+                  {selectedInvoiceDetail?.customerInfo?.fullName}
+                </Text>
               </View>
-            )
-          })}
-          {/* <Text style={[styles.tableCell, styles.colInvNo]}>INV-007</Text>
+            </View>
+
+            <View style={styles.row}>
+              <Text style={styles.label}>Phone</Text>
+              <Text style={styles.colon}>:</Text>
+              <View style={styles.valueContainer}>
+                <Text style={styles.value}>
+                  +{selectedInvoiceDetail?.customerInfo?.countryCode}{" "}
+                  {selectedInvoiceDetail?.customerInfo?.customerMobileNo}
+                </Text>
+              </View>
+            </View>
+
+          </View>
+
+          <View style={{ flex: 1, alignItems: 'flex-end' }}>
+            <View style={styles.invStyle}>
+
+              <Text style={styles.invSty}>
+                Invoice : {' '}
+                <Text style={styles.bold}>{selectedInvoiceDetail?.invoiceNumber}</Text>
+              </Text>
+
+              <Text style={styles.invSty}>
+                Date : {' '}
+                <Text style={styles.bold}>{selectedInvoiceDetail?.invoiceDate}</Text>
+              </Text>
+
+
+            </View>
+          </View>
+
+        </View>
+
+
+
+
+
+
+
+
+        {/* QR + Account Details */}
+        <View style={styles.accountSection}>
+          <View style={styles.accountLeft}>
+            <Text style={[styles.accountTitle, { color: selectedInvoiceDetail?.configurations?.templateColor }]}>
+              ACCOUNT DETAILS</Text>
+            <Text style={styles.accountText}>Account No:
+              <Text style={styles.bold}>{selectedInvoiceDetail?.accountDetails?.accountNo != null ? selectedInvoiceDetail?.accountDetails?.accountNo : "N/A"}</Text></Text>
+            <Text style={styles.accountText}>IFSC Code: <Text style={styles.bold}>
+              {selectedInvoiceDetail?.accountDetails?.ifscCode != null ? selectedInvoiceDetail?.accountDetails?.ifscCode : "N/A"}</Text></Text>
+            <Text style={styles.accountText}>Bank Name: <Text style={styles.bold}>
+              {selectedInvoiceDetail?.accountDetails?.bankName != null ? selectedInvoiceDetail?.accountDetails?.bankName : "N/A"}</Text></Text>
+            <Text style={styles.accountText}>UPI ID: <Text style={styles.bold}>
+              {selectedInvoiceDetail?.accountDetails?.upiId != null ? selectedInvoiceDetail?.accountDetails?.upiId : "N/A"}</Text></Text>
+          </View>
+
+          <View style={styles.accountRight}>
+            <Image
+              source={{ uri: selectedInvoiceDetail?.accountDetails?.qrCode }}
+              style={styles.qr}
+            />
+            <Text style={styles.qrText}>Scan QR for payment</Text>
+            <View style={styles.paymentLogos}>
+              <Image
+                source={gpay}
+                style={styles.payIcon}
+              />
+              <Image
+                source={paytm}
+                style={styles.payIcon}
+              />
+              <Image
+                source={phonepe}
+                style={styles.payIcon}
+              />
+            </View>
+          </View>
+        </View>
+
+
+        {/* Terms and Conditions & Signature in same line */}
+        <View style={styles.termsAndSignatureRow}>
+          <View style={styles.termsSection}>
+            <Text style={[styles.termsTitle, { color: selectedInvoiceDetail?.configurations?.templateColor }]}>
+              Terms and Conditions</Text>
+            <Text style={styles.termsText}>
+              Booking confirms your stay. Advanvce is non-refundable. Room is allotted based on availablity. Provide correct details. Follow property guildlines always.
+            </Text>
+          </View>
+
+          <View style={styles.signatureSection}>
+            <Image
+              source={{ uri: selectedInvoiceDetail?.configurations?.signatureUrl }}
+              style={styles.signature}
+            />
+            <Text style={styles.authText} numberOfLines={1}>Authorized Signature</Text>
+          </View>
+        </View>
+
+
+        <View style={styles.paymentSummarySection}>
+          <Text style={[styles.paymentSummaryTitle, { color: selectedInvoiceDetail?.configurations?.templateColor }]}>
+            Payment Summary</Text>
+          <View style={styles.table}>
+
+            <View style={styles.tableHeader}>
+              <Text style={[styles.tableHeaderText, styles.colInvNo]}>INV NO</Text>
+              <Text style={[styles.tableHeaderText, styles.colDesc]}>DESCRIPTION</Text>
+              <Text style={[styles.tableHeaderText, styles.colAmount]}>AMOUNT / INR</Text>
+            </View>
+
+
+            {selectedInvoiceDetail?.invoiceInfo?.invoiceItems.map(i => {
+              return (
+                <View style={styles.tableRow}>
+                  <Text style={[styles.tableCell, styles.colInvNo]}>{i.invoiceNo}</Text>
+                  <Text style={[styles.tableCell, styles.colDesc]}>{i.description}</Text>
+                  <Text style={[styles.tableCell, styles.colAmount]}>₹ {new Intl.NumberFormat('en-IN').format(i.amount)}</Text>
+                </View>
+              )
+            })}
+            {/* <Text style={[styles.tableCell, styles.colInvNo]}>INV-007</Text>
             <Text style={[styles.tableCell, styles.colDesc]}>Rent</Text>
             <Text style={[styles.tableCell, styles.colAmount]}>₹ 8,334</Text> */}
 
 
-          <View style={styles.tableRow}>
-            <Text style={[styles.tableCell, styles.colInvNo]}></Text>
-            <Text style={[styles.tableCell, styles.colDesc, styles.totalText]}>Total</Text>
-            <Text style={[styles.tableCell, styles.colAmount, styles.totalText]}>₹ {selectedInvoiceDetail?.invoiceInfo?.totalAmount}</Text>
+            <View style={styles.tableRow}>
+              <Text style={[styles.tableCell, styles.colInvNo]}></Text>
+              <Text style={[styles.tableCell, styles.colDesc, styles.totalText]}>Total</Text>
+              <Text style={[styles.tableCell, styles.colAmount, styles.totalText]}>
+                ₹ {new Intl.NumberFormat('en-IN').format(selectedInvoiceDetail?.invoiceInfo?.totalAmount)}</Text>
+            </View>
+          </View>
+
+
+          <View style={styles.grandTotal}>
+            <Text style={styles.grandTotalLabel}>Grand Total</Text>
+            <Text style={styles.grandTotalAmount}>
+              ₹ {new Intl.NumberFormat('en-IN').format(selectedInvoiceDetail?.invoiceInfo?.totalAmount)}</Text>
           </View>
         </View>
 
 
-        <View style={styles.grandTotal}>
-          <Text style={styles.grandTotalLabel}>Grand Total</Text>
-          <Text style={styles.grandTotalAmount}>₹ {selectedInvoiceDetail?.invoiceInfo?.totalAmount}</Text>
-        </View>
-      </View>
 
 
-
-
-      {/* <View style={styles.paymentSummarySection}>
+        {/* <View style={styles.paymentSummarySection}>
         <Text style={styles.paymentSummaryTitle}>Payment Summary</Text>
         <View style={styles.table}>
       
@@ -283,12 +298,22 @@ const BookingInvoice = () => {
 
 
 
-      {/* Footer */}
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>email : contact@roomsearch.in</Text>
-        <Text style={styles.footerText}>Contact : +91 88994 56311</Text>
-      </View>
-    </ScrollView>
+        {/* Footer */}
+
+        <View style={styles.footerContainer}>
+          <Text style={styles.footerLeft}>
+            email : <Text style={styles.highlight}>{selectedInvoiceDetail?.emailId ? selectedInvoiceDetail?.emailId : "N/A "}</Text>
+          </Text>
+          <Text style={styles.footerRight}>
+            Contact : <Text style={styles.highlight}>+91 {selectedInvoiceDetail?.mobile ? selectedInvoiceDetail?.mobile : "N/A "}</Text>
+          </Text>
+        </View>
+        {/* <View style={styles.footer}>
+          <Text style={styles.footerText}>email : {selectedInvoiceDetail?.emailId ? selectedInvoiceDetail?.emailId : "N/A "}</Text>
+          <Text style={styles.footerText}>Contact : +91 {selectedInvoiceDetail?.mobile ? selectedInvoiceDetail?.mobile : "N/A "}</Text>
+        </View> */}
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
@@ -300,10 +325,9 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    padding: 20,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
+    // justifyContent: "space-between",
+    alignItems: "center",
+    padding: 15
   },
   logo: {
     width: 80,
@@ -311,16 +335,10 @@ const styles = StyleSheet.create({
     resizeMode: "contain"
   },
   headerText: {
-    color: "#000000",
-    fontSize: 16,
-    fontWeight: "700"
+    fontSize: 14, fontWeight: "bold", color: "#2B2B2B", flexWrap: "wrap",
   },
   headerSub: {
-    color: "#000000",
-    fontSize: 11,
-    marginTop: 4,
-    textAlign: 'right',
-    flexShrink: 1
+    fontSize: 12, color: "#4B4B4B", flexWrap: "wrap"
   },
   label: {
     fontSize: 12,
@@ -335,23 +353,23 @@ const styles = StyleSheet.create({
   },
   valueContainer: {
     flex: 1,
-    marginTop: 2
+
   },
   colon: {
-    marginHorizontal: 3,
+    marginHorizontal: 5,
     fontSize: 12,
     fontWeight: 600
   },
 
   value: {
     flex: 1,
-    fontSize: 10,
+    fontSize: 12,
     flexShrink: 1,
     fontWeight: 600
   },
   invoiceMonth: {
-    alignItems: "flex-end",
-    justifyContent: "center",
+    justifyContent: "flex-end",
+    flex: 1
   },
   receiptTitleContainer: {
     alignItems: "center",
@@ -371,14 +389,7 @@ const styles = StyleSheet.create({
   //     borderBottomWidth: 1,
   //     borderColor: "#eee",
   //   },
-  invoiceInfo: {
-    flexDirection: "row",
-    justifyContent: "space-between", // Important for end line alignment
-    padding: 20,
-    paddingTop: 10,
-    borderBottomWidth: 1,
-    borderColor: "#eee",
-  },
+
   billToSection: {
     flex: 1,
     flexDirection: "row"
@@ -387,11 +398,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "flex-end",
   },
-  //   invStyle:{marginTop:20,marginLeft:5},
   invStyle: {
-    alignItems: "flex-end", // This aligns content to right end
-    marginLeft: 20, // Add some space between left and right sections
-    minWidth: 150, // Ensure it has enough width
+    alignItems: "flex-end",
+    marginLeft: 20,
+
   },
   //   invSty:{
   // fontSize:12,
@@ -400,8 +410,7 @@ const styles = StyleSheet.create({
   invSty: {
     fontSize: 12,
     marginBottom: 2,
-    //   textAlign: "right", // Right align text within each line
-    //   width: '100%', // Ensure full width for right alignment
+
   },
   bold: {
     fontWeight: "600",
@@ -409,7 +418,6 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontWeight: "700",
-    marginBottom: 6,
     fontSize: 13,
   },
   name: {
@@ -609,7 +617,47 @@ const styles = StyleSheet.create({
   },
   footerText: {
     color: "#fff",
-    fontSize: 12
+    fontSize: 12,
+    flex: 1
+  },
+  hostelImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 10,
+  },
+  initialContainer: {
+    backgroundColor: '#eef1ff',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  initialText: {
+    color: '#788fed',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  footerContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    borderTopWidth: 1,
+    borderColor: "#ccc",
+    marginTop: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+      backgroundColor: "#001F60",
+  },
+  footerLeft: {
+    fontSize: 11,
+    color: "#ffffff",
+    flex:1
+  },
+  footerRight: {
+    fontSize: 11,
+    color: "#ffffff",
+  },
+  highlight: {
+    fontWeight: "600",
+    color: "#ffffff",
   },
 });
 

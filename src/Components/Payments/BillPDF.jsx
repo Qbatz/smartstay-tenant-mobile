@@ -42,32 +42,29 @@ const InvoiceDesign = () => {
 
   const addressLine = selectedInvoiceDetail?.customerInfo?.fullAddress?.split(',');
 
-  const hostelAddress=selectedInvoiceDetail?.configurations?.address?.split(',')
+  const hostelAddress = selectedInvoiceDetail?.configurations?.address?.split(',')
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} >
 
       <View style={styles.header}>
-        <View>
-           {selectedInvoiceDetail?.configurations?.hostelLogo ? (
-                        <Image
-                          source={{ uri: selectedInvoiceDetail?.configurations?.hostelLogo }}
-                          style={styles.hostelImage} />
-                      ) : (
-                        <View style={[styles.hostelImage, styles.initialContainer]}>
-                          <Text style={styles.initialText}>
-                            {selectedInvoiceDetail?.stayInfo?.initials}
-                          </Text>
-                        </View>
-                      )}
+        <View style={{ flex: 1 }}>
+          {selectedInvoiceDetail?.configurations?.hostelLogo ? (
+            <Image
+              source={{ uri: selectedInvoiceDetail?.configurations?.hostelLogo }}
+              style={styles.hostelImage} />
+          ) : (
+            <View style={[styles.hostelImage, styles.initialContainer]}>
+              <Text style={styles.initialText}>
+                {selectedInvoiceDetail?.stayInfo?.initials}
+              </Text>
+            </View>
+          )}
         </View>
-        <View style={styles.invoiceMonth}>
+
+        <View style={{ flex: 1 }}>
           <Text style={styles.headerText}>{selectedInvoiceDetail?.stayInfo?.hostelName}</Text>
-           {hostelAddress?.map((line, index) => (
-                <Text key={index} style={styles.info}>
-                  {line.split()}
-                </Text>
-              ))}
+          <Text style={styles.headerSub}>{selectedInvoiceDetail?.configurations?.address}</Text>
         </View>
       </View>
 
@@ -77,9 +74,12 @@ const InvoiceDesign = () => {
           {selectedInvoiceDetail?.configurations?.invoiceType === "Rent" ? "Rental Invoice" : "Security Deposit Invoice"}</Text>
       </View>
 
+
+
+
       <View style={{ flexDirection: 'row', padding: 20 }}>
         <View style={{ flex: 1 }}>
-           <Text style={[styles.sectionTitle,{ color: selectedInvoiceDetail?.configurations?.templateColor }]}>Bill to:</Text>
+          <Text style={[styles.sectionTitle, { color: selectedInvoiceDetail?.configurations?.templateColor }]}>Bill to:</Text>
 
           <View style={styles.row}>
             <Text style={styles.label}>Name</Text>
@@ -118,17 +118,22 @@ const InvoiceDesign = () => {
             <Text style={styles.label}>Address</Text>
             <Text style={styles.colon}>:</Text>
             <View style={styles.valueContainer}>
-              {addressLine?.map((line, index) => (
-                <Text key={index} style={styles.info}>
-                  {line.split()}
-                </Text>
-              ))}
+              {selectedInvoiceDetail?.customerInfo?.fullAddress &&
+                addressLine?.length > 0 ? (
+                addressLine.map((line, index) => (
+                  <Text key={index} style={styles.info}>
+                    {line}
+                    {index < addressLine.length - 1 ? ',' : ''}
+                  </Text>
+                ))
+              ) : (
+                <Text style={styles.value}>N/A</Text>
+              )}
             </View>
           </View>
-
-
-
         </View>
+
+
         <View style={{ flex: 1, alignItems: 'flex-end' }}>
           <View style={styles.invStyle}>
 
@@ -138,8 +143,13 @@ const InvoiceDesign = () => {
             </Text>
 
             <Text style={styles.invSty}>
-              Date : {' '}
+              Invoice Date : {' '}
               <Text style={styles.bold}>{selectedInvoiceDetail?.invoiceDate}</Text>
+            </Text>
+
+            <Text style={styles.invSty}>
+              Due Date : {' '}
+              <Text style={styles.bold}>{selectedInvoiceDetail?.dueDate}</Text>
             </Text>
 
             <Text style={styles.invSty}>
@@ -152,10 +162,14 @@ const InvoiceDesign = () => {
               <Text style={styles.bold}>11:56:24 AM</Text>
             </Text>
 
-            <Text style={styles.invSty}>
-              Rental Period: {' '}
-              <Text style={styles.bold}>{selectedInvoiceDetail?.invoiceInfo?.invoicePeriod}</Text>
-            </Text>
+            {selectedInvoiceDetail?.configurations?.invoiceType === "Advance" ? null :
+              <Text style={styles.invSty}>
+                Rental Period: {' '}
+                <Text style={styles.bold}>{selectedInvoiceDetail?.invoiceInfo?.invoicePeriod}</Text>
+              </Text>
+            }
+
+
           </View>
         </View>
 
@@ -216,7 +230,7 @@ const InvoiceDesign = () => {
               ))}
             </View>
             {/* <Text style={styles.info}>: 8th Main Rd,{"\n"}   Sameeshwar Nagar,{"\n"}   Bengaluru, Karnataka 560071</Text> */}
-          {/* </View>
+      {/* </View>
         </View>
 
         <View style={styles.invStyle}>
@@ -266,7 +280,7 @@ const InvoiceDesign = () => {
               <View style={styles.tableRow}>
                 <Text style={[styles.tableCell, styles.colInvNo]}>{i.invoiceNo}</Text>
                 <Text style={[styles.tableCell, styles.colDesc]}>{i.description}</Text>
-                <Text style={[styles.tableCell, styles.colAmount]}>₹ {i.amount}</Text>
+                <Text style={[styles.tableCell, styles.colAmount]}>₹ {new Intl.NumberFormat('en-IN').format(i.amount)}</Text>
               </View>
             )
           })}
@@ -278,14 +292,32 @@ const InvoiceDesign = () => {
           <View style={styles.tableRow}>
             <Text style={[styles.tableCell, styles.colInvNo]}></Text>
             <Text style={[styles.tableCell, styles.colDesc, styles.totalText]}>Total</Text>
-            <Text style={[styles.tableCell, styles.colAmount, styles.totalText]}>₹ {selectedInvoiceDetail?.invoiceInfo?.totalAmount}</Text>
+            <Text style={[styles.tableCell, styles.colAmount, styles.totalText]}>
+              ₹ {new Intl.NumberFormat('en-IN').format(selectedInvoiceDetail?.invoiceInfo?.totalAmount)}</Text>
           </View>
         </View>
 
 
         <View style={styles.grandTotal}>
-          <Text style={styles.grandTotalLabel}>Grand Total</Text>
-          <Text style={styles.grandTotalAmount}>₹ {selectedInvoiceDetail?.invoiceInfo?.totalAmount}</Text>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <Text style={styles.grandTotalLabel}>Grand Total</Text>
+            <Text style={styles.grandTotalAmount}>
+              ₹ {new Intl.NumberFormat('en-IN').format(selectedInvoiceDetail?.invoiceInfo?.totalAmount)}</Text>
+          </View>
+
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 5 }}>
+            <Text style={styles.grandTotalLabel}>Payment Made</Text>
+            <Text style={styles.grandTotalAmount}>
+              ₹ {new Intl.NumberFormat('en-IN').format(selectedInvoiceDetail?.invoiceInfo?.paidAmount)}</Text>
+          </View>
+
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 5 }}>
+            <Text style={styles.grandTotalLabel}>Balance Amount</Text>
+            <Text style={styles.grandTotalAmount}>
+              ₹ {selectedInvoiceDetail?.invoiceInfo?.balanceAmount ?
+                new Intl.NumberFormat('en-IN').format(selectedInvoiceDetail?.invoiceInfo?.balanceAmount) : "0"}</Text>
+          </View>
+
         </View>
       </View>
 
@@ -379,10 +411,18 @@ const InvoiceDesign = () => {
       </View>
 
       {/* Footer */}
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>email : contact@roomsearch.in</Text>
-        <Text style={styles.footerText}>Contact : +91 88994 56311</Text>
+      <View style={styles.footerContainer}>
+        <Text style={styles.footerLeft}>
+          email : <Text style={styles.highlight}>{selectedInvoiceDetail?.emailId ? selectedInvoiceDetail?.emailId : "N/A "}</Text>
+        </Text>
+        <Text style={styles.footerRight}>
+          Contact : <Text style={styles.highlight}>+91 {selectedInvoiceDetail?.mobile ? selectedInvoiceDetail?.mobile : "N/A "}</Text>
+        </Text>
       </View>
+      {/* <View style={styles.footer}>
+        <Text style={styles.footerText}>email : {selectedInvoiceDetail?.emailId ? selectedInvoiceDetail?.emailId : "N/A "}</Text>
+        <Text style={styles.footerText}>Contact : +91 {selectedInvoiceDetail?.mobile ? selectedInvoiceDetail?.mobile : "N/A "}1</Text>
+      </View> */}
     </ScrollView>
   );
 };
@@ -410,13 +450,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "700"
   },
-  headerSub: {
-    color: "#000000",
-    fontSize: 11,
-    marginTop: 4,
-    textAlign: 'right',
-    flexShrink: 1
-  },
+  // headerSub: {
+  //   color: "#000000",
+  //   fontSize: 11,
+  //   marginTop: 4,
+  //   textAlign: 'right',
+  //   flexShrink: 1
+  // },
   // label: {
   //   fontSize: 12,
   //   fontFamily: "Gilroy",
@@ -427,6 +467,9 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
     justifyContent: "center",
     flex: 1
+  },
+  headerSub: {
+    fontSize: 12, color: "#4B4B4B", flexWrap: "wrap", width: 150
   },
   receiptTitleContainer: {
     alignItems: "center",
@@ -464,12 +507,11 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
   },
   invStyle: {
-    alignItems: "flex-end", 
-    marginLeft: 20, 
-    minWidth: 150,
-    flex: 1, 
+    alignItems: "flex-end",
+    marginLeft: 20,
+    flex: 1,
   },
-  
+
   invSty: {
     fontSize: 12,
     marginBottom: 2,
@@ -653,9 +695,9 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
   grandTotal: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    // flexDirection: "row",
+    // justifyContent: "space-between",
+    // alignItems: "center",
     paddingVertical: 12,
     paddingHorizontal: 10,
     backgroundColor: "#f8f9fa",
@@ -689,30 +731,30 @@ const styles = StyleSheet.create({
   // -----------
   valueContainer: {
     flex: 1,
-    marginTop:2
+    marginTop: 2
   },
 
   row: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     marginBottom: 4,
-    justifyContent:'center'
+    justifyContent: 'center'
   },
 
   label: {
     fontSize: 12,
-  
+
   },
 
   colon: {
-    marginHorizontal: 3,
+    marginHorizontal: 5,
     fontSize: 12,
     fontWeight: 600
   },
 
   value: {
     flex: 1,
-    fontSize: 10,
+    fontSize: 11,
     flexShrink: 1,
     fontWeight: 600
   },
@@ -727,10 +769,33 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-   initialText: {
+  initialText: {
     color: '#788fed',
     fontSize: 20,
     fontWeight: 'bold',
+  },
+  footerContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    borderTopWidth: 1,
+    borderColor: "#ccc",
+    marginTop: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    backgroundColor: "#001F60",
+  },
+  footerLeft: {
+    fontSize: 11,
+    color: "#ffffff",
+    flex: 1
+  },
+  footerRight: {
+    fontSize: 11,
+    color: "#ffffff",
+  },
+  highlight: {
+    fontWeight: "600",
+    color: "#ffffff",
   },
 
 });

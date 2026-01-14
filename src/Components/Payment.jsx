@@ -1,4 +1,4 @@
-import React, { useState,useRef,useEffect, useContext, useCallback} from "react";
+import React, { useState, useRef, useEffect, useContext, useCallback } from "react";
 import {
   View,
   Text,
@@ -8,8 +8,8 @@ import {
   TouchableOpacity,
   Modal,
   Pressable,
-  TouchableWithoutFeedback,  Linking, Alert, Animated,
-    PanResponder,
+  TouchableWithoutFeedback, Linking, Alert, Animated,
+  PanResponder,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import SideArrow from "../assets/Images/arrow-up.png";
@@ -28,74 +28,75 @@ import { UsersContext } from "../Context/UserContext";
 import { LoginContexts } from "../Context/LoginContext";
 import { paymentContexts } from "../Context/PaymentContext";
 import FilterPayments from "./DashboardPage/BottomSheet/filterPayments";
+import NoResultPic from "../assets/Images/NoResultPic.png"
 
 
 
 const Payment = (props) => {
   console.log(props)
-     const sheetY = useRef(new Animated.Value(700)).current;
-     const navigation = useNavigation();
+  const sheetY = useRef(new Animated.Value(700)).current;
+  const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState(null);
-  const context=useContext(UsersContext)
-  const loginContext=useContext(LoginContexts)
-  const paymentContext=useContext(paymentContexts)
- 
+  const context = useContext(UsersContext)
+  const loginContext = useContext(LoginContexts)
+  const paymentContext = useContext(paymentContexts)
 
 
 
 
-  const fetchPaymentData=()=>{
-        getPaymentList(context.getHostelDetail.hostelId,loginContext.getToken).then(r=>{
-        console.log(r)
-        paymentContext.updateInvoiceList(r.data)
-      })
+
+  const fetchPaymentData = () => {
+    getPaymentList(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
+      console.log(r)
+      paymentContext.updateInvoiceList(r.data)
+    })
   }
 
-  useEffect(()=>{
-       fetchPaymentData();
-  },[])
+  useEffect(() => {
+    fetchPaymentData();
+  }, [])
 
 
 
 
   const staticReceiptData = {
-  configurations: {
-    hostelLogo: "https://example.com/logo.png",
-    receiptType: "Rent",
-    address: "123, Main Road, Chennai",
-    signatureUrl: "https://example.com/signature.png",
-  },
-  stayInfo: {
-    hostelName: "Smart Stay Hostel",
-    floorName: "2nd Floor",
-    roomName: "Room 202",
-    bedName: "B2",
-  },
-  customerInfo: {
-    fullName: "Pon Allwin",
-    customerMobileNo: "9876543210",
-    countryCode: "91",
-    fullAddress: "No. 45, Anna Nagar, Chennai",
-  },
-  receiptInfo: {
-    paidAmount: 5500,
-    receiptNumber: "RCP-1023",
-    transactionDate: "03/11/2025",
-    transactionTime: "10:45 AM",
-  },
-  accountDetails: { bankName: "Cash" },
-};
+    configurations: {
+      hostelLogo: "https://example.com/logo.png",
+      receiptType: "Rent",
+      address: "123, Main Road, Chennai",
+      signatureUrl: "https://example.com/signature.png",
+    },
+    stayInfo: {
+      hostelName: "Smart Stay Hostel",
+      floorName: "2nd Floor",
+      roomName: "Room 202",
+      bedName: "B2",
+    },
+    customerInfo: {
+      fullName: "Pon Allwin",
+      customerMobileNo: "9876543210",
+      countryCode: "91",
+      fullAddress: "No. 45, Anna Nagar, Chennai",
+    },
+    receiptInfo: {
+      paidAmount: 5500,
+      receiptNumber: "RCP-1023",
+      transactionDate: "03/11/2025",
+      transactionTime: "10:45 AM",
+    },
+    accountDetails: { bankName: "Cash" },
+  };
 
 
   const handleOpenModal = (item) => {
     console.log("item", item);
-    
+
     setSelectedPayment(item);
     setModalVisible(true);
   };
 
-   console.log("item", modalVisible);
+  console.log("item", modalVisible);
 
   const handleCloseModal = () => {
     setModalVisible(false);
@@ -105,56 +106,55 @@ const Payment = (props) => {
 
 
 
+  const handleDownload = async () => {
+    try {
+      const response = await fetch("https://smartstaytestingapi.s3remotica.com/invoice/invoice-list-pdf", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTkzLCJzdWIiOjE5MywidXNlcl90eXBlIjoiYWRtaW4iLCJyb2xlX2lkIjowLCJwbGFuX2NvZGUiOiJvbmVfZGF5IiwicGxhbl9zdGF0dXMiOjEsImlhdCI6MTc2MjQxMDIzOSwiZXhwIjoxNzYyNDEyMDM5fQ.BNCXjNx4B9AH0UV9Yy_dXnnBLzjfDUY7qOJOzuxlS2E`,
+        },
+        body: JSON.stringify({
+          Date: "2025-11-01",
+          User_Id: "NOTI1629",
+          id: 2148,
+        }),
+      });
 
-const handleDownload = async () => {
-  try {
-    const response = await fetch("https://smartstaytestingapi.s3remotica.com/invoice/invoice-list-pdf", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTkzLCJzdWIiOjE5MywidXNlcl90eXBlIjoiYWRtaW4iLCJyb2xlX2lkIjowLCJwbGFuX2NvZGUiOiJvbmVfZGF5IiwicGxhbl9zdGF0dXMiOjEsImlhdCI6MTc2MjQxMDIzOSwiZXhwIjoxNzYyNDEyMDM5fQ.BNCXjNx4B9AH0UV9Yy_dXnnBLzjfDUY7qOJOzuxlS2E`,
-      },
-      body: JSON.stringify({
-        Date: "2025-11-01",
-        User_Id: "NOTI1629",
-        id: 2148,
-      }),
-    });
+      const data = await response.json();
 
-    const data = await response.json();
+      const pdfUrl = data?.pdf_url;
 
-    const pdfUrl = data?.pdf_url;
-
-    if (pdfUrl) {
-      const supported = await Linking.canOpenURL(pdfUrl);
-      if (supported) {
-        await Linking.openURL(pdfUrl);
+      if (pdfUrl) {
+        const supported = await Linking.canOpenURL(pdfUrl);
+        if (supported) {
+          await Linking.openURL(pdfUrl);
+        } else {
+          Alert.alert("Error", "Cannot open this PDF link");
+        }
       } else {
-        Alert.alert("Error", "Cannot open this PDF link");
+        Alert.alert("No PDF found in response");
       }
-    } else {
-      Alert.alert("No PDF found in response");
+    } catch (error) {
+      console.error("PDF open error:", error);
+      Alert.alert("Error", "Failed to open PDF");
     }
-  } catch (error) {
-    console.error("PDF open error:", error);
-    Alert.alert("Error", "Failed to open PDF");
-  }
-};
+  };
 
-const handleReceiptPdfDownload =  () => { 
-  setModalVisible(false);
-   navigation.navigate("ReceiptPdfView");
-};
+  const handleReceiptPdfDownload = () => {
+    setModalVisible(false);
+    navigation.navigate("ReceiptPdfView");
+  };
 
 
 
 
   return (
     <>
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      {paymentContext.getInvoiceList?.invoices?.length > 0 ? <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {paymentContext.getInvoiceList?.invoices?.map((item, index) => (
           <TouchableOpacity key={index} onPress={() => props.onPayment(item)} style={styles.card}>
-            <View style={{flexDirection: "row",}}>
+            <View style={{ flexDirection: "row", }}>
               <View style={styles.iconContainer}>
                 {item?.title === "July EB Bill" ? (
                   <Image
@@ -175,15 +175,15 @@ const handleReceiptPdfDownload =  () => {
                 <View style={{ flex: 1 }}>
                   <Text style={styles.title}>{item.invoiceType}</Text>
 
-                  {item.status === "Pending" ?
-                   <Text style={styles.date}> Due: {item.invoiceDueDate}</Text> :
-                  <Text style={styles.date}> Paid: {item.paymentDate}</Text>
-                 }
+                  {[ "Pending", "Partial Payment"].includes(item.status) ?
+                    <Text style={styles.date}> Due: {item.invoiceDueDate}</Text> :
+                    <Text style={styles.date}> Paid: {item.paymentDate}</Text>
+                  }
                   {/* // <Text style={styles.date}>{item.invoiceDueDate}</Text> */}
                 </View>
 
                 <View style={styles.amountContainer}>
-                   <Text style={styles.amount}>₹{item.amount}</Text>
+                  <Text style={styles.amount}>₹{new Intl.NumberFormat('en-IN').format(item.amount)     }</Text>
                   {/* {item.status === "Pending" ? 
                   <Text style={styles.amount}>₹{item.amount}</Text>
                 :
@@ -199,27 +199,29 @@ const handleReceiptPdfDownload =  () => {
                       },
                     ]}
                   >
-                    <View style={{ flexDirection: "row",alignItems:'center' }}>
+                    <View style={{ flexDirection: "row", alignItems: 'center' }}>
                       <Text
                         style={[styles.statusText, { color: item.statusColor }]}
                       >
                         {item.status}
                       </Text>
-                      {paymentContext?.getInvoiceList?.hostelUrl !=null ?
-                       (<Image
-                        source={{uri:paymentContext.getInvoiceList?.hostelUrl}}
-                        style={{ width: 16, height: 16,borderRadius:8, marginLeft: 6 }}
-                        resizeMode="contain"
-                      />)
-                      : (<View style={{width:18,height:18,borderRadius:9,backgroundColor:'#788fed',marginLeft:5,
-                                      alignItems:'center',justifyContent:'center'}}>
-                                    <Text style={{fontSize:9,fontWeight:600}}>
-                                      {paymentContext.getInvoiceList.initials}
-                                    </Text>
-                                  </View>)
+                      {paymentContext?.getInvoiceList?.hostelUrl != null ?
+                        (<Image
+                          source={{ uri: paymentContext.getInvoiceList?.hostelUrl }}
+                          style={{ width: 16, height: 16, borderRadius: 8, marginLeft: 6 }}
+                          resizeMode="contain"
+                        />)
+                        : (<View style={{
+                          width: 18, height: 18, borderRadius: 9, backgroundColor: '#788fed', marginLeft: 5,
+                          alignItems: 'center', justifyContent: 'center'
+                        }}>
+                          <Text style={{ fontSize: 9, fontWeight: 600 }}>
+                            {paymentContext.getInvoiceList.initials}
+                          </Text>
+                        </View>)
                       }
-                       
-                      
+
+
 
                     </View>
                   </View>
@@ -228,227 +230,246 @@ const handleReceiptPdfDownload =  () => {
             </View>
           </TouchableOpacity>
         ))}
-      </ScrollView>
+      </ScrollView> 
+      :
+        <View style={styles.noResult}>
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+            <Image
+              source={NoResultPic}
+              style={{ width: 324, height: 221, resizeMode: 'contain', marginBottom: 20, }}
+            />
+            <Text style={{ fontSize: 22, fontWeight: '700', color: '#000', marginBottom: 8, }}>
+              No Results Found!
+            </Text>
+            <Text style={{ fontSize: 15, color: '#555', textAlign: 'center', width: 260, lineHeight: 18, }}>
+              Try adjusting your search or filters to see more options.
+            </Text>
+          </View>
+        </View>
+        }
+
 
       {/* ---------- MODAL ---------- */}
-     {modalVisible && (
-  <View style={styles.sheetOverlay}>
+      {modalVisible && (
+        <View style={styles.sheetOverlay}>
 
-    {/* Tap outside to close */}
-    <TouchableWithoutFeedback onPress={onClose}>
-      <View style={StyleSheet.absoluteFill} />
-    </TouchableWithoutFeedback>
+          {/* Tap outside to close */}
+          <TouchableWithoutFeedback onPress={onClose}>
+            <View style={StyleSheet.absoluteFill} />
+          </TouchableWithoutFeedback>
 
-    <Animated.View
-      style={[styles.bottomSheet, { transform: [{ translateY: sheetY }] }]}
-      {...panResponder.panHandlers}
-    >
-      <View style={styles.dragIndicator} />
+          <Animated.View
+            style={[styles.bottomSheet, { transform: [{ translateY: sheetY }] }]}
+            {...panResponder.panHandlers}
+          >
+            <View style={styles.dragIndicator} />
 
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {selectedPayment && (
-          <>
-            <Text style={styles.modalTitle}>{selectedPayment.title}</Text>
-
-            <View style={{ flexDirection: "row" }}>
-              <Text style={styles.invoiceId}>#INV001</Text>
-              <TouchableOpacity
-                onPress={() => handleReceiptPdfDownload(staticReceiptData)}
-              >
-                <Image
-                  source={ViewIcon}
-                  style={{ width: 15, height: 15, marginLeft: 5, marginTop: 2 }}
-                />
-              </TouchableOpacity>
-            </View>
-
-            {/* Amount Section */}
-            <View style={styles.amountSection}>
-              <Text style={styles.label}>Total Amount</Text>
-
-              <View>
-                <Text style={styles.totalAmount}>
-                  ₹{selectedPayment.amount.toFixed(2)}
-                </Text>
-
-                {selectedPayment.status === "Pay Now" && (
-                  <View
-                    style={[
-                      styles.statusBadge,
-                      { backgroundColor: "rgba(254,243,198,1)" },
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.statusText,
-                        { color: "rgba(187,77,0,1)" },
-                      ]}
-                    >
-                      Pending
-                    </Text>
-                  </View>
-                )}
-
-                {(selectedPayment.status === "Partially Paid to" ||
-                  selectedPayment.status === "Paid to") && (
-                  <View style={{ flexDirection: "row", marginTop: 6 }}>
-                    <Image
-                      source={PaidIcon}
-                      style={{ width: 20, height: 20 }}
-                    />
-                    <Text style={{ fontSize: 14, marginLeft: 6 }}>
-                      {selectedPayment.status === "Partially Paid to"
-                        ? "Partially Paid"
-                        : "Full Paid"}
-                    </Text>
-                  </View>
-                )}
-              </View>
-            </View>
-
-            {/* Details */}
-            <View style={styles.detailsSection}>
-              <View style={styles.row}>
-                <Text style={styles.detailLabel}>Actual Rent</Text>
-                <Text style={styles.detailValue}>₹5512.00</Text>
-              </View>
-
-              <View style={styles.row}>
-                <Text style={styles.detailLabel}>Taxes GST 10%</Text>
-                <Text style={styles.detailValue}>₹488.00</Text>
-              </View>
-
-              {selectedPayment.paid === "partial" && (
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {selectedPayment && (
                 <>
-                  <View style={styles.row}>
-                    <Text style={styles.detailLabel}>Paid Amount</Text>
-                    <Text style={styles.detailValue}>₹3500.00</Text>
+                  <Text style={styles.modalTitle}>{selectedPayment.title}</Text>
+
+                  <View style={{ flexDirection: "row" }}>
+                    <Text style={styles.invoiceId}>#INV001</Text>
+                    <TouchableOpacity
+                      onPress={() => handleReceiptPdfDownload(staticReceiptData)}
+                    >
+                      <Image
+                        source={ViewIcon}
+                        style={{ width: 15, height: 15, marginLeft: 5, marginTop: 2 }}
+                      />
+                    </TouchableOpacity>
                   </View>
 
-                  <View style={styles.row}>
-                    <Text style={styles.detailLabel}>Remain</Text>
+                  {/* Amount Section */}
+                  <View style={styles.amountSection}>
+                    <Text style={styles.label}>Total Amount</Text>
+
                     <View>
-                      <Text style={styles.detailValue}>₹2500.00</Text>
-                      <Text style={styles.payBillText}>Pay Bill</Text>
+                      <Text style={styles.totalAmount}>
+                        ₹{selectedPayment.amount.toFixed(2)}
+                      </Text>
+
+                      {selectedPayment.status === "Pay Now" && (
+                        <View
+                          style={[
+                            styles.statusBadge,
+                            { backgroundColor: "rgba(254,243,198,1)" },
+                          ]}
+                        >
+                          <Text
+                            style={[
+                              styles.statusText,
+                              { color: "rgba(187,77,0,1)" },
+                            ]}
+                          >
+                            Pending
+                          </Text>
+                        </View>
+                      )}
+
+                      {(selectedPayment.status === "Partially Paid to" ||
+                        selectedPayment.status === "Paid to") && (
+                          <View style={{ flexDirection: "row", marginTop: 6 }}>
+                            <Image
+                              source={PaidIcon}
+                              style={{ width: 20, height: 20 }}
+                            />
+                            <Text style={{ fontSize: 14, marginLeft: 6 }}>
+                              {selectedPayment.status === "Partially Paid to"
+                                ? "Partially Paid"
+                                : "Full Paid"}
+                            </Text>
+                          </View>
+                        )}
                     </View>
                   </View>
-                </>
-              )}
-            </View>
 
-            <View
-              style={{
-                borderBottomWidth: 0.4,
-                borderBottomColor: "grey",
-                opacity: 0.4,
-                marginVertical: 10,
-              }}
-            />
+                  {/* Details */}
+                  <View style={styles.detailsSection}>
+                    <View style={styles.row}>
+                      <Text style={styles.detailLabel}>Actual Rent</Text>
+                      <Text style={styles.detailValue}>₹5512.00</Text>
+                    </View>
 
-            {/* Paid / Due Date */}
-            <View style={styles.Billbottom}>
-              <Text style={styles.paiddetailLabel}>
-                {selectedPayment.status === "Pay Now" ? "Due Date" : "Paid Date"}
-              </Text>
-              <Text style={styles.paiddetailValue}>25 Sep 2025</Text>
-            </View>
+                    <View style={styles.row}>
+                      <Text style={styles.detailLabel}>Taxes GST 10%</Text>
+                      <Text style={styles.detailValue}>₹488.00</Text>
+                    </View>
 
-            {/* Notes */}
-            {selectedPayment.status === "Pay Now" && (
-              <View style={{ marginTop: 10 }}>
-                <Text style={{ fontSize: 13, color: "rgba(60,60,67,0.6)" }}>
-                  Notes & Instructions
-                </Text>
-                <Text style={styles.noteText}>
-                  Kindly pay on or before the due date
-                </Text>
-                <Text style={styles.noteText}>
-                  Late fee may apply after 3 days of due date
-                </Text>
-                <Text style={styles.noteText}>
-                  For any billing errors, contact hostel admin
-                </Text>
-              </View>
-            )}
+                    {selectedPayment.paid === "partial" && (
+                      <>
+                        <View style={styles.row}>
+                          <Text style={styles.detailLabel}>Paid Amount</Text>
+                          <Text style={styles.detailValue}>₹3500.00</Text>
+                        </View>
 
-            {/* Payment mode section */}
-            {selectedPayment.status !== "Pay Now" && (
-              <View style={{ marginTop: 10 }}>
-                <View style={styles.Billbottom}>
-                  <Text style={styles.paiddetailLabel}>Payment Mode</Text>
-                  <Text style={styles.paiddetailValue}>UPI</Text>
-                </View>
+                        <View style={styles.row}>
+                          <Text style={styles.detailLabel}>Remain</Text>
+                          <View>
+                            <Text style={styles.detailValue}>₹2500.00</Text>
+                            <Text style={styles.payBillText}>Pay Bill</Text>
+                          </View>
+                        </View>
+                      </>
+                    )}
+                  </View>
 
-                <View style={styles.Billbottom}>
-                  <Text style={styles.paiddetailLabel}>Reference number</Text>
-                  <Text style={styles.paiddetailValue}>#RSIN001</Text>
-                </View>
-              </View>
-            )}
+                  <View
+                    style={{
+                      borderBottomWidth: 0.4,
+                      borderBottomColor: "grey",
+                      opacity: 0.4,
+                      marginVertical: 10,
+                    }}
+                  />
 
-            {/* Buttons */}
-            <View style={styles.buttonRow}>
-              {selectedPayment.status === "Pay Now" ? (
-                <>
-                  <TouchableOpacity
-                    style={styles.shareBtn}
-                    onPress={handleDownload}
-                  >
-                    <Text style={{ fontWeight: "600", color: "#071C70" }}>
-                      Download Bill
+                  {/* Paid / Due Date */}
+                  <View style={styles.Billbottom}>
+                    <Text style={styles.paiddetailLabel}>
+                      {selectedPayment.status === "Pay Now" ? "Due Date" : "Paid Date"}
                     </Text>
-                    <Image
-                      source={DownloadBlueIcon}
-                      style={{ width: 17, height: 17, marginLeft: 8 }}
-                    />
-                  </TouchableOpacity>
+                    <Text style={styles.paiddetailValue}>25 Sep 2025</Text>
+                  </View>
 
-                  <TouchableOpacity style={styles.downloadBtn}>
-                    <Text style={styles.downloadText}>Pay Now</Text>
-                    <Image
-                      source={ArrowRightIcon}
-                      style={{ width: 20, height: 20, marginLeft: 8 }}
-                    />
-                  </TouchableOpacity>
-                </>
-              ) : (
-                <>
-                  <TouchableOpacity style={styles.shareBtn}>
-                    <Text style={styles.shareText}>Share</Text>
-                    <Image
-                      source={ShareIcon}
-                      style={{ width: 17, height: 17, marginLeft: 8 }}
-                    />
-                  </TouchableOpacity>
+                  {/* Notes */}
+                  {selectedPayment.status === "Pay Now" && (
+                    <View style={{ marginTop: 10 }}>
+                      <Text style={{ fontSize: 13, color: "rgba(60,60,67,0.6)" }}>
+                        Notes & Instructions
+                      </Text>
+                      <Text style={styles.noteText}>
+                        Kindly pay on or before the due date
+                      </Text>
+                      <Text style={styles.noteText}>
+                        Late fee may apply after 3 days of due date
+                      </Text>
+                      <Text style={styles.noteText}>
+                        For any billing errors, contact hostel admin
+                      </Text>
+                    </View>
+                  )}
 
-                  <TouchableOpacity
-                    style={styles.downloadBtn}
-                    onPress={handleDownload}
-                  >
-                    <Text style={styles.downloadText}>Download</Text>
-                    <Image
-                      source={DownloadIcon}
-                      style={{ width: 20, height: 20, marginLeft: 8 }}
-                    />
-                  </TouchableOpacity>
+                  {/* Payment mode section */}
+                  {selectedPayment.status !== "Pay Now" && (
+                    <View style={{ marginTop: 10 }}>
+                      <View style={styles.Billbottom}>
+                        <Text style={styles.paiddetailLabel}>Payment Mode</Text>
+                        <Text style={styles.paiddetailValue}>UPI</Text>
+                      </View>
+
+                      <View style={styles.Billbottom}>
+                        <Text style={styles.paiddetailLabel}>Reference number</Text>
+                        <Text style={styles.paiddetailValue}>#RSIN001</Text>
+                      </View>
+                    </View>
+                  )}
+
+                  {/* Buttons */}
+                  <View style={styles.buttonRow}>
+                    {selectedPayment.status === "Pay Now" ? (
+                      <>
+                        <TouchableOpacity
+                          style={styles.shareBtn}
+                          onPress={handleDownload}
+                        >
+                          <Text style={{ fontWeight: "600", color: "#071C70" }}>
+                            Download Bill
+                          </Text>
+                          <Image
+                            source={DownloadBlueIcon}
+                            style={{ width: 17, height: 17, marginLeft: 8 }}
+                          />
+                        </TouchableOpacity>
+
+                        <TouchableOpacity style={styles.downloadBtn}>
+                          <Text style={styles.downloadText}>Pay Now</Text>
+                          <Image
+                            source={ArrowRightIcon}
+                            style={{ width: 20, height: 20, marginLeft: 8 }}
+                          />
+                        </TouchableOpacity>
+                      </>
+                    ) : (
+                      <>
+                        <TouchableOpacity style={styles.shareBtn}>
+                          <Text style={styles.shareText}>Share</Text>
+                          <Image
+                            source={ShareIcon}
+                            style={{ width: 17, height: 17, marginLeft: 8 }}
+                          />
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          style={styles.downloadBtn}
+                          onPress={handleDownload}
+                        >
+                          <Text style={styles.downloadText}>Download</Text>
+                          <Image
+                            source={DownloadIcon}
+                            style={{ width: 20, height: 20, marginLeft: 8 }}
+                          />
+                        </TouchableOpacity>
+                      </>
+                    )}
+                  </View>
                 </>
               )}
-            </View>
-          </>
-        )}
-      </ScrollView>
-    </Animated.View>
-  </View>
-)}
+            </ScrollView>
+          </Animated.View>
+        </View>
+      )}
+
+      {paymentContext?.getInvoiceList?.invoices?.length > 0 && <TouchableOpacity onPress={props.onFilterPayment} style={styles.filterFab} >
+        <Image
+          source={FilterIcon}
+          resizeMode="contain"
+          style={styles.filterIcon}
+        />
+      </TouchableOpacity>}
 
 
-      <TouchableOpacity onPress={props.onFilterPayment} style={styles.filterFab} >
- <Image 
- source={FilterIcon} 
- resizeMode="contain" 
- style={styles.filterIcon}
- />
- </TouchableOpacity>
+      
 
     </>
   );
@@ -464,10 +485,10 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   card: {
-    
+
     backgroundColor: "#fff",
     borderRadius: 14,
-    padding: 12  ,
+    padding: 12,
     marginBottom: 12,
     borderWidth: 1,
     borderColor: "#E8E8E8",
@@ -537,7 +558,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  label: { fontSize: 20, color: "rgba(31, 38, 51, 1)" , fontWeight: "600" },
+  label: { fontSize: 20, color: "rgba(31, 38, 51, 1)", fontWeight: "600" },
   totalAmount: { fontSize: 16, fontWeight: "700", color: "#000" },
   detailsSection: { marginVertical: 10 },
   row: {
@@ -547,10 +568,10 @@ const styles = StyleSheet.create({
   },
   detailLabel: { fontSize: 13, color: "rgba(31, 38, 51, 1)" },
   detailValue: { fontSize: 15, fontWeight: "600", color: "rgba(31, 38, 51, 1)" },
-  payBillText: { fontSize: 13, color: "#0057FF", fontWeight: "600" , marginLeft:10 , marginTop:5},
+  payBillText: { fontSize: 13, color: "#0057FF", fontWeight: "600", marginLeft: 10, marginTop: 5 },
   paiddetailLabel: { fontSize: 13, color: "rgba(60, 60, 67, 0.6)" },
-  paiddetailValue: { fontSize: 13, color: "black" ,  fontWeight: "600" ,},
-  Billbottom : {display:'flex', flexDirection:'row',   justifyContent: "space-between",},
+  paiddetailValue: { fontSize: 13, color: "black", fontWeight: "600", },
+  Billbottom: { display: 'flex', flexDirection: 'row', justifyContent: "space-between", },
   buttonRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -562,10 +583,10 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 10,
     alignItems: "center",
-     display:'flex',
-    flexDirection:'row',
+    display: 'flex',
+    flexDirection: 'row',
     marginRight: 10,
-    justifyContent:'center'
+    justifyContent: 'center'
   },
   shareText: { color: "#000", fontWeight: "600" },
   downloadBtn: {
@@ -573,42 +594,43 @@ const styles = StyleSheet.create({
     backgroundColor: "#0057FF",
     paddingVertical: 10,
     borderRadius: 10,
-    display:'flex',
-    flexDirection:'row',
+    display: 'flex',
+    flexDirection: 'row',
     alignItems: "center",
-    justifyContent:'center'
+    justifyContent: 'center'
   },
   downloadText: { color: "#fff", fontWeight: "600" },
   filterFab: {
- position: 'absolute', 
- bottom: 40,
- right: 10, 
- borderRadius: 30,
- width: 60,
- height: 60,
- justifyContent: 'center',
- alignItems: 'center',
- },
- filterIcon: {
-   width: 60,
-   height: 60,
- },
- sheetOverlay: {
-  position: "absolute",
-  top: 0,
-  bottom: 0,
-  left: 0,
-  right: 0,
-  backgroundColor: "rgba(0,0,0,0.4)",
-  justifyContent: "flex-end",
-},
+    position: 'absolute',
+    bottom: 40,
+    right: 10,
+    borderRadius: 30,
+    width: 60,
+    height: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  filterIcon: {
+    width: 60,
+    height: 60,
+  },
+  sheetOverlay: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "flex-end",
+  },
 
-bottomSheet: {
-  backgroundColor: "#fff",
-  borderTopLeftRadius: 20,
-  borderTopRightRadius: 20,
-  padding: 20,
-  height: "75%",
-},
+  bottomSheet: {
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    height: "75%",
+  },
+   noResult: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: 20 }
 
 });

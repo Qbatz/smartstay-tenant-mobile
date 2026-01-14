@@ -37,7 +37,7 @@ const ReopennComplaint = ({
 
                 <View style={{ paddingTop: 20 }}>
                     {reasonReopen.map((item) => (
-                        <TouchableOpacity onPress={() => setSelectedReason(item.reason)}
+                        <TouchableOpacity key={item.id} onPress={() => setSelectedReason(item.reason)}
                             style={{
                                 backgroundColor: '#FAFAFA', borderRadius: 8, paddingHorizontal: 12,
                                 marginBottom: 10, flexDirection: 'row', alignItems: 'center', paddingVertical: 12

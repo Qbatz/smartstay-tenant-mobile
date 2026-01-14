@@ -14,6 +14,7 @@ import Room from '../../../assets/Images/Room.png'
 import Bed from '../../../assets/Images/Bed_Icon.png'
 import { Dropdown } from "react-native-element-dropdown";
 import { SafeAreaView } from "react-native-safe-area-context";
+import ErrorMessage from "../../ToastFile/ErrorMessage";
 
 
 
@@ -47,19 +48,51 @@ const RequestBedChange = ({ visible,
     const [focusReason, setFocusReason] = useState(false);
     const [bedType, setBedType] = useState(null)
     const [urgencyType, setUrgencyType] = useState(null)
+    const [bedChangeReasonError, setBedChangeReasonError] = useState()
+    const [bedTypeError, setBedTypeError] = useState()
+    const [urgencyError, setUrgencyError] = useState()
 
 
-      useEffect(() => {
-            if (!visible) {
-                setChangeBed(null);
-                setBedType(null);
-                setUrgencyType(null);
-                setIsFocus(false);
-            }
-        }, [visible]);
+    useEffect(() => {
+        if (!visible) {
+            setChangeBed(null);
+            setBedType(null);
+            setUrgencyType(null);
+            setIsFocus(false);
+
+            setBedChangeReasonError("")
+            setBedTypeError("")
+            setUrgencyError("")
+        }
+    }, [visible]);
+
+    const validateForm = () => {
+        let valid = true;
+
+        setBedChangeReasonError("")
+        setBedTypeError("")
+        setUrgencyError("")
+
+        if (changeBed == null) {
+            setBedChangeReasonError("Select bed change reason");
+            valid = false;
+        }
+
+        if (bedType == null) {
+            setBedTypeError("Select preferred bed type");
+            valid = false;
+        }
+        if (urgencyType === null) {
+            setUrgencyError("Select urgency of change in bed");
+            valid = false;
+        }
+
+        return valid;
+    }
 
 
     const bedRequestSubmit = () => {
+        if (!validateForm()) return;
 
         const data = {
             title: changeBed,
@@ -106,13 +139,13 @@ const RequestBedChange = ({ visible,
 
         }
         else {
-            setShowSuccessModal(true)
-            setToastMessage('Fill all Fields')
-            setModelType('error')
+            // setShowSuccessModal(true)
+            // setToastMessage('Fill all Fields')
+            // setModelType('error')
 
-            setTimeout(() => {
-                setShowSuccessModal(false)
-            }, 2000);
+            // setTimeout(() => {
+            //     setShowSuccessModal(false)
+            // }, 2000);
         }
 
     }
@@ -154,19 +187,19 @@ const RequestBedChange = ({ visible,
                                         backgroundColor: '#F6F8FF', borderRadius: 10, paddingVertical: 17,
                                         paddingHorizontal: 8, marginTop: 10, flexDirection: 'row'
                                     }}>
-                                        <View style={{ backgroundColor: '#F9D796',flex:1, paddingVertical: 4.64, paddingHorizontal: 9.28, alignSelf: 'flex-start', borderRadius: 46.38 }}>
-                                            <Text style={{ color: '#642B00', fontSize: 10.82, fontWeight: 400,textAlign:'center' }}>
+                                        <View style={{ backgroundColor: '#F9D796', flex: 1, paddingVertical: 4.64, paddingHorizontal: 9.28, alignSelf: 'flex-start', borderRadius: 46.38 }}>
+                                            <Text style={{ color: '#642B00', fontSize: 10.82, fontWeight: 400, textAlign: 'center' }}>
                                                 {context.getCustomerDetail?.bookingDetails?.floorName}</Text>
                                         </View>
 
-                                        <View style={{ flexDirection: 'row', paddingLeft: 20,flex:1, alignItems: 'center' }}>
+                                        <View style={{ flexDirection: 'row', paddingLeft: 20, flex: 1, alignItems: 'center' }}>
                                             <Image source={Room} style={{ width: 21.17, height: 21.17 }} />
                                             <Text style={{ marginLeft: 10, fontSize: 15.97, fontWeight: 400 }}>
                                                 {context.getCustomerDetail?.bookingDetails?.roomName}
                                             </Text>
                                         </View>
 
-                                        <View style={{ flexDirection: 'row', paddingLeft: 10, alignItems: 'center',flex:1 }}>
+                                        <View style={{ flexDirection: 'row', paddingLeft: 10, alignItems: 'center', flex: 1 }}>
                                             <Image source={Bed} style={{ width: 21.17, height: 21.17 }} />
                                             <Text style={{ marginLeft: 10, fontSize: 15.97, fontWeight: 400 }}>
                                                 {context.getCustomerDetail?.bookingDetails?.bedName}
@@ -221,7 +254,10 @@ const RequestBedChange = ({ visible,
                                                 <TouchableOpacity
                                                     onPress={() => {
                                                         setChangeBed(item.value);
-                                                        setFocusReason(false); // Close dropdown on item press
+                                                        setFocusReason(false);
+                                                        if (bedChangeReasonError) {
+                                                            setBedChangeReasonError("")
+                                                        }
                                                         bedDropdownRef.current?.close();
                                                     }}
                                                     style={{
@@ -241,6 +277,7 @@ const RequestBedChange = ({ visible,
                                             );
                                         }}
                                     />
+                                    {bedChangeReasonError && <ErrorMessage message={bedChangeReasonError} type="error" />}
 
 
                                 </View>
@@ -281,6 +318,9 @@ const RequestBedChange = ({ visible,
                                                 <TouchableOpacity onPress={() => {
                                                     setBedType(item.value)
                                                     setFocusReason(false)
+                                                    if (bedTypeError) {
+                                                        setBedTypeError("")
+                                                    }
                                                     bedTypeDropdow.current?.close();
                                                 }}
                                                     style={{
@@ -302,6 +342,7 @@ const RequestBedChange = ({ visible,
                                         }}
 
                                     />
+                                    {bedTypeError && <ErrorMessage message={bedTypeError} type="error" />}
                                 </View>
 
                                 <View style={{ paddingTop: 15 }}>
@@ -340,6 +381,9 @@ const RequestBedChange = ({ visible,
                                                 <TouchableOpacity onPress={() => {
                                                     setUrgencyType(item.value)
                                                     setFocusReason(false)
+                                                    if (urgencyError) {
+                                                        setUrgencyError("")
+                                                    }
                                                     urgencyDropdown.current?.close();
                                                 }}
                                                     style={{
@@ -356,6 +400,7 @@ const RequestBedChange = ({ visible,
                                             );
                                         }}
                                     />
+                                    {urgencyError && <ErrorMessage message={urgencyError} type="error" />}
                                 </View>
 
                             </View>
@@ -365,7 +410,7 @@ const RequestBedChange = ({ visible,
                                     paddingVertical: 16, paddingHorizontal: 32, borderRadius: 50,
                                     backgroundColor: changeBed != null && bedType != null && urgencyType != null ? '#1E45E1' : '#788fed',
                                     alignItems: 'center', marginBottom: 15
-                                }} disabled={changeBed == null && bedType == null && urgencyType == null ? true : false}>
+                                }}>
                                 <Text style={{ fontSize: 14, fontWeight: 600, color: '#FFFFFF' }}>Submit Request</Text>
                             </TouchableOpacity>
 
