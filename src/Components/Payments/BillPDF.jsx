@@ -43,6 +43,12 @@ const InvoiceDesign = () => {
   const addressLine = selectedInvoiceDetail?.customerInfo?.fullAddress?.split(',');
 
   const hostelAddress = selectedInvoiceDetail?.configurations?.address?.split(',')
+//   const addDashForLongWords = (text, chunkSize = 20) => {
+//   return text.replace(
+//     new RegExp(`(.{${chunkSize}})`, 'g'),
+//     '$1-\u200B'
+//   );
+// };
 
   return (
     <ScrollView style={styles.container} >
@@ -71,7 +77,7 @@ const InvoiceDesign = () => {
 
       <View style={styles.receiptTitleContainer}>
         <Text style={[styles.receiptTitle, { color: selectedInvoiceDetail?.configurations?.templateColor }]}>
-          {selectedInvoiceDetail?.configurations?.invoiceType === "Rent" ? "Rental Invoice" : "Security Deposit Invoice"}</Text>
+          {selectedInvoiceDetail?.configurations?.invoiceType === "Rent" ? "Rental Invoice" : selectedInvoiceDetail?.configurations?.invoiceType === "Advance" ? "Security Deposit Invoice" : "Final Settlement Invoice"}</Text>
       </View>
 
 
@@ -162,13 +168,27 @@ const InvoiceDesign = () => {
               <Text style={styles.bold}>11:56:24 AM</Text>
             </Text>
 
-            {selectedInvoiceDetail?.configurations?.invoiceType === "Advance" ? null :
+            {/* {selectedInvoiceDetail?.configurations?.invoiceType === "Advance" ? null :
               <Text style={styles.invSty}>
                 Rental Period: {' '}
-                <Text style={styles.bold}>{selectedInvoiceDetail?.invoiceInfo?.invoicePeriod}</Text>
+                <Text style={styles.bold}>lsfosdfsdofji0efjdfodifsdpfsdf</Text>
               </Text>
+            } */}
+            {
+              selectedInvoiceDetail?.configurations?.invoiceType === "Advance" ? null :
+                <View style={{ flexDirection: 'row',alignItems:'flex-end',marginBottom: 4,justifyContent: 'center'}}>
+                  <Text style={styles.label}>Rental Period</Text>
+                  <Text style={styles.colon}>:</Text>
+                  <View style={styles.valueContainer}>
+                    <Text style={{flex: 1,fontSize: 10,flexShrink: 1,fontWeight: 600}}>
+                      {selectedInvoiceDetail?.invoiceInfo?.invoicePeriod} 
+                    </Text>
+                  </View>
+                </View>
             }
 
+
+            {/* {selectedInvoiceDetail?.invoiceInfo?.invoicePeriod} */}
 
           </View>
         </View>
@@ -279,7 +299,8 @@ const InvoiceDesign = () => {
             return (
               <View style={styles.tableRow}>
                 <Text style={[styles.tableCell, styles.colInvNo]}>{i.invoiceNo}</Text>
-                <Text style={[styles.tableCell, styles.colDesc]}>{i.description}</Text>
+                <Text style={[styles.tableCell, styles.colDesc]}>
+                  {i?.description?.includes('Advance') ? "Security deposit invoice" : i.description}</Text>
                 <Text style={[styles.tableCell, styles.colAmount]}>₹ {new Intl.NumberFormat('en-IN').format(i.amount)}</Text>
               </View>
             )

@@ -112,6 +112,16 @@ const BookingReceipt = ({ route }) => {
         
                 <View style={{ flex: 1, alignItems: 'flex-end' }}>
                   <View style={styles.invStyle}>
+
+                    <View style={styles.row}>
+                    <Text style={styles.label}>Reference no</Text>
+                    <Text style={styles.colon}>:</Text>
+                    <View style={styles.valueContainer}>
+                      <Text style={styles.value}>
+                        {selectedReceiptDetail?.receiptInfo?.receiptNumber}
+                      </Text>
+                    </View>
+                  </View>
         
                     <Text style={styles.invSty}>
                       Invoice : {' '}

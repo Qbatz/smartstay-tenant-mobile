@@ -48,7 +48,7 @@ const Payment = (props) => {
 
   const fetchPaymentData = () => {
     getPaymentList(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
-      console.log(r)
+      console.log("PaymentList", r)
       paymentContext.updateInvoiceList(r.data)
     })
   }
@@ -175,15 +175,22 @@ const Payment = (props) => {
                 <View style={{ flex: 1 }}>
                   <Text style={styles.title}>{item.invoiceType}</Text>
 
-                  {[ "Pending", "Partial Payment"].includes(item.status) ?
-                    <Text style={styles.date}> Due: {item.invoiceDueDate}</Text> :
-                    <Text style={styles.date}> Paid: {item.paymentDate}</Text>
-                  }
+                  {item.status === "Cancelled" ? (
+                    <Text style={styles.date}>invoice date: {item.invoiceStartDate}</Text>
+                  ) : ["Pending", "Partial Payment"].includes(item.status) ? (
+                    <Text style={styles.date}>
+                      Due: {item?.invoiceDueDate || "N/A"}
+                    </Text>
+                  ) : (
+                    <Text style={styles.date}>
+                      Paid: {item?.paymentDate || "N/A"}
+                    </Text>
+                  )}
                   {/* // <Text style={styles.date}>{item.invoiceDueDate}</Text> */}
                 </View>
 
                 <View style={styles.amountContainer}>
-                  <Text style={styles.amount}>₹{new Intl.NumberFormat('en-IN').format(item.amount)     }</Text>
+                  <Text style={styles.amount}>₹{new Intl.NumberFormat('en-IN').format(item.amount)}</Text>
                   {/* {item.status === "Pending" ? 
                   <Text style={styles.amount}>₹{item.amount}</Text>
                 :
@@ -230,8 +237,8 @@ const Payment = (props) => {
             </View>
           </TouchableOpacity>
         ))}
-      </ScrollView> 
-      :
+      </ScrollView>
+        :
         <View style={styles.noResult}>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
@@ -246,7 +253,7 @@ const Payment = (props) => {
             </Text>
           </View>
         </View>
-        }
+      }
 
 
       {/* ---------- MODAL ---------- */}
@@ -469,7 +476,7 @@ const Payment = (props) => {
       </TouchableOpacity>}
 
 
-      
+
 
     </>
   );
@@ -631,6 +638,6 @@ const styles = StyleSheet.create({
     padding: 20,
     height: "75%",
   },
-   noResult: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: 20 }
+  noResult: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: 20 }
 
 });

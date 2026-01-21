@@ -357,7 +357,7 @@ function Services(props) {
 
         {selectedfield == 'Complaint' && <View style={{ position: 'absolute', bottom: 35, right: -3 }}>
             <TouchableOpacity onPress={() => props.onSheet()}>
-                <Image source={AddComplaint} style={{ width: 48, height: 47 }} />
+                <Image source={AddComplaint} style={{ width: 55, height: 55 }} />
             </TouchableOpacity>
         </View>}
     </View>
