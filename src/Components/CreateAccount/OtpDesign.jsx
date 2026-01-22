@@ -8,6 +8,7 @@ import { storeData } from "../../Utils/Storage";
 import { ACCESS_TOKEN, PHONE_NO, LOGGEDIN, USERID } from "../../Utils/Constant";
 import SuccessModal from "../ToastFile/TostFilePage";
 import { LoginContexts } from "../../Context/LoginContext";
+import AppLogo from "../../assets/Images/AppLogo.png"
 
 const OtpDesign = ({ route }) => {
 
@@ -51,6 +52,7 @@ const OtpDesign = ({ route }) => {
 
         if (data.data.isMpinVerified == true) {
           loginContext.loggedin('true')
+          // navigation.navigate("WelcomeBackPage")
         }
         else {
           navigation.navigate('CreateMpin')
@@ -108,7 +110,7 @@ const OtpDesign = ({ route }) => {
         message={showModelMessage}
         type={modelType}
       />
-      <Image source={require("../../assets/Images/Sm_logo.png")} />
+      <Image source={AppLogo} style={{width:45,height:45, resizeMode:'contain'}} />
       <Text style={styles.title}>Otp Validation</Text>
       <Text style={styles.subtitle}>
         Enter the 6 digit otp sent on +91 {phone} to proceed
@@ -145,7 +147,7 @@ const OtpDesign = ({ route }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff", padding: 25, paddingTop: 50 },
-  title: { fontSize: 22, fontWeight: "700", color: "#000", marginBottom: 5 },
+  title: { fontSize: 22, fontWeight: "700", color: "#000", marginBottom: 5,marginTop:14 },
   subtitle: { color: "#555", marginBottom: 25 },
   otpContainer: {
     flexDirection: "row",

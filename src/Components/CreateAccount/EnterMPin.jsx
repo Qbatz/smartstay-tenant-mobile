@@ -10,6 +10,7 @@ import { ACCESS_TOKEN, LOGGEDIN } from "../../Utils/Constant";
 import { LoginContexts } from "../../Context/LoginContext";
 import WaveIcon from '../../assets/Images/HiIcon.png';
 import ErrorMessage from "../ToastFile/ErrorMessage";
+import AppLogo from "../../assets/Images/AppLogo.png"
 
 
 const EnterMPin = (props) => {
@@ -70,39 +71,39 @@ const EnterMPin = (props) => {
             console.log(pinNumber)
 
             const data = {
-            xuid: loginContext.getUserId,
-            mPin: pinNumber,
-        }
-
-        verifyMPin(data).then(r => {
-            console.log(r)
-            if (r.status == 200) {
-                console.log(r.data)
-                setHostelList(r.data)
-                storeData(LOGGEDIN, "true")
-                loginContext.loggedin('true')
-                context.updateHostelList(r.data)
-
-                setShowSuccessModal(true)
-                setShowModelMessage("Login Successfully")
-                setModelType('success')
-
-                setTimeout(() => {
-                    setShowSuccessModal(false);
-                    // navigation.navigate('HostelList')
-                    props.callbackMpin()
-                }, 2000);
+                xuid: loginContext.getUserId,
+                mPin: pinNumber,
             }
-            else if (r.status == 400) {
-                setShowSuccessModal(true)
-                setShowModelMessage("Incorrect MPIN")
-                setModelType('error')
 
-                setTimeout(() => {
-                    setShowSuccessModal(false);
-                }, 2000);
-            }
-        })
+            verifyMPin(data).then(r => {
+                console.log(r)
+                if (r.status == 200) {
+                    console.log(r.data)
+                    setHostelList(r.data)
+                    storeData(LOGGEDIN, "true")
+                    loginContext.loggedin('true')
+                    context.updateHostelList(r.data)
+
+                    setShowSuccessModal(true)
+                    setShowModelMessage("Login Successfully")
+                    setModelType('success')
+
+                    setTimeout(() => {
+                        setShowSuccessModal(false);
+                        // navigation.navigate('HostelList')
+                        props.callbackMpin()
+                    }, 2000);
+                }
+                else if (r.status == 400) {
+                    setShowSuccessModal(true)
+                    setShowModelMessage("Incorrect MPIN")
+                    setModelType('error')
+
+                    setTimeout(() => {
+                        setShowSuccessModal(false);
+                    }, 2000);
+                }
+            })
         } else {
             setmPinNumber("")
         }
@@ -189,9 +190,9 @@ const EnterMPin = (props) => {
             type={modelType}
         />
         <View style={{ paddingTop: 70 }} >
-            <Image source={Sm_logo} style={style.logo} />
 
-            <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 15 }}>
+
+            {/* <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 15 }}>
                 <Text style={style.title}>Welcome Back</Text>
 
                 <Animated.Image
@@ -208,11 +209,21 @@ const EnterMPin = (props) => {
                     ]}
                 />
 
+            </View> */}
+
+            <View style={{ alignItems: 'center' }}>
+
+                <Image source={AppLogo} style={style.logo} />
+
+                <Text style={style.createText}>Welcome to SmartStay</Text>
+
+                <Text style={style.subtitle}>Please enter 4 Digit the mPIN </Text>
+
+
+
             </View>
 
-            <Text style={style.createText}>Enter mPIN</Text>
 
-            <Text style={style.subtitle}>Please enter the mPIN </Text>
 
             <View style={style.pinContainer}>
                 {createMpin.map((digit, index) => (
@@ -255,10 +266,10 @@ const EnterMPin = (props) => {
 }
 
 const style = StyleSheet.create({
-    logo: { width: 151, height: 28.22 },
+    logo: { width: 66.32, height: 66.25,resizeMode:'contain' },
     createText: { fontSize: 27, fontWeight: 600, color: '#222222', marginTop: 20 },
     subtitle: { fontSize: 14, fontWeight: 400, color: '#4B4B4B', marginTop: 15 },
-    pinContainer: { flexDirection: 'row', justifyContent: 'space-between', paddingTop: 20, paddingLeft: 10, paddingRight: 10, marginBottom: 5 },
+    pinContainer: { flexDirection: 'row', justifyContent: 'space-between', paddingTop: 40, paddingLeft: 10, paddingRight: 10, marginBottom: 5 },
     pinBox: {
         width: 60, heiht: 70, borderWidth: 1, borderColor: "#ccc", borderRadius: 8, textAlign: "center",
         fontSize: 20, color: "#000"

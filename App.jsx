@@ -62,6 +62,7 @@ import PaymentContext from './src/Context/PaymentContext';
 import SuccessFlow from './src/SuccessFlow';
 import NotificationContext from './src/Context/NotificationContext';
 import { initBaseUrl } from './src/Utils/Constant';
+import WelcomeBackPage from './src/Components/CreateAccount/WelcomeBackPage';
 
 
 
@@ -220,6 +221,7 @@ function AppContent(props) {
           <Navigation.Screen name="OnboardingScreen" component={OnboardingScreen} />
           <Navigation.Screen name="CreateAccount" component={CreateAccount} />
           <Navigation.Screen name="OtpDesign" component={OtpDesign} />
+          {/* <Navigation.Screen name='WelcomeBackPage' component={WelcomeBackPage}/> */}
           <Navigation.Screen name='CreateMpin' component={CreateMpin}/>
           <Navigation.Screen name='ConfirmMPin' component={ConfirmMPin}/>
           <Navigation.Screen name='LoginPage' component={LoginMobileScreen}/>

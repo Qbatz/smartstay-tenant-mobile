@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     padding: 20,
-    paddingBottom: 90,
+    paddingBottom: 50,
     flexGrow:1,
     justifyContent:"space-between"
   },

@@ -236,10 +236,10 @@ function Services(props) {
                     style={{ width: 324, height: 221, resizeMode: 'contain', marginBottom: 20, }}
                 />
                 <Text style={{ fontSize: 22, fontWeight: '700', color: '#000', marginBottom: 8, }}>
-                    No Results Found!
+                    No Records Found!
                 </Text>
                 <Text style={{ fontSize: 15, color: '#555', textAlign: 'center', width: 260, lineHeight: 18, }}>
-                    Try adjusting your search or filters to see more options.
+                    There is no records relevant to this field.
                 </Text>
             </View>
         </View>
@@ -253,10 +253,10 @@ function Services(props) {
                             style={{ width: 324, height: 221, resizeMode: 'contain', marginBottom: 20 }}
                         />
                         <Text style={{ fontSize: 22, fontWeight: '700', color: '#000', marginBottom: 8 }}>
-                            No Results Found!
+                            No Records Found!
                         </Text>
                         <Text style={{ fontSize: 15, color: '#555', textAlign: 'center', width: 260, lineHeight: 18 }}>
-                            Try adjusting your search or filters to see more options.
+                            There is no records relevant to this field.
                         </Text>
                     </View>
                 </View>

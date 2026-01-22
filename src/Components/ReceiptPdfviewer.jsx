@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, useState, useCallback } from "react";
-import { View, Text, Image, ScrollView, StyleSheet, BackHandler } from "react-native";
+import { View, Text, Image, ScrollView, StyleSheet, BackHandler, TouchableOpacity } from "react-native";
 import HostelImage from "../assets/Images/Group 1.png";
 import PaymentReceivedIcon from "../assets/Images/paymentreceived.png";
 import SigantureIcon from "../assets/Images/signature.png";
@@ -9,6 +9,11 @@ import { LoginContexts } from "../Context/LoginContext";
 import { paymentContexts } from "../Context/PaymentContext";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import LeftArrow from "../assets/Images/LeftArrow.png"
+import ShareIcon from "../assets/Images/Union.png"
+import DownloadIcon from "../assets/Images/download.png"
+import PaidIcon from "../assets/Images/Checkboxes.png"
+
 // import Pdf from "react-native-pdf";
 
 const ReceiptPdfViewer = ({ route }) => {
@@ -43,376 +48,194 @@ const ReceiptPdfViewer = ({ route }) => {
     }, [navigation])
   )
   const addressLine = selectedReceiptDetail?.customerInfo?.fullAddress?.split(',');
+  const handleBack = () => navigation.goBack();
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
       <ScrollView style={styles.container} >
-        <ScrollView style={styles.receiptCard}>
-          <View style={styles.header}>
-            <View style={{ flex: 1 }}>
-              {selectedReceiptDetail?.configurations?.hostelLogo ? (
+        <View style={{ padding: 20 }}>
+
+          <View style={{ flexDirection: 'row', marginTop: 10 }}>
+            <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+              <TouchableOpacity onPress={handleBack}>
                 <Image
-                  source={{ uri: selectedReceiptDetail?.configurations?.hostelLogo }}
-                  style={styles.hostelImage} />
-              ) : (
-                <View style={[styles.hostelImage, styles.initialContainer]}>
-                  <Text style={styles.initialText}>
-                    {selectedReceiptDetail?.stayInfo?.initials}
-                  </Text>
-                </View>
-              )}
-            </View>
-
-            <View style={{ flex: 1 }}>
-              <Text style={styles.hostelName}>{selectedReceiptDetail?.stayInfo?.hostelName}</Text>
-              <Text style={styles.address}>{selectedReceiptDetail?.configurations?.address}</Text>
-            </View>
-          </View>
-
-          <View style={{ alignItems: "center", marginVertical: 10, marginTop: 20, marginBottom: 15 }}>
-            <Text style={[styles.title, { color: selectedReceiptDetail?.configurations?.templateColor }]}>
-              {/* {pdfDetails?.configurations?.receiptType === "Rent"
-              ? "Payment Receipt"
-              : pdfDetails?.configurations?.receiptType === "Booking"
-              ? "Security Deposit Receipt"
-              : pdfDetails?.configurations?.receiptType === "Advance"
-              ? "Security Deposit Receipt"
-              : "Final Settlement Receipt"} */}
-
-
-              {selectedReceiptDetail?.configurations?.receiptType === "Rent" ? "Rental Payment Receipt" : selectedReceiptDetail?.configurations?.receiptType === "Settlement" ? "Final settlement Receipt" : "Security Deposit Receipt"}
-            </Text>
-          </View>
-
-          {/* ---- */}
-          <Text style={[styles.sectionTitle, { color: selectedReceiptDetail?.configurations?.templateColor }]}>Receipt to:</Text>
-
-          <View style={{ flexDirection: 'row', padding: 5 }}>
-
-            <View style={{ flex: 1 }}>
-
-
-              <View style={{
-                flexDirection: 'row', alignItems: 'flex-start',
-                marginBottom: 4, justifyContent: 'center'
-              }}>
-                <Text style={styles.label}>Name</Text>
-                <Text style={styles.colon}>:</Text>
-                <View style={styles.valueContainer}>
-                  <Text style={styles.value}>
-                    {selectedReceiptDetail?.customerInfo?.fullName}
-                  </Text>
-                </View>
-              </View>
-
-              <View style={{
-                flexDirection: 'row',
-                alignItems: 'flex-start',
-                marginBottom: 4,
-                justifyContent: 'center'
-              }}>
-                <Text style={styles.label}>Phone</Text>
-                <Text style={styles.colon}>:</Text>
-                <View style={styles.valueContainer}>
-                  <Text style={styles.value}>
-                    +{selectedReceiptDetail?.customerInfo?.countryCode}{" "}
-                    {selectedReceiptDetail?.customerInfo?.customerMobileNo}
-                  </Text>
-                </View>
-              </View>
-
-              <View style={{
-                flexDirection: 'row',
-                alignItems: 'flex-start',
-                marginBottom: 4,
-                justifyContent: 'center'
-              }}>
-                <Text style={styles.label}>Room No</Text>
-                <Text style={styles.colon}>:</Text>
-                <View style={styles.valueContainer}>
-                  <Text style={styles.value}>
-                    {selectedReceiptDetail?.stayInfo?.floorName},{" "}
-                    {selectedReceiptDetail?.stayInfo?.roomName} -{" "}
-                    {selectedReceiptDetail?.stayInfo?.bedName}
-                  </Text>
-                </View>
-              </View>
-
-              <View style={{
-                flexDirection: 'row',
-                alignItems: 'flex-start',
-                marginBottom: 4,
-                justifyContent: 'center'
-              }}>
-                <Text style={styles.label}>Address</Text>
-                <Text style={styles.colon}>:</Text>
-                <View style={styles.valueContainer}>
-                  {selectedReceiptDetail?.customerInfo?.fullAddress &&
-                    addressLine?.length > 0 ? (
-                    addressLine.map((line, index) => (
-                      <Text key={index} style={styles.info}>
-                        {line}
-                        {index < addressLine.length - 1 ? ',' : ''}
-                      </Text>
-                    ))
-                  ) : (
-                    <Text style={styles.value}>N/A</Text>
-                  )}
-                </View>
-              </View>
-            </View>
-
-
-            <View style={{ flex: 1, alignItems: 'flex-end' }}>
-              <View style={styles.invStyle}>
-
-                <Text style={styles.invSty}>
-                  Receipt : {' '}
-                  <Text style={styles.bold}>{selectedReceiptDetail?.receiptInfo?.receiptNumber}</Text>
-                </Text>
-
-                <Text style={styles.invSty}>
-                  Paid Date : {' '}
-                  <Text style={styles.bold}>{selectedReceiptDetail?.receiptInfo?.transactionDate}</Text>
-                </Text>
-
-                <Text style={styles.invSty}>
-                  Joining Date: {' '}
-                  <Text style={styles.bold}>{selectedReceiptDetail?.customerInfo?.joiningDate}</Text>
-                </Text>
-
-                <Text style={styles.invSty}>
-                  Time: {' '}
-                  <Text style={styles.bold}>{selectedReceiptDetail?.receiptInfo?.transactionTime}</Text>
-                </Text>
-
-                {selectedReceiptDetail?.configurations?.receiptType === "Advance" ? null :
-                  <Text style={styles.invSty}>
-                    Rental Period: {' '}
-                    <Text style={styles.bold}>{selectedReceiptDetail?.invoiceRentalPeriod}</Text>
-                  </Text>
-                }
-
-
-
-                <Text style={styles.invSty}>
-                  Transaction Id: {' '}
-                  <Text style={styles.bold}>
-                    {selectedReceiptDetail?.receiptInfo?.transactionId ? selectedReceiptDetail?.receiptInfo?.transactionId : 'N/A'}</Text>
-                </Text>
-              </View>
-            </View>
-
-          </View>
-
-          <View style={{ borderWidth: 1, borderColor: '#E6E6E6' }} />
-
-
-          {/* ----- */}
-
-          {/* <View style={styles.row}>
-            <View style={styles.leftColumn}>
-              <Text style={[styles.sectionHeader, { color: selectedReceiptDetail?.configurations?.templateColor }]}>Receipt to:</Text>
-
-              <View style={styles.detailRow}>
-                <Text style={styles.label}>Tenant Name :</Text>
-                <Text style={styles.value}>{selectedReceiptDetail?.customerInfo?.fullName}</Text>
-              </View>
-
-              <View style={styles.detailRow}>
-                <Text style={styles.label}>Mobile No :</Text>
-                <Text style={styles.value}>{selectedReceiptDetail?.customerInfo?.customerMobileNo}</Text>
-              </View>
-
-              <View style={styles.detailRow}>
-                <Text style={styles.label}>Room No :</Text>
-                <Text style={styles.value}>
-                  {selectedReceiptDetail?.stayInfo?.floorName}, {selectedReceiptDetail?.stayInfo?.roomName}-{selectedReceiptDetail?.stayInfo?.bedName}</Text>
-              </View>
-
-              <View style={styles.detailRow}>
-                <Text style={styles.label}>Address :</Text>
-                <Text style={[styles.value, { flex: 1 }]}>
-                  {selectedReceiptDetail?.customerInfo?.fullAddress}
-                </Text>
-              </View>
-            </View>
-
-            <View style={styles.rightColumn}>
-              <View style={styles.detailRow}>
-                <Text style={styles.label}>Receipt No :</Text>
-                <Text style={styles.value}>{selectedReceiptDetail?.receiptInfo?.receiptNumber}</Text>
-              </View>
-
-              <View style={styles.detailRow}>
-                <Text style={styles.label}>Date :</Text>
-                <Text style={styles.value}>{selectedReceiptDetail?.receiptInfo?.transactionDate}</Text>
-              </View>
-
-              <View style={styles.detailRow}>
-                <Text style={styles.label}>Time :</Text>
-                <Text style={styles.value}>{selectedReceiptDetail?.receiptInfo?.transactionTime}</Text>
-              </View>
-
-              <View style={styles.detailRow}>
-                <Text style={styles.label}>Payment Mode :</Text>
-                <Text style={[styles.value, { color: "#1E45E1" }]}>{selectedReceiptDetail?.receiptInfo?.paymentMode}</Text>
-              </View>
-
-              <View style={styles.detailRow}>
-                <Text style={styles.label}>TranscationId :</Text>
-                <Text style={[styles.value, { color: "#1E45E1" }]}>{selectedReceiptDetail?.receiptInfo?.transactionId}</Text>
-              </View>
-            </View>
-          </View> */}
-
-
-
-
-
-
-
-          <View style={styles.amountBox}>
-            <View style={{ display: 'flex', alignItems: "center", justifyContent: 'center', flex: 1 }}>
-              <Text style={styles.amountTitle}>TOTAL PAID AMOUNT</Text>
-              {selectedReceiptDetail?.configurations?.receiptType === "Advance" && (
-                <Text style={{ fontSize: 12, color: "#4B4B4B", marginBottom: 6, }}>Security Deposit (Advance)</Text>
-              )}
-            </View>
-            <View style={{ flex: 1 }}>
-              <View style={styles.amountValueBox}>
-                <View style={styles.amountBar} />
-                <Text style={styles.amount}>
-                  ₹ {new Intl.NumberFormat('en-IN').format(selectedReceiptDetail?.receiptInfo?.paidAmount)}</Text>
-              </View>
-              <Text style={styles.amountWords}>
-                {convertNumberToWords(selectedReceiptDetail?.receiptInfo?.paidAmount || 0)} only
+                  source={LeftArrow}
+                  style={{ height: 25, width: 25 }}
+                />
+              </TouchableOpacity>
+              <Text style={{ fontSize: 18, fontWeight: 600, marginLeft: 5 }}>
+                {selectedReceiptDetail?.receiptInfo?.receiptNumber}
               </Text>
+
+              <View style={{
+                flexDirection: "row", borderRadius: 8, padding: 5, marginLeft: 6,
+                backgroundColor: paymentContext.getInvoiceDetail.status === "Paid" ? "#A5FF9624" : "#FFF7E7"
+              }}>
+                {/* <Image
+                    source={PaidIcon}
+                    style={{ width: 20, height: 20 }}
+                  /> */}
+                <Text style={{
+                  fontSize: 11,
+                  color: paymentContext.getInvoiceDetail.status === "Paid" ? "#09882C" : "#EC9B29"
+                }}>
+                  {paymentContext.getInvoiceDetail.status === "Paid"
+                    ? "Full Paid"
+                    : "Partial Payment"}
+                </Text>
+              </View>
             </View>
+
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <TouchableOpacity
+                style={{ marginRight: 8 }}
+              // onPress={downloadOption}
+              >
+                <Image
+                  source={DownloadIcon}
+                  style={{ width: 22, height: 22, marginLeft: 8, tintColor: 'black' }}
+                />
+              </TouchableOpacity>
+
+              <TouchableOpacity >
+                <Image
+                  source={ShareIcon}
+                  style={{ width: 18, height: 18, marginLeft: 8 }}
+                />
+              </TouchableOpacity>
+            </View>
+
           </View>
 
-          <View style={styles.acknowledgementRow}>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.ackTitle}>Acknowledgement</Text>
-              <Text style={styles.ackDescription}>
-                This payment confirms your dues till the mentioned period. Final settlement
-                during checkout will be calculated based on services utilized and advance paid.
+          <View style={{ flexDirection: 'row', paddingTop: 50, justifyContent: 'space-between' }}>
+            <Text style={{ fontSize: 20, fontWeight: 600 }}>Amount Paid</Text>
+
+            <View style={{ alignItems: 'flex-end' }}>
+              <Text style={{ fontSize: 18, fontWeight: 600 }}>
+                ₹ {new Intl.NumberFormat('en-IN', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }).format(
+                  selectedReceiptDetail?.receiptInfo?.paidAmount
+                )}
               </Text>
-            </View>
 
-            <View style={{ flex: 1 }}>
-              <Image
-                source={{ uri: selectedReceiptDetail?.configurations?.signatureUrl }}
-                style={styles.signature}
-                resizeMode="contain"
-              />
-              <Text style={styles.signText}>Authorized Signature</Text>
-            </View>
-          </View>
+              <View style={{ flexDirection: "row", marginTop: 6 }}>
+                <Image
+                  source={PaidIcon}
+                  style={{ width: 20, height: 20 }}
+                />
+                <Text style={{ fontSize: 14, marginLeft: 6 }}>
+                  {paymentContext.getInvoiceDetail.status === "Paid"
+                    ? "Full Paid"
+                    : "Partial Payment"}
+                </Text>
+              </View>
 
-
-
-          <View style={{ display: 'flex', flexDirection: 'row', marginTop: 15, marginBottom: 10 }}>
-            <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 10 }}>"Thank you for choosing roomsearch.in Your transaction is completed"</Text>
-            </View>
-            <View style={{ flex: 1, paddingLeft: 40, }}>
-              <Image
-                source={PaymentReceivedIcon}
-                style={[styles.signature, { tintColor: selectedReceiptDetail?.configurations?.templateColor }]}
-                resizeMode="contain"
-              />
             </View>
           </View>
 
+          <View style={{
+            borderBottomWidth: 0.4,
+            borderBottomColor: "grey",
+            opacity: 0.4,
+            marginTop: 30, marginBottom: 10
+          }} />
+
+          <View style={{ paddingTop: 10 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Text style={{ fontSize: 14, fontWeight: 400, color: '#3C3C4399' }}>Paid Date</Text>
+              <Text style={{ fontSize: 14, fontWeight: 600 }}>
+                {selectedReceiptDetail?.receiptInfo?.transactionDate}</Text>
+            </View>
+
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 8 }}>
+              <Text style={{ fontSize: 14, fontWeight: 400, color: '#3C3C4399' }}>Time</Text>
+              <Text style={{ fontSize: 14, fontWeight: 600 }}>
+                {selectedReceiptDetail?.receiptInfo?.transactionTime}</Text>
+            </View>
+
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 8 }}>
+              <Text style={{ fontSize: 14, fontWeight: 400, color: '#3C3C4399' }}>Payment Mode</Text>
+              <Text style={{ fontSize: 14, fontWeight: 600 }}>
+                {selectedReceiptDetail?.receiptInfo?.paymentMode}</Text>
+            </View>
+
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 8 }}>
+              <Text style={{ fontSize: 14, fontWeight: 400, color: '#3C3C4399' }}>Reference number</Text>
+              <Text style={{ fontSize: 14, fontWeight: 600 }}>
+                {selectedReceiptDetail?.receiptInfo?.receiptNumber}</Text>
+            </View>
+
+          </View>
+
+          <View style={{
+            borderBottomWidth: 0.4,
+            borderBottomColor: "grey",
+            opacity: 0.4,
+            marginTop: 20, marginBottom: 15
+          }} />
 
           <View>
-            <Text style={styles.sectionTitle}>Payment for</Text>
 
-            {receiptname === "SecurityDeposit" ? (
-              <View style={styles.securityTable}>
-                <View style={[styles.tableRow, styles.tableHeader]}>
-                  <Text style={[styles.tableCell, { flex: 0.5 }]}>S.NO</Text>
-                  <Text style={[styles.tableCell, { flex: 2 }]}>DESCRIPTION</Text>
-                  <Text style={[styles.tableCell, { flex: 1, textAlign: "right" }]}>
-                    AMOUNT / INR
-                  </Text>
-                </View>
+            <Text style={{ fontSize: 16, fontWeight: 600 }}>Payment for</Text>
 
-                <View style={styles.tableRow}>
-                  <Text style={[styles.tableCell, { flex: 0.5 }]}>1</Text>
-                  <Text style={[styles.tableCell, { flex: 2 }]}>
-                    Security Deposit (Advance) - Deductions
-                  </Text>
-                  <Text style={[styles.tableCell, { flex: 1, textAlign: "right" }]}>
-                    Rs: 12,530.00
-                  </Text>
-                </View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 15 }}>
+              <Text style={{ fontSize: 14, fontWeight: 400 }}>Invoice.no</Text>
+              <Text style={{ fontSize: 14, fontWeight: 600 }}>
+                {selectedReceiptDetail?.invoiceNumber}</Text>
+            </View>
 
-                <View style={[styles.tableRow, styles.totalRow]}>
-                  <Text style={[styles.tableCell, { flex: 2.5, fontWeight: "600" }]}>
-                    Total
-                  </Text>
-                  <Text
-                    style={[
-                      styles.tableCell,
-                      { flex: 1, textAlign: "right", fontWeight: "600" },
-                    ]}
-                  >
-                    ₹ 12,530.00
-                  </Text>
-                </View>
-              </View>
-            ) : (
-              <View style={styles.table}>
-                <View style={[styles.row, styles.headerRow]}>
-                  <Text style={[styles.cell, styles.headerCell, { flex: 1 }]}>
-                    INVOICE.NO
-                  </Text>
-                  <Text style={[styles.cell, styles.headerCell, { flex: 1 }]}>
-                    INV. DATE
-                  </Text>
-                  <Text style={[styles.cell, styles.headerCell, { flex: 1.2 }]}>
-                    INVOICE AMOUNT
-                  </Text>
-                  <Text style={[styles.cell, styles.headerCell, { flex: 1.2 }]}>
-                    PAYMENT AMOUNT / INR
-                  </Text>
-                </View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 9 }}>
+              <Text style={{ fontSize: 14, fontWeight: 400 }}>Invoice Date</Text>
+              <Text style={{ fontSize: 14, fontWeight: 600 }}>
+                {selectedReceiptDetail?.invoiceDate}</Text>
+            </View>
 
-                <View style={styles.row}>
-                  <Text
-                    style={[
-                      styles.cell,
-                      { flex: 1, color: selectedReceiptDetail?.configurations?.templateColor, textDecorationLine: "underline" },
-                    ]}
-                  >
-                    {selectedReceiptDetail?.invoiceNumber}
-                  </Text>
-                  <Text style={[styles.cell, { flex: 1 }]}>{selectedReceiptDetail?.invoiceDate}</Text>
-                  <Text style={[styles.cell, { flex: 1.2 }]}>
-                    ₹{new Intl.NumberFormat('en-IN').format(selectedReceiptDetail?.invoiceAmount)}
-                  </Text>
-                  <Text style={[styles.cell, { flex: 1.2 }]}>
-                    ₹{new Intl.NumberFormat('en-IN').format(selectedReceiptDetail?.receiptInfo?.paidAmount)}
-                  </Text>
-                </View>
-              </View>
-            )}
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 9 }}>
+              <Text style={{ fontSize: 14, fontWeight: 400, }}>Invoice amount</Text>
+              <Text style={{ fontSize: 14, fontWeight: 600 }}>
+                ₹ {new Intl.NumberFormat('en-IN', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }).format(
+                  selectedReceiptDetail?.invoiceAmount
+                )}
+              </Text>
+            </View>
+
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 9 }}>
+              <Text style={{ fontSize: 14, fontWeight: 400 }}>Payment Amount</Text>
+              <Text style={{ fontSize: 14, fontWeight: 600 }}>
+                ₹ {new Intl.NumberFormat('en-IN', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }).format(
+                  selectedReceiptDetail?.receiptInfo?.paidAmount
+                )}</Text>
+            </View>
+
           </View>
 
+          {paymentContext.getInvoiceDetail.status === "Partial Payment" && (
+            <View style={{ paddingTop: 30 }}>
+              <Text style={{ fontSize: 14, fontWeight: 400, color: '#3C3C4399' }}>
+                Notes & Instructions
+              </Text>
+
+              <Text style={{ fontSize: 14, fontWeight: 400, marginTop: 15 }}>
+                This payment confirms the partial payment of the mentioned invoice, pay the remaining amount within the
+                Due date.
+              </Text>
+            </View>
+
+          )}
 
 
-          <View style={styles.footerContainer}>
-            <Text style={styles.footerLeft}>
-              email : <Text style={styles.highlight}>{selectedReceiptDetail?.emailId ? selectedReceiptDetail?.emailId : "N/A "}</Text>
-            </Text>
-            <Text style={styles.footerRight}>
-              Contact : <Text style={styles.highlight}>+91 {selectedReceiptDetail?.mobile ? selectedReceiptDetail?.mobile : "N/A "}</Text>
-            </Text>
-          </View>
 
-        </ScrollView>
+
+        </View>
+
       </ScrollView>
     </SafeAreaView>
   );

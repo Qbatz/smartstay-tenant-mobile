@@ -153,89 +153,105 @@ const Payment = (props) => {
     <>
       {paymentContext.getInvoiceList?.invoices?.length > 0 ? <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {paymentContext.getInvoiceList?.invoices?.map((item, index) => (
-          <TouchableOpacity key={index} onPress={() => props.onPayment(item)} style={styles.card}>
-            <View style={{ flexDirection: "row", }}>
-              <View style={styles.iconContainer}>
-                {item?.title === "July EB Bill" ? (
-                  <Image
-                    source={ElectrictyIcon}
-                    style={styles.icon}
-                    resizeMode="contain"
-                  />
-                ) : (
-                  <Image
-                    source={SideArrow}
-                    style={styles.icon}
-                    resizeMode="contain"
-                  />
-                )}
-              </View>
-
-              <View style={styles.infoContainer}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.title}>{item.invoiceType}</Text>
-
-                  {item.status === "Cancelled" ? (
-                    <Text style={styles.date}>invoice date: {item.invoiceStartDate}</Text>
-                  ) : ["Pending", "Partial Payment"].includes(item.status) ? (
-                    <Text style={styles.date}>
-                      Due: {item?.invoiceDueDate || "N/A"}
-                    </Text>
+          <React.Fragment key={index}>
+            <TouchableOpacity onPress={() => props.onPayment(item)} style={styles.card}>
+              <View style={{ flexDirection: "row", }}>
+                <View style={styles.iconContainer}>
+                  {item?.title === "July EB Bill" ? (
+                    <Image
+                      source={ElectrictyIcon}
+                      style={styles.icon}
+                      resizeMode="contain"
+                    />
                   ) : (
-                    <Text style={styles.date}>
-                      Paid: {item?.paymentDate || "N/A"}
-                    </Text>
+                    <Image
+                      source={SideArrow}
+                      style={styles.icon}
+                      resizeMode="contain"
+                    />
                   )}
-                  {/* // <Text style={styles.date}>{item.invoiceDueDate}</Text> */}
                 </View>
 
-                <View style={styles.amountContainer}>
-                  <Text style={styles.amount}>₹{new Intl.NumberFormat('en-IN').format(item.amount)}</Text>
-                  {/* {item.status === "Pending" ? 
-                  <Text style={styles.amount}>₹{item.amount}</Text>
-                :
-                <Text style={styles.amount}>{item.paidAmount}</Text>} */}
-                  <View
-                    style={[
-                      styles.statusBadge,
-                      {
-                        backgroundColor:
-                          item.statusColor === "#0057FF"
-                            ? "#E3ECFF"
-                            : "#E9F8EE",
-                      },
-                    ]}
-                  >
-                    <View style={{ flexDirection: "row", alignItems: 'center' }}>
-                      <Text
-                        style={[styles.statusText, { color: item.statusColor }]}
-                      >
-                        {item.status}
+                <View style={styles.infoContainer}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.title}>{item.invoiceType}</Text>
+
+                    {item.status === "Cancelled" || item.status === "Pending Refund" ? (
+                      <Text style={styles.date}>invoice date: {item.invoiceStartDate}</Text>
+                    ) : ["Pending", "Partial Payment"].includes(item.status) ? (
+                      <Text style={styles.date}>
+                        Due: {item?.invoiceDueDate || "N/A"}
                       </Text>
-                      {paymentContext?.getInvoiceList?.hostelUrl != null ?
-                        (<Image
-                          source={{ uri: paymentContext.getInvoiceList?.hostelUrl }}
-                          style={{ width: 16, height: 16, borderRadius: 8, marginLeft: 6 }}
-                          resizeMode="contain"
-                        />)
-                        : (<View style={{
-                          width: 18, height: 18, borderRadius: 9, backgroundColor: '#788fed', marginLeft: 5,
-                          alignItems: 'center', justifyContent: 'center'
-                        }}>
-                          <Text style={{ fontSize: 9, fontWeight: 600 }}>
-                            {paymentContext.getInvoiceList.initials}
-                          </Text>
-                        </View>)
-                      }
+                    ) : (
+                      <Text style={styles.date}>
+                        Paid: {item?.paymentDate || "N/A"}
+                      </Text>
+                    )}
+                    {/* // <Text style={styles.date}>{item.invoiceDueDate}</Text> */}
+                  </View>
+
+                  <View style={styles.amountContainer}>
+                    <Text style={styles.amount}>₹{new Intl.NumberFormat('en-IN').format(item.amount)}</Text>
+                                   {/* {item.status === "Pending" ? 
+                                  <Text style={styles.amount}>₹{item.amount}</Text>
+                                    :
+                                  <Text style={styles.amount}>{item.paidAmount}</Text>} */}
+                    <View
+                      style={[
+                        styles.statusBadge,
+                        {
+                          backgroundColor: item?.status === "Pending" ||
+                            item?.status === "Partial Payment" || item?.status === "Pending Refund"  ||
+                            item?.status === "Partially Refunded" ?  "#FFF8EA" :
+                            item?.status === "Cancelled" ? "#FFD5D5" : "#A5FF9624"
+                        },
+                      ]}
+                    >
+                      <View style={{ flexDirection: "row", alignItems: 'center' }}>
+                        <Text
+                          style={[styles.statusText,
+                          {
+                            color: item?.status === "Pending" ||
+                              item?.status === "Partial Payment" || item?.status === "Pending Refund" ||
+                              item?.status === "Partially Refunded" ? "#EC9B29" :
+                              item?.status === "Cancelled" ? "#FF3B30" : "#09882C"
+                          }]}
+                        >
+                          {item.status}
+                        </Text>
+                        {paymentContext?.getInvoiceList?.hostelUrl != null ?
+                          (<Image
+                            source={{ uri: paymentContext.getInvoiceList?.hostelUrl }}
+                            style={{ width: 16, height: 16, borderRadius: 8, marginLeft: 6 }}
+                            resizeMode="contain"
+                          />)
+                          : (<View style={{
+                            width: 18, height: 18, borderRadius: 9, backgroundColor: '#788fed', marginLeft: 5,
+                            alignItems: 'center', justifyContent: 'center'
+                          }}>
+                            <Text style={{ fontSize: 9, fontWeight: 600 }}>
+                              {paymentContext.getInvoiceList.initials}
+                            </Text>
+                          </View>)
+                        }
 
 
 
+                      </View>
                     </View>
                   </View>
                 </View>
               </View>
-            </View>
-          </TouchableOpacity>
+            </TouchableOpacity>
+
+            <View style={{
+              borderWidth: 0.5,
+              borderColor: "#E8E8E8",
+              // marginLeft:55
+              // opacity: 0.4,
+              // marginTop: 10, marginBottom: 10
+            }} />
+          </React.Fragment>
         ))}
       </ScrollView>
         :
@@ -493,16 +509,16 @@ const styles = StyleSheet.create({
   },
   card: {
 
-    backgroundColor: "#fff",
-    borderRadius: 14,
+    // backgroundColor: "#fff",
+    // borderRadius: 14,
     padding: 12,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: "#E8E8E8",
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 5,
-    elevation: 2,
+    marginBottom: 5,
+    // borderWidth: 1,
+    // borderColor: "#E8E8E8",
+    // shadowColor: "#000",
+    // shadowOpacity: 0.05,
+    // shadowRadius: 5,
+    // elevation: 2,
   },
   iconContainer: {
     backgroundColor: "#F3F5FF",
@@ -610,7 +626,7 @@ const styles = StyleSheet.create({
   filterFab: {
     position: 'absolute',
     bottom: 40,
-    right: 10,
+    right: -3,
     borderRadius: 30,
     width: 60,
     height: 60,

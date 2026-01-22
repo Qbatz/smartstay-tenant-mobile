@@ -434,25 +434,26 @@ function Dashboard(props) {
     }
   };
 
-  const handleReceiptPdfDownload = (invoiceType) => {
-    if (invoiceType === "Booking") {
-      navigation.navigate("BookingInvoice");
-    }
-    else {
-      navigation.navigate("InvoiceDesign");
-    }
+  // const handleReceiptPdfDownload = (invoiceType) => {
+  //   if (invoiceType === "Booking") {
+  //     navigation.navigate("BookingInvoice");
+  //   }
+  //   else {
+  //     navigation.navigate("InvoiceDesign");
+  //   }
 
-  };
+  // };
 
-  const handlePaymentReceipt = (transcationId, invoiceType) => {
+  const handlePaymentReceipt = (transcationId, invoiceType,invoiceStatus) => {
 
     console.log(transcationId)
-    if (invoiceType === "Booking") {
-      navigation.navigate('BookingReceipt', { transcationId: transcationId })
-    }
-    else {
-      navigation.navigate('ReceiptPdfView', { transcationId: transcationId })
-    }
+    navigation.navigate('ReceiptPdfView', { transcationId: transcationId,invoiceStatus:invoiceStatus })
+    // if (invoiceType === "Booking") {
+    //   navigation.navigate('BookingReceipt', { transcationId: transcationId,invoiceStatus: invoiceStatus })
+    // }
+    // else {
+    //   navigation.navigate('ReceiptPdfView', { transcationId: transcationId,invoiceStatus:invoiceStatus })
+    // }
 
   }
 
@@ -975,14 +976,14 @@ function Dashboard(props) {
 
                   <View style={{ flexDirection: "row" }}>
                     <Text style={style.invoiceId}>{paymentContext.getInvoiceDetail?.invoiceNumber}</Text>
-                    <TouchableOpacity
+                    {/* <TouchableOpacity
                       onPress={() => handleReceiptPdfDownload(paymentContext.getInvoiceDetail.invoiceType)}
-                    >
+                    > */}
                       <Image
                         source={ViewIcon}
                         style={{ width: 15, height: 15, marginLeft: 5, marginTop: 2 }}
                       />
-                    </TouchableOpacity>
+                    {/* </TouchableOpacity> */}
                   </View>
                 </View>
 
@@ -1070,7 +1071,9 @@ function Dashboard(props) {
                         {paymentContext.getInvoiceDetail?.receipts.map(i => {
                           return (
                             <View key={i.transactionId} style={style.row}>
-                              <TouchableOpacity onPress={() => handlePaymentReceipt(i.transactionId, paymentContext.getInvoiceDetail.invoiceType)}
+                              <TouchableOpacity 
+                              onPress={() =>
+                                 handlePaymentReceipt(i.transactionId, paymentContext.getInvoiceDetail.invoiceType,paymentContext.getInvoiceDetail?.status)}
                                 style={{flexDirection:'row'}}>
                                 <Text style={{ fontSize: 10, color: "#1e45e2" }}>{i.transactionNumber}</Text>
                                 <Image source={ReceiptPic} style={{ width: 14, height: 14, marginLeft: 5 }} resizeMode="contain" />
@@ -1237,9 +1240,13 @@ function Dashboard(props) {
                 <View style={style.row}>
                   <Text style={style.modalTitle}>{paymentContext?.getInvoiceDetail?.invoiceType}</Text>
 
-                  <TouchableOpacity
+                  {/* <TouchableOpacity
                     onPress={() => handleReceiptPdfDownload(paymentContext.getInvoiceDetail.invoiceType)}
                     style={{
+                      flexDirection: "row", backgroundColor: '#F1F4FF', paddingVertical: 3, paddingHorizontal: 5,
+                      borderRadius: 5, alignItems: 'center'
+                    }}> */}
+                      <View  style={{
                       flexDirection: "row", backgroundColor: '#F1F4FF', paddingVertical: 3, paddingHorizontal: 5,
                       borderRadius: 5, alignItems: 'center'
                     }}>
@@ -1249,7 +1256,8 @@ function Dashboard(props) {
                       source={ViewIcon}
                       style={{ width: 15, height: 15, marginLeft: 5, marginTop: 2 }}
                     />
-                  </TouchableOpacity>
+                    </View>
+                  {/* </TouchableOpacity> */}
                 </View>
 
                 <View
@@ -1280,7 +1288,8 @@ function Dashboard(props) {
                 {paymentContext.getInvoiceDetail?.receipts.map(i => {
                           return (
                             <View key={i.transactionId} style={style.row}>
-                              <TouchableOpacity onPress={() => handlePaymentReceipt(i.transactionId, paymentContext?.getInvoiceDetail.invoiceType)}
+                              <TouchableOpacity onPress={() => 
+                              handlePaymentReceipt(i.transactionId, paymentContext?.getInvoiceDetail.invoiceType,paymentContext.getInvoiceDetail?.status)}
                                 style={{flexDirection:'row'}}>
                                 <Text style={{ fontSize: 10, color: "#1e45e2" }}>{i.transactionNumber}</Text>
                                 <Image source={ReceiptPic} style={{ width: 14, height: 14, marginLeft: 5 }} resizeMode="contain" />
@@ -1316,22 +1325,50 @@ function Dashboard(props) {
                 </View>
 
                 {showVisible && (
-                  refundable.map(i => {
-                    return (
-                      <View style={style.row}>
-                        <Text style={{ fontSize: 14, fontWeight: 300, color: '#2F2F2F' }}>{i.list}</Text>
-                        <Text style={{ fontSize: 14, fontWeight: 300, color: '#2F2F2F' }}>₹ {new Intl.NumberFormat('en-IN').format(i.amount)}</Text>
-                      </View>
-                    )
-                  })
+                  <>
+                  <View style={style.row}>
+                        <Text style={{ fontSize: 14, fontWeight: 300, color: '#2F2F2F' }}>
+                          Last Rent Paid(30 days)
+                        </Text>
+                        <Text style={{ fontSize: 14, fontWeight: 300, color: '#2F2F2F' }}>
+                          ₹ {new Intl.NumberFormat('en-IN').format(
+                            paymentContext?.getInvoiceDetail?.currentMonthInfo?.lastRentPaid ? paymentContext?.getInvoiceDetail?.currentMonthInfo?.lastRentPaid : "N/A")}
+                        </Text>
+                  </View>
+
+                  <View style={style.row}>
+                        <Text style={{ fontSize: 14, fontWeight: 300, color: '#2F2F2F' }}>
+                          Actual Stay days
+                        </Text>
+                        <Text style={{ fontSize: 14, fontWeight: 300, color: '#2F2F2F' }}>
+                          ₹ {new Intl.NumberFormat('en-IN').format(
+                            paymentContext?.getInvoiceDetail?.currentMonthInfo?.payableRent ? paymentContext?.getInvoiceDetail?.currentMonthInfo?.payableRent : "N/A")}
+                        </Text>
+                  </View>
+                  </>
+
+
+                  // paymentContext?.getInvoiceDetail?.currentMonthInfo.map(i => {
+                  //   return (
+                  //     <View style={style.row}>
+                  //       <Text style={{ fontSize: 14, fontWeight: 300, color: '#2F2F2F' }}>{i.list}</Text>
+                  //       <Text style={{ fontSize: 14, fontWeight: 300, color: '#2F2F2F' }}>₹ {new Intl.NumberFormat('en-IN').format(i.amount)}</Text>
+                  //     </View>
+                  //   )
+                  // })
 
                 )}
 
-                <View style={[style.row, { marginTop: 10 }]}>
-                  <Text style={{ fontSize: 14, fontWeight: 400 }}>Maintanence</Text>
+                {paymentContext?.getInvoiceDetail?.advanceInfo?.deductions.length >0 && (
+                  paymentContext?.getInvoiceDetail?.advanceInfo?.deductions.map(i=>{
 
-                  <Text style={{ fontSize: 16, fontWeight: 700 }}>₹ 9000</Text>
+                   return <View style={[style.row, { marginTop: 10 }]}>
+                  <Text style={{ fontSize: 14, fontWeight: 400 }}>{i.name}</Text>
+
+                  <Text style={{ fontSize: 16, fontWeight: 700 }}>₹ {i.amount}</Text>
                 </View>
+                  })
+                )}
 
                 <View
                   style={{
@@ -1347,21 +1384,24 @@ function Dashboard(props) {
                     Paid Date
                   </Text>
                   <Text style={style.paiddetailValue}>
-                    {paymentContext?.getInvoiceDetail?.lastPaidDate}
+                    {paymentContext?.getInvoiceDetail?.lastPaidDate ? paymentContext?.getInvoiceDetail?.lastPaidDate : "N/A"}
                   </Text>
                 </View>
 
                 <View style={{ marginTop: 10 }}>
                   <View style={style.Billbottom}>
                     <Text style={style.paiddetailLabel}>Payment Mode</Text>
-                    <Text style={style.paiddetailValue}>{paymentContext?.getInvoiceDetail?.lastPaymentMode}</Text>
+                    <Text style={style.paiddetailValue}>
+                      {paymentContext?.getInvoiceDetail?.lastPaymentMode ? paymentContext?.getInvoiceDetail?.lastPaymentMode : "N/A"}</Text>
 
                   </View>
 
                   <View style={[style.Billbottom, { paddingTop: 10 }]}>
                     <Text style={style.paiddetailLabel}>Reference number</Text>
 
-                    <Text>{paymentContext?.getInvoiceDetail?.lastReferenceId}</Text>
+                    <Text style={style.paiddetailValue}>
+                      {paymentContext?.getInvoiceDetail?.lastReferenceId ? paymentContext?.getInvoiceDetail?.lastReferenceId : "N/A"}
+                    </Text>
                     {/* {paymentContext.getInvoiceDetail.receipts.map(i => {
                       return (
                         <Text key={i.transactionId} style={style.paiddetailValue}>{i.referenceNumber}</Text>
@@ -1537,7 +1577,7 @@ const style = StyleSheet.create({
 
   },
   bottomSheetwithimage: {
-    height: height * 0.60,
+    height: height * 0.65,
     backgroundColor: '#fff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
@@ -1547,7 +1587,7 @@ const style = StyleSheet.create({
     overflow: 'hidden'
   },
    resolvedSheetWithImage: {
-    height: height * 0.70,
+    height: height * 0.76,
     backgroundColor: '#fff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
@@ -1557,7 +1597,7 @@ const style = StyleSheet.create({
     overflow: 'hidden'
   },
   resolvedSheet: {
-    height: height * 0.65,
+    height: height * 0.67,
     backgroundColor: '#fff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
