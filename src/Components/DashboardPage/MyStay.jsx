@@ -326,7 +326,7 @@ function MyStay(props) {
                 <Text style={{ fontSize: 14, fontWeight: '600' }}>Quick Links</Text>
             </View>
             <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'space-between' }}>
-                <TouchableOpacity onPress={complaintsClick}
+                <TouchableOpacity onPress={() => props.onSheet()}
                     style={{
                         borderWidth: 1, borderRadius: 10, flex: 1, justifyContent: 'center',
                         alignItems: 'center', marginRight: 10, padding: 10, borderColor: '#EFF2FF'

@@ -80,7 +80,7 @@ const ReceiptPdfViewer = ({ route }) => {
               : "Final Settlement Receipt"} */}
 
 
-              {selectedReceiptDetail?.configurations?.receiptType === "Rent" ? "Rental Payment Receipt" : "Security Deposit Receipt"}
+              {selectedReceiptDetail?.configurations?.receiptType === "Rent" ? "Rental Payment Receipt" : selectedReceiptDetail?.configurations?.receiptType === "Settlement" ? "Final settlement Receipt" : "Security Deposit Receipt"}
             </Text>
           </View>
 
@@ -167,8 +167,8 @@ const ReceiptPdfViewer = ({ route }) => {
               <View style={styles.invStyle}>
 
                 <Text style={styles.invSty}>
-                  Invoice : {' '}
-                  <Text style={styles.bold}>{selectedReceiptDetail?.invoiceNumber}</Text>
+                  Receipt : {' '}
+                  <Text style={styles.bold}>{selectedReceiptDetail?.receiptInfo?.receiptNumber}</Text>
                 </Text>
 
                 <Text style={styles.invSty}>

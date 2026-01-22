@@ -46,7 +46,7 @@ const CustomerProfile = (route) => {
 
   const navigation = useNavigation();
   const [customer, setCustomers] = useState()
-  const {NotificationModule}=NativeModules;
+  const { NotificationModule } = NativeModules;
 
   useEffect(() => {
     const onBackPress = () => {
@@ -122,11 +122,11 @@ const CustomerProfile = (route) => {
 
   const handleLogout = () => {
 
-    const data= {
+    const data = {
       xuid: loginContext.getUserId,
     }
 
-     logoutSetup(data,loginContext.getToken).then(r=>{
+    logoutSetup(data, loginContext.getToken).then(r => {
       console.log(r)
     })
     loginContext.logout('false')
@@ -136,7 +136,7 @@ const CustomerProfile = (route) => {
     loginContext.updateToken(null)
     NotificationModule.logout();
 
-   
+
     // navigation.navigate("SplashScreen");
   }
 
@@ -153,94 +153,97 @@ const CustomerProfile = (route) => {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer} >
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-            <Image
-              source={LeftArrow}
-              style={{ height: 25, width: 25 }}
-            />
-          </TouchableOpacity>
-          <Text style={styles.header}>Customer Profile</Text>
-        </View>
-
-        <View style={styles.profileCard}>
-          <View style={styles.profileRow}>
-
-            {context.getCustomerDetail?.profilePic ? (
+        <View >
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <TouchableOpacity style={styles.backButton} onPress={handleBack}>
               <Image
-                source={{ uri: context.getCustomerDetail?.profilePic }}
-                style={styles.profileImage} />
-            ) : (
-              <View style={[styles.profileImage, styles.initialContainer]}>
-                <Text style={styles.initialText}>
-                  {context.getCustomerDetail?.initials}
-                </Text>
-              </View>
-            )}
-            <View style={{ flex: 1, marginLeft: 10 }}>
-              <View style={{ display: 'flex', flexDirection: 'row',flex:1 }}>
-                <Text style={[styles.profileName,{flexShrink:1}]}
-                numberOfLines={1} 
-                ellipsizeMode="tail">
-                  {context.getCustomerDetail?.firstName}
-                  {" "}{context.getCustomerDetail?.lastName}
-                </Text>
+                source={LeftArrow}
+                style={{ height: 25, width: 25 }}
+              />
+            </TouchableOpacity>
+            <Text style={styles.header}>Customer Profile</Text>
+          </View>
 
-                {/* <Text style={styles.lastName}>{context.getCustomerDetail?.lastName}</Text> */}
-                <Image source={VerifyIcon} resizeMode="contain" style={{ marginTop: 2, marginLeft: 4, height: 20, width: 20 }} />
-              </View>
 
-              <View style={styles.infoRow}>
-                <View style={styles.FloorBadgePending}>
-                  <Text numberOfLines={1} ellipsizeMode="clip"
-                   style={{ color: 'black',textAlign:'center' }}>{context.getCustomerDetail?.bookingDetails?.floorName}</Text>
+          <View style={styles.profileCard}>
+            <View style={styles.profileRow}>
+
+              {context.getCustomerDetail?.profilePic ? (
+                <Image
+                  source={{ uri: context.getCustomerDetail?.profilePic }}
+                  style={styles.profileImage} />
+              ) : (
+                <View style={[styles.profileImage, styles.initialContainer]}>
+                  <Text style={styles.initialText}>
+                    {context.getCustomerDetail?.initials}
+                  </Text>
+                </View>
+              )}
+              <View style={{ flex: 1, marginLeft: 10 }}>
+                <View style={{ display: 'flex', flexDirection: 'row', flex: 1 }}>
+                  <Text style={[styles.profileName, { flexShrink: 1 }]}
+                    numberOfLines={1}
+                    ellipsizeMode="tail">
+                    {context.getCustomerDetail?.firstName}
+                    {" "}{context.getCustomerDetail?.lastName}
+                  </Text>
+
+                  {/* <Text style={styles.lastName}>{context.getCustomerDetail?.lastName}</Text> */}
+                  <Image source={VerifyIcon} resizeMode="contain" style={{ marginTop: 2, marginLeft: 4, height: 20, width: 20 }} />
                 </View>
 
-                <View style={{ flexDirection: 'row', alignItems: 'center',flex:1}}>
-                  <Image
-                    source={RoomIcon}
-                    style={{ height: 16, width: 16, marginRight: 4 }}
-                    resizeMode="contain"
-                  />
-                  <Text style={{ flexShrink: 1 }}
-                    numberOfLines={2}
-                    ellipsizeMode="tail">{context.getCustomerDetail?.bookingDetails?.roomName}</Text>
+                <View style={styles.infoRow}>
+                  <View style={styles.FloorBadgePending}>
+                    <Text numberOfLines={1} ellipsizeMode="clip"
+                      style={{ color: 'black', textAlign: 'center' }}>{context.getCustomerDetail?.bookingDetails?.floorName}</Text>
+                  </View>
+
+                  <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                    <Image
+                      source={RoomIcon}
+                      style={{ height: 16, width: 16, marginRight: 4 }}
+                      resizeMode="contain"
+                    />
+                    <Text style={{ flexShrink: 1 }}
+                      numberOfLines={2}
+                      ellipsizeMode="tail">{context.getCustomerDetail?.bookingDetails?.roomName}</Text>
+                  </View>
+
+                  <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                    <Image
+                      source={BedIcon}
+                      style={{ height: 16, width: 16, marginRight: 4 }}
+                      resizeMode="contain"
+                    />
+                    <Text style={{ flexShrink: 1 }}
+                      numberOfLines={2}
+                      ellipsizeMode="tail">{context.getCustomerDetail?.bookingDetails?.bedName}</Text>
+                  </View>
+
+
                 </View>
-
-                <View style={{ flexDirection: 'row', alignItems: 'center',flex:1}}>
-                  <Image
-                    source={BedIcon}
-                    style={{ height: 16, width: 16, marginRight: 4 }}
-                    resizeMode="contain"
-                  />
-                  <Text style={{ flexShrink: 1 }}
-                    numberOfLines={2}
-                    ellipsizeMode="tail">{context.getCustomerDetail?.bookingDetails?.bedName}</Text>
-                </View>
-
-
               </View>
-            </View>
-            {/* <TouchableOpacity onPress={handleEditProfile}>
+              {/* <TouchableOpacity onPress={handleEditProfile}>
               <Image source={EditIcon} resizeMode="contain"
                 style={{ height: 20, width: 20 }} />
             </TouchableOpacity> */}
+            </View>
           </View>
-        </View>
 
-        {/* ----KYC------ */}
 
-        <View style={styles.card}>
-          <Text style={styles.sectionTitle}>Complete your KYC verification</Text>
-          <Text style={styles.warningText}>
-            Enter your Aadhar/PAN card documents and Complete the status
-          </Text>
-          <TouchableOpacity style={styles.primaryButton} onPress={() => navigation.navigate("ComingSoonPage")}>
-            <Text style={styles.primaryButtonText}>Verify Now</Text>
-          </TouchableOpacity>
-        </View>
+          {/* ----KYC------ */}
 
-        {/* <View style={styles.card}>
+          <View style={styles.card}>
+            <Text style={styles.sectionTitle}>Complete your KYC verification</Text>
+            <Text style={styles.warningText}>
+              Enter your Aadhar/PAN card documents and Complete the status
+            </Text>
+            <TouchableOpacity style={styles.primaryButton} onPress={() => navigation.navigate("ComingSoonPage")}>
+              <Text style={styles.primaryButtonText}>Verify Now</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* <View style={styles.card}>
           <View style={styles.cardRow}>
             <Text style={styles.cardTitle}>KYC Status</Text>
             <View style={styles.statusBadgePending}>
@@ -254,29 +257,30 @@ const CustomerProfile = (route) => {
         </View> */}
 
 
-        <View style={styles.cards}>
+          <View style={styles.cards}>
 
-          <TouchableOpacity onPress={HostelClick} style={styles.row}>
-            <View style={{ flexDirection: 'row' }}>
-              <Image source={buildings} style={{ width: 20, height: 20 }} />
-              <Text style={{ fontSize: 14, fontWeight: 400, marginLeft: 5 }}>
-                Hostels</Text>
-            </View>
+            <TouchableOpacity onPress={HostelClick} style={styles.row}>
+              <View style={{ flexDirection: 'row' }}>
+                <Image source={buildings} style={{ width: 20, height: 20 }} />
+                <Text style={{ fontSize: 14, fontWeight: 400, marginLeft: 5 }}>
+                  Hostels</Text>
+              </View>
 
-            <Image source={sideframe} style={{ width: 23, height: 23 }} />
-          </TouchableOpacity>
+              <Image source={sideframe} style={{ width: 23, height: 23 }} />
+            </TouchableOpacity>
 
-          <View style={styles.divider} />
+            <View style={styles.divider} />
 
-          <TouchableOpacity onPress={() => navigation.navigate('ComingSoonPage')} style={styles.row}>
-            <View style={{ flexDirection: 'row' }}>
-              <Image source={paperclip} style={{ width: 20, height: 20 }} />
-              <Text style={{ fontSize: 14, fontWeight: 400, marginLeft: 5 }}>Rental Agreement</Text>
-            </View>
+            <TouchableOpacity onPress={() => navigation.navigate('ComingSoonPage')} style={styles.row}>
+              <View style={{ flexDirection: 'row' }}>
+                <Image source={paperclip} style={{ width: 20, height: 20 }} />
+                <Text style={{ fontSize: 14, fontWeight: 400, marginLeft: 5 }}>Rental Agreement</Text>
+              </View>
 
-            <Image source={sideframe} style={{ width: 23, height: 23 }} />
-          </TouchableOpacity>
+              <Image source={sideframe} style={{ width: 23, height: 23 }} />
+            </TouchableOpacity>
 
+          </View>
         </View>
 
 
@@ -314,18 +318,21 @@ const CustomerProfile = (route) => {
 
         {/* </View> */}
         {/* </View> */}
+        <View style={{ justifyContent: 'flex-end'}}>
+          <View style={styles.helpRow}>
+            <Image source={InfoIcon} resizeMode="contain" style={{ width: 20, height: 20 }} />
+            <Text style={styles.helpText}>Help & Information</Text>
+          </View>
 
-        <View style={styles.helpRow}>
-          <Image source={InfoIcon} resizeMode="contain" style={{ width: 20, height: 20 }} />
-          <Text style={styles.helpText}>Help & Information</Text>
-        </View>
+          <View style={{ marginTop: 20, }}>
+            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+              <Image source={LogoutIcon} resizeMode="contain" style={{ width: 20, height: 20 }} />
+              <Text style={styles.logoutText}>Logout</Text>
+            </TouchableOpacity>
+          </View>
 
-        <View style={{ marginTop: 20, }}>
-          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-            <Image source={LogoutIcon} resizeMode="contain" style={{ width: 20, height: 20 }} />
-            <Text style={styles.logoutText}>Logout</Text>
-          </TouchableOpacity>
         </View>
+        
       </ScrollView>
 
 
@@ -343,7 +350,9 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     padding: 20,
-    paddingBottom: 100,
+    paddingBottom: 90,
+    flexGrow:1,
+    justifyContent:"space-between"
   },
   backButton: {
     flexDirection: "row",
@@ -363,11 +372,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#eee",
     marginBottom: 12,
-    flex:1
+    flex: 1
   },
   profileRow: {
     flexDirection: "row",
-    flex:1
+    flex: 1
   },
   profileImage: {
     width: 60,
@@ -435,8 +444,8 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: 5,
     borderRadius: 20,
-    alignItems:'center',
-    flex:1
+    alignItems: 'center',
+    flex: 1
   },
   statusText: {
     color: "white",

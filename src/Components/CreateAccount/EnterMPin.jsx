@@ -68,6 +68,41 @@ const EnterMPin = (props) => {
             setmPinNumber(pinNumber)
             setEnterPinError("")
             console.log(pinNumber)
+
+            const data = {
+            xuid: loginContext.getUserId,
+            mPin: pinNumber,
+        }
+
+        verifyMPin(data).then(r => {
+            console.log(r)
+            if (r.status == 200) {
+                console.log(r.data)
+                setHostelList(r.data)
+                storeData(LOGGEDIN, "true")
+                loginContext.loggedin('true')
+                context.updateHostelList(r.data)
+
+                setShowSuccessModal(true)
+                setShowModelMessage("Login Successfully")
+                setModelType('success')
+
+                setTimeout(() => {
+                    setShowSuccessModal(false);
+                    // navigation.navigate('HostelList')
+                    props.callbackMpin()
+                }, 2000);
+            }
+            else if (r.status == 400) {
+                setShowSuccessModal(true)
+                setShowModelMessage("Incorrect MPIN")
+                setModelType('error')
+
+                setTimeout(() => {
+                    setShowSuccessModal(false);
+                }, 2000);
+            }
+        })
         } else {
             setmPinNumber("")
         }
@@ -207,11 +242,11 @@ const EnterMPin = (props) => {
         </View>
 
 
-        <View style={{ flex: 1, justifyContent: "center", }}>
+        {/* <View style={{ flex: 1, justifyContent: "center", }}>
             <TouchableOpacity onPress={enterPinClick} style={style.nextButton}>
                 <Text style={style.nextText}>Enter mPIN</Text>
             </TouchableOpacity>
-        </View>
+        </View> */}
 
 
 

@@ -72,6 +72,7 @@ const AddComplaint = ({
                 quality: 0.6,
                 selectionLimit: 0,
             });
+            console.log(result)
              if (!result.canceled) {
             setmediaImage(result.assets.map(item => item.uri));
             setImageuri(result.assets);

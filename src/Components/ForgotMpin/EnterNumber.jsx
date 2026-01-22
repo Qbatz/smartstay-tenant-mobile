@@ -3,6 +3,7 @@ import { View,TouchableOpacity,Text,StyleSheet,Image,TextInput } from "react-nat
 import { LoginContexts } from "../../Context/LoginContext";
 import SuccessModal from "../ToastFile/TostFilePage";
 import { verifyPhoneNo } from "../../Action/LoginAction";
+import ErrorMessage from "../ToastFile/ErrorMessage";
 
 
 const EnterNumber=({navigation})=>{
@@ -13,6 +14,7 @@ const EnterNumber=({navigation})=>{
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const[otp,setOtp]=useState();
   const [modelTpe,setModelType]=useState()
+  const [phoneNoError, setPhoneNoError]=useState()
   
 
  const handlePhoneChange = (text) => { 
@@ -22,8 +24,23 @@ const EnterNumber=({navigation})=>{
 
 };
 
+const validateForm=()=>{
+    let valid= true
+
+    setPhoneNoError("")
+
+    if(phoneNumber.length != 10){
+       setPhoneNoError("Please enter valid mobile Number")
+       valid =false;
+    }
+
+    return valid;
+  }
+
+
 
 const handleGetOtp = async () => {
+  if(!validateForm()) return;
   if (phoneNumber.length === 10) {
 
     const dat= await verifyPhoneNo(phoneNumber)
@@ -87,6 +104,7 @@ const handleGetOtp = async () => {
             maxLength={10}
           />
         </View>
+        {phoneNoError && <ErrorMessage message={phoneNoError} type="error"/>}
       </View>
 
       <View style={styles.centerButtonContainer}>
@@ -95,7 +113,7 @@ const handleGetOtp = async () => {
             styles.button,
             isButtonDisabled ? styles.buttonDisabled : styles.buttonEnabled,
           ]}
-          disabled={isButtonDisabled}
+          // disabled={isButtonDisabled}
           onPress={handleGetOtp}
         >
           <Text style={styles.buttonText}>Get OTP →</Text>
@@ -142,7 +160,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 10,
     alignItems: "center",
-    marginBottom: 25,
+    marginBottom: 5,
   },
   countryCode: {
     fontWeight: "600",

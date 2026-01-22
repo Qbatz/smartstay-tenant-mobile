@@ -11,6 +11,8 @@ import {
 import Swiper from "react-native-swiper";
 
 import onboardImg from "../../assets/Images/image 6345209.png";
+import RaisePic from "../../assets/Images/RaisePic.png";
+import SeamlesslyPic from "../../assets/Images/SeamlesslyPic.png"
 import Logo from "../../assets/Images/Logo.png";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -62,7 +64,7 @@ export default function OnboardingScreen({ navigation }) {
 
               {/* SLIDE 2 */}
               <View style={styles.card}>
-                <Image source={onboardImg} style={styles.image} />
+                <Image source={RaisePic} style={styles.image} />
                 <Text style={styles.title}>Raise Services &</Text>
                 <Text style={styles.title}>Track Easily</Text>
 
@@ -73,7 +75,7 @@ export default function OnboardingScreen({ navigation }) {
 
               {/* {--slide 3--} */}
                <View style={styles.card}>
-                <Image source={onboardImg} style={styles.image} />
+                <Image source={SeamlesslyPic} style={styles.image} />
                 <Text style={styles.title}>View & Pay Bills</Text>
                 <Text style={styles.title}>Seamlessly</Text>
 
