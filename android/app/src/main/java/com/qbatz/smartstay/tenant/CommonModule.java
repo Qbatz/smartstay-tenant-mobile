@@ -5,6 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.provider.Settings;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -44,7 +45,9 @@ public class CommonModule extends ReactContextBaseJavaModule {
         boolean connected=(connectivityManager.getNetworkInfo(connectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
                 connectivityManager.getNetworkInfo(connectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED);
 
-        System.out.println(connected);
+        System.out.println("Connected,"+ connected);
+        Log.d("CommonModule", "connected = " + connected);
+
         promise.resolve(connected);
     }
 

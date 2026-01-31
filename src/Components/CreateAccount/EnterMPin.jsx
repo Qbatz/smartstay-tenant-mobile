@@ -5,8 +5,8 @@ import { useNavigation } from "@react-navigation/native";
 import { UsersContext } from "../../Context/UserContext";
 import { verifyMPin } from "../../Action/LoginAction";
 import SuccessModal from "../ToastFile/TostFilePage";
-import { storeData } from "../../Utils/Storage";
-import { ACCESS_TOKEN, LOGGEDIN } from "../../Utils/Constant";
+import { retriveData, storeData } from "../../Utils/Storage";
+import { ACCESS_TOKEN, CUSTOMERDETAIL, LOGGEDIN } from "../../Utils/Constant";
 import { LoginContexts } from "../../Context/LoginContext";
 import WaveIcon from '../../assets/Images/HiIcon.png';
 import ErrorMessage from "../ToastFile/ErrorMessage";
@@ -14,6 +14,7 @@ import AppLogo from "../../assets/Images/AppLogo.png"
 
 
 const EnterMPin = (props) => {
+    console.log(props)
 
     const context = useContext(UsersContext)
     const loginContext = useContext(LoginContexts)
@@ -26,6 +27,8 @@ const EnterMPin = (props) => {
     const [modelType, setModelType] = useState();
     const [hostelList, setHostelList] = useState([]);
     const [enterPinError, setEnterPinError] = useState()
+
+     const [customerName, setCustomerName] = useState();
 
     const rotation = useRef(new Animated.Value(0)).current;
 
@@ -47,6 +50,13 @@ const EnterMPin = (props) => {
             ])
         ).start();
     }, []);
+
+    useEffect(()=>{
+        retriveData(CUSTOMERDETAIL).then(r=>{
+            console.log(r)
+            setCustomerName(r)
+        })
+    },[])
 
     const rotateInterpolate = rotation.interpolate({
         inputRange: [-1, 1],
@@ -80,9 +90,7 @@ const EnterMPin = (props) => {
                 if (r.status == 200) {
                     console.log(r.data)
                     setHostelList(r.data)
-                    storeData(LOGGEDIN, "true")
-                    loginContext.loggedin('true')
-                    context.updateHostelList(r.data)
+
 
                     setShowSuccessModal(true)
                     setShowModelMessage("Login Successfully")
@@ -90,6 +98,9 @@ const EnterMPin = (props) => {
 
                     setTimeout(() => {
                         setShowSuccessModal(false);
+                        storeData(LOGGEDIN, "true")
+                        loginContext.loggedin('true')
+                        context.updateHostelList(r.data)
                         // navigation.navigate('HostelList')
                         props.callbackMpin()
                     }, 2000);
@@ -215,6 +226,8 @@ const EnterMPin = (props) => {
 
                 <Image source={AppLogo} style={style.logo} />
 
+                {/* <Text style={style.createText}>Hi,{customerName}</Text> */}
+
                 <Text style={style.createText}>Welcome to SmartStay</Text>
 
                 <Text style={style.subtitle}>Please enter 4 Digit the mPIN </Text>
@@ -266,8 +279,8 @@ const EnterMPin = (props) => {
 }
 
 const style = StyleSheet.create({
-    logo: { width: 66.32, height: 66.25,resizeMode:'contain' },
-    createText: { fontSize: 27, fontWeight: 600, color: '#222222', marginTop: 20 },
+    logo: { width: 66.32, height: 66.25, resizeMode: 'contain' },
+    createText: { fontSize: 27, fontWeight: 600, color: '#222222', marginTop: 20},
     subtitle: { fontSize: 14, fontWeight: 400, color: '#4B4B4B', marginTop: 15 },
     pinContainer: { flexDirection: 'row', justifyContent: 'space-between', paddingTop: 40, paddingLeft: 10, paddingRight: 10, marginBottom: 5 },
     pinBox: {

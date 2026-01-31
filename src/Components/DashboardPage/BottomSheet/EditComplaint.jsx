@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, FlatList, Image, TouchableWithoutFeedback, Animated, ScrollView } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -11,6 +11,9 @@ import { UsersContext } from "../../../Context/UserContext";
 import { LoginContexts } from "../../../Context/LoginContext";
 import { compliantContexts } from "../../../Context/ComplaintContext";
 import ErrorMessage from "../../ToastFile/ErrorMessage";
+import { useFocusEffect } from "@react-navigation/native";
+import Trash from "../../../assets/Images/trash 01.png"
+
 
 
 const EditComplaintSheet = ({
@@ -39,50 +42,96 @@ const EditComplaintSheet = ({
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [toastMessage, setToastMessage] = useState()
     const [modelType, setModelType] = useState()
-     const [compliantTypeError, setComplaintTypeError]=useState();
-    const [commentError, setCommentError]=useState()
-    const [commentNoChanges,setCommentNoChanges]=useState()
+    const [compliantTypeError, setComplaintTypeError] = useState();
+    const [commentError, setCommentError] = useState()
+    const [commentNoChanges, setCommentNoChanges] = useState()
+    const [selectedIndex, setSelectedIndex] = useState(null);
+    const [deleteVisible, setDeleteVisible] = useState(false);
 
     console.log(selectedComplaintTypeId)
     console.log(selectedComplaint)
     console.log(mediaimage)
+    console.log(description)
 
     useEffect(() => {
-        if (selectedComplaint?.complaintTypeId) {
-            console.log(selectedComplaint.images)
-            setSelectedComplaintTypeId(selectedComplaint.complaintTypeId);
-            setDespriction(selectedComplaint.description)
-            setMediaimage(selectedComplaint.images)
+        if (visible && selectedComplaint) {
+            setSelectedComplaintTypeId(selectedComplaint.complaintTypeId ?? null);
+            setDespriction(selectedComplaint.complaintDescription ?? "");
+            setMediaimage(selectedComplaint.complaintImages ?? []);
+            setImageuri([]); 
+            setSelectedIndex(null);
+            setDeleteVisible(false);
         }
-    }, [selectedComplaint]);
+    }, [visible, selectedComplaint]);
+
+
+    // const uploadimage = async () => {
+    //     try {
+    //         const result = await launchImageLibrary({
+    //             mediaTypes: 'photo',
+    //             allowsEditing: true,
+    //             // aspect: [1, 1],
+    //             maxHeight: 100, maxWidth: 100,
+    //             quality: 0.5,
+    //         });
+    //         setMediaimage([...mediaimage, result.assets[0].uri])
+    //         setImageuri([...imageuri, result.assets[0]])
+    //     } catch (error) {
+    //         console.log(error)
+    //     }
+    // }
 
     const uploadimage = async () => {
         try {
             const result = await launchImageLibrary({
-                mediaTypes: 'photo',
-                allowsEditing: true,
-                aspect: [1, 1],
+                mediaType: 'photo',
                 quality: 0.5,
+                selectionLimit: 0,
             });
-            setMediaimage([...mediaimage, result.assets[0].uri])
-            setImageuri([...imageuri, result.assets[0]])
+            if (!result.canceled) {
+                setMediaimage(prev =>
+                    prev.concat(result.assets.map(item => item.uri))
+                );
+
+                setImageuri(prev =>
+                    prev.concat(result.assets)
+                );
+            }
         } catch (error) {
             console.log(error)
         }
     }
 
+    const imageClick = (index) => {
+        if (selectedIndex === index) {
+            setDeleteVisible(!deleteVisible)
+        }
+        else {
+            setSelectedIndex(index)
+            setDeleteVisible(true)
+        }
+    }
+
+    const removeImage = (index) => {
+        setMediaimage(prev => prev.filter((_, i) => i !== index));
+        setImageuri(prev => prev.filter((_, i) => i !== index));
+
+        setSelectedIndex(null);
+        setDeleteVisible(false);
+    }
+
     console.log(imageuri)
 
-    const validateForm=()=>{
-        let valid=true;
+    const validateForm = () => {
+        let valid = true;
 
-          setComplaintTypeError("")
-            setCommentError("")
-            setCommentNoChanges("")
+        setComplaintTypeError("")
+        setCommentError("")
+        setCommentNoChanges("")
 
-        if(selectedComplaintTypeId === 0){
+        if (selectedComplaintTypeId === 0) {
             setComplaintTypeError("Select complaint type");
-            valid =false;
+            valid = false;
         }
 
 
@@ -90,16 +139,16 @@ const EditComplaintSheet = ({
 
         if (!desc) {
             setCommentError("Enter comment && above 15 letters")
-            valid =false;
+            valid = false;
         }
 
         if (desc.length < 15) {
-             setCommentError("Enter comment && above 15 letters")
-             valid =false;
+            setCommentError("Enter comment && above 15 letters")
+            valid = false;
         }
 
         // const noChanges = selectedComplaint.complaintTypeId === selectedComplaintTypeId &&
-        //     selectedComplaint.description === description && mediaimage.length ===(selectedComplaint?.images?.length || 0)
+        //     selectedComplaint.description === description && mediaimage.length ===(selectedComplaint?.complaintImages?.length || 0)
 
         // if (noChanges) {
         //    setCommentNoChanges("No changes made in comment")
@@ -109,7 +158,9 @@ const EditComplaintSheet = ({
         return valid;
     }
     const submitBtn = () => {
-        if(!validateForm()) return;
+        if (!validateForm()) return;
+
+
 
         //  if (selectedComplaintTypeId === 0) {
         //     setShowSuccessModal(true);
@@ -137,8 +188,9 @@ const EditComplaintSheet = ({
         //     return;
         // }
 
+
         const noChanges = selectedComplaint.complaintTypeId === selectedComplaintTypeId &&
-            selectedComplaint.description === description && mediaimage.length ===(selectedComplaint?.images?.length || 0)
+            selectedComplaint.complaintDescription === description && mediaimage.length === (selectedComplaint?.complaintImages?.length || 0)
 
         if (noChanges) {
             setShowSuccessModal(true)
@@ -155,17 +207,13 @@ const EditComplaintSheet = ({
             description: description,
         }
 
-        console.log(payloads)
-
-        console.log(imageuri)
-
 
         const formData = new FormData();
 
         const base64EncodeUnicode = (str) => {
             return btoa(
                 encodeURIComponent(str).replace(
-                    /%([0-9A-F]{2})/g,  
+                    /%([0-9A-F]{2})/g,
                     (_, p1) => String.fromCharCode('0x' + p1)
                 )
             );
@@ -194,7 +242,7 @@ const EditComplaintSheet = ({
             // console.log(complaitImages)
 
 
-            formData.append("complaintImage", imageuri)
+            // formData.append("complaintImage", imageuri)
 
             imageuri.forEach((img, index) => {
                 formData.append("complaintImage", {
@@ -303,13 +351,14 @@ const EditComplaintSheet = ({
                                         onFocus={() => setIsFocus(true)}
                                         onBlur={() => setIsFocus(false)}
                                         data={complaintType}
-                                        containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
+                                        containerStyle={{ borderRadius: 10, paddingLeft: 0}}
                                         placeholder="Select a type"
                                         labelField="complaintTypeName"
                                         valueField="complaintTypeId"
                                         value={selectedComplaintTypeId}
-                                        onChange={(item) => {setSelectedComplaintTypeId(item.complaintTypeId)
-                                            if(compliantTypeError){
+                                        onChange={(item) => {
+                                            setSelectedComplaintTypeId(item.complaintTypeId)
+                                            if (compliantTypeError) {
                                                 setComplaintTypeError("")
                                             }
                                         }}
@@ -323,25 +372,26 @@ const EditComplaintSheet = ({
                                         )}
                                     />
                                 </View>
-                                {compliantTypeError && <ErrorMessage message={compliantTypeError} type="error"/>}
+                                {compliantTypeError && <ErrorMessage message={compliantTypeError} type="error" />}
 
                                 <View style={{ paddingTop: 16 }}>
                                     <Text>Complaint message
                                         <Text style={{ color: 'red' }}> *</Text>
                                     </Text>
                                     <View style={styles.textInputBox}>
-                                        <TextInput value={description} placeholder="Enter message" onChangeText={(value)=>{setDespriction(value)
-                                            if(commentError){
-                                                setCommentError("")     
+                                        <TextInput value={description} placeholder="Enter message" onChangeText={(value) => {
+                                            setDespriction(value)
+                                            if (commentError) {
+                                                setCommentError("")
                                             }
-                                            if(commentNoChanges){setCommentNoChanges("")}
+                                            if (commentNoChanges) { setCommentNoChanges("") }
                                         }}
                                             multiline={true}
                                             numberOfLines={4}
                                             style={{ textAlignVertical: "top" }} />
                                     </View>
-                                     {commentError && <ErrorMessage message={commentError} type="error"/>}
-                                      {commentNoChanges && <ErrorMessage message={commentNoChanges} type="error"/>}
+                                    {commentError && <ErrorMessage message={commentError} type="error" />}
+                                    {commentNoChanges && <ErrorMessage message={commentNoChanges} type="error" />}
                                 </View>
 
                                 <View style={{ paddingTop: 16 }}>
@@ -359,11 +409,23 @@ const EditComplaintSheet = ({
                                             horizontal
                                             style={{ paddingTop: 20 }}
                                             data={mediaimage}
-                                            renderItem={({ item }) => (
-                                                <Image
-                                                    source={{ uri: item.imageUrl || item }}
-                                                    style={{ width: 80, height: 70, marginRight: 8, borderRadius: 5 }}
-                                                />
+                                            renderItem={({ item, index }) => (
+                                                <TouchableOpacity onPress={() => imageClick(index)}>
+                                                    <Image
+                                                        source={{ uri: item.imageUrl || item }}
+                                                        style={{ width: 80, height: 70, marginRight: 8, borderRadius: 5 }}
+                                                    />
+                                                    {selectedIndex === index && deleteVisible && (
+                                                        <TouchableOpacity onPress={() => removeImage(index)}
+                                                            style={{
+                                                                position: 'absolute', top: 0, bottom: 0, left: 0,
+                                                                right: 0, alignItems: 'center', justifyContent: 'center',
+                                                            }}>
+                                                            <Image source={Trash} style={{ width: 17.72, height: 17.72 }} />
+
+                                                        </TouchableOpacity>
+                                                    )}
+                                                </TouchableOpacity>
                                             )}
                                         />
                                     )}

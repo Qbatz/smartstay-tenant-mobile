@@ -28,7 +28,7 @@ import InfoIcon from "../../assets/Images/info-circle.png"
 import LogoutIcon from "../../assets/Images/logout.png";
 import { UsersContext } from "../../Context/UserContext";
 import { remoteData, storeData } from "../../Utils/Storage";
-import { ACCESS_TOKEN, LOGGEDIN, PHONE_NO } from "../../Utils/Constant";
+import { ACCESS_TOKEN, CUSTOMERDETAIL, CUSTOMERINITIALS, CUSTOMERPROFILEPIC, LOGGEDIN, LOGGEDOUT, PHONE_NO } from "../../Utils/Constant";
 import { customerDetails } from "../../Action/CustomerAction";
 import buildings from '../../assets/Images/buildings.png'
 import paperclip from '../../assets/Images/paperclip.png'
@@ -64,6 +64,12 @@ const CustomerProfile = (route) => {
     customerDetails(loginContext.getToken).then(r => {
       console.log(r.data)
       context.updateCustomer(r.data)
+      storeData(CUSTOMERDETAIL, r.data.firstName)
+      
+      storeData(CUSTOMERINITIALS,r.data.initials)
+      if(r.data.profilePic != null){
+        storeData(CUSTOMERPROFILEPIC, r.data.profilePic)
+      }
     }).catch(error => {
       console.log(error)
     })
@@ -121,6 +127,7 @@ const CustomerProfile = (route) => {
   }
 
   const handleLogout = () => {
+     console.log(loginContext)
 
     const data = {
       xuid: loginContext.getUserId,
@@ -129,12 +136,14 @@ const CustomerProfile = (route) => {
     logoutSetup(data, loginContext.getToken).then(r => {
       console.log(r)
     })
+    storeData(LOGGEDOUT, "true")
     loginContext.logout('false')
     remoteData(ACCESS_TOKEN)
-    remoteData(PHONE_NO)
+    // remoteData(PHONE_NO) 
     storeData(LOGGEDIN, "false")
     loginContext.updateToken(null)
     NotificationModule.logout();
+   
 
 
     // navigation.navigate("SplashScreen");
@@ -194,7 +203,7 @@ const CustomerProfile = (route) => {
 
                 <View style={styles.infoRow}>
                   <View style={styles.FloorBadgePending}>
-                    <Text numberOfLines={1} ellipsizeMode="clip"
+                    <Text numberOfLines={2} ellipsizeMode="clip"
                       style={{ color: 'black', textAlign: 'center' }}>{context.getCustomerDetail?.bookingDetails?.floorName}</Text>
                   </View>
 
@@ -346,7 +355,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    paddingTop: 30,
+    paddingTop: 20,
   },
   scrollContainer: {
     padding: 20,
@@ -361,9 +370,10 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   header: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "600",
     marginLeft: 10,
+    fontFamily:"gilroy-semibold"
   },
   profileCard: {
     backgroundColor: "#fff",

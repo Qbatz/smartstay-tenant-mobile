@@ -52,10 +52,17 @@ function Services(props) {
                     textColor: '#8B4513',
                 };
             case 'resolved':
+            case 'assigned':
                 return {
                     backgroundColor: '#C1F0C1',
                     textColor: '#06470C',
                 };
+            case 'OPENED':
+            case 'opened':
+                return {
+                    backgroundColor :'#EFF6FF',
+                    textColor: "#007FFF"
+                }
             default:
                 return {
                     backgroundColor: '#E0E0E0',
@@ -203,7 +210,7 @@ function Services(props) {
                                     fontSize: 12, color: '#A4A4A4', marginBottom: 8, fontWeight: '400',
                                 }}
                             >
-                                {item.complaintDate}
+                                {item?.complaintDateDisplay}
                             </Text>
 
                             <View

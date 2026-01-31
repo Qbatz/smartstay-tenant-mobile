@@ -55,7 +55,7 @@ const ReceiptPdfViewer = ({ route }) => {
       <ScrollView style={styles.container} >
         <View style={{ padding: 20 }}>
 
-          <View style={{ flexDirection: 'row', marginTop: 10 }}>
+          <View style={{ flexDirection: 'row', marginTop: 10, alignItems: 'center' }}>
             <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
               <TouchableOpacity onPress={handleBack}>
                 <Image
@@ -63,30 +63,40 @@ const ReceiptPdfViewer = ({ route }) => {
                   style={{ height: 25, width: 25 }}
                 />
               </TouchableOpacity>
-              <Text style={{ fontSize: 18, fontWeight: 600, marginLeft: 5 }}>
-                {selectedReceiptDetail?.receiptInfo?.receiptNumber}
-              </Text>
 
-              <View style={{
-                flexDirection: "row", borderRadius: 8, padding: 5, marginLeft: 6,
-                backgroundColor: paymentContext.getInvoiceDetail.status === "Paid" ? "#A5FF9624" : "#FFF7E7"
-              }}>
-                {/* <Image
+              <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+
+                <Text
+                  numberOfLines={1}
+                  style={{ fontSize: 18, fontWeight: 600, marginLeft: 5,flex:1  }}>
+                  {selectedReceiptDetail?.receiptInfo?.receiptNumber}
+                </Text>
+
+                <View style={{
+                  flexDirection: "row", borderRadius: 8, padding:5, marginLeft: 6, alignSelf: 'flex-start',
+                  backgroundColor: paymentContext.getInvoiceDetail.status === "Paid" ? "#A5FF9624" : "#FFF7E7",
+                  justifyContent:'center',alignItems:'center'
+                }}>
+                  {/* <Image
                     source={PaidIcon}
                     style={{ width: 20, height: 20 }}
                   /> */}
-                <Text style={{
-                  fontSize: 11,
-                  color: paymentContext.getInvoiceDetail.status === "Paid" ? "#09882C" : "#EC9B29"
-                }}>
-                  {paymentContext.getInvoiceDetail.status === "Paid"
+                  <Text
+                    numberOfLines={2}
+                    style={{
+                      fontSize: 11, flexWrap: 'wrap',textAlign:'center',
+                      color: paymentContext.getInvoiceDetail.status === "Paid" ? "#09882C" : "#EC9B29"
+                    }}>
+                    {paymentContext.getInvoiceDetail.status === "Paid"
                     ? "Full Paid"
                     : "Partial Payment"}
-                </Text>
+                  </Text>
+                </View>
               </View>
+
             </View>
 
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
               <TouchableOpacity
                 style={{ marginRight: 8 }}
               // onPress={downloadOption}

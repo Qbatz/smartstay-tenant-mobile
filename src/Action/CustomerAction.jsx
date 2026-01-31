@@ -169,3 +169,18 @@ export const getHostelRentalDetails=async(userId,token)=>{
     }
 
 }
+
+export const getComplaintsUpdates=async(hostelId,token, complaintId)=>{
+    try{
+        const axios=getAxios()
+        const response=await axios.get('/v2/complaints/updates/' + hostelId + "/" + complaintId , {
+            headers: {
+                Authorization: "Bearer " + token
+            }
+        }) 
+        return response;
+    }catch(error){
+        console.log(error.response)
+         return{status: error.response.status, message: error.response.data}
+    }
+}
