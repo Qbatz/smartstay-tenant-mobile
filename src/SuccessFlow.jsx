@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import EnterMPin from "./Components/CreateAccount/EnterMPin";
 import { View } from "react-native";
 import { LoginContexts } from "./Context/LoginContext";
@@ -30,11 +30,19 @@ import ComplaintUpdatesScreen from "./Components/ComplaintUpdates/Updates";
 import BookingInvoice from "./Components/InvoiceReceipt/BookingInvoice";
 import BookingReceipt from "./Components/InvoiceReceipt/BookingReceipt";
 
-const SuccessFlow = (props) => {
+const SuccessFlow = ({props, MpinVerified}) => {
+  console.log(props)
+  console.log(MpinVerified)
 
   const loginContext = useContext(LoginContexts)
   const Navigation = createStackNavigator();
   const [isMpinVerified, setMpinVerified] = useState(false)
+
+  useEffect(()=>{
+    if(MpinVerified === true){
+      setMpinVerified(true)
+    }
+  },[MpinVerified])
 
   const verifiedmpin = () => {
     setMpinVerified(true)

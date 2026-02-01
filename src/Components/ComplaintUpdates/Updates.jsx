@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -16,6 +16,10 @@ import InprogressLogo from '../../assets/Images/inprogresspic.png'
 import PersonLogo from '../../assets/Images/personlogo.png'
 import LeftArrow from "../../assets/Images/LeftArrow.png"
 import { useFocusEffect } from '@react-navigation/native';
+import { getComplaintsUpdates } from '../../Action/CustomerAction';
+import { UsersContext } from '../../Context/UserContext';
+import { LoginContexts } from '../../Context/LoginContext';
+import { compliantContexts } from '../../Context/ComplaintContext';
 
 
 const UPDATES = [
@@ -51,63 +55,95 @@ const UPDATES = [
   },
 ];
 
-/* ---------- STATUS CONFIG ---------- */
+
 const STATUS = {
   ASSIGNED: { color: '#CBD5E1', icon: PersonLogo },
   IN_PROGRESS: { color: '#FDBA74', icon: InprogressLogo },
   COMPLETED: { color: '#86EFAC', icon: SingleTickPic },
   RESOLVED: { color: '#22C55E', icon: DoubleTick },
+  OPENED: { color: '#CBD5E1', icon: PersonLogo }
 };
 
- 
 
-  const HistoryCommentsScreen=({ navigation }) =>{
+
+const HistoryCommentsScreen = ({ route, navigation }) => {
+  console.log(route)
+
+  const userContext = useContext(UsersContext)
+  const loginContext = useContext(LoginContexts)
+  const complaintContext = useContext(compliantContexts)
 
   const [comment, setComment] = useState('');
-  const isResolved = UPDATES[0]?.type === 'RESOLVED';
 
-    useFocusEffect(
-      useCallback(()=>{
-        const onBackPress=()=>{
-          navigation.goBack();
-          return true;
-        };
+  const isResolved = complaintContext.NewComplaintUpdates?.currentStatus === 'RESOLVED' || "resolved";
 
-       const subcription= BackHandler.addEventListener('hardwareBackPress',onBackPress);
+  //  UPDATES[0]?.type
 
-        return ()=>subcription.remove();
-      },[navigation])
-    )
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        navigation.goBack();
+        return true;
+      };
+
+      const subcription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () => subcription.remove();
+    }, [navigation])
+  )
+
+  useEffect(() => {
+    getComplaintsUpdates(userContext.getHostelDetail?.hostelId, loginContext.getToken, route.params.complaintId).then(r => {
+      console.log(r)
+      complaintContext.complaintUpdates(r.data.complaintsUpdates)
+    })
+  }, [])
+
+  console.log(complaintContext.NewComplaintUpdates)
 
   const renderItem = ({ item, index }) => {
+    console.log(item)
     const isLast = index === UPDATES.length - 1;
-    const config = STATUS[item.type];
+    const config = STATUS[item?.status];
 
     return (
       <View style={styles.row}>
         <View style={styles.timeline}>
-          <View style={[styles.circle, { backgroundColor: config.color }]}>
-            <Image source={config.icon} style={{width:35,height:35,resizeMode:'contain'}}/>
+          <View style={[styles.circle, { backgroundColor: config?.color }]}>
+            <Image source={config?.icon} style={{ width: 35, height: 35, resizeMode: 'contain' }} />
           </View>
           {!isLast && <View style={styles.line} />}
         </View>
 
         <View style={styles.content}>
-          <Text style={styles.title}>{item.title}</Text>
+          <Text style={styles.title}>{item.update}</Text>
           <Text style={styles.desc}>{item.description}</Text>
-          <Text style={styles.time}>{item.time}</Text>
+          <Text style={styles.time}>Added at {item?.updatedAt}, {item.updatedTime}</Text>
 
-          {item.comment && (
-            <View style={styles.commentBox}>
-              <View style={styles.commentHeader}>
-                <Image
-                  source={{ uri: 'https://i.pravatar.cc/100' }}
-                  style={styles.avatarSmall}
-                />
-                <Text style={styles.commentUser}>{item.user}</Text>
+          {item.comments && (
+            item.comments.map(r => {
+              return <View style={styles.commentBox}>
+                <View style={styles.commentHeader}>
+                  {r.profilePic ? <Image
+                    source={{ uri: r.profilePic }}
+                    style={styles.avatarSmall}
+                  /> :
+                    <View style={{ width: 28, height: 28, borderRadius: 18, backgroundColor: '#eef1ff', alignItems: 'center', justifyContent: 'center', marginRight: 10 }}>
+                      <Text style={{ fontSize: 16, fontWeight: 600, color: '#788fed', }}>
+                        {r?.initials}
+                      </Text>
+                    </View>
+
+
+                  }
+
+
+                  <Text style={styles.commentUser}>{r?.commentdBy}</Text>
+                </View>
+                <Text style={styles.commentText}>{r?.comment}</Text>
               </View>
-              <Text style={styles.commentText}>{item.comment}</Text>
-            </View>
+            })
+
           )}
         </View>
       </View>
@@ -121,21 +157,28 @@ const STATUS = {
           style={styles.backRow}
           onPress={() => navigation?.goBack()}
         >
-         <Image source={LeftArrow} style={{ height: 25, width: 25 }}/>
+          <Image source={LeftArrow} style={{ height: 25, width: 25 }} />
           <Text style={styles.headerTitle}>History & Comments</Text>
         </TouchableOpacity>
 
-        <Text style={styles.complaintId}>Complaint Id - #CMP674</Text>
+        <Text style={styles.complaintId}>Complaint Id - {route?.params?.complaintId}</Text>
       </View>
 
       {/* ---------- COMMENT INPUT (ONLY AFTER RESOLVED) ---------- */}
       {isResolved && (
         <View style={styles.inputWrapper}>
           <View style={styles.inputRow}>
-            <Image
-              source={{ uri: 'https://i.pravatar.cc/100' }}
+
+            {complaintContext.NewComplaintUpdates?.profilePic ? <Image
+              source={{ uri: complaintContext.NewComplaintUpdates[0]?.profilePic }}
               style={styles.avatar}
-            />
+            /> :
+              <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: '#eef1ff', alignItems: 'center', justifyContent: 'center', marginRight: 10 }}>
+                <Text style={{ fontSize: 16, fontWeight: 600, color: '#788fed', }}>
+                  {complaintContext.NewComplaintUpdates[0]?.initials}
+                </Text>
+              </View>}
+
             <TextInput
               placeholder="Add new comment"
               value={comment}
@@ -152,7 +195,7 @@ const STATUS = {
       )}
 
       <FlatList
-        data={UPDATES}
+        data={complaintContext.NewComplaintUpdates}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={{ padding: 16 }}
@@ -170,7 +213,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderBottomWidth: 1,
     borderColor: '#E5E7EB',
-    marginTop:15
+    marginTop: 15
   },
   backRow: { flexDirection: 'row', alignItems: 'center' },
   backArrow: { fontSize: 20, marginRight: 8 },
@@ -238,7 +281,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   commentHeader: { flexDirection: 'row', alignItems: 'center' },
-  avatarSmall: { width: 24, height: 24, borderRadius: 12, marginRight: 6 },
-  commentUser: { fontSize: 12, fontWeight: '600' },
+  avatarSmall: { width: 28, height: 28, borderRadius: 18 , marginRight: 6 },
+  commentUser: { fontSize: 12, fontWeight: '600',flexWrap:'wrap',flex:1 },
   commentText: { fontSize: 13, marginTop: 6 },
 });

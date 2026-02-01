@@ -11,6 +11,7 @@ import { verifyPhoneNo } from "../../Action/LoginAction";
 import SuccessModal from "../ToastFile/TostFilePage";
 import { LoginContexts } from "../../Context/LoginContext";
 import ErrorMessage from "../ToastFile/ErrorMessage";
+import AppLogo from "../../assets/Images/AppLogo.png"
 
 const CreateAccount = ({ navigation }) => {
 
@@ -104,12 +105,13 @@ const CreateAccount = ({ navigation }) => {
         type={modelTpe} />
       <View style={styles.topContent}>
         <Image
-          source={require("../../assets/Images/Sm_logo.png")}
+          source={AppLogo}
           style={styles.logo}
         />
-        <Text style={styles.title}>Create Your Account</Text>
+        <Text style={styles.title}>Login With Mobile</Text>
         <Text style={styles.subtitle}>
-          Fill in the details below to create your {"\n"}SmartStay account.
+          Enter your mobile number to get OTP {"\n"}verification
+          {/* Fill in the details below to create your {"\n"}SmartStay account. */}
         </Text>
 
         <Text style={styles.label}>
@@ -157,12 +159,16 @@ const styles = StyleSheet.create({
   },
   logo: {
     marginBottom: 10,
+    width:45,
+    height:45,
+    resizeMode:'contain'
   },
   title: {
     fontSize: 22,
     fontWeight: "700",
     color: "#000",
     marginBottom: 5,
+    marginTop:14
   },
   subtitle: {
     color: "#555",

@@ -13,6 +13,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import CameraPic from '../../../assets/Images/cameraPic.png'
 import { SafeAreaView } from "react-native-safe-area-context";
 import ErrorMessage from "../../ToastFile/ErrorMessage";
+import Trash from "../../../assets/Images/trash 01.png"
 
 
 const AddComplaint = ({
@@ -37,8 +38,10 @@ const AddComplaint = ({
     const [selectedValue, setSelectedValue] = useState(null);
     const [isFocus, setIsFocus] = useState(false);
     const [complaintType, setComplaintTypes] = useState([])
-    const [compliantTypeError, setComplaintTypeError]=useState();
-    const [commentError, setCommentError]=useState()
+    const [compliantTypeError, setComplaintTypeError] = useState();
+    const [commentError, setCommentError] = useState()
+    const [selectedIndex, setSelectedIndex] = useState(null);
+    const [deleteVisible, setDeleteVisible] = useState(false);
 
     useEffect(() => {
         if (visible) {
@@ -61,53 +64,98 @@ const AddComplaint = ({
         }
     }, [visible])
 
-
-
     const uploadimage = async () => {
         try {
             const result = await launchImageLibrary({
                 mediaTypes: 'photo',
-                allowsEditing: true,
-                aspect: [1, 1],
+                // allowsEditing: true,
+                // aspect: [1, 1],
                 quality: 0.6,
                 selectionLimit: 0,
             });
-            console.log(result)
-             if (!result.canceled) {
-            setmediaImage(result.assets.map(item => item.uri));
-            setImageuri(result.assets);
-        }
-            // setmediaImage([...mediaimage, result.assets[0].uri])
-            // setImageuri([...imageuri, result.assets[0]])
-        } catch (error) {
-            console.log(error)
 
+            if (!result.canceled) {
+                setmediaImage(prev =>
+                    prev.concat(result.assets.map(item => item.uri))
+                );
+
+                setImageuri(prev =>
+                    prev.concat(result.assets)
+                );
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+
+
+
+    // const uploadimage = async () => {
+    //     try {
+    //         const result = await launchImageLibrary({
+    //             mediaTypes: 'photo',
+    //             allowsEditing: true,
+    //             aspect: [1, 1],
+    //             quality: 0.6,
+    //             selectionLimit: 0,
+    //         });
+    //         console.log(result)
+    //         if (!result.canceled) {
+    //             setmediaImage(result.assets.map(item => item.uri));
+    //             setImageuri(result.assets);
+    //         }
+    //         // setmediaImage([...mediaimage, result.assets[0].uri])
+    //         // setImageuri([...imageuri, result.assets[0]])
+    //     } catch (error) {
+    //         console.log(error)
+
+    //     }
+    // }
+
+    const imageClick = (index) => {
+        console.log(index)
+        if (selectedIndex === index) {
+            setDeleteVisible(!deleteVisible)
+        }
+        else {
+            setSelectedIndex(index)
+            setDeleteVisible(true)
         }
     }
 
+    const removeImage = (index) => {
+        setmediaImage(prev => prev.filter((_, i) => i !== index));
+        setImageuri(prev => prev.filter((_, i) => i !== index));
+
+        setSelectedIndex(null);
+        setDeleteVisible(false);
+    };
+
+
     console.log(imageuri)
 
-    const validateForm=()=>{
-        let valid =true;
+    const validateForm = () => {
+        let valid = true;
 
         setComplaintTypeError("")
         setCommentError("")
 
-          if(selectedComplaintTypeId ===0){
-                setComplaintTypeError("Select Complaint Type");
-                valid = false;
+        if (selectedComplaintTypeId === 0) {
+            setComplaintTypeError("Select Complaint Type");
+            valid = false;
         }
 
-         const desc = complaintDescription?.trim() ?? "";
+        const desc = complaintDescription?.trim() ?? "";
 
         if (!desc) {
-          setCommentError("Enter comment && above 15 letters");
-          valid =false;
+            setCommentError("Enter comment && above 15 letters");
+            valid = false;
         }
 
         if (desc.length < 15) {
-              setCommentError("Enter comment && above 15 letters");
-              valid =false;     
+            setCommentError("Enter comment && above 15 letters");
+            valid = false;
         }
 
         return valid;
@@ -115,8 +163,8 @@ const AddComplaint = ({
 
     const submitClick = () => {
 
-        if(!validateForm()) return;
-        
+        if (!validateForm()) return;
+
         const payloads = {
             complaintTypeId: selectedComplaintTypeId,
             description: complaintDescription,
@@ -130,7 +178,7 @@ const AddComplaint = ({
         const base64EncodeUnicode = (str) => {
             return btoa(
                 encodeURIComponent(str).replace(
-                    /%([0-9A-F]{2})/g,  
+                    /%([0-9A-F]{2})/g,
                     (_, p1) => String.fromCharCode('0x' + p1)
                 )
             );
@@ -171,7 +219,7 @@ const AddComplaint = ({
             })
         }
 
-      
+
         // if (selectedComplaintTypeId === 0) {
         //     setShowSuccessModal(true);
         //     setToastMessage('Select complaint type');
@@ -278,7 +326,61 @@ const AddComplaint = ({
                                         <Text style={{ color: 'red' }}> *</Text>
                                     </Text>
 
-                                    <Dropdown style={{ borderWidth: 1, borderRadius: 10, paddingVertical: 10, marginTop: 10, borderColor: '#e5e5e5', paddingLeft: 15 }}
+                                    {complaintType && complaintType.length > 0 ? (
+                                        <Dropdown
+                                            style={{
+                                                borderWidth: 1,
+                                                borderRadius: 10,
+                                                paddingVertical: 10,
+                                                marginTop: 10,
+                                                borderColor: '#e5e5e5',
+                                                paddingLeft: 15,
+                                            }}
+                                            onFocus={() => setIsFocus(true)}
+                                            onBlur={() => setIsFocus(false)}
+                                            data={complaintType}
+                                            containerStyle={{ borderRadius: 10 }}
+                                            placeholderStyle={{ fontSize: 14 }}
+                                            placeholder="Select a type"
+                                            labelField="complaintTypeName"
+                                            valueField="complaintTypeId"
+                                            value={selectedComplaintTypeId}
+                                            onChange={item => {
+                                                setSelectedComplaintTypeId(item.complaintTypeId);
+                                                setSelectedValue(item.value);
+
+                                                if (compliantTypeError) {
+                                                    setComplaintTypeError("");
+                                                }
+                                            }}
+                                            renderRightIcon={() => (
+                                                <Ionicons
+                                                    name={isFocus ? "chevron-up" : "chevron-down"}
+                                                    size={22}
+                                                    color="#000"
+                                                    style={{ paddingRight: 10 }}
+                                                />
+                                            )}
+                                        />
+                                    ) : (
+                                        <Text
+                                            style={{
+                                                marginTop: 10,
+                                                paddingVertical: 12,
+                                                paddingLeft: 15,
+                                                borderWidth: 1,
+                                                borderRadius: 10,
+                                                borderColor: '#e5e5e5',
+                                                fontSize: 14,
+                                                color: '#9e9e9e',
+                                            }}
+                                        >
+                                            No data available
+                                        </Text>
+                                    )}
+
+
+                                    {/* <Dropdown style={{ borderWidth: 1, borderRadius: 10, paddingVertical: 10, marginTop: 10, borderColor: '#e5e5e5', paddingLeft: 15 }}
                                         onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
                                         data={complaintType}
                                         containerStyle={{ borderRadius: 10 }}
@@ -302,28 +404,29 @@ const AddComplaint = ({
                                                 color="#000"
                                                 style={{ paddingRight: 10 }}
                                             />
-                                        )} />
+                                        )} /> */}
                                 </View>
-                                {compliantTypeError && <ErrorMessage message={compliantTypeError} type="error"/>}
+                                {compliantTypeError && <ErrorMessage message={compliantTypeError} type="error" />}
 
                                 <View style={{ paddingTop: 16 }}>
                                     <Text style={{ fontSize: 14, fontWeight: 400 }}>Complaint message
                                         <Text style={{ color: 'red' }}> *</Text>
                                     </Text>
                                     <View style={{ borderWidth: 1, borderRadius: 10, marginTop: 8, paddingTop: 7, paddingLeft: 10, borderColor: '#e5e5e5', height: 80 }}>
-                                        <TextInput value={complaintDescription} placeholder="Enter message" 
-                                        onChangeText={(value) => {setDespriction(value);
-                                            if(value.trim().length >=15){
-                                                setCommentError("")
-                                            }
-                                        }}
+                                        <TextInput value={complaintDescription} placeholder="Enter message"
+                                            onChangeText={(value) => {
+                                                setDespriction(value);
+                                                if (value.trim().length >= 15) {
+                                                    setCommentError("")
+                                                }
+                                            }}
                                             multiline
                                             textAlignVertical="top"
                                             style={{ flex: 1, padding: 0 }} />
                                     </View>
                                 </View>
 
-                                 {commentError && <ErrorMessage message={commentError} type="error"/>}
+                                {commentError && <ErrorMessage message={commentError} type="error" />}
 
                                 <View style={{ paddingTop: 16 }}>
                                     <Text>Add Proof</Text>
@@ -352,10 +455,23 @@ const AddComplaint = ({
                                     {mediaimage.length > 0 ? <FlatList horizontal showsHorizontalScrollIndicator={true} style={{ paddingTop: 20 }} key={(item) => item.id}
                                         data={mediaimage}
                                         // keyExtractor={(item, index) => index.toString()}
-                                        renderItem={({ item }) => {
+                                        renderItem={({ item, index }) => {
                                             console.log(item)
-                                            return <View style={{ padding: 5 }}>
-                                                <Image source={{ uri: item }} style={{ width: 80, height: 70, borderRadius: 5 }} />
+                                            return <View style={{ padding: 5, position: 'relative' }}>
+                                                <TouchableOpacity onPress={() => { imageClick(index) }}>
+                                                    <Image source={{ uri: item }} style={{ width: 80, height: 70, borderRadius: 5 }} />
+
+                                                    {selectedIndex === index && deleteVisible && (
+                                                        <TouchableOpacity onPress={()=>removeImage(index)}
+                                                            style={{
+                                                                position: 'absolute', top: 0, bottom: 0, left: 0,
+                                                                right: 0, alignItems: 'center', justifyContent: 'center',
+                                                            }}>
+                                                            <Image source={Trash} style={{ width: 17.72, height: 17.72 }} />
+
+                                                        </TouchableOpacity>
+                                                    )}
+                                                </TouchableOpacity>
                                             </View>
                                         }} /> : null}
                                 </View>

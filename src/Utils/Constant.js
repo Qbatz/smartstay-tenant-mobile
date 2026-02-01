@@ -4,6 +4,10 @@ export const LOGGEDIN='loggedin'
 export const USERID= 'userId'
 export const FCM_TOKEN = 'FCM-TOKEN'
 export const SHOULD_TOKEN_UPDATE = "SHOULD-TOKEN-UPDATE"
+export const LOGGEDOUT="loggedout"
+export const CUSTOMERDETAIL="customerDetail"
+export const CUSTOMERPROFILEPIC= "customerProfilePic"
+export const CUSTOMERINITIALS= "customerinitials"
 
 
 let _BASE_URL;         

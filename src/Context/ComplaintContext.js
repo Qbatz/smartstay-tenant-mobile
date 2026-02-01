@@ -7,6 +7,7 @@ const ComplaintContext=(props)=> {
     const [complaintsList, setComplaintsList] = useState([]);
     const [complaintComments,setComplaintComments]=useState([])
     const [complaintDetail,setComplaintDetails]=useState()
+    const [newComplaintUpdates,setComplaintNewUpdates]=useState([])
 
     console.log(complaintComments)
 
@@ -14,7 +15,7 @@ const ComplaintContext=(props)=> {
 
     return<compliantContexts.Provider value={{ updateComplaintList:setComplaintsList, getComplaintList:complaintsList,
         updateComments:setComplaintComments,getComplaintComments:complaintComments,updateComplaint:setComplaintDetails,
-         getComplaintDetail:complaintDetail
+         getComplaintDetail:complaintDetail, complaintUpdates:setComplaintNewUpdates, NewComplaintUpdates:newComplaintUpdates
     }} >
         {props.children}
     </compliantContexts.Provider>
