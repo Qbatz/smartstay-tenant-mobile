@@ -46,7 +46,6 @@ const AddComplaint = ({
     useEffect(() => {
         if (visible) {
             getComplaintTypes(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
-                console.log(r)
                 setComplaintTypes(r.data)
             })
         }
@@ -70,24 +69,25 @@ const AddComplaint = ({
                 mediaTypes: 'photo',
                 // allowsEditing: true,
                 // aspect: [1, 1],
+                maxWidth: 500,
+                maxHeight: 500,
                 quality: 0.6,
                 selectionLimit: 0,
             });
 
             if (!result.canceled) {
                 setmediaImage(prev =>
-                    prev.concat(result.assets.map(item => item.uri))
+                    prev.concat(result.assets?.map(item => item.uri))
                 );
 
                 setImageuri(prev =>
-                    prev.concat(result.assets)
+                    prev.concat(result.assets?.map(item => item.uri))
                 );
             }
         } catch (error) {
             console.log(error);
         }
     };
-
 
 
 
@@ -114,7 +114,6 @@ const AddComplaint = ({
     // }
 
     const imageClick = (index) => {
-        console.log(index)
         if (selectedIndex === index) {
             setDeleteVisible(!deleteVisible)
         }
@@ -133,7 +132,6 @@ const AddComplaint = ({
     };
 
 
-    console.log(imageuri)
 
     const validateForm = () => {
         let valid = true;
@@ -170,7 +168,6 @@ const AddComplaint = ({
             description: complaintDescription,
         }
 
-        console.log(payloads)
 
         const formData = new FormData();
 
@@ -195,7 +192,6 @@ const AddComplaint = ({
 
         if (imageuri) {
 
-            console.log(imageuri)
             // let complaitImages = []
             // imageuri.forEach(img => {
             //   complaitImages.push({
@@ -205,15 +201,20 @@ const AddComplaint = ({
             //   })
             // })
             // console.log(complaitImages)
+            //   formData.append("complaintImage", {
+            //         uri: imageuri.uri,
+            //         type: imageuri.type || "image/jpeg",
+            //         name: imageuri.fileName || "profile.jpg",
+            //     })
 
 
             // formData.append("complaintImage", imageuri)
 
             imageuri.forEach((img, index) => {
                 formData.append("complaintImage", {
-                    uri: img.uri,
-                    type: img.type,
-                    name: img.fileName,
+                    uri: img,
+                    type: "image/jpeg",
+                    name: "profile.jpg",
                 })
 
             })
@@ -248,7 +249,6 @@ const AddComplaint = ({
 
         postComplaint(context.getHostelDetail.hostelId, loginContext.getToken, formData).then(r => {
             setLoading(true);
-            console.log(r)
 
             setTimeout(() => {
                 setLoading(false);
@@ -462,7 +462,7 @@ const AddComplaint = ({
                                                     <Image source={{ uri: item }} style={{ width: 80, height: 70, borderRadius: 5 }} />
 
                                                     {selectedIndex === index && deleteVisible && (
-                                                        <TouchableOpacity onPress={()=>removeImage(index)}
+                                                        <TouchableOpacity onPress={() => removeImage(index)}
                                                             style={{
                                                                 position: 'absolute', top: 0, bottom: 0, left: 0,
                                                                 right: 0, alignItems: 'center', justifyContent: 'center',

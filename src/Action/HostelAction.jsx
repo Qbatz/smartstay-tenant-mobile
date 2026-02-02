@@ -36,7 +36,6 @@ export const complaints=async(hostelId,token)=>{
             Authorization: 'Bearer ' + token
         }
     })
-    console.log(response)
     return response
     } catch (error){
         return{status: error.response.status, message: error.response.data}
@@ -91,7 +90,6 @@ export const deleteComplaint=async(hostelId,complaintId,token, reason)=>{
     const data={
         message: reason
     }
-    console.log(data)
     try{
         const axios = getAxios()
         console.log('/v2/complaints/' + hostelId + "/" + complaintId)
@@ -117,7 +115,6 @@ export const addComment=async(complaintId,token,data)=>{
             Authorization: 'Bearer ' + token
         }
     })
-    console.log(response)
     return response;
 }
 

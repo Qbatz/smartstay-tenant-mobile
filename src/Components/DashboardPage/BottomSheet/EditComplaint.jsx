@@ -48,17 +48,13 @@ const EditComplaintSheet = ({
     const [selectedIndex, setSelectedIndex] = useState(null);
     const [deleteVisible, setDeleteVisible] = useState(false);
 
-    console.log(selectedComplaintTypeId)
-    console.log(selectedComplaint)
-    console.log(mediaimage)
-    console.log(description)
 
     useEffect(() => {
         if (visible && selectedComplaint) {
             setSelectedComplaintTypeId(selectedComplaint.complaintTypeId ?? null);
             setDespriction(selectedComplaint.complaintDescription ?? "");
             setMediaimage(selectedComplaint.complaintImages ?? []);
-            setImageuri([]); 
+            setImageuri([]);
             setSelectedIndex(null);
             setDeleteVisible(false);
         }
@@ -85,17 +81,19 @@ const EditComplaintSheet = ({
         try {
             const result = await launchImageLibrary({
                 mediaType: 'photo',
+                maxWidth: 500,
+                maxHeight: 500,
+                selectionLimit: 0,
                 quality: 0.5,
                 selectionLimit: 0,
             });
-            if (!result.canceled) {
-                setMediaimage(prev =>
-                    prev.concat(result.assets.map(item => item.uri))
-                );
+            if (result?.assets && result.assets.length > 0) {
+                const uris = result.assets.map(item => item?.uri).filter(Boolean); 
+                    
+                if (uris.length === 0) return;
 
-                setImageuri(prev =>
-                    prev.concat(result.assets)
-                );
+                setMediaimage(prev => [...prev, ...uris]);
+                setImageuri(prev => [...prev, ...uris]);
             }
         } catch (error) {
             console.log(error)
@@ -120,7 +118,6 @@ const EditComplaintSheet = ({
         setDeleteVisible(false);
     }
 
-    console.log(imageuri)
 
     const validateForm = () => {
         let valid = true;
@@ -246,9 +243,9 @@ const EditComplaintSheet = ({
 
             imageuri.forEach((img, index) => {
                 formData.append("complaintImage", {
-                    uri: img.uri,
-                    type: img.type,
-                    name: img.fileName,
+                    uri: img,
+                    type: "image/jpeg",
+                    name: "profile.jpg",
                 })
 
             })
@@ -257,7 +254,6 @@ const EditComplaintSheet = ({
         putComplaint(context.getHostelDetail.hostelId, complaintContext.getComplaintDetail.complaintId, loginContext.getToken, formData).
             then(r => {
 
-                console.log(r)
 
                 setLoading(true)
 
@@ -351,7 +347,7 @@ const EditComplaintSheet = ({
                                         onFocus={() => setIsFocus(true)}
                                         onBlur={() => setIsFocus(false)}
                                         data={complaintType}
-                                        containerStyle={{ borderRadius: 10, paddingLeft: 0}}
+                                        containerStyle={{ borderRadius: 10, paddingLeft: 0 }}
                                         placeholder="Select a type"
                                         labelField="complaintTypeName"
                                         valueField="complaintTypeId"
@@ -412,7 +408,7 @@ const EditComplaintSheet = ({
                                             renderItem={({ item, index }) => (
                                                 <TouchableOpacity onPress={() => imageClick(index)}>
                                                     <Image
-                                                        source={{ uri: item.imageUrl || item }}
+                                                        source={{ uri: item?.imageUrl || item }}
                                                         style={{ width: 80, height: 70, marginRight: 8, borderRadius: 5 }}
                                                     />
                                                     {selectedIndex === index && deleteVisible && (
