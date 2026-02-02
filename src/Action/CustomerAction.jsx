@@ -32,9 +32,7 @@ export const editProfile=async(token,formData)=>{
 }
 
 export const postComplaint=async(hostelId,token,formData)=>{
-    console.log(hostelId)
-    console.log(token)
-    console.log(formData)
+   
     try{
         const axios = getAxios()
          const response=await axios.post('/v2/complaints/' + hostelId, formData,   {
@@ -43,7 +41,6 @@ export const postComplaint=async(hostelId,token,formData)=>{
                  "Content-Type": "multipart/form-data",
             },
         })
-        console.log(response)
         return response;
     }catch(error){
         return{status: error.response.status, message: error.response.data}
@@ -51,7 +48,6 @@ export const postComplaint=async(hostelId,token,formData)=>{
 }
 
 export const getRequestRaised=async(hostelId, token)=>{
-    console.log(token)
    try{
     const axios = getAxios()
     const response=await axios.get('/v2/tenant/hostels/requests/' + hostelId, {
@@ -81,10 +77,7 @@ export const getRentalDetials=async(hostelId,token)=>{
 }
 
 export const putComplaint = async (hostelId, complaintId, token, formData) => {
-    console.log(hostelId);
-    console.log(complaintId);
-    console.log(token);
-    console.log(formData);
+
 
     try {
         const axios = getAxios()
@@ -101,7 +94,6 @@ export const putComplaint = async (hostelId, complaintId, token, formData) => {
         return response;
 
     } catch (error) {
-        console.log(error?.response); // debug
         return { 
             status: error.response?.status, 
             message: error.response?.data 

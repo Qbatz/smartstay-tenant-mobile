@@ -276,9 +276,7 @@ function Dashboard(props) {
     setShowSheet(true)
 
     getComplaints(context.getHostelDetail.hostelId, complaint.complaintId, loginContext.getToken).then(r => {
-      console.log(r.data)
       setSelectComplaint(r.data)
-      console.log(r.data)
       complaintContext.updateComplaint(r.data)
       complaintContext.updateComments(r.data?.comments)
     })
@@ -302,10 +300,8 @@ function Dashboard(props) {
       hostelId: context.getHostelDetail.hostelId
     }
 
-    console.log(selectedComplaint)
 
     addComment(selectedComplaint?.complaintId, loginContext.getToken, data).then(r => {
-      console.log(r)
       setSendComment(null)
 
       getComplaints(context.getHostelDetail.hostelId, selectedComplaint?.complaintId, loginContext.getToken).then(r => {
@@ -317,7 +313,6 @@ function Dashboard(props) {
   }
 
   const seeAllUpdates=(complaintId)=>{
-    console.log(complaintId)
      navigation.navigate('Updates',{complaintId:complaintId})
   }
 
@@ -330,22 +325,6 @@ function Dashboard(props) {
 
   const onCloseAddComplaint = () => {
     setAddComplaint(false)
-  }
-
-  const uploadimage = async () => {
-    try {
-      const result = await launchImageLibrary({
-        mediaTypes: 'photo',
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 1,
-      });
-      setmediaImage([...mediaimage, result.assets[0].uri])
-      setImageuri([...imageuri, result.assets[0]])
-    } catch (error) {
-      console.log(error)
-
-    }
   }
 
 
@@ -911,7 +890,6 @@ function Dashboard(props) {
       selectedComplaintTypeId={selectedComplaintTypeId}
       setSelectedComplaintTypeId={setSelectedComplaintTypeId}
       mediaimage={mediaimage}
-      uploadimage={uploadimage}
       isFocus={isFocus}
       setIsFocus={setIsFocus}
       panResponder={panResponder}

@@ -20,6 +20,8 @@ import { getComplaintsUpdates } from '../../Action/CustomerAction';
 import { UsersContext } from '../../Context/UserContext';
 import { LoginContexts } from '../../Context/LoginContext';
 import { compliantContexts } from '../../Context/ComplaintContext';
+import { addComment } from '../../Action/HostelAction';
+import ErrorMessage from '../ToastFile/ErrorMessage';
 
 
 const UPDATES = [
@@ -72,6 +74,7 @@ const HistoryCommentsScreen = ({ route, navigation }) => {
   const userContext = useContext(UsersContext)
   const loginContext = useContext(LoginContexts)
   const complaintContext = useContext(compliantContexts)
+  const [addCommentError, setAddCommentError] = useState()
 
   const [comment, setComment] = useState('');
 
@@ -94,17 +97,34 @@ const HistoryCommentsScreen = ({ route, navigation }) => {
 
   useEffect(() => {
     getComplaintsUpdates(userContext.getHostelDetail?.hostelId, loginContext.getToken, route.params.complaintId).then(r => {
-      console.log(r)
       complaintContext.complaintUpdates(r.data.complaintsUpdates)
     })
   }, [])
 
   console.log(complaintContext.NewComplaintUpdates)
+  const addCommentClick = () => {
+
+    if (!comment) {
+      setAddCommentError("Please Enter a Comment")
+      return;
+    }
+
+    const data = {
+      message: comment,
+      hostelId: userContext.getHostelDetail.hostelId,
+    }
+
+    addComment(route.params?.complaintId, loginContext.getToken, data).then(r => {
+      setComment("")
+    })
+  }
 
   const renderItem = ({ item, index }) => {
     console.log(item)
     const isLast = index === UPDATES.length - 1;
     const config = STATUS[item?.status];
+
+
 
     return (
       <View style={styles.row}>
@@ -168,27 +188,43 @@ const HistoryCommentsScreen = ({ route, navigation }) => {
       {isResolved && (
         <View style={styles.inputWrapper}>
           <View style={styles.inputRow}>
-
-            {complaintContext.NewComplaintUpdates?.profilePic ? <Image
-              source={{ uri: complaintContext.NewComplaintUpdates[0]?.profilePic }}
-              style={styles.avatar}
-            /> :
-              <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: '#eef1ff', alignItems: 'center', justifyContent: 'center', marginRight: 10 }}>
-                <Text style={{ fontSize: 16, fontWeight: 600, color: '#788fed', }}>
+            {complaintContext.NewComplaintUpdates?.profilePic ? (
+              <Image
+                source={{ uri: complaintContext.NewComplaintUpdates[0]?.profilePic }}
+                style={styles.avatar}
+              />
+            ) : (
+              <View style={styles.avatarFallback}>
+                <Text style={styles.avatarText}>
                   {complaintContext.NewComplaintUpdates[0]?.initials}
                 </Text>
-              </View>}
+              </View>
+            )}
 
-            <TextInput
-              placeholder="Add new comment"
-              value={comment}
-              onChangeText={setComment}
-              multiline
-              style={styles.input}
-            />
+            {/* Input + Error wrapper */}
+            <View style={styles.inputColumn}>
+              <TextInput
+                placeholder="Add new comment"
+                value={comment}
+                onChangeText={(value)=>{
+                  setComment(value);
+                  if(comment.trim().length >0){
+                    setAddCommentError("")
+                  }
+                }}
+                multiline
+                style={styles.input}
+              />
+
+              {addCommentError && (
+                <View style={styles.errorWrapper}>
+                  <ErrorMessage message={addCommentError} type="error" />
+                </View>
+              )}
+            </View>
           </View>
 
-          <TouchableOpacity style={styles.addButton}>
+          <TouchableOpacity onPress={addCommentClick} style={styles.addButton}>
             <Text style={styles.addButtonText}>Add Comment</Text>
           </TouchableOpacity>
         </View>
@@ -220,33 +256,33 @@ const styles = StyleSheet.create({
   headerTitle: { fontSize: 18, fontWeight: '600' },
   complaintId: { color: '#2563EB', marginTop: 6 },
 
-  inputWrapper: {
-    padding: 16,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderColor: '#E5E7EB',
-  },
-  inputRow: { flexDirection: 'row', alignItems: 'flex-start' },
-  avatar: { width: 40, height: 40, borderRadius: 20, marginRight: 10 },
-  input: {
-    flex: 1,
-    minHeight: 80,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    borderRadius: 10,
-    padding: 10,
-    textAlignVertical: 'top',
-    backgroundColor: '#fff',
-  },
-  addButton: {
-    alignSelf: 'flex-end',
-    marginTop: 10,
-    backgroundColor: '#2563EB',
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    borderRadius: 8,
-  },
-  addButtonText: { color: '#fff', fontWeight: '600' },
+  // inputWrapper: {
+  //   padding: 16,
+  //   backgroundColor: '#fff',
+  //   borderBottomWidth: 1,
+  //   borderColor: '#E5E7EB',
+  // },
+  // inputRow: { flexDirection: 'row', alignItems: 'flex-start' },
+  // avatar: { width: 40, height: 40, borderRadius: 20, marginRight: 10 },
+  // input: {
+  //   flex: 1,
+  //   minHeight: 80,
+  //   borderWidth: 1,
+  //   borderColor: '#E5E7EB',
+  //   borderRadius: 10,
+  //   padding: 10,
+  //   textAlignVertical: 'top',
+  //   backgroundColor: '#fff',
+  // },
+  // addButton: {
+  //   alignSelf: 'flex-end',
+  //   marginTop: 10,
+  //   backgroundColor: '#2563EB',
+  //   paddingHorizontal: 18,
+  //   paddingVertical: 10,
+  //   borderRadius: 8,
+  // },
+  // addButtonText: { color: '#fff', fontWeight: '600' },
 
   row: { flexDirection: 'row', marginBottom: 24 },
   timeline: { width: 40, alignItems: 'center' },
@@ -281,7 +317,75 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   commentHeader: { flexDirection: 'row', alignItems: 'center' },
-  avatarSmall: { width: 28, height: 28, borderRadius: 18 , marginRight: 6 },
-  commentUser: { fontSize: 12, fontWeight: '600',flexWrap:'wrap',flex:1 },
+  avatarSmall: { width: 28, height: 28, borderRadius: 18, marginRight: 6 },
+  commentUser: { fontSize: 12, fontWeight: '600', flexWrap: 'wrap', flex: 1 },
   commentText: { fontSize: 13, marginTop: 6 },
+
+  inputWrapper: {
+    padding: 16,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+
+  inputColumn: {
+    flex: 1,
+  },
+
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 10,
+  },
+
+  avatarFallback: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#eef1ff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
+  },
+
+  avatarText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#788fed',
+  },
+
+  input: {
+    minHeight: 80,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 10,
+    padding: 10,
+    textAlignVertical: 'top',
+    backgroundColor: '#fff',
+  },
+
+  errorWrapper: {
+    marginTop: 6,
+  },
+
+  addButton: {
+    alignSelf: 'flex-end',
+    marginTop: 12,
+    backgroundColor: '#2563EB',
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+
+  addButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+  },
+
 });
