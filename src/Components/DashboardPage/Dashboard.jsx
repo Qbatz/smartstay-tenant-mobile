@@ -2,7 +2,7 @@ import React, { useState, useMemo, useCallback, useRef, useEffect, useContext } 
 import {
   View, Text, Dimensions, Image, TouchableOpacity, Button, FlatList,
   TextInput, StyleSheet, BackHandler, TouchableWithoutFeedback, Platform, PanResponder,
-  Animated, ScrollView, Alert, KeyboardAvoidingView, Keyboard
+  Animated, ScrollView, Alert, KeyboardAvoidingView, Keyboard, NativeModules
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
@@ -108,6 +108,8 @@ function Dashboard(props) {
   const [showNonrefundable,setNonrefundable]=useState(false)
   const [reopenComplaint, setReopenComplaint] = useState(false)
   const [deletComplaintError, setDeleteComplaintError] = useState()
+
+  const {CommonModule} = NativeModules;
 
 
 
@@ -416,39 +418,13 @@ function Dashboard(props) {
   };
 
   const handleDownload = async () => {
-    try {
-      const response = await fetch("https://smartstaytestingapi.s3remotica.com/invoice/invoice-list-pdf", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTkzLCJzdWIiOjE5MywidXNlcl90eXBlIjoiYWRtaW4iLCJyb2xlX2lkIjowLCJwbGFuX2NvZGUiOiJvbmVfZGF5IiwicGxhbl9zdGF0dXMiOjEsImlhdCI6MTc2MjQxMDIzOSwiZXhwIjoxNzYyNDEyMDM5fQ.BNCXjNx4B9AH0UV9Yy_dXnnBLzjfDUY7qOJOzuxlS2E`,
-        },
-        body: JSON.stringify({
-          Date: "2025-11-01",
-          User_Id: "NOTI1629",
-          id: 2148,
-        }),
-      });
-
-      const data = await response.json();
-
-      const pdfUrl = data?.pdf_url;
-
-      if (pdfUrl) {
-        const supported = await Linking.canOpenURL(pdfUrl);
-        if (supported) {
-          await Linking.openURL(pdfUrl);
-        } else {
-          Alert.alert("Error", "Cannot open this PDF link");
-        }
-      } else {
-        Alert.alert("No PDF found in response");
-      }
-    } catch (error) {
-      console.error("PDF open error:", error);
-      Alert.alert("Error", "Failed to open PDF");
-    }
+    CommonModule.downloadPDF("https://smartstaydevs.s3.ap-south-1.amazonaws.com/invoices/invoice-16782931186426385900.pdf")
   };
+
+  const sharePdf = () => {
+    console.log("calling share pdf function")
+    CommonModule.sharePDF("https://smartstaydevs.s3.ap-south-1.amazonaws.com/invoices/invoice-16782931186426385900.pdf", "Sharing the invoice")
+  }
 
   // const handleReceiptPdfDownload = (invoiceType) => {
   //   if (invoiceType === "Booking") {
@@ -1232,7 +1208,7 @@ function Dashboard(props) {
                     </>
                   ) : (
                     <>
-                      <TouchableOpacity style={style.shareBtn}>
+                      <TouchableOpacity style={style.shareBtn} onPress={sharePdf}>
                         <Text style={style.shareText}>Share</Text>
                         <Image
                           source={ShareIcon}
@@ -1491,7 +1467,7 @@ function Dashboard(props) {
                 {/* {---------Button--} */}
 
                 <View style={style.buttonRow}>
-                  <TouchableOpacity style={style.shareBtn}>
+                  <TouchableOpacity style={style.shareBtn} onPress={sharePdf}>
                     <Text style={style.shareText}>Share</Text>
                     <Image
                       source={ShareIcon}
