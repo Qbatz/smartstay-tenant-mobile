@@ -382,7 +382,7 @@ function MyStay(props) {
 
                         <View style={{ paddingRight: 10 }}>
                             <Text style={{ color: '#9C9C9C', fontSize: 11, fontWeight: 400, marginBottom: 5 }}>
-                                {i.requestedDate}
+                                {i.requestedDateDisplay}
                             </Text>
 
                             <Text style={{
@@ -427,7 +427,8 @@ function MyStay(props) {
                 return (
                     <View key={i.complaintId}>
 
-                        <View style={{
+                        <TouchableOpacity onPress={()=>props.onViewComplaint(i.complaintId)}
+                         style={{
                             borderWidth: 1, borderRadius: 12, marginTop: 12, flexDirection: 'row', justifyContent: 'space-between',
                             borderColor: '#EFF2FF', backgroundColor: '#FFFFFF',
                         }}>
@@ -478,7 +479,7 @@ function MyStay(props) {
                                 </View>
                             </View>
 
-                        </View>
+                        </TouchableOpacity>
 
                     </View>
                 )
