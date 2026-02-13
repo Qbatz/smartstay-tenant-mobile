@@ -467,7 +467,7 @@ function MyStay(props) {
                                 <Text style={{
                                     color: '#9C9C9C', fontSize: 12, fontWeight: '400', marginBottom: 18
                                 }}>
-                                    {i.complaintDate}
+                                    {i?.complaintDateDisplay}
                                 </Text>
 
                                 <View style={{

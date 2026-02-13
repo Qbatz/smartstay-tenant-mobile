@@ -27,3 +27,18 @@ export const getPaymentReceiptDetails=async(hostelId,token,transactionId)=>{
          return{status: error.response.status, message: error.response.data}
     }
 }
+
+export const getInvoiceDownload=async(hostelId, invoiceId, token)=>{
+    try{
+        const axios=getAxios()
+        const response=await axios.get('/v2/invoices/pdf/' + hostelId + "/" + invoiceId, {
+            headers: {
+                Authorization: "Bearer " + token
+            }
+        })
+        return response;
+    }catch (error){
+        console.log(error)
+        return{status: error.response.status, message: error.response.data}
+    }
+}

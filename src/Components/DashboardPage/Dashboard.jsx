@@ -51,6 +51,7 @@ import AmenitiesBottomSheet from "./BottomSheet/AmenitiesSheet";
 import ReopennComplaint from "./Popup/ReopenComplaint";
 import ErrorMessage from "../ToastFile/ErrorMessage";
 import DeleteComplaint from "./Popup/DeleteComplaint";
+import { getInvoiceDownload } from "../../Action/PaymentAction";
 
 const { width, height } = Dimensions.get("window");
 
@@ -105,11 +106,12 @@ function Dashboard(props) {
   const [filterBottomsheet, setFilterBottomSheet] = useState(false)
   const [showVisible, setShowVisible] = useState(false);
   const [rentAmountVisible, setRentAmountVisible] = useState(false)
-  const [showNonrefundable,setNonrefundable]=useState(false)
+  const [showNonrefundable, setNonrefundable] = useState(false)
   const [reopenComplaint, setReopenComplaint] = useState(false)
   const [deletComplaintError, setDeleteComplaintError] = useState()
+  const [selectedInvoiceId, setSelectedIvoiceId] = useState();
 
-  const {CommonModule} = NativeModules;
+  const { CommonModule } = NativeModules;
 
 
 
@@ -286,7 +288,7 @@ function Dashboard(props) {
     })
   }
 
-  const handleViewComplaint =(id)=> {
+  const handleViewComplaint = (id) => {
 
     setShowSheet(true)
 
@@ -295,7 +297,7 @@ function Dashboard(props) {
       complaintContext.updateComplaint(r.data)
       complaintContext.updateComments(r.data?.comments)
     })
-    
+
 
   }
 
@@ -417,13 +419,24 @@ function Dashboard(props) {
     })
   };
 
-  const handleDownload = async () => {
-    CommonModule.downloadPDF("https://smartstaydevs.s3.ap-south-1.amazonaws.com/invoices/invoice-16782931186426385900.pdf")
+  const handleDownload = () => {
+
+    getInvoiceDownload(context.getHostelDetail.hostelId, selectedInvoiceId, loginContext.getToken).then(r => {
+      console.log(r)
+      CommonModule.downloadPDF(r.data)
+    })
+
+
   };
+
 
   const sharePdf = () => {
     console.log("calling share pdf function")
-    CommonModule.sharePDF("https://smartstaydevs.s3.ap-south-1.amazonaws.com/invoices/invoice-16782931186426385900.pdf", "Sharing the invoice")
+    getInvoiceDownload(context.getHostelDetail.hostelId, selectedInvoiceId, loginContext.getToken).then(r => {
+      console.log(r)
+      CommonModule.sharePDF(r.data, "Sharing the invoice")
+    })
+
   }
 
   // const handleReceiptPdfDownload = (invoiceType) => {
@@ -449,9 +462,11 @@ function Dashboard(props) {
 
   }
 
-  const downloadOption = () => {
+  const downloadOption = (invoiceId) => {
+    console.log(invoiceId)
     setShowOption(true)
     setModalVisible(false)
+    setSelectedIvoiceId(invoiceId)
   }
 
   const filterpay = () => {
@@ -471,8 +486,8 @@ function Dashboard(props) {
   const renderScene = ({ route, jumpTo }) => {
     switch (route.key) {
       case 'mystay':
-        return <MyStay onRequestBedChange={bedfn} onSheet={addComplaint} hostel={props?.route?.params?.hostel} jumpTo={jumpTo} 
-                onViewComplaint={handleViewComplaint}/>;
+        return <MyStay onRequestBedChange={bedfn} onSheet={addComplaint} hostel={props?.route?.params?.hostel} jumpTo={jumpTo}
+          onViewComplaint={handleViewComplaint} />;
       case 'services':
         return <Services onOpen={handle} onSheet={addComplaint} onAmenities={handleAmenity} jumpTo={jumpTo} hostel={props?.route?.params?.hostel} />;
       case 'payment':
@@ -593,8 +608,8 @@ function Dashboard(props) {
                     <FlatList keyExtractor={(item) => item.commentId} showsVerticalScrollIndicator={false}
                       keyboardShouldPersistTaps="handled"
                       data={complaintContext?.getComplaintComments} style={{ marginBottom: 20 }}
-                      renderItem={({ item,index }) => {
-                        return <View style={{ paddingTop: 15, flexDirection: 'row', flex: 1 }}  key={index}>
+                      renderItem={({ item, index }) => {
+                        return <View style={{ paddingTop: 15, flexDirection: 'row', flex: 1 }} key={index}>
                           <View>
                             {item.profilePic != null ? (
                               <Image source={{ uri: item.profilePic }} style={{ width: 36, height: 36, borderRadius: 18 }} />
@@ -644,7 +659,7 @@ function Dashboard(props) {
                     <TextInput value={sendComment} placeholder="Post your Reply here" onChangeText={setSendComment}
                       multiline
                       blurOnSubmit={false}
-                      style={{ flex: 1,marginLeft:4 }} />
+                      style={{ flex: 1, marginLeft: 4 }} />
                     {
                       sendComment?.trim().length > 0 && (<TouchableOpacity onPress={sendclick} style={{ paddingRight: 10 }}>
                         <Image source={SendButton} style={{ width: 34, height: 34 }} />
@@ -1187,7 +1202,7 @@ function Dashboard(props) {
                     <>
                       <TouchableOpacity
                         style={style.shareBtn}
-                        onPress={downloadOption}
+                        onPress={() => downloadOption(paymentContext.getInvoiceDetail.invoiceId)}
                       >
                         <Text style={{ fontWeight: "600", color: "#071C70" }}>
                           Download Bill
@@ -1208,7 +1223,7 @@ function Dashboard(props) {
                     </>
                   ) : (
                     <>
-                      <TouchableOpacity style={style.shareBtn} onPress={sharePdf}>
+                      <TouchableOpacity style={style.shareBtn} onPress={() => sharePdf(paymentContext.getInvoiceDetail.invoiceId)}>
                         <Text style={style.shareText}>Share</Text>
                         <Image
                           source={ShareIcon}
@@ -1218,7 +1233,7 @@ function Dashboard(props) {
 
                       <TouchableOpacity
                         style={style.downloadBtn}
-                        onPress={downloadOption}
+                        onPress={() => downloadOption(paymentContext.getInvoiceDetail.invoiceId)}
                       // handleDownload
                       >
                         <Text style={style.downloadText}>Download</Text>
@@ -1312,7 +1327,7 @@ function Dashboard(props) {
                         name={showVisible ? "chevron-up" : "chevron-down"}
                         size={20}
                         color="#007FFF"
-                        style={{  marginLeft: 6,padding:2,borderRadius:5,backgroundColor :'#EFF6FF', }}
+                        style={{ marginLeft: 6, padding: 2, borderRadius: 5, backgroundColor: '#EFF6FF', }}
                       />
                     </View>
                   </TouchableOpacity>
@@ -1343,8 +1358,8 @@ function Dashboard(props) {
                           <Ionicons
                             name={rentAmountVisible ? "chevron-up" : "chevron-down"}
                             size={20}
-                             color="#007FFF"
-                            style={{ marginLeft: 6,padding:2,borderRadius:5,backgroundColor :'#EFF6FF', }}
+                            color="#007FFF"
+                            style={{ marginLeft: 6, padding: 2, borderRadius: 5, backgroundColor: '#EFF6FF', }}
                           />
                         </View>
 
@@ -1357,8 +1372,8 @@ function Dashboard(props) {
                     </View>
                     {rentAmountVisible && (
                       <>
-                        <View style={{marginBottom:10}}>
-                          {paymentContext?.getInvoiceDetail?.currentMonthInfo?.bedHistories.map((r,index) => {
+                        <View style={{ marginBottom: 10 }}>
+                          {paymentContext?.getInvoiceDetail?.currentMonthInfo?.bedHistories.map((r, index) => {
                             return <View key={index} style={{ paddingTop: 5, flexDirection: 'row', alignItems: 'center' }}>
 
                               <Text style={{ fontSize: 12, fontWeight: 400, color: '#1e45e2' }}>
@@ -1387,41 +1402,41 @@ function Dashboard(props) {
 
                 )}
 
-                <View style={{flexDirection:'row',paddingTop:10}}>
+                <View style={{ flexDirection: 'row', paddingTop: 10 }}>
                   <Text style={{ fontSize: 14, fontWeight: 400 }}>Non Refundable Rent</Text>
-                  <TouchableOpacity onPress={()=>setNonrefundable(!showNonrefundable)}
-                    style={{padding:2,backgroundColor:'green',marginLeft: 6,borderRadius:5,backgroundColor :'#EFF6FF',}}>
+                  <TouchableOpacity onPress={() => setNonrefundable(!showNonrefundable)}
+                    style={{ padding: 2, backgroundColor: 'green', marginLeft: 6, borderRadius: 5, backgroundColor: '#EFF6FF', }}>
                     <Ionicons
-                        name={showNonrefundable ? "chevron-up" : "chevron-down"}
-                        size={20}
-                        color="#007FFF"
-                      />
+                      name={showNonrefundable ? "chevron-up" : "chevron-down"}
+                      size={20}
+                      color="#007FFF"
+                    />
                   </TouchableOpacity>
 
                 </View>
 
                 {showNonrefundable && (
                   <>
-                  <View>
+                    <View>
                       {paymentContext?.getInvoiceDetail?.advanceInfo?.deductions.length > 0 && (
-                  paymentContext?.getInvoiceDetail?.advanceInfo?.deductions.map((i,index) => {
+                        paymentContext?.getInvoiceDetail?.advanceInfo?.deductions.map((i, index) => {
 
-                    return <View key={index}
-                     style={{flexDirection: "row", justifyContent: "space-between", marginTop:8, alignItems: 'center'}}>
-                      <Text style={{ fontSize: 14, fontWeight: 400 }}>{i.name}</Text>
+                          return <View key={index}
+                            style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 8, alignItems: 'center' }}>
+                            <Text style={{ fontSize: 14, fontWeight: 400 }}>{i.name}</Text>
 
-                      <Text style={{ fontSize: 16, fontWeight: 700 }}>₹ {i.amount}</Text>
+                            <Text style={{ fontSize: 16, fontWeight: 700 }}>₹ {i.amount}</Text>
+                          </View>
+                        })
+                      )}
+
                     </View>
-                  })
-                )}
-
-                  </View>
                   </>
                 )}
 
-                
 
-              
+
+
 
                 <View
                   style={{
@@ -1477,7 +1492,7 @@ function Dashboard(props) {
 
                   <TouchableOpacity
                     style={style.downloadBtn}
-                    onPress={downloadOption}
+                    onPress={() => downloadOption(paymentContext.getInvoiceDetail.invoiceId)}
                   // handleDownload
                   >
                     <Text style={style.downloadText}>Download</Text>
@@ -1587,19 +1602,19 @@ function Dashboard(props) {
               </View>
 
 
-              <View style={style.footer}>
+              {/* <View style={style.footer}> */}
                 <TouchableOpacity
+                  style={[style.footer,{ width: "100%" }]}   
                   onPress={handleDownload}
-                  activeOpacity={0.9}
-
+                  // activeOpacity={0.8}
                 >
-
                   <View style={style.downloadContent}>
                     <Image source={DownloadSide} style={{ width: 20, height: 20 }} />
                     <Text style={style.downloadText}> Download</Text>
                   </View>
                 </TouchableOpacity>
-              </View>
+              {/* </View> */}
+
             </ScrollView>
           </SafeAreaView>
         </Animated.View>
