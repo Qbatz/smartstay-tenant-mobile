@@ -6,13 +6,14 @@ import SuccessModal from "../../ToastFile/TostFilePage";
 import AppLoader from "../../ToastFile/LoaderPage";
 import CameraPic from '../../../assets/Images/cameraPic.png'
 import { launchImageLibrary } from "react-native-image-picker";
-import { putComplaint } from "../../../Action/CustomerAction";
+import { deleteImage, putComplaint } from "../../../Action/CustomerAction";
 import { UsersContext } from "../../../Context/UserContext";
 import { LoginContexts } from "../../../Context/LoginContext";
 import { compliantContexts } from "../../../Context/ComplaintContext";
 import ErrorMessage from "../../ToastFile/ErrorMessage";
 import { useFocusEffect } from "@react-navigation/native";
 import Trash from "../../../assets/Images/trash 01.png"
+import { getComplaints } from "../../../Action/HostelAction";
 
 
 
@@ -88,8 +89,8 @@ const EditComplaintSheet = ({
                 selectionLimit: 0,
             });
             if (result?.assets && result.assets.length > 0) {
-                const uris = result.assets.map(item => item?.uri).filter(Boolean); 
-                    
+                const uris = result.assets.map(item => item?.uri).filter(Boolean);
+
                 if (uris.length === 0) return;
 
                 setMediaimage(prev => [...prev, ...uris]);
@@ -110,13 +111,41 @@ const EditComplaintSheet = ({
         }
     }
 
-    const removeImage = (index) => {
-        setMediaimage(prev => prev.filter((_, i) => i !== index));
-        setImageuri(prev => prev.filter((_, i) => i !== index));
+    const removeImage = (index, imageId) => {
+        console.log(index, imageId);
+
+        if (index !== null && index !== undefined) {
+            setMediaimage(prev => prev.filter((_, i) => i !== index));
+            setImageuri(prev => prev.filter((_, i) => i !== index));
+        }
 
         setSelectedIndex(null);
         setDeleteVisible(false);
-    }
+
+        if (imageId) {
+            deleteImage(imageId, complaintContext.getComplaintDetail.complaintId, loginContext.getToken, context.getHostelDetail.hostelId
+            ).then(r => {
+                console.log("Deleted from server", r);
+
+                getComplaints(context.getHostelDetail.hostelId, complaintContext.getComplaintDetail.complaintId, loginContext.getToken)
+                    .then(r => {
+                        console.log(r)
+                        complaintContext.updateComplaint(r.data)
+                        complaintContext.updateComments(r.data?.comments)
+                    })
+
+            });
+        }
+    };
+
+
+
+    // setMediaimage(prev => prev.filter((_, i) => i !== index));
+    // setImageuri(prev => prev.filter((_, i) => i !== index));
+
+    // setSelectedIndex(null);
+    // setDeleteVisible(false);
+
 
 
     const validateForm = () => {
@@ -263,6 +292,12 @@ const EditComplaintSheet = ({
                         setShowSuccessModal(true)
                         setToastMessage("Updated Successfully")
                         setModelType('success')
+                        getComplaints(context.getHostelDetail.hostelId, complaintContext.getComplaintDetail.complaintId, loginContext.getToken)
+                            .then(r => {
+                                console.log(r)
+                                complaintContext.updateComplaint(r.data)
+                                complaintContext.updateComments(r.data?.comments)
+                            })
 
                         setTimeout(() => {
                             setShowSuccessModal(false)
@@ -406,13 +441,15 @@ const EditComplaintSheet = ({
                                             style={{ paddingTop: 20 }}
                                             data={mediaimage}
                                             renderItem={({ item, index }) => (
+
                                                 <TouchableOpacity onPress={() => imageClick(index)}>
+                                                    {console.log(item)}
                                                     <Image
                                                         source={{ uri: item?.imageUrl || item }}
                                                         style={{ width: 80, height: 70, marginRight: 8, borderRadius: 5 }}
                                                     />
                                                     {selectedIndex === index && deleteVisible && (
-                                                        <TouchableOpacity onPress={() => removeImage(index)}
+                                                        <TouchableOpacity onPress={() => removeImage(index, item?.imageId)}
                                                             style={{
                                                                 position: 'absolute', top: 0, bottom: 0, left: 0,
                                                                 right: 0, alignItems: 'center', justifyContent: 'center',

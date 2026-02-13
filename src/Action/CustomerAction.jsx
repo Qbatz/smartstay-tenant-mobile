@@ -176,3 +176,18 @@ export const getComplaintsUpdates=async(hostelId,token, complaintId)=>{
          return{status: error.response.status, message: error.response.data}
     }
 }
+
+export const deleteImage=async(imageId,complaintId,token,hostelId)=>{
+        try{
+            const axios=getAxios()
+            const response=await axios.delete('/v2/complaints/image/' + complaintId + "/" + hostelId + "/" + imageId , {
+                headers: {
+                    Authorization: "Bearer " + token
+                }
+            })
+        return response;
+        }catch(error){
+            console.log(error.response)
+            return{status: error.response.status, message: error.response.data}
+        }
+}
