@@ -36,8 +36,26 @@ export const getInvoiceDownload=async(hostelId, invoiceId, token)=>{
                 Authorization: "Bearer " + token
             }
         })
+        console.log(response)
         return response;
     }catch (error){
+        console.log(error)
+        return{status: error.response.status, message: error.response.data}
+    }
+}
+
+export const getReceiptDownload=async(hostelId, receiptId, token)=>{
+    console.log(hostelId,receiptId)
+    console.log(token)
+    try{
+        const axios=getAxios();
+        const response=await axios.get("/v2/invoices/pdf/receipts/" + hostelId + "/" + receiptId, {
+            headers: {
+                Authorization: "Bearer " + token
+            }
+        })
+        return response;
+    }catch(error){
         console.log(error)
         return{status: error.response.status, message: error.response.data}
     }
