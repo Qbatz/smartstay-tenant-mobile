@@ -52,7 +52,6 @@ import ReopennComplaint from "./Popup/ReopenComplaint";
 import ErrorMessage from "../ToastFile/ErrorMessage";
 import DeleteComplaint from "./Popup/DeleteComplaint";
 import { getInvoiceDownload, getReceiptDownload } from "../../Action/PaymentAction";
-import ComplaintBottomSheet from "./BottomSheet/ComplaintBottomSheet";
 
 const { width, height } = Dimensions.get("window");
 
@@ -429,12 +428,19 @@ function Dashboard(props) {
     })
     }
 
+    if( selected === "receipt"){
+      getReceiptDownload(context.getHostelDetail.hostelId,)
+    }
+
+    
+
+
   };
 
 
-  const sharePdf = () => {
+  const sharePdf = (invoiceId) => {
     console.log("calling share pdf function")
-    getInvoiceDownload(context.getHostelDetail.hostelId, selectedInvoiceId, loginContext.getToken).then(r => {
+    getInvoiceDownload(context.getHostelDetail.hostelId, invoiceId, loginContext.getToken).then(r => {
       console.log(r)
       CommonModule.sharePDF(r.data, "Sharing the invoice")
     })
@@ -581,11 +587,6 @@ function Dashboard(props) {
 
     </View>
 
-    {/* <ComplaintBottomSheet 
-      visible={showSheet}
-      onClose={()=>setShowSheet(false)}
-      selectedComplaintSend={selectedComplaint}/> */}
-
     {showSheet && (
 
       <View style={style.sheetOverlay}>
@@ -593,7 +594,9 @@ function Dashboard(props) {
           <View style={StyleSheet.absoluteFill} />
         </TouchableWithoutFeedback>
 
-        <Animated.View style={[style.bottomSheet,{transform:[{translateY:sheetY}]}]}>
+        <Animated.View style={[(selectedComplaint?.images?.length > 0 && complaintContext?.getComplaintDetail?.status === "resolved") ? style.resolvedSheetWithImage
+          : selectedComplaint?.images?.length > 0 ? style.bottomSheetwithimage : complaintContext?.getComplaintDetail?.status === "resolved" ? style.resolvedSheet : style.bottomSheet, { transform: [{ translateY: sheetY }], paddingBottom: keyboardHeight }]}
+          {...panResponder.panHandlers}>
 
           {/* { transform: [{ translateY: sheetY }] } */}
 
@@ -1487,7 +1490,7 @@ function Dashboard(props) {
                 {/* {---------Button--} */}
 
                 <View style={style.buttonRow}>
-                  <TouchableOpacity style={style.shareBtn} onPress={sharePdf}>
+                  <TouchableOpacity style={style.shareBtn} onPress={()=>sharePdf(paymentContext.getInvoiceDetail.invoiceId)}>
                     <Text style={style.shareText}>Share</Text>
                     <Image
                       source={ShareIcon}
@@ -1610,7 +1613,7 @@ function Dashboard(props) {
               {/* <View style={style.footer}> */}
                 <TouchableOpacity
                   style={[style.footer,{ width: "100%" }]}   
-                  onPress={()=>{handleDownload(paymentContext.getInvoiceDetail.invoiceId)}}
+                  onPress={handleDownload}
                   // activeOpacity={0.8}
                 >
                   <View style={style.downloadContent}>
@@ -1650,7 +1653,7 @@ const style = StyleSheet.create({
 
   },
   bottomSheetwithimage: {
-    // height: height * 0.65,
+    height: height * 0.65,
     backgroundColor: '#fff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
@@ -1661,7 +1664,6 @@ const style = StyleSheet.create({
   },
   resolvedSheetWithImage: {
     height: "90%",
-    maxHeight:'80%',
     backgroundColor: '#fff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
@@ -1681,7 +1683,7 @@ const style = StyleSheet.create({
     overflow: 'hidden'
   },
   bottomSheet: {
-    maxHeight:"90%",
+    height: height * 0.55,
     backgroundColor: '#fff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
