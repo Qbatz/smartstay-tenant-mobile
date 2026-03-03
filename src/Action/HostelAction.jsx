@@ -109,6 +109,7 @@ export const deleteComplaint=async(hostelId,complaintId,token, reason)=>{
 }
 
 export const addComment=async(complaintId,token,data)=>{
+    console.log(complaintId,token,data)
     const axios = getAxios()
     const response=await axios.post('/v2/complaints/comment/' + complaintId, data, {
         headers: {

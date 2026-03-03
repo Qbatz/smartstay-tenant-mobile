@@ -142,7 +142,7 @@ const AmenitiesBottomSheet = ({
                       <View>
                         <Text style={{ fontSize: 12, fontWeight: 40, color: '#4B4B4B' }}>Description</Text>
                         <Text style={{ marginTop: 13, fontSize: 16, fontWeight: 400 }}>
-                          Airtel Fiber 5G/100mpb
+                          {myAmenitis?.description}
                         </Text>
                       </View>
 
@@ -180,8 +180,8 @@ const AmenitiesBottomSheet = ({
                         <Text style={{ fontSize: 12, fontWeight: 400, color: '#4B4B4B' }}>Description</Text>
 
                         <View style={{ paddingTop: 14 }}>
-                          <Text style={{ fontSize: 16, fontWeight: 400, marginBottom: 2 }}>Gear,Non Gear</Text>
-                          <Text style={{ fontSize: 16, fontWeight: 400, marginTop: 2 }}>24/7 Access, pickup lopp from lobby</Text>
+                          <Text style={{ fontSize: 16, fontWeight: 400, marginBottom: 2 }}>{available?.description}</Text>
+                          {/* <Text style={{ fontSize: 16, fontWeight: 400, marginTop: 2 }}>24/7 Access, pickup lopp from lobby</Text> */}
                         </View>
 
                         <View style={{ paddingTop: 20 }}>

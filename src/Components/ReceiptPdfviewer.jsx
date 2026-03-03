@@ -1,9 +1,9 @@
 import React, { useEffect, useContext, useState, useCallback } from "react";
-import { View, Text, Image, ScrollView, StyleSheet, BackHandler, TouchableOpacity } from "react-native";
+import { View, Text, Image, ScrollView, StyleSheet, BackHandler, TouchableOpacity, NativeModules } from "react-native";
 import HostelImage from "../assets/Images/Group 1.png";
 import PaymentReceivedIcon from "../assets/Images/paymentreceived.png";
 import SigantureIcon from "../assets/Images/signature.png";
-import { getPaymentReceiptDetails } from "../Action/PaymentAction";
+import { getPaymentReceiptDetails, getReceiptDownload } from "../Action/PaymentAction";
 import { UsersContext } from "../Context/UserContext";
 import { LoginContexts } from "../Context/LoginContext";
 import { paymentContexts } from "../Context/PaymentContext";
@@ -24,7 +24,8 @@ const ReceiptPdfViewer = ({ route }) => {
   const userContext = useContext(UsersContext)
   const loginContext = useContext(LoginContexts)
   const { pdfDetails } = route.params || {};
-  const [selectedReceiptDetail, setSelectedReceiptDetails] = useState()
+  const [selectedReceiptDetail, setSelectedReceiptDetails] = useState();
+  const {CommonModule}= NativeModules;
 
   const receiptname = "PaymentReceipt"
 
@@ -49,6 +50,23 @@ const ReceiptPdfViewer = ({ route }) => {
   )
   const addressLine = selectedReceiptDetail?.customerInfo?.fullAddress?.split(',');
   const handleBack = () => navigation.goBack();
+
+  const handleDownloadReceipt=()=>{
+    console.log('dlslsl')
+
+    getReceiptDownload(userContext.getHostelDetail.hostelId, selectedReceiptDetail?.receiptInfo?.receiptId, loginContext.getToken).then(r=>{
+      console.log(r)
+      CommonModule.downloadPDF(r.data)
+    })
+  };
+
+  const handleShareReceipt=()=>{
+    getReceiptDownload(userContext.getHostelDetail.hostelId, selectedReceiptDetail?.receiptInfo?.receiptId, loginContext.getToken).then(r=>{
+      console.log(r)
+      CommonModule.sharePDF(r.data, "Sharing the receipt")
+    })
+
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
@@ -99,7 +117,8 @@ const ReceiptPdfViewer = ({ route }) => {
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
               <TouchableOpacity
                 style={{ marginRight: 8 }}
-              // onPress={downloadOption}
+              onPress={
+                handleDownloadReceipt}
               >
                 <Image
                   source={DownloadIcon}
@@ -107,7 +126,7 @@ const ReceiptPdfViewer = ({ route }) => {
                 />
               </TouchableOpacity>
 
-              <TouchableOpacity >
+              <TouchableOpacity onPress={handleShareReceipt}>
                 <Image
                   source={ShareIcon}
                   style={{ width: 18, height: 18, marginLeft: 8 }}

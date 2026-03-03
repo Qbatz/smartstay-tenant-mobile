@@ -51,7 +51,8 @@ import AmenitiesBottomSheet from "./BottomSheet/AmenitiesSheet";
 import ReopennComplaint from "./Popup/ReopenComplaint";
 import ErrorMessage from "../ToastFile/ErrorMessage";
 import DeleteComplaint from "./Popup/DeleteComplaint";
-import { getInvoiceDownload } from "../../Action/PaymentAction";
+import { getInvoiceDownload, getReceiptDownload } from "../../Action/PaymentAction";
+import ComplaintBottomSheet from "./BottomSheet/ComplaintBottomSheet";
 
 const { width, height } = Dimensions.get("window");
 
@@ -419,13 +420,14 @@ function Dashboard(props) {
     })
   };
 
-  const handleDownload = () => {
+  const handleDownload = (invoiceId) => {
 
-    getInvoiceDownload(context.getHostelDetail.hostelId, selectedInvoiceId, loginContext.getToken).then(r => {
+    if( selected === "invoice"){
+      getInvoiceDownload(context.getHostelDetail.hostelId, invoiceId, loginContext.getToken).then(r => {
       console.log(r)
       CommonModule.downloadPDF(r.data)
     })
-
+    }
 
   };
 
@@ -579,6 +581,11 @@ function Dashboard(props) {
 
     </View>
 
+    {/* <ComplaintBottomSheet 
+      visible={showSheet}
+      onClose={()=>setShowSheet(false)}
+      selectedComplaintSend={selectedComplaint}/> */}
+
     {showSheet && (
 
       <View style={style.sheetOverlay}>
@@ -586,9 +593,7 @@ function Dashboard(props) {
           <View style={StyleSheet.absoluteFill} />
         </TouchableWithoutFeedback>
 
-        <Animated.View style={[(selectedComplaint?.images?.length > 0 && complaintContext?.getComplaintDetail?.status === "resolved") ? style.resolvedSheetWithImage
-          : selectedComplaint?.images?.length > 0 ? style.bottomSheetwithimage : complaintContext?.getComplaintDetail?.status === "resolved" ? style.resolvedSheet : style.bottomSheet, { transform: [{ translateY: sheetY }], paddingBottom: keyboardHeight }]}
-          {...panResponder.panHandlers}>
+        <Animated.View style={[style.bottomSheet,{transform:[{translateY:sheetY}]}]}>
 
           {/* { transform: [{ translateY: sheetY }] } */}
 
@@ -1202,7 +1207,7 @@ function Dashboard(props) {
                     <>
                       <TouchableOpacity
                         style={style.shareBtn}
-                        onPress={() => downloadOption(paymentContext.getInvoiceDetail.invoiceId)}
+                        onPress={() => handleDownload(paymentContext.getInvoiceDetail.invoiceId)}
                       >
                         <Text style={{ fontWeight: "600", color: "#071C70" }}>
                           Download Bill
@@ -1233,7 +1238,7 @@ function Dashboard(props) {
 
                       <TouchableOpacity
                         style={style.downloadBtn}
-                        onPress={() => downloadOption(paymentContext.getInvoiceDetail.invoiceId)}
+                        onPress={() => handleDownload(paymentContext.getInvoiceDetail.invoiceId)}
                       // handleDownload
                       >
                         <Text style={style.downloadText}>Download</Text>
@@ -1492,7 +1497,7 @@ function Dashboard(props) {
 
                   <TouchableOpacity
                     style={style.downloadBtn}
-                    onPress={() => downloadOption(paymentContext.getInvoiceDetail.invoiceId)}
+                    onPress={() => handleDownload(paymentContext.getInvoiceDetail.invoiceId)}
                   // handleDownload
                   >
                     <Text style={style.downloadText}>Download</Text>
@@ -1520,7 +1525,7 @@ function Dashboard(props) {
         </TouchableWithoutFeedback>
 
         <Animated.View
-          style={[style.bottomSheetoption, { transform: [{ translateY: sheetY }] }]}
+          style={[style.bottomSheetoption, {transform: [{ translateY: sheetY }] }]}
           {...panResponder.panHandlers}
         >
           <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
@@ -1605,7 +1610,7 @@ function Dashboard(props) {
               {/* <View style={style.footer}> */}
                 <TouchableOpacity
                   style={[style.footer,{ width: "100%" }]}   
-                  onPress={handleDownload}
+                  onPress={()=>{handleDownload(paymentContext.getInvoiceDetail.invoiceId)}}
                   // activeOpacity={0.8}
                 >
                   <View style={style.downloadContent}>
@@ -1645,7 +1650,7 @@ const style = StyleSheet.create({
 
   },
   bottomSheetwithimage: {
-    height: height * 0.65,
+    // height: height * 0.65,
     backgroundColor: '#fff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
@@ -1656,6 +1661,7 @@ const style = StyleSheet.create({
   },
   resolvedSheetWithImage: {
     height: "90%",
+    maxHeight:'80%',
     backgroundColor: '#fff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
@@ -1675,7 +1681,7 @@ const style = StyleSheet.create({
     overflow: 'hidden'
   },
   bottomSheet: {
-    height: height * 0.55,
+    maxHeight:"90%",
     backgroundColor: '#fff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
