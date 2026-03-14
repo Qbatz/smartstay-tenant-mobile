@@ -13,6 +13,7 @@ import LeftArrow from "../assets/Images/LeftArrow.png"
 import ShareIcon from "../assets/Images/Union.png"
 import DownloadIcon from "../assets/Images/download.png"
 import PaidIcon from "../assets/Images/Checkboxes.png"
+import SuccessModal from "./ToastFile/TostFilePage";
 
 // import Pdf from "react-native-pdf";
 
@@ -26,6 +27,9 @@ const ReceiptPdfViewer = ({ route }) => {
   const { pdfDetails } = route.params || {};
   const [selectedReceiptDetail, setSelectedReceiptDetails] = useState();
   const {CommonModule}= NativeModules;
+  const [showSuccessModal,setShowSuccessModal]=useState(false);
+  const [toastMessage,setToastMessage]=useState()
+  const [modelType,setModelType]=useState();
 
   const receiptname = "PaymentReceipt"
 
@@ -56,20 +60,38 @@ const ReceiptPdfViewer = ({ route }) => {
 
     getReceiptDownload(userContext.getHostelDetail.hostelId, selectedReceiptDetail?.receiptInfo?.receiptId, loginContext.getToken).then(r=>{
       console.log(r)
-      CommonModule.downloadPDF(r.data)
+      if(r.status== 200){
+          CommonModule.downloadPDF(r.data)
+      }else{
+        setShowSuccessModal(true)
+        setToastMessage("Something Went Wrong")
+        setModelType("error")
+        setTimeout(() => {
+          setShowSuccessModal(false)
+        }, 1000);
+      }
+      
     })
   };
 
   const handleShareReceipt=()=>{
     getReceiptDownload(userContext.getHostelDetail.hostelId, selectedReceiptDetail?.receiptInfo?.receiptId, loginContext.getToken).then(r=>{
       console.log(r)
+      if(r.status== 200){
       CommonModule.sharePDF(r.data, "Sharing the receipt")
+      }
     })
 
   }
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+      <SuccessModal
+                        visible={showSuccessModal}
+                        onClose={() => setShowSuccessModal(false)}
+                        message={toastMessage}
+                        type={modelType}
+                    />
       <ScrollView style={styles.container} >
         <View style={{ padding: 20 }}>
 
@@ -86,7 +108,7 @@ const ReceiptPdfViewer = ({ route }) => {
 
                 <Text
                   numberOfLines={1}
-                  style={{ fontSize: 18, fontWeight: 600, marginLeft: 5,flex:1  }}>
+                  style={{ fontSize: 18,fontFamily:'Gilroy-Semibold', marginLeft: 5,flex:1  }}>
                   {selectedReceiptDetail?.receiptInfo?.receiptNumber}
                 </Text>
 
@@ -102,7 +124,7 @@ const ReceiptPdfViewer = ({ route }) => {
                   <Text
                     numberOfLines={2}
                     style={{
-                      fontSize: 11, flexWrap: 'wrap',textAlign:'center',
+                      fontSize: 11, flexWrap: 'wrap',textAlign:'center',fontFamily:'Gilroy-Medium',
                       color: paymentContext.getInvoiceDetail.status === "Paid" ? "#09882C" : "#EC9B29"
                     }}>
                     {paymentContext.getInvoiceDetail.status === "Paid"
@@ -137,10 +159,10 @@ const ReceiptPdfViewer = ({ route }) => {
           </View>
 
           <View style={{ flexDirection: 'row', paddingTop: 50, justifyContent: 'space-between' }}>
-            <Text style={{ fontSize: 20, fontWeight: 600 }}>Amount Paid</Text>
+            <Text style={{ fontSize: 20,fontFamily:'Gilroy-Semibold'}}>Amount Paid</Text>
 
             <View style={{ alignItems: 'flex-end' }}>
-              <Text style={{ fontSize: 18, fontWeight: 600 }}>
+              <Text style={{ fontSize: 18, fontFamily:'Gilroy-Bold' }}>
                 ₹ {new Intl.NumberFormat('en-IN', {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
@@ -173,26 +195,26 @@ const ReceiptPdfViewer = ({ route }) => {
 
           <View style={{ paddingTop: 10 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-              <Text style={{ fontSize: 14, fontWeight: 400, color: '#3C3C4399' }}>Paid Date</Text>
-              <Text style={{ fontSize: 14, fontWeight: 600 }}>
+              <Text style={{ fontSize: 14, fontFamily:'Gilroy-Medium', color: '#3C3C4399' }}>Paid Date</Text>
+              <Text style={{ fontSize: 14, fontFamily:'Gilroy-Semibold'}}>
                 {selectedReceiptDetail?.receiptInfo?.transactionDate}</Text>
             </View>
 
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 8 }}>
-              <Text style={{ fontSize: 14, fontWeight: 400, color: '#3C3C4399' }}>Time</Text>
-              <Text style={{ fontSize: 14, fontWeight: 600 }}>
+              <Text style={{ fontSize: 14,fontFamily:'Gilroy-Medium', color: '#3C3C4399' }}>Time</Text>
+              <Text style={{ fontSize: 14, fontFamily:'Gilroy-Semibold'}}>
                 {selectedReceiptDetail?.receiptInfo?.transactionTime}</Text>
             </View>
 
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 8 }}>
-              <Text style={{ fontSize: 14, fontWeight: 400, color: '#3C3C4399' }}>Payment Mode</Text>
-              <Text style={{ fontSize: 14, fontWeight: 600 }}>
+              <Text style={{ fontSize: 14, fontFamily:'Gilroy-Medium', color: '#3C3C4399' }}>Payment Mode</Text>
+              <Text style={{ fontSize: 14, fontFamily:'Gilroy-Semibold'}}>
                 {selectedReceiptDetail?.receiptInfo?.paymentMode}</Text>
             </View>
 
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 8 }}>
-              <Text style={{ fontSize: 14, fontWeight: 400, color: '#3C3C4399' }}>Reference number</Text>
-              <Text style={{ fontSize: 14, fontWeight: 600 }}>
+              <Text style={{ fontSize: 14,fontFamily:'Gilroy-Medium', color: '#3C3C4399' }}>Reference number</Text>
+              <Text style={{ fontSize: 14,fontFamily:'Gilroy-Semibold'}}>
                 {selectedReceiptDetail?.receiptInfo?.receiptNumber}</Text>
             </View>
 
@@ -210,20 +232,20 @@ const ReceiptPdfViewer = ({ route }) => {
             <Text style={{ fontSize: 16, fontWeight: 600 }}>Payment for</Text>
 
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 15 }}>
-              <Text style={{ fontSize: 14, fontWeight: 400 }}>Invoice.no</Text>
-              <Text style={{ fontSize: 14, fontWeight: 600 }}>
+              <Text style={{ fontSize: 14,fontFamily:'Gilroy-Medium' }}>Invoice.no</Text>
+              <Text style={{ fontSize: 14,fontFamily:'Gilroy-Semibold' }}>
                 {selectedReceiptDetail?.invoiceNumber}</Text>
             </View>
 
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 9 }}>
-              <Text style={{ fontSize: 14, fontWeight: 400 }}>Invoice Date</Text>
-              <Text style={{ fontSize: 14, fontWeight: 600 }}>
+              <Text style={{ fontSize: 14,fontFamily:'Gilroy-Medium' }}>Invoice Date</Text>
+              <Text style={{ fontSize: 14,fontFamily:'Gilroy-Semibold'}}>
                 {selectedReceiptDetail?.invoiceDate}</Text>
             </View>
 
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 9 }}>
-              <Text style={{ fontSize: 14, fontWeight: 400, }}>Invoice amount</Text>
-              <Text style={{ fontSize: 14, fontWeight: 600 }}>
+              <Text style={{ fontSize: 14,fontFamily:'Gilroy-Medium'}}>Invoice amount</Text>
+              <Text style={{ fontSize: 14,fontFamily:'Gilroy-Semibold'}}>
                 ₹ {new Intl.NumberFormat('en-IN', {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
@@ -234,8 +256,8 @@ const ReceiptPdfViewer = ({ route }) => {
             </View>
 
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 9 }}>
-              <Text style={{ fontSize: 14, fontWeight: 400 }}>Payment Amount</Text>
-              <Text style={{ fontSize: 14, fontWeight: 600 }}>
+              <Text style={{ fontSize: 14,fontFamily:'Gilroy-Medium'}}>Payment Amount</Text>
+              <Text style={{ fontSize: 14, fontFamily:'Gilroy-Semibold'}}>
                 ₹ {new Intl.NumberFormat('en-IN', {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,

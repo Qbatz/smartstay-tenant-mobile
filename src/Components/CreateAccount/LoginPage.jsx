@@ -125,19 +125,19 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 28,
-        fontWeight: "600",
+        fontFamily:'Gilroy-Semibold',
         marginBottom: 6,
         color: "#222",
     },
     subtitle: {
-        fontSize: 14,fontWeight:400,
+        fontSize: 14,fontFamily:'Gilroy-Medium',
         color: "#444",
         marginBottom: 15,marginTop:15
     },
     label: {
         fontSize: 12,
         marginBottom: 4,color:'#222222',    
-        fontWeight: "400",
+        fontFamily:'Gilroy-Medium',
     },
     inputBox: {
         flexDirection: "row",

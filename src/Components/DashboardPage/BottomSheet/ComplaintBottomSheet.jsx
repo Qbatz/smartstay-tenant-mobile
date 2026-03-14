@@ -28,13 +28,15 @@ import SendButton from '../../../assets/Images/Send.png';
 import Trash from '../../../assets/Images/trash 01.png'
 import { UsersContext } from "../../../Context/UserContext";
 import { LoginContexts } from "../../../Context/LoginContext";
+import DeleteComplaint from "../Popup/DeleteComplaint";
+import ReopennComplaint from "../Popup/ReopenComplaint";
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 
 export default function ComplaintBottomSheet({
     visible,
     onClose,
-    selectedComplaintSend,
+    selectedComplaintSend, setEditCompliantBottomSheet, setShowSheet
 }) {
     const translateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
     const complaintContext = useContext(compliantContexts)
@@ -47,12 +49,22 @@ export default function ComplaintBottomSheet({
     const [currentComplaint, setCurrentComplaint] = useState(null);
     const [imageid, setimageid] = useState();
     const [deletevisible, setdeleteVisible] = useState(false)
+    const [complaintId, setComplaintId] = useState()
+    const [showPopUp, setShowPopUp] = useState(false)
+    const [reopenComplaint, setReopenComplaint] = useState(false)
 
     useEffect(() => {
-  if (visible && selectedComplaintSend) {
-    setCurrentComplaint(selectedComplaintSend);
-  }
-}, [visible, selectedComplaintSend]);
+        if (visible && selectedComplaintSend) {
+            setCurrentComplaint(selectedComplaintSend);
+        }
+    }, [visible, selectedComplaintSend]);
+    console.log(selectedComplaint)
+
+    useEffect(() => {
+        if (!visible) {
+            setComment(false)
+        }
+    }, [visible])
 
 
     /* ================= OPEN / CLOSE ================= */
@@ -134,6 +146,11 @@ export default function ComplaintBottomSheet({
         navigation.navigate('Updates', { complaintId: complaintId })
     }
 
+    const deleteClick = (complaintId) => {
+        setShowPopUp(true)
+        setComplaintId(complaintId)
+    }
+
     if (!visible) return null;
 
     return (
@@ -185,32 +202,18 @@ export default function ComplaintBottomSheet({
                                         complaintContext?.getComplaintComments.map((item, index) => (
                                             <View
                                                 key={item.commentId}
-                                                style={{
-                                                    paddingTop: 15,
-                                                    flexDirection: "row",
-                                                }}
-                                            >
+                                                style={{ paddingTop: 15, flexDirection: "row" }}>
                                                 <View>
                                                     {item.profilePic ? (
                                                         <Image
                                                             source={{ uri: item.profilePic }}
-                                                            style={{
-                                                                width: 36,
-                                                                height: 36,
-                                                                borderRadius: 18,
-                                                            }}
-                                                        />
+                                                            style={{ width: 36, height: 36, borderRadius: 18, }} />
                                                     ) : (
                                                         <View
                                                             style={{
-                                                                width: 36,
-                                                                height: 36,
-                                                                borderRadius: 18,
-                                                                backgroundColor: "#eef1ff",
-                                                                justifyContent: "center",
-                                                                alignItems: "center",
-                                                            }}
-                                                        >
+                                                                width: 36, height: 36, borderRadius: 18, backgroundColor: "#eef1ff",
+                                                                justifyContent: "center", alignItems: "center"
+                                                            }}>
                                                             <Text
                                                                 style={{
                                                                     color: "#788fed",
@@ -341,7 +344,7 @@ export default function ComplaintBottomSheet({
                                                     <TouchableOpacity onPress={() => { setEditCompliantBottomSheet(true) }} style={{ paddingRight: 10 }}>
                                                         <Image source={Edit} style={{ width: 17.72, height: 17.72 }} />
                                                     </TouchableOpacity>
-                                                    <TouchableOpacity onPress={() => deleteClick(selectedComplaint.complaintId)} style={{ paddingLeft: 10 }}>
+                                                    <TouchableOpacity onPress={() => deleteClick(currentComplaint?.complaintId)} style={{ paddingLeft: 10 }}>
                                                         <Image source={Delete} style={{ width: 17.72, height: 17.72 }} />
                                                     </TouchableOpacity>
                                                 </View>
@@ -542,10 +545,23 @@ export default function ComplaintBottomSheet({
                         {/* ======================================================= */}
                     </SafeAreaView>
                 </KeyboardAvoidingView>
+                <DeleteComplaint
+                    visible={showPopUp}
+                    onClose={() => setShowPopUp(false)}
+                    complaintId={complaintId}
+                    setShowSheet={onClose} />
+
+                <ReopennComplaint
+                    visible={reopenComplaint}
+                    onClose={() => setReopenComplaint(false)} />
             </Animated.View>
         </View>
+
     );
+
 }
+
+
 
 const styles = StyleSheet.create({
     overlay: {

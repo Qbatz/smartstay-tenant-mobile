@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: 20,
-    fontWeight: "600",
+    fontFamily:'Gilroy-Semibold',
     marginLeft: 10,
   },
   profileCard: {
@@ -317,7 +317,7 @@ const styles = StyleSheet.create({
   },
   hostelTitle: {
     fontSize: 16,
-    fontWeight: "600",
+    fontFamily:'Gilroy-Semibold',
     color: "#000",
   },
   locationRow: {
@@ -329,6 +329,7 @@ const styles = StyleSheet.create({
     marginLeft: 4,
     color: "#555",
     fontSize: 13,
+    fontFamily:'Gilroy-Regular'
   },
   divider: {
     height: 1,
@@ -338,7 +339,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 15,
-    fontWeight: "600",
+    fontFamily:'Gilroy-Semibold',
     color: "#000",
     marginBottom: 8,
   },
@@ -350,11 +351,12 @@ const styles = StyleSheet.create({
   detailLabel: {
     marginBottom: 5,
     color: "#555",
-    fontWeight: "500",
+    fontSize:13,
+    fontFamily:'Gilroy-Medium',
   },
   detailValue: {
     color: "#000",
-    fontWeight: "600",
+    fontFamily:'Gilroy-Semibold',fontSize:16,
     marginLeft: 8
   },
   dropdown: {
@@ -373,10 +375,11 @@ const styles = StyleSheet.create({
   },
   dropdownText: {
     fontSize: 15,
-    fontWeight: "600",
+    fontFamily:'Gilroy-Semibold',
   },
   dropdownSub: {
     fontSize: 13,
+    fontFamily:'Gilroy-Regular',
     color: "#777",
   },
 })

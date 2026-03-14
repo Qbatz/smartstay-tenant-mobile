@@ -69,18 +69,20 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontWeight: "600",
+    fontFamily:'Gilroy-Semibold',
     fontSize: 15,
     color: "#111827",
   },
   description: {
     color: "#6B7280",
     fontSize: 13,
+    fontFamily:'Gilroy-Regular',
     marginTop: 3,
   },
   time: {
     color: "#9CA3AF",
     fontSize: 12,
+    fontFamily:'Gilroy-Regular',
     marginTop: 5,
     alignSelf: "flex-end",
   },

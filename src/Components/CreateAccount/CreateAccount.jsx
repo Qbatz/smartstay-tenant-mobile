@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 22,
-    fontWeight: "700",
+   fontFamily:'Gilroy-Semibold',
     color: "#000",
     marginBottom: 5,
     marginTop:14
@@ -173,9 +173,10 @@ const styles = StyleSheet.create({
   subtitle: {
     color: "#555",
     marginBottom: 25,
+    fontFamily:'Gilroy-Medium'
   },
   label: {
-    fontWeight: "500",
+    fontFamily:'Gilroy-Medium',
     color: "#000",
     marginBottom: 8,
   },
@@ -200,6 +201,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
+    fontFamily:'Gilroy-Medium',
     color: "#000",
   },
   centerButtonContainer: {
@@ -222,7 +224,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontSize: 16,
-    fontWeight: "600",
+    fontFamily:'Gilroy-Semibold',
   },
 });
 

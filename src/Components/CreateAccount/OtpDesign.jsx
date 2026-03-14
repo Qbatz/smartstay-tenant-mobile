@@ -147,8 +147,8 @@ const OtpDesign = ({ route }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff", padding: 25, paddingTop: 50 },
-  title: { fontSize: 22, fontWeight: "700", color: "#000", marginBottom: 5,marginTop:14 },
-  subtitle: { color: "#555", marginBottom: 25 },
+  title: { fontSize: 22, fontFamily:'Gilroy-Semibold', color: "#000", marginBottom: 5,marginTop:14 },
+  subtitle: { color: "#555", marginBottom: 25,fontFamily:'Gilroy-Medium' },
   otpContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -164,8 +164,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: "#000",
   },
-  resendText: { color: "#555", alignItems: 'center', justifyContent: 'center' },
-  resendLink: { color: "#0057FF", fontWeight: "600",marginLeft:3 },
+  resendText: { color: "#555", alignItems: 'center', justifyContent: 'center',fontFamily:'Gilroy-Medium' },
+  resendLink: { color: "#0057FF", fontFamily:'Gilroy-Medium',marginLeft:3 },
 });
 
 export default OtpDesign;

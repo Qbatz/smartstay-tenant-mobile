@@ -87,7 +87,7 @@ const WelcomeBackPage = () => {
                 }
                 {/* <Image source={{uri:customerProfilePic}} style={{ width: 70, height: 70,borderRadius:35 }} /> */}
 
-                <Text style={{ fontSize: 24, fontWeight: 600, marginTop: 30, textAlign: 'center' }}>
+                <Text style={{ fontSize: 24,fontFamily:'Gilroy-Semibold', marginTop: 30, textAlign: 'center' }}>
                     Welcome back, {customerName} </Text>
             </View>
         </View>
@@ -101,11 +101,11 @@ const WelcomeBackPage = () => {
                     borderRadius: 8, alignItems: 'center', backgroundColor: '#1E45E1', marginBottom: 5,
                     flexDirection:"row",alignItems:'center',justifyContent:'center'
                 }}>
-                <Text style={{ fontSize: 14, fontWeight: 600, color: '#ffffff'}}>
+                <Text style={{ fontSize: 14,fontFamily:'Gilroy-Semibold', color: '#ffffff'}}>
                     Login as
                 </Text>
                 <Image source={RightArrow} style={{ width: 16, height: 16, resizeMode: "contain",marginHorizontal:5, }} />
-                <Text style={{ fontSize: 14, fontWeight: 600, color: '#ffffff' }}>
+                <Text style={{ fontSize: 14,fontFamily:'Gilroy-Semibold', color: '#ffffff' }}>
                    +91 {loginContext.getPhoneNo}
                 </Text>
             </TouchableOpacity>
@@ -115,7 +115,7 @@ const WelcomeBackPage = () => {
                     borderWidth: 1, borderColor: '#E6E6E6', paddingVertical: 15, width: '100%',
                     borderRadius: 8, alignItems: 'center', backgroundColor: '#ffffff', marginTop: 5
                 }}>
-                <Text style={{ fontSize: 14, fontWeight: 600 }}>Login with another Mobile.no</Text>
+                <Text style={{ fontSize: 14,fontFamily:'Gilroy-Semibold'}}>Login with another Mobile.no</Text>
             </TouchableOpacity>
 
         </View>

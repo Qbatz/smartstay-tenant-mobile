@@ -2,7 +2,8 @@ import React, { useState, useMemo, useCallback, useRef, useEffect, useContext } 
 import {
   View, Text, Dimensions, Image, TouchableOpacity, Button, FlatList,
   TextInput, StyleSheet, BackHandler, TouchableWithoutFeedback, Platform, PanResponder,
-  Animated, ScrollView, Alert, KeyboardAvoidingView, Keyboard, NativeModules
+  Animated, ScrollView, Alert, KeyboardAvoidingView, Keyboard, NativeModules,
+  StatusBar
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
@@ -52,6 +53,7 @@ import ReopennComplaint from "./Popup/ReopenComplaint";
 import ErrorMessage from "../ToastFile/ErrorMessage";
 import DeleteComplaint from "./Popup/DeleteComplaint";
 import { getInvoiceDownload, getReceiptDownload } from "../../Action/PaymentAction";
+import ComplaintBottomSheet from "./BottomSheet/ComplaintBottomSheet";
 
 const { width, height } = Dimensions.get("window");
 
@@ -421,18 +423,22 @@ function Dashboard(props) {
 
   const handleDownload = (invoiceId) => {
 
-    if( selected === "invoice"){
+    if (selected === "invoice") {
       getInvoiceDownload(context.getHostelDetail.hostelId, invoiceId, loginContext.getToken).then(r => {
-      console.log(r)
-      CommonModule.downloadPDF(r.data)
-    })
+        console.log(r)
+
+        if (r.status == 200) {
+          CommonModule.downloadPDF(r.data)
+        }
+
+      })
     }
 
-    if( selected === "receipt"){
+    if (selected === "receipt") {
       getReceiptDownload(context.getHostelDetail.hostelId,)
     }
 
-    
+
 
 
   };
@@ -442,7 +448,9 @@ function Dashboard(props) {
     console.log("calling share pdf function")
     getInvoiceDownload(context.getHostelDetail.hostelId, invoiceId, loginContext.getToken).then(r => {
       console.log(r)
-      CommonModule.sharePDF(r.data, "Sharing the invoice")
+      if (r.status == 200) {
+        CommonModule.sharePDF(r.data, "Sharing the invoice")
+      }
     })
 
   }
@@ -512,6 +520,8 @@ function Dashboard(props) {
 
   return <SafeAreaView style={style.mainDashb}>
 
+    <StatusBar backgroundColor="#DAEEFF" barStyle="dark-content"/>
+
     <LinearGradient
       colors={["#DAEEFF", "#FFFFFF"]}
       start={{ x: 0.5, y: 0 }}
@@ -537,14 +547,14 @@ function Dashboard(props) {
 
             <View style={{ paddingLeft: 2, flex: 1 }}>
               <Text numberOfLines={1} ellipsizeMode="tail"
-                style={{ fontSize: 18, fontWeight: '600', fontFamily: 'gilroy-semibold', color: '#1B1D21', flexShrink: 1 }}>
+                style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold', color: '#1B1D21', flexShrink: 1 }}>
                 {context.getHostelDetail?.hostelName}
                 {/* maxWidth: '90%' */}
               </Text>
 
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Image source={Location} style={{ width: 16, height: 16 }} />
-                <Text style={{ marginLeft: 7, fontSize: 14, color: '#4B4B4B' }}>
+                <Text style={{ marginLeft: 7, fontSize: 14, color: '#4B4B4B', fontFamily: 'Gilroy-Regular' }}>
                   {context.getHostelDetail.city}
                 </Text>
               </View>
@@ -587,6 +597,13 @@ function Dashboard(props) {
 
     </View>
 
+    {/* <ComplaintBottomSheet
+    visible={showSheet}
+    onClose={()=>setShowSheet(false)}
+    selectedComplaintSend={selectedComplaint}
+    setEditCompliantBottomSheet={setEditCompliantBottomSheet}
+    /> */}
+
     {showSheet && (
 
       <View style={style.sheetOverlay}>
@@ -608,12 +625,12 @@ function Dashboard(props) {
             {comment ? (
               <View style={{ flex: 1, justifyContent: 'space-between' }}>
                 <View style={{ flex: 1 }}>
-                  <Text style={{ fontSize: 18, fontWeight: 400 }}>Comments</Text>
+                  <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Medium' }}>Comments</Text>
                   {/* Divider */}
                   <View style={{ height: 1, backgroundColor: "#eee", marginVertical: 10 }} />
 
                   {complaintContext?.getComplaintComments?.length > 0 ?
-                    <FlatList keyExtractor={(item) => item.commentId} showsVerticalScrollIndicator={false}
+                    <FlatList keyExtractor={(item, index) => item.commentId} showsVerticalScrollIndicator={false}
                       keyboardShouldPersistTaps="handled"
                       data={complaintContext?.getComplaintComments} style={{ marginBottom: 20 }}
                       renderItem={({ item, index }) => {
@@ -638,24 +655,24 @@ function Dashboard(props) {
                             <View style={{ flexDirection: 'row' }}>
                               <Text style={{
                                 flex: 1, fontSize: 12, color: '#4B4B4B',
-                                fontWeight: '400', textAlign: 'left',
+                                fontFamily: 'Gilroy-Regular', textAlign: 'left',
                               }}
                                 numberOfLines={1}>
                                 {item.commentdBy}
                               </Text>
-                              <Text style={{ flex: 1, fontSize: 10, fontWeight: '400', color: '#6E6E6E', textAlign: 'right', }}
+                              <Text style={{ flex: 1, fontSize: 10, fontFamily: 'Gilroy-Regular', color: '#6E6E6E', textAlign: 'right', }}
                                 numberOfLines={1}>
                                 {item.commentedAt} - {item?.time}
                               </Text>
                             </View>
-                            <Text style={{ fontSize: 14, fontWeight: 400, marginTop: 5, marginRight: 10 }}>{item.comment}</Text>
+                            <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', marginTop: 5, marginRight: 10 }}>{item.comment}</Text>
                           </View>
                         </View>
                       }} />
                     :
                     <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
-                      <Text style={{ fontSize: 16, fontWeight: 600 }}>No Comments Yet</Text>
-                      <Text style={{ fontSize: 14, fontWeight: 400, color: '#8E8E93', marginTop: 5 }}>
+                      <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold' }}>No Comments Yet</Text>
+                      <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Semibold', color: '#8E8E93', marginTop: 5 }}>
                         Start Your Conversation
                       </Text>
                     </View>}
@@ -667,7 +684,7 @@ function Dashboard(props) {
                     <TextInput value={sendComment} placeholder="Post your Reply here" onChangeText={setSendComment}
                       multiline
                       blurOnSubmit={false}
-                      style={{ flex: 1, marginLeft: 4 }} />
+                      style={{ flex: 1, marginLeft: 4, fontFamily: 'Gilroy-Medium' }} />
                     {
                       sendComment?.trim().length > 0 && (<TouchableOpacity onPress={sendclick} style={{ paddingRight: 10 }}>
                         <Image source={SendButton} style={{ width: 34, height: 34 }} />
@@ -690,10 +707,10 @@ function Dashboard(props) {
                       <View >
                         <View style={{ flexDirection: "row", justifyContent: "space-between", paddingLeft: 5, paddingRight: 8, marginBottom: 10, paddingTop: 10, }}>
                           <View>
-                            <Text style={{ fontSize: 18, fontWeight: "500", fontFamily: "gilroy-semibold", }} >
+                            <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold' }} >
                               {complaintContext.getComplaintDetail?.complaintType}
                             </Text>
-                            <Text style={{ fontSize: 12.8, fontWeight: "400", color: "#424242", marginTop: 6 }}>
+                            <Text style={{ fontSize: 12.8, fontFamily: 'Gilroy-Medium', color: "#424242", marginTop: 6 }}>
                               {complaintContext.getComplaintDetail?.raisedAt}{"  "} {complaintContext.getComplaintDetail?.time}
                             </Text>
                           </View>
@@ -711,26 +728,26 @@ function Dashboard(props) {
                         <View style={{ height: 1, backgroundColor: "#eee", marginVertical: 10 }} />
 
                         <View style={{ paddingTop: 5 }}>
-                          <Text style={{ fontSize: 12, fontWeight: "400", color: "#4B4B4B" }}>Description </Text>
-                          <Text style={{ fontSize: 16, fontWeight: "400", marginTop: 9 }}>
+                          <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Medium', color: "#4B4B4B" }}>Description </Text>
+                          <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium', marginTop: 9 }}>
                             {complaintContext.getComplaintDetail?.complaintDescription}
                           </Text>
                         </View>
 
                         <View style={{ paddingTop: 10 }}>
-                          <Text style={{ fontSize: 12, fontWeight: "400", color: "#4B4B4B" }}> Assigned to</Text>
+                          <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Medium', color: "#4B4B4B" }}> Assigned to</Text>
 
                           <View style={{ flexDirection: "row", justifyContent: "space-between", paddingTop: 8, }}>
                             {complaintContext.getComplaintDetail?.assignee != null ? <Text style={{ fontSize: 15, fontWeight: "500" }}>
                               {complaintContext.getComplaintDetail?.assignee?.firstName}{""}{complaintContext.getComplaintDetail?.assignee?.lastName}
                             </Text>
-                              : <Text style={{ fontSize: 14, fontWeight: "500", color: "#FF3B30", }}>
+                              : <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Semibold', color: "#FF3B30", }}>
                                 Not Assigned Yet
                               </Text>
                             }
 
                             {complaintContext.getComplaintDetail?.assignee?.mobile != null ?
-                              <Text style={{ fontSize: 12, color: "#1E45E1", fontWeight: "400" }}>
+                              <Text style={{ fontSize: 12, color: "#1E45E1", fontFamily: 'Gilroy-Medium' }}>
                                 {complaintContext.getComplaintDetail?.assignee?.mobile}
                               </Text> : null}
                           </View>
@@ -738,7 +755,7 @@ function Dashboard(props) {
 
                         {/* ATTACHED IMAGES */}
                         <View style={{ paddingTop: 15 }}>
-                          <Text style={{ fontSize: 12, fontWeight: "400", color: "#4B4B4B" }}> Attached images</Text>
+                          <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Medium', color: "#4B4B4B" }}> Attached images</Text>
 
                           <FlatList horizontal
                             style={{ paddingTop: 15 }}
@@ -768,7 +785,7 @@ function Dashboard(props) {
                       {["ASSIGNED", "assigned"].includes(complaintContext.getComplaintDetail?.currentStatus) ?
                         <View style={{ borderWidth: 1, borderRadius: 10, borderColor: '#DCDCDC', paddingVertical: 10, paddingHorizontal: 15, marginTop: 15 }}>
                           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                            <Text style={{ fontSize: 15, fontWeight: 600 }}>Complaint Assigned</Text>
+                            <Text style={{ fontSize: 15, fontFamily: 'Gilroy-Semibold' }}>Complaint Assigned</Text>
 
                             <View style={{
                               flexDirection: 'row', borderRadius: 10, paddingVertical: 5, paddingHorizontal: 10, justifyContent: 'center', alignItems: 'center',
@@ -781,7 +798,7 @@ function Dashboard(props) {
                                 }} />
 
                               <Text style={{
-                                fontSize: 12, fontWeight: 600, marginLeft: 5,
+                                fontSize: 12, fontFamily: 'Gilroy-Semibold', marginLeft: 5,
                                 color: complaintContext.getComplaintDetail?.currentStatus === "PENDING" ? "#FFEEEEA3" : complaintContext.getComplaintDetail?.currentStatus === "Inpogress" ? "#FFF6E7" : "green"
                               }}>
                                 {complaintContext.getComplaintDetail?.currentStatus}</Text>
@@ -793,7 +810,7 @@ function Dashboard(props) {
 
                           <TouchableOpacity onPress={() => seeAllUpdates(complaintContext.getComplaintDetail?.complaintId)}
                             style={{ justifyContent: 'center', alignItems: 'center', paddingBottom: 10 }}>
-                            <Text style={{ color: "#00A1FF", fontSize: 14, fontWeight: 600 }}>
+                            <Text style={{ color: "#00A1FF", fontSize: 14, fontFamily: 'Gilroy-Semibold' }}>
                               See all updates
                             </Text>
                           </TouchableOpacity>
@@ -803,7 +820,7 @@ function Dashboard(props) {
                       {complaintContext.getComplaintDetail?.currentStatus == "resolved" ?
                         <View style={{ borderWidth: 1, borderRadius: 10, borderColor: '#DCDCDC', paddingVertical: 10, paddingHorizontal: 15, marginTop: 15 }}>
                           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                            <Text style={{ fontSize: 15, fontWeight: 600 }}>Your complaint was Resolved</Text>
+                            <Text style={{ fontSize: 15, fontFamily: 'Gilroy-Semibold' }}>Your complaint was Resolved</Text>
 
                             <View style={{
                               flexDirection: 'row', borderRadius: 10, paddingVertical: 5, paddingHorizontal: 10, justifyContent: 'center', alignItems: 'center',
@@ -816,7 +833,7 @@ function Dashboard(props) {
                                 }} />
 
                               <Text style={{
-                                fontSize: 12, fontWeight: 600, marginLeft: 5,
+                                fontSize: 12, fontFamily: 'Gilroy-Semibold', marginLeft: 5,
                                 color: complaintContext.getComplaintDetail?.currentStatus === "PENDING" ? "#FFEEEEA3" : complaintContext.getComplaintDetail?.currentStatus === "Inpogress" ? "#FFF6E7" : "green"
                               }}>
                                 {complaintContext.getComplaintDetail?.currentStatus}</Text>
@@ -828,7 +845,7 @@ function Dashboard(props) {
 
                           <TouchableOpacity onPress={() => setReopenComplaint(true)}
                             style={{ justifyContent: 'center', alignItems: 'center', paddingBottom: 10 }}>
-                            <Text style={{ color: "#2E70E8", fontSize: 14, fontWeight: 600 }}>
+                            <Text style={{ color: "#2E70E8", fontSize: 14, fontFamily: 'Gilroy-Semibold' }}>
                               Want to Reopen
                             </Text>
                           </TouchableOpacity>
@@ -838,7 +855,7 @@ function Dashboard(props) {
                               justifyContent: 'center', alignItems: 'center', backgroundColor: '#1E45E1',
                               padding: 10, borderRadius: 8
                             }}>
-                            <Text style={{ color: "#FFFFFF", fontSize: 14, fontWeight: 600 }}>
+                            <Text style={{ color: "#FFFFFF", fontSize: 14, fontFamily: 'Gilroy-Semibold' }}>
                               See all updates
                             </Text>
                           </TouchableOpacity>
@@ -851,7 +868,7 @@ function Dashboard(props) {
                           <View style={{ padding: 4, borderRadius: 10, borderWidth: 1, justifyContent: "space-between", flexDirection: "row", alignItems: "center", borderColor: '#DCDCDC' }} >
                             <TextInput value={sendComment} placeholder="Add your Comment" onChangeText={setSendComment} multiline
                               blurOnSubmit={false}
-                              style={{ flex: 1 }} />
+                              style={{ flex: 1, fontFamily: 'Gilroy-Medium' }} />
                             <TouchableOpacity onPress={sendComment ? sendclick : commentclick} style={{ flexDirection: 'row', marginRight: 14 }}>
                               <Image
                                 source={sendComment?.trim().length > 0 ? SendButton : CommentMesg}
@@ -884,7 +901,7 @@ function Dashboard(props) {
                               <Text
                                 style={{
                                   color: complaintContext.getComplaintDetail?.currentStatus === "PENDING" ? "#FF3B30" : complaintContext.getComplaintDetail?.currentStatus === "Inpogress" ? "#FF9500" : "green",
-                                  fontSize: 14.11, fontWeight: "600", marginLeft: 10,
+                                  fontSize: 14.11, fontFamily: 'Gilroy-Semibold', marginLeft: 10,
                                 }}>
                                 {complaintContext.getComplaintDetail?.currentStatus}
                               </Text>
@@ -998,10 +1015,10 @@ function Dashboard(props) {
                     {/* <TouchableOpacity
                       onPress={() => handleReceiptPdfDownload(paymentContext.getInvoiceDetail.invoiceType)}
                     > */}
-                    <Image
+                    {/* <Image
                       source={ViewIcon}
                       style={{ width: 15, height: 15, marginLeft: 5, marginTop: 2 }}
-                    />
+                    /> */}
                     {/* </TouchableOpacity> */}
                   </View>
                 </View>
@@ -1046,7 +1063,7 @@ function Dashboard(props) {
                             source={PaidIcon}
                             style={{ width: 20, height: 20 }}
                           />
-                          <Text style={{ fontSize: 14, marginLeft: 6 }}>
+                          <Text style={{ fontSize: 14, marginLeft: 6,fontFamily:'Gilroy-Medium' }}>
                             {paymentContext.getInvoiceDetail.status === "Paid"
                               ? "Full Paid"
                               : "Partial Payment"}
@@ -1094,7 +1111,7 @@ function Dashboard(props) {
                                 onPress={() =>
                                   handlePaymentReceipt(i.transactionId, paymentContext.getInvoiceDetail.invoiceType, paymentContext.getInvoiceDetail?.status)}
                                 style={{ flexDirection: 'row' }}>
-                                <Text style={{ fontSize: 10, color: "#1e45e2" }}>{i.transactionNumber}</Text>
+                                <Text style={{ fontSize: 12, color: "#1e45e2",fontFamily:'Gilroy-Semibold' }}>{i.transactionNumber}</Text>
                                 <Image source={ReceiptPic} style={{ width: 14, height: 14, marginLeft: 5 }} resizeMode="contain" />
                               </TouchableOpacity>
                               <Text style={style.detailValue}>₹{new Intl.NumberFormat('en-IN').format(i.paidAmount)}</Text>
@@ -1155,16 +1172,16 @@ function Dashboard(props) {
                 {/* Notes */}
                 {paymentContext.getInvoiceDetail.status === "Pending" && (
                   <View style={{ marginTop: 10 }}>
-                    <Text style={{ fontSize: 13, color: "rgba(60,60,67,0.6)" }}>
+                    <Text style={{ fontSize: 14, color: "rgba(60,60,67,0.6)",fontFamily:'Gilroy-Medium' }}>
                       Notes & Instructions
                     </Text>
-                    <Text style={style.noteText}>
+                    <Text style={{fontSize:16,fontFamily:'Gilroy-Semibold',marginTop:8}}>
                       Kindly pay on or before the due date
                     </Text>
-                    <Text style={style.noteText}>
+                    <Text style={{fontSize:16,fontFamily:'Gilroy-Semibold'}}>
                       Late fee may apply after 3 days of due date
                     </Text>
-                    <Text style={style.noteText}>
+                    <Text style={{fontSize:16,fontFamily:'Gilroy-Semibold'}}>
                       For any billing errors, contact hostel admin
                     </Text>
                   </View>
@@ -1212,7 +1229,7 @@ function Dashboard(props) {
                         style={style.shareBtn}
                         onPress={() => handleDownload(paymentContext.getInvoiceDetail.invoiceId)}
                       >
-                        <Text style={{ fontWeight: "600", color: "#071C70" }}>
+                        <Text style={{ fontFamily:'Gilroy-Semibold',fontSize:16, color: "#071C70" }}>
                           Download Bill
                         </Text>
                         <Image
@@ -1271,10 +1288,10 @@ function Dashboard(props) {
                   }}>
                     <Text style={{ fontSize: 13, color: "#0057FF", fontWeight: "600" }}>{paymentContext?.getInvoiceDetail?.invoiceNumber}</Text>
 
-                    <Image
+                    {/* <Image
                       source={ViewIcon}
                       style={{ width: 15, height: 15, marginLeft: 5, marginTop: 2 }}
-                    />
+                    /> */}
                   </View>
                   {/* </TouchableOpacity> */}
                 </View>
@@ -1490,7 +1507,7 @@ function Dashboard(props) {
                 {/* {---------Button--} */}
 
                 <View style={style.buttonRow}>
-                  <TouchableOpacity style={style.shareBtn} onPress={()=>sharePdf(paymentContext.getInvoiceDetail.invoiceId)}>
+                  <TouchableOpacity style={style.shareBtn} onPress={() => sharePdf(paymentContext.getInvoiceDetail.invoiceId)}>
                     <Text style={style.shareText}>Share</Text>
                     <Image
                       source={ShareIcon}
@@ -1528,7 +1545,7 @@ function Dashboard(props) {
         </TouchableWithoutFeedback>
 
         <Animated.View
-          style={[style.bottomSheetoption, {transform: [{ translateY: sheetY }] }]}
+          style={[style.bottomSheetoption, { transform: [{ translateY: sheetY }] }]}
           {...panResponder.panHandlers}
         >
           <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
@@ -1611,16 +1628,16 @@ function Dashboard(props) {
 
 
               {/* <View style={style.footer}> */}
-                <TouchableOpacity
-                  style={[style.footer,{ width: "100%" }]}   
-                  onPress={handleDownload}
-                  // activeOpacity={0.8}
-                >
-                  <View style={style.downloadContent}>
-                    <Image source={DownloadSide} style={{ width: 20, height: 20 }} />
-                    <Text style={style.downloadText}> Download</Text>
-                  </View>
-                </TouchableOpacity>
+              <TouchableOpacity
+                style={[style.footer, { width: "100%" }]}
+                onPress={handleDownload}
+              // activeOpacity={0.8}
+              >
+                <View style={style.downloadContent}>
+                  <Image source={DownloadSide} style={{ width: 20, height: 20 }} />
+                  <Text style={style.downloadText}> Download</Text>
+                </View>
+              </TouchableOpacity>
               {/* </View> */}
 
             </ScrollView>
@@ -1720,12 +1737,15 @@ const style = StyleSheet.create({
     alignSelf: "center",
     marginBottom: 10,
   },
-  modalTitle: { fontSize: 20, fontWeight: "600", color: "#000" },
+  modalTitle: { fontSize: 20,fontFamily:'Gilroy-Semibold', color: "#000" },
   invoiceId: {
     fontSize: 13,
     color: "#0057FF",
     fontWeight: "600",
     marginBottom: 6,
+    fontFamily:'Gilroy-Semibold',
+    paddingVertical:5,backgroundColor:'#F1F4FF',paddingHorizontal:8,
+    borderRadius:10
   },
   amountSection: {
     marginTop: 10,
@@ -1733,8 +1753,8 @@ const style = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  label: { fontSize: 20, color: "rgba(31, 38, 51, 1)", fontWeight: "600" },
-  totalAmount: { fontSize: 16, fontWeight: "700", color: "#000" },
+  label: { fontSize: 20, color: "rgba(31, 38, 51, 1)",fontFamily:'Gilroy-Semibold'},
+  totalAmount: { fontSize: 18,fontFamily:'Gilroy-Bold', color: "#000" },
   detailsSection: { marginVertical: 10 },
   row: {
     flexDirection: "row",
@@ -1742,11 +1762,11 @@ const style = StyleSheet.create({
     marginVertical: 9,
     alignItems: 'center'
   },
-  detailLabel: { fontSize: 13, color: "rgba(31, 38, 51, 1)" },
-  detailValue: { fontSize: 15, fontWeight: "600", color: "rgba(31, 38, 51, 1)" },
-  payBillText: { fontSize: 13, color: "#0057FF", fontWeight: "600" },
-  paiddetailLabel: { fontSize: 13, color: "rgba(60, 60, 67, 0.6)" },
-  paiddetailValue: { fontSize: 13, color: "black", fontWeight: "600", },
+  detailLabel: { fontSize: 14, color: "rgba(31, 38, 51, 1)",fontFamily:'Gilroy-Medium' },
+  detailValue: { fontSize: 16, fontFamily:'Gilroy-Semibold', color: "rgba(31, 38, 51, 1)" },
+  payBillText: { fontSize: 13, color: "#0057FF",fontFamily:'Gilroy-Semibold'},
+  paiddetailLabel: { fontSize: 14, color: "rgba(60, 60, 67, 0.6)",fontFamily:'Gilroy-Medium' },
+  paiddetailValue: { fontSize: 14, color: "black", fontFamily:'Gilroy-Semibold'},
   Billbottom: { display: 'flex', flexDirection: 'row', justifyContent: "space-between", },
   buttonRow: {
     flexDirection: "row",
@@ -1764,7 +1784,7 @@ const style = StyleSheet.create({
     marginRight: 10,
     justifyContent: 'center'
   },
-  shareText: { color: "#000", fontWeight: "600" },
+  shareText: { color: "#000",fontFamily:'Gilroy-Semibold',fontSize:16},
   downloadBtn: {
     flex: 1,
     backgroundColor: "#0057FF",
@@ -1775,7 +1795,7 @@ const style = StyleSheet.create({
     alignItems: "center",
     justifyContent: 'center'
   },
-  downloadText: { color: "#fff", fontWeight: "600" },
+  // downloadText: { color: "#fff", fontWeight: "600" },
   filterFab: {
     position: 'absolute',
     bottom: 40,
@@ -1812,7 +1832,7 @@ const style = StyleSheet.create({
     marginTop: 6,
     alignItems: 'center'
   },
-  statusText: { fontSize: 12, fontWeight: "500" },
+  statusText: { fontSize: 14,fontFamily:'Gilroy-Medium'},
   hostelImage: {
     width: 50,
     height: 50,
@@ -1960,6 +1980,6 @@ const style = StyleSheet.create({
   },
 
   downloadContent: { alignItems: 'center', justifyContent: 'center', flexDirection: 'row' },
-  downloadText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
+  downloadText: { color: '#FFFFFF', fontSize: 16, fontFamily:'Gilroy-Semibold'},
 })
 export default Dashboard;

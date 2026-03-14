@@ -143,7 +143,7 @@ function Services(props) {
                         <Image source={ComplaintsPic} style={{ tintColor: selectedfield === 'Complaint' ? '#1E45E1' : "#4B4B4B", width: 18.67, height: 17.8 }} />
                     </View>
 
-                    <Text style={{ color: selectedfield == 'Complaint' ? "white" : 'black', fontSize: 16, fontWeight: '400', marginLeft: 10 }}>Complaints</Text>
+                    <Text style={{ color: selectedfield == 'Complaint' ? "white" : 'black', fontSize: 16,fontFamily:'Gilroy-Semibold', marginLeft: 10 }}>Complaints</Text>
                 </View>
             </TouchableOpacity>
 
@@ -163,7 +163,7 @@ function Services(props) {
                     <View style={{ borderWidth: 1, borderRadius: 4, paddingTop: 4, paddingBottom: 4, paddingLeft: 4, paddingRight: 4, backgroundColor: '#ffff', borderColor: '#ffffff' }}>
                         <Image source={AmenitiesPic} style={{ width: 18, height: 17, tintColor: selectedfield === 'Amenities' ? '#1E45E1' : '#4B4B4B' }} />
                     </View>
-                    <Text style={{ color: selectedfield == 'Amenities' ? "white" : 'black', fontSize: 16, fontWeight: '400', marginLeft: 10 }}>Amenities</Text>
+                    <Text style={{ color: selectedfield == 'Amenities' ? "white" : 'black', fontSize: 16,fontFamily:'Gilroy-Semibold', marginLeft: 10 }}>Amenities</Text>
                 </View>
             </TouchableOpacity>
         </View>
@@ -174,10 +174,10 @@ function Services(props) {
                     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                         <Image source={AccessRestricted} style={{ width: 260, height: 180, resizeMode: 'contain' }} />
 
-                        <Text style={{ fontSize: 20, fontWeight: 600, marginTop: 40 }}>
+                        <Text style={{ fontSize: 20,fontFamily:'Gilroy-Semibold', marginTop: 40 }}>
                             Access Restricted..!</Text>
 
-                        <Text style={{ fontSize: 13, fontWeight: 400, color: '#717171', textAlign: 'center', marginTop: 10, lineHeight: 22 }}>
+                        <Text style={{ fontSize: 13,fontFamily:'Gilroy-Medium', color: '#717171', textAlign: 'center', marginTop: 10, lineHeight: 22 }}>
                             You will get the Access after when {"\n"} you getting Check-in</Text>
                     </View>
                 )}
@@ -197,7 +197,7 @@ function Services(props) {
                                             numberOfLines={1}
                                             ellipsizeMode="tail"
                                             style={{
-                                                fontSize: 16, fontWeight: '600', color: '#1C1C1C', marginBottom: 10
+                                                fontSize: 16,fontFamily:'Gilroy-Semibold', color: '#1C1C1C', marginBottom: 10
                                             }}
                                         >
                                             {item.description}
@@ -210,7 +210,7 @@ function Services(props) {
                                             />
                                             <Text
                                                 style={{
-                                                    marginLeft: 8, fontSize: 14, fontWeight: '400', color: '#505050',
+                                                    marginLeft: 8, fontSize: 14,fontFamily:'Gilroy-Medium', color: '#505050',
                                                 }}
                                             >
                                                 {item.complaintTypeName}
@@ -222,7 +222,7 @@ function Services(props) {
                                     <View style={{ alignItems: 'flex-end' }}>
                                         <Text
                                             style={{
-                                                fontSize: 12, color: '#A4A4A4', marginBottom: 8, fontWeight: '400',
+                                                fontSize: 12, color: '#A4A4A4', marginBottom: 8,fontFamily:'Gilroy-Medium',
                                             }}
                                         >
                                             {item?.complaintDateDisplay}
@@ -239,7 +239,7 @@ function Services(props) {
                                             <Text
                                                 style={{
                                                     fontSize: 12,
-                                                    fontWeight: '500',
+                                                    fontFamily:'Gilroy-Medium',
                                                     color: textColor,
                                                 }}
                                             >
@@ -279,10 +279,10 @@ function Services(props) {
                             source={NoResultPic}
                             style={{ width: 324, height: 221, resizeMode: 'contain', marginBottom: 20 }}
                         />
-                        <Text style={{ fontSize: 22, fontWeight: '700', color: '#000', marginBottom: 8 }}>
+                        <Text style={{ fontSize: 22,fontFamily:'Gilroy-Semibold', color: '#000', marginBottom: 8 }}>
                             No Records Found!
                         </Text>
-                        <Text style={{ fontSize: 15, color: '#555', textAlign: 'center', width: 260, lineHeight: 18 }}>
+                        <Text style={{ fontSize: 15,fontFamily:'Gilroy-Medium',color: '#555', textAlign: 'center', width: 260, lineHeight: 18 }}>
                             There is no records relevant to this field.
                         </Text>
                     </View>
@@ -297,7 +297,7 @@ function Services(props) {
                     {amenitiesContext.getAssignedAmenities?.length > 0 && (
                         <>
                             <View style={{ paddingTop: 10 }}>
-                                <Text style={{ fontSize: 14, fontWeight: '400' }}>My Amenities</Text>
+                                <Text style={{ fontSize: 14,fontFamily:'Gilroy-Medium'}}>My Amenities</Text>
                             </View>
 
                             <FlatList
@@ -321,11 +321,11 @@ function Services(props) {
                                                 }}
                                             >
                                                 <View>
-                                                    <Text style={{ fontSize: 16, fontWeight: '600' }}>
+                                                    <Text style={{ fontSize: 16,fontFamily:'Gilroy-Semibold'}}>
                                                         {item.amenityName}
                                                     </Text>
                                                     <View style={{ paddingTop: 7 }}>
-                                                        <Text style={{ fontSize: 14, color: '#4B4B4B' }}>
+                                                        <Text style={{ fontSize: 14,fontFamily:'Gilroy-Regular',color: '#4B4B4B' }}>
                                                             {'\u20B9'}{item.amenityAmount}/month
                                                         </Text>
                                                     </View>
@@ -343,7 +343,7 @@ function Services(props) {
                     {amenitiesContext.getUnassignedAmenities?.length > 0 && (
                         <>
                             <View style={{ paddingTop: 12 }}>
-                                <Text style={{ fontSize: 14, fontWeight: '400' }}>Available Amenities</Text>
+                                <Text style={{ fontSize: 14,fontFamily:'Gilroy-Medium'}}>Available Amenities</Text>
                             </View>
 
                             <FlatList
@@ -366,7 +366,7 @@ function Services(props) {
                                                     borderColor: '#edf3ff',
                                                 }}
                                             >
-                                                <Text style={{ fontSize: 16, fontWeight: '500' }}>{item.amenityName}</Text>
+                                                <Text style={{ fontSize: 16,fontFamily:'Gilroy-Semibold'}}>{item.amenityName}</Text>
                                                 <Image source={AddSquare} style={{ width: 22, height: 22 }} />
                                             </View>
                                         </TouchableOpacity>

@@ -422,7 +422,7 @@ function MyStay(props) {
 
                     <View>
                         <View style={{ marginTop: 20 }}>
-                            <Text style={{ fontSize: 14, fontWeight: '600' }}>Quick Links</Text>
+                            <Text style={{ fontSize: 14, fontFamily:'Gilroy-Semibold' }}>Quick Links</Text>
                         </View>
                         <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'space-between' }}>
                             <TouchableOpacity onPress={() => props.onSheet()}
@@ -433,7 +433,7 @@ function MyStay(props) {
                                 <View style={{ marginBottom: 10 }}>
                                     <Image source={Receipt} style={{ width: 26, height: 26 }} />
                                 </View>
-                                <Text style={{ fontSize: 10, marginTop: 5 }}>Complaint</Text>
+                                <Text style={{ fontSize: 10, marginTop: 5,fontFamily:'Gilroy-Medium'}}>Complaint</Text>
                             </TouchableOpacity>
 
                             <TouchableOpacity onPress={() => props.onRequestBedChange()}
@@ -445,8 +445,8 @@ function MyStay(props) {
                                     <Image source={FrameAdd} style={{ width: 24, height: 24 }} />
                                 </View>
                                 <View style={{ justifyContent: 'center', alignItems: 'center', paddingTop: 5 }}>
-                                    <Text style={{ fontSize: 10 }}>Request</Text>
-                                    <Text style={{ fontSize: 10 }}>Bed change</Text>
+                                    <Text style={{ fontSize: 10,fontFamily:'Gilroy-Regular' }}>Request</Text>
+                                    <Text style={{ fontSize: 10,fontFamily:'Gilroy-Regular' }}>Bed change</Text>
                                 </View>
                             </TouchableOpacity>
                         </View>
@@ -454,7 +454,7 @@ function MyStay(props) {
                     </View>
 
                     <View style={{ paddingTop: 15 }}>
-                        <Text style={{ fontSize: 16, fontWeight: 600 }}>Request</Text>
+                        <Text style={{ fontSize: 16,fontFamily:'Gilroy-Semibold' }}>Request</Text>
 
 
                         {context.getRequestRaised && context.getRequestRaised.length > 0 ?
@@ -466,26 +466,26 @@ function MyStay(props) {
                                         borderColor: '#EFF2FF', justifyContent: 'space-between', marginTop: 10
                                     }}>
                                     <View style={{ paddingLeft: 12, paddingRight: 10 }}>
-                                        <Text style={{ fontSize: 16, fontWeight: 600, marginBottom: 5 }}>
+                                        <Text style={{ fontSize: 16,fontFamily:'Gilroy-Semibold', marginBottom: 5 }}>
                                             {i.type}
                                         </Text>
 
                                         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
                                             <Image source={Clippath} style={{ width: 20, height: 20 }} />
 
-                                            <Text style={{ fontSize: 14, fontWeight: 400, marginLeft: 10 }}>
+                                            <Text style={{ fontSize: 14,fontFamily:'Gilroy-Medium', marginLeft: 10 }}>
                                                 {i.title}</Text>
                                         </View>
 
                                     </View>
 
                                     <View style={{ paddingRight: 10 }}>
-                                        <Text style={{ color: '#9C9C9C', fontSize: 11, fontWeight: 400, marginBottom: 5 }}>
+                                        <Text style={{ color: '#9C9C9C', fontSize: 11,fontFamily:'Gilroy-Medium', marginBottom: 5 }}>
                                             {i.requestedDateDisplay}
                                         </Text>
 
                                         <Text style={{
-                                            fontSize: 12, fontWeight: 400, paddingHorizontal: 8, paddingVertical: 4, backgroundColor: '#FFF8EC',
+                                            fontSize: 12,fontFamily:'Gilroy-Medium', paddingHorizontal: 8, paddingVertical: 4, backgroundColor: '#FFF8EC',
                                             color: '#FF9500', borderRadius: 28, textAlign: 'center', textAlignVertical: 'center', marginTop: 8
                                         }}>
                                             {i.status}
@@ -499,10 +499,10 @@ function MyStay(props) {
                                 justifyContent: 'space-between', marginTop: 10
                             }}>
                                 <View style={{ paddingLeft: 12, paddingRight: 10 }}>
-                                    <Text style={{ fontSize: 16, fontWeight: 600, marginBottom: 5 }}>
+                                    <Text style={{ fontSize: 16,fontFamily:'Gilroy-Semibold', marginBottom: 5 }}>
                                         No Request yet
                                     </Text>
-                                    <Text style={{ fontSize: 14, fontWeight: 400, color: '#4B4B4B', marginTop: 5 }}>
+                                    <Text style={{ fontSize: 14,fontFamily:'Gilroy-Medium', color: '#4B4B4B', marginTop: 5 }}>
                                         You have'nt raised any request</Text>
                                 </View>
 
@@ -512,9 +512,9 @@ function MyStay(props) {
                     </View>
 
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 12 }}>
-                        <Text style={{ fontSize: 16, fontWeight: 600 }}>Complaints</Text>
+                        <Text style={{ fontSize: 16,fontFamily:'Gilroy-Semibold' }}>Complaints</Text>
                         <TouchableOpacity onPress={viewallclick}>
-                            <Text style={{ color: '#1E45E1', marginRight: 2, fontSize: 14, fontWeight: 500 }}>view all</Text>
+                            <Text style={{ color: '#1E45E1', marginRight: 2, fontSize: 14,fontFamily:'Gilroy-Semibold'}}>view all</Text>
                         </TouchableOpacity>
 
                     </View>
@@ -540,7 +540,7 @@ function MyStay(props) {
                                                 numberOfLines={1}
                                                 ellipsizeMode="tail"
                                                 style={{
-                                                    fontSize: 17, fontWeight: '600', color: '#1C1C1E', maxWidth: '90%'
+                                                    fontSize: 17,fontFamily:'Gilroy-Semibold', color: '#1C1C1E', maxWidth: '90%'
                                                 }}
                                             >
                                                 {i.description}
@@ -552,7 +552,7 @@ function MyStay(props) {
                                                     style={{ width: 18, height: 18 }}
                                                 />
                                                 <Text style={{
-                                                    marginLeft: 8, fontSize: 14, fontWeight: '400', color: '#6C6C70'
+                                                    marginLeft: 8, fontSize: 14,fontFamily:'Gilroy-Medium', color: '#6C6C70'
                                                 }}>
                                                     {i.complaintTypeName}
                                                 </Text>
@@ -564,7 +564,7 @@ function MyStay(props) {
                                             justifyContent: 'center', alignItems: 'flex-end', paddingRight: 18, paddingTop: 18, paddingBottom: 20
                                         }}>
                                             <Text style={{
-                                                color: '#9C9C9C', fontSize: 12, fontWeight: '400', marginBottom: 18
+                                                color: '#9C9C9C', fontSize: 12,fontFamily:'Gilroy-Medium', marginBottom: 18
                                             }}>
                                                 {i?.complaintDateDisplay}
                                             </Text>
@@ -572,7 +572,7 @@ function MyStay(props) {
                                             <View style={{
                                                 borderRadius: 20, paddingHorizontal: 12, paddingVertical: 4, backgroundColor: backgroundColor
                                             }}>
-                                                <Text style={{ fontSize: 12, fontWeight: '500', color: textColor }}>
+                                                <Text style={{ fontSize: 12,fontFamily:'Gilroy-Medium', color: textColor }}>
                                                     {i.status}
                                                 </Text>
                                             </View>
@@ -587,10 +587,10 @@ function MyStay(props) {
                             justifyContent: 'space-between', marginTop: 10
                         }}>
                             <View style={{ paddingLeft: 12, paddingRight: 10 }}>
-                                <Text style={{ fontSize: 16, fontWeight: 600, marginBottom: 5 }}>
+                                <Text style={{ fontSize: 16,fontFamily:'Gilroy-Semibold', marginBottom: 5 }}>
                                     No Complaints yet
                                 </Text>
-                                <Text style={{ fontSize: 14, fontWeight: 400, color: '#4B4B4B', marginTop: 5 }}>
+                                <Text style={{ fontSize: 14,fontFamily:'Gilroy-Medium', color: '#4B4B4B', marginTop: 5 }}>
                                     You have'nt raised any Complaints</Text>
                             </View>
 
@@ -657,7 +657,8 @@ const style = StyleSheet.create({
 
     amount: {
         fontSize: 20,
-        fontWeight: '700',
+        fontFamily:"Gilroy-Bold",
+        // fontWeight: '700',
         color: '#1C1C1E',
     },
 
@@ -665,13 +666,14 @@ const style = StyleSheet.create({
         fontSize: 13,
         color: '#AEAEB2',
         marginTop: 4,
+        fontFamily:'Gilroy-Medium'
     },
 
     highlightText: {
         fontSize: 13,
         color: '#FF9500',
         marginTop: 4,
-        fontWeight: '500',
+        fontFamily:'Gilroy-Medium'
     },
 
     inlineRow: {
@@ -684,11 +686,12 @@ const style = StyleSheet.create({
     label: {
         fontSize: 11,
         color: '#8E8E93',
+        fontFamily:'Gilroy-Medium'
     },
 
     value: {
         fontSize: 12,
-        fontWeight: '600',
+       fontFamily:'Gilroy-Semibold',
         marginLeft: 4,
         flexShrink: 1,
     },

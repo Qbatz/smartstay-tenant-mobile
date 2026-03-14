@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -6,7 +6,11 @@ import {
   ScrollView,
   TouchableOpacity,
   Image, Linking, Alert,
-  BackHandler
+  BackHandler,
+  Animated,
+  Dimensions,
+  PanResponder,
+  Pressable
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -36,6 +40,11 @@ import sideframe from '../../assets/Images/sideframe.png'
 import { LoginContexts } from "../../Context/LoginContext";
 import logoutSetup from '../../Action/LogoutAction';
 import { NativeModules } from "react-native";
+import Svg, { Circle } from "react-native-svg";
+import DotIcon from "../../assets/Images/dot.png"
+import { TouchableWithoutFeedback } from "@gorhom/bottom-sheet";
+import CloseIcon from "../../assets/Images/close.png";
+import GreenAddIcon from "../../assets/Images/GreenAddIcon.png"
 
 
 
@@ -47,17 +56,35 @@ const CustomerProfile = (route) => {
   const navigation = useNavigation();
   const [customer, setCustomers] = useState()
   const { NotificationModule } = NativeModules;
+  const [penditnActionBottomSheet, setPendingActionSheet] = useState(false);
+
+  const SCREEN_HEIGHT = Dimensions.get("window").height;
+
+  const translateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
+
+  const radius = 48;
+  const strokeWidth = 6;
+  const circumference = 2 * Math.PI * radius;
+
+  const percent = 70
+
+  const progress = circumference - (circumference * percent) / 100;
 
   useEffect(() => {
     const onBackPress = () => {
+
+      if(penditnActionBottomSheet){
+        setPendingActionSheet(false);
+        return true;
+      }
       navigation.goBack();
       return true;
     }
 
-    BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    const backHandler=BackHandler.addEventListener('hardwareBackPress', onBackPress);
 
-    return () => BackHandler.addEventListener('hardwareBackPress', onBackPress);
-  }, [navigation])
+    return () => backHandler.remove();
+  }, [navigation,penditnActionBottomSheet])
 
 
   useEffect(() => {
@@ -65,9 +92,9 @@ const CustomerProfile = (route) => {
       console.log(r.data)
       context.updateCustomer(r.data)
       storeData(CUSTOMERDETAIL, r.data.firstName)
-      
-      storeData(CUSTOMERINITIALS,r.data.initials)
-      if(r.data.profilePic != null){
+
+      storeData(CUSTOMERINITIALS, r.data.initials)
+      if (r.data.profilePic != null) {
         storeData(CUSTOMERPROFILEPIC, r.data.profilePic)
       }
     }).catch(error => {
@@ -75,6 +102,66 @@ const CustomerProfile = (route) => {
     })
   }, [])
 
+  const openSheet = () => {
+    Animated.timing(translateY, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  }
+
+  const closeSheet = () => {
+    Animated.timing(translateY, {
+      toValue: SCREEN_HEIGHT,
+      duration: 250,
+      useNativeDriver: true,
+    }).start(() => setPendingActionSheet(false));
+  }
+
+  useEffect(() => {
+    if (penditnActionBottomSheet) {
+      openSheet();
+    }
+  }, [penditnActionBottomSheet]);
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_, gesture) => gesture.dy > 10,
+
+      onPanResponderMove: (_, gesture) => {
+        if (gesture.dy > 0) {
+          translateY.setValue(gesture.dy);
+        }
+      },
+
+      onPanResponderRelease: (_, gesture) => {
+        if (gesture.dy > 120) {
+          closeSheet();
+        } else {
+          openSheet();
+        }
+      }
+    })
+  ).current;
+
+  //  const panResponder = useRef(
+  //       PanResponder.create({
+  //           onMoveShouldSetPanResponder: (_, g) => g.dy > 10,
+  //           onPanResponderMove: (_, g) => {
+  //               if (g.dy > 0) translateY.setValue(g.dy);
+  //           },
+  //           onPanResponderRelease: (_, g) => {
+  //               if (g.dy > 150) {
+  //                  closeSheet();
+  //               } else {
+  //                   Animated.spring(translateY, {
+  //                       toValue: 0,
+  //                       useNativeDriver: true,
+  //                   }).start();
+  //               }
+  //           },
+  //       })
+  //   ).current;
 
 
 
@@ -127,7 +214,7 @@ const CustomerProfile = (route) => {
   }
 
   const handleLogout = () => {
-     console.log(loginContext)
+    console.log(loginContext)
 
     const data = {
       xuid: loginContext.getUserId,
@@ -143,7 +230,7 @@ const CustomerProfile = (route) => {
     storeData(LOGGEDIN, "false")
     loginContext.updateToken(null)
     NotificationModule.logout();
-   
+
 
 
     // navigation.navigate("SplashScreen");
@@ -175,22 +262,69 @@ const CustomerProfile = (route) => {
 
 
           <View style={styles.profileCard}>
+
+            <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'center', position: 'relative' }}>
+              <View style={{ padding: 5, alignItems: 'center', justifyContent: 'center', position: "relative" }}>
+                <Svg width={110} height={110}>
+                  <Circle stroke="#E6E6E6"
+                    fill="none"
+                    cx="55"
+                    cy="55"
+                    r={radius}
+                    strokeWidth={strokeWidth} />
+
+                  <Circle
+                    stroke="#F58B00"
+                    fill="none"
+                    cx="55"
+                    cy="55"
+                    r={radius}
+                    strokeWidth={strokeWidth}
+                    strokeDasharray={circumference}
+                    strokeDashoffset={progress}
+                    strokeLinecap="round"
+                    rotation="90"
+                    origin="55,55"
+                  />
+
+                </Svg>
+                {context.getCustomerDetail?.profilePic ? (
+                  <Image
+                    source={{ uri: context.getCustomerDetail?.profilePic }}
+                    style={[styles.profileImage, { position: "absolute", }]} />
+                ) : (
+                  <View style={[styles.profileImage, styles.initialContainer, { position: "absolute", }]}>
+                    <Text style={styles.initialText}>
+                      {context.getCustomerDetail?.initials}
+                    </Text>
+                  </View>
+                )}
+
+                <View style={{
+                  position: "absolute", bottom: 0, backgroundColor: "#FFEFCF", paddingHorizontal: 8, paddingVertical: 2,
+                  borderRadius: 15,
+                }}>
+                  <Text style={{ fontSize: 9.5, color: '#FF9900' }}>{percent}%</Text>
+                </View>
+
+
+              </View>
+
+              <TouchableOpacity style={{ position: "absolute", top: 10, right: 10, }}>
+                <Image source={DotIcon} style={{ width: 20, height: 20 }} />
+              </TouchableOpacity>
+
+            </View>
+
+
+
+
             <View style={styles.profileRow}>
 
-              {context.getCustomerDetail?.profilePic ? (
-                <Image
-                  source={{ uri: context.getCustomerDetail?.profilePic }}
-                  style={styles.profileImage} />
-              ) : (
-                <View style={[styles.profileImage, styles.initialContainer]}>
-                  <Text style={styles.initialText}>
-                    {context.getCustomerDetail?.initials}
-                  </Text>
-                </View>
-              )}
-              <View style={{ flex: 1, marginLeft: 10 }}>
+
+              <View style={{ flex: 1, marginLeft: 10, alignItems: 'center' }}>
                 <View style={{ display: 'flex', flexDirection: 'row', flex: 1 }}>
-                  <Text style={[styles.profileName, { flexShrink: 1 }]}
+                  <Text style={[styles.profileName, { flexShrink: 1, fontFamily: 'Gilroy-Semibold' }]}
                     numberOfLines={1}
                     ellipsizeMode="tail">
                     {context.getCustomerDetail?.firstName}
@@ -203,8 +337,9 @@ const CustomerProfile = (route) => {
 
                 <View style={styles.infoRow}>
                   <View style={styles.FloorBadgePending}>
-                    <Text numberOfLines={2} ellipsizeMode="clip"
-                      style={{ color: 'black', textAlign: 'center' }}>{context.getCustomerDetail?.bookingDetails?.floorName}</Text>
+                    <Text numberOfLines={1} ellipsizeMode="clip"
+                      style={{ color: 'black', textAlign: 'center', fontFamily: 'Gilroy-Medium' }}>
+                      {context.getCustomerDetail?.bookingDetails?.floorName}</Text>
                   </View>
 
                   <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
@@ -213,7 +348,7 @@ const CustomerProfile = (route) => {
                       style={{ height: 16, width: 16, marginRight: 4 }}
                       resizeMode="contain"
                     />
-                    <Text style={{ flexShrink: 1 }}
+                    <Text style={{ flexShrink: 1, fontFamily: 'Gilroy-Medium' }}
                       numberOfLines={2}
                       ellipsizeMode="tail">{context.getCustomerDetail?.bookingDetails?.roomName}</Text>
                   </View>
@@ -224,25 +359,35 @@ const CustomerProfile = (route) => {
                       style={{ height: 16, width: 16, marginRight: 4 }}
                       resizeMode="contain"
                     />
-                    <Text style={{ flexShrink: 1 }}
+                    <Text style={{ flexShrink: 1, fontFamily: 'Gilroy-Medium' }}
                       numberOfLines={2}
                       ellipsizeMode="tail">{context.getCustomerDetail?.bookingDetails?.bedName}</Text>
                   </View>
 
 
                 </View>
+
+
               </View>
               {/* <TouchableOpacity onPress={handleEditProfile}>
               <Image source={EditIcon} resizeMode="contain"
                 style={{ height: 20, width: 20 }} />
             </TouchableOpacity> */}
             </View>
+            <TouchableOpacity 
+            // onPress={() => setPendingActionSheet(true)}
+              style={{
+                marginTop: 18, borderColor: '#E27625', borderWidth: 1, backgroundColor: '#FFF8EA', width: '100%', alignItems: 'center',
+                justifyContent: 'center', paddingHorizontal: 10, paddingVertical: 12, borderRadius: 10
+              }}>
+              <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Semibold', color: '#FF9500' }}>+  Pending Action</Text>
+            </TouchableOpacity>
           </View>
 
 
           {/* ----KYC------ */}
 
-          <View style={styles.card}>
+          {/* <View style={styles.card}>
             <Text style={styles.sectionTitle}>Complete your KYC verification</Text>
             <Text style={styles.warningText}>
               Enter your Aadhar/PAN card documents and Complete the status
@@ -250,7 +395,7 @@ const CustomerProfile = (route) => {
             <TouchableOpacity style={styles.primaryButton} onPress={() => navigation.navigate("ComingSoonPage")}>
               <Text style={styles.primaryButtonText}>Verify Now</Text>
             </TouchableOpacity>
-          </View>
+          </View> */}
 
           {/* <View style={styles.card}>
           <View style={styles.cardRow}>
@@ -271,7 +416,7 @@ const CustomerProfile = (route) => {
             <TouchableOpacity onPress={HostelClick} style={styles.row}>
               <View style={{ flexDirection: 'row' }}>
                 <Image source={buildings} style={{ width: 20, height: 20 }} />
-                <Text style={{ fontSize: 14, fontWeight: 400, marginLeft: 5 }}>
+                <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', marginLeft: 5 }}>
                   Hostels</Text>
               </View>
 
@@ -283,7 +428,7 @@ const CustomerProfile = (route) => {
             <TouchableOpacity onPress={() => navigation.navigate('ComingSoonPage')} style={styles.row}>
               <View style={{ flexDirection: 'row' }}>
                 <Image source={paperclip} style={{ width: 20, height: 20 }} />
-                <Text style={{ fontSize: 14, fontWeight: 400, marginLeft: 5 }}>Rental Agreement</Text>
+                <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', marginLeft: 5 }}>Rental Agreement</Text>
               </View>
 
               <Image source={sideframe} style={{ width: 23, height: 23 }} />
@@ -327,7 +472,7 @@ const CustomerProfile = (route) => {
 
         {/* </View> */}
         {/* </View> */}
-        <View style={{ justifyContent: 'flex-end'}}>
+        <View style={{ justifyContent: 'flex-end' }}>
           <View style={styles.helpRow}>
             <Image source={InfoIcon} resizeMode="contain" style={{ width: 20, height: 20 }} />
             <Text style={styles.helpText}>Help & Information</Text>
@@ -341,9 +486,77 @@ const CustomerProfile = (route) => {
           </View>
 
         </View>
-        
+
       </ScrollView>
 
+      {
+        penditnActionBottomSheet && (
+          <View style={styles.overlay}>
+            <Pressable
+              style={StyleSheet.absoluteFillObject}
+              onPress={closeSheet}
+            />
+
+            <Animated.View
+              {...panResponder.panHandlers}
+              style={[styles.sheet,
+              {
+                transform: [{ translateY }]
+              }]}>
+
+
+              <View style={styles.dragindictor} />
+
+              <View style={{ marginTop: 5,marginBottom:20 }}>
+
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Text style={{ fontSize: 20, fontFamily: 'Gilroy-Semibold' }}>Pending Action</Text>
+
+                  <TouchableOpacity onPress={closeSheet}>
+                    <Image source={CloseIcon} style={{ width: 22, height: 22 }} />
+                  </TouchableOpacity>
+                </View>
+
+                <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 18, justifyContent: 'space-between' }}>
+                  <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>Profile completed</Text>
+                  <Text style={{
+                    fontSize: 12, fontFamily: 'Gilroy-Medium', paddingVertical: 3, backgroundColor: '#FFF4DD',
+                    paddingHorizontal: 10, color: '#FF9900', borderRadius: 14.5
+                  }}>
+                    {percent}%</Text>
+                </View>
+
+                <View style={styles.progressContainer}>
+                  <View style={[styles.progressFill, { width: `${percent}%` }]} />
+                </View>
+
+                <View style={{ width: '100%', borderWidth: 0.8, borderColor: '#E5E7EB',marginTop:20,marginBottom:10 }} />
+
+                <TouchableOpacity onPress={handleEditProfile}
+                style={styles.touchableAction}>
+                  <Text style={styles.actionText}>Update profile</Text>
+                  <Image source={GreenAddIcon} style={{width:24,height:24}}/>
+                </TouchableOpacity>
+
+                <TouchableOpacity  onPress={() => navigation.navigate("ComingSoonPage")}
+                style={styles.touchableAction}>
+                  <Text style={styles.actionText}>Kyc Verification</Text>
+                   <Image source={GreenAddIcon} style={{width:24,height:24}}/>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => navigation.navigate('ComingSoonPage')}
+                style={styles.touchableAction}>
+                  <Text style={styles.actionText}>Rental Aggrement</Text>
+                   <Image source={GreenAddIcon} style={{width:24,height:24}}/>
+                </TouchableOpacity>
+
+              </View>
+
+            </Animated.View>
+
+          </View>
+        )
+      }
 
     </View>
   );
@@ -360,8 +573,8 @@ const styles = StyleSheet.create({
   scrollContainer: {
     padding: 20,
     paddingBottom: 50,
-    flexGrow:1,
-    justifyContent:"space-between"
+    flexGrow: 1,
+    justifyContent: "space-between"
   },
   backButton: {
     flexDirection: "row",
@@ -371,9 +584,9 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: 20,
-    fontWeight: "600",
+    fontFamily: 'Gilroy-Semibold',
     marginLeft: 10,
-    fontFamily:"gilroy-semibold"
+
   },
   profileCard: {
     backgroundColor: "#fff",
@@ -382,16 +595,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#eee",
     marginBottom: 12,
-    flex: 1
+    flex: 1,
+    justifyContent: 'center', alignItems: 'center'
   },
   profileRow: {
     flexDirection: "row",
-    flex: 1
+    flex: 1,
+    marginTop: 15, alignItems: 'center',
   },
   profileImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 82,
+    height: 82,
+    borderRadius: 41,
   },
   initialText: {
     color: '#788fed',
@@ -420,6 +635,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 5,
     flex: 1,
+    marginTop: 10,
   },
   infoText: {
     color: "#555",
@@ -516,7 +732,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 15,
-    fontWeight: "600",
+    fontFamily: 'Gilroy-Semibold',
     color: "#000",
     marginBottom: 8,
   },
@@ -561,6 +777,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 246, 244, 1)',
     color: "rgba(255, 0, 0, 1)",
     fontSize: 13,
+    fontFamily: 'Gilroy-Regular',
     marginBottom: 10,
     padding: 5
   },
@@ -582,7 +799,7 @@ const styles = StyleSheet.create({
   },
   primaryButtonText: {
     color: "#fff",
-    fontWeight: "600",
+    fontFamily: 'Gilroy-Semibold', fontSize: 14,
   },
   buttonRow: {
     flexDirection: "row",
@@ -618,6 +835,7 @@ const styles = StyleSheet.create({
   },
   helpText: {
     color: "#555",
+    fontFamily: 'Gilroy-Medium'
   },
   logoutButton: {
     width: "100%",
@@ -631,8 +849,47 @@ const styles = StyleSheet.create({
   },
   logoutText: {
     color: "#ff3b30",
-    fontWeight: "600",
+    fontFamily: 'Gilroy-Medium', fontSize: 16,
     marginLeft: 6,
   },
-  row: { flexDirection: 'row', justifyContent: 'space-between' }
+  row: { flexDirection: 'row', justifyContent: 'space-between' },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "flex-end",
+    zIndex: 999
+  },
+  sheet: {
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
+    padding: 16,
+    maxHeight: "90%",
+    overflow: 'hidden'
+    // dynamic height limit
+  },
+  dragindictor: { width: 50, height: 4, backgroundColor: "#ccc", borderRadius: 2, alignSelf: "center", marginBottom: 10 },
+  progressContainer: {
+    width: "100%",
+    height: 6,
+    backgroundColor: "#E6E6E6",
+    borderRadius: 10,
+    overflow: "hidden",
+    marginTop: 12
+  },
+
+  progressFill: {
+    height: "100%",
+    backgroundColor: "#F58B00",
+    borderRadius: 10
+  },
+  touchableAction:{ 
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    backgroundColor: '#F9FAFB', paddingVertical: 10, marginTop: 10,borderRadius:10,
+    paddingHorizontal:10 
+  },
+  actionText:{
+    fontSize:16,fontFamily:'Gilroy-Semibold'
+  }
+  
 });

@@ -131,28 +131,28 @@ const Notification = (props) => {
         contentContainerStyle={styles.listContainer}
         // showsVerticalScrollIndicator={false}
 
-        renderHiddenItem={(data,rowMap)=>(
-          <View style={styles.rowBack}>
+  //       renderHiddenItem={(data,rowMap)=>(
+  //         <View style={styles.rowBack}>
 
-            <TouchableOpacity style={[styles.backRightBtn, styles.backRightBtnRight]}
-            onPress={() => deleteRow(rowMap, data.item.id)}>
-                <Image source={Delete} style={{ width: 24, height: 24,tintColor:'#ffffff' }}/>
+  //           <TouchableOpacity style={[styles.backRightBtn, styles.backRightBtnRight]}
+  //           onPress={() => deleteRow(rowMap, data.item.id)}>
+  //               <Image source={Delete} style={{ width: 24, height: 24,tintColor:'#ffffff' }}/>
 
-            </TouchableOpacity>
-          </View>
-  )}
-        rightOpenValue={-75}
-        disableRightSwipe
+  //           </TouchableOpacity>
+  //         </View>
+  // )}
+        // rightOpenValue={-75}
+        // disableRightSwipe
       /> : <View style={styles.noResult}>
                   <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                       <Image
                           source={NoResultPic}
                           style={{ width: 324, height: 221, resizeMode: 'contain', marginBottom: 20, }}
                       />
-                      <Text style={{ fontSize: 22, fontWeight: '700', color: '#000', marginBottom: 8, }}>
+                      <Text style={{ fontSize: 22,fontFamily:'Gilroy-Semibold', color: '#000', marginBottom: 8, }}>
                           No Results Found!
                       </Text>
-                      <Text style={{ fontSize: 15, color: '#555', textAlign: 'center', width: 260, lineHeight: 18, }}>
+                      <Text style={{ fontSize: 15, color: '#555', textAlign: 'center', width: 260, lineHeight: 18,fontFamily:'Gilroy-Medium' }}>
                           Try adjusting your search or filters to see more options.
                       </Text>
                   </View>
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: 22,
-    fontWeight: "600",
+    fontFamily:'Gilroy-Semibold',
     marginLeft: 10,
   },
   listContainer: {
