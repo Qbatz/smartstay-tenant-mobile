@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
 
   title: {
     fontSize: 22,
-    fontWeight: "700",
+    fontFamily:'Gilroy-Semibold',
     color: "#000",
     lineHeight: 28,
   },
@@ -189,6 +189,7 @@ const styles = StyleSheet.create({
   desc: {
     textAlign: "center",
     fontSize: 13,
+    fontFamily:'Gilroy-Medium',
     color: "#555",
     marginTop: 12,
     lineHeight: 20,
@@ -227,7 +228,7 @@ const styles = StyleSheet.create({
 
   buttonText: {
     color: "#fff",
-    fontWeight: "600",
+    fontFamily:'Gilroy-Semibold',
     fontSize: 16,
   },
 });

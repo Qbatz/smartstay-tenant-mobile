@@ -177,7 +177,7 @@ const Payment = (props) => {
                     <Text style={styles.title}>{item.invoiceType}</Text>
 
                     {item.status === "Cancelled" || item.status === "Pending Refund" ? (
-                      <Text style={styles.date}>invoice date: {item.invoiceStartDate}</Text>
+                      <Text style={styles.date}>Inv date: {item.invoiceStartDate}</Text>
                     ) : ["Pending", "Partial Payment"].includes(item.status) ? (
                       <Text style={styles.date}>
                         Due: {item?.invoiceDueDate || "N/A"}
@@ -261,10 +261,10 @@ const Payment = (props) => {
               source={NoResultPic}
               style={{ width: 324, height: 221, resizeMode: 'contain', marginBottom: 20, }}
             />
-            <Text style={{ fontSize: 22, fontWeight: '700', color: '#000', marginBottom: 8, }}>
+            <Text style={{ fontSize: 22,fontFamily:'Gilroy-Semibold', color: '#000', marginBottom: 8, }}>
               No Results Found!
             </Text>
-            <Text style={{ fontSize: 15, color: '#555', textAlign: 'center', width: 260, lineHeight: 18, }}>
+            <Text style={{ fontSize: 15, color: '#555', textAlign: 'center', width: 260, lineHeight: 18,fontFamily:'Gilroy-Medium' }}>
               Try adjusting your search or filters to see more options.
             </Text>
           </View>
@@ -535,17 +535,17 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginLeft: 12,
   },
-  title: { fontSize: 14, fontWeight: "600", color: "#000" },
-  date: { fontSize: 12, color: "#888", marginTop: 5 },
+  title: { fontSize: 14,fontFamily:'Gilroy-Semibold', color: "#000" },
+  date: { fontSize: 12, color: "#888", marginTop: 5,fontFamily:'Gilroy-Medium' },
   amountContainer: { alignItems: "flex-end", justifyContent: "center" },
-  amount: { fontSize: 14, fontWeight: "600", color: "#000" },
+  amount: { fontSize: 14,fontFamily:'Gilroy-Bold', color: "#000" },
   statusBadge: {
     borderRadius: 20,
     paddingHorizontal: 5,
     paddingVertical: 2,
     marginTop: 6,
   },
-  statusText: { fontSize: 12, fontWeight: "500" },
+  statusText: { fontSize: 12,fontFamily:'Gilroy-Medium' },
 
   // 🔽 Modal Styles
   modalBackground: {

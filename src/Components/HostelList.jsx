@@ -175,12 +175,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 22,
-    fontWeight: "700",
+   fontFamily:'Gilroy-Semibold',
     color: "#000",
   },
   subtitle: {
     color: "#666",
     marginTop: 5,
+    fontFamily:'Gilroy-Regular',
     marginBottom: 20,
   },
   hostelCard: {
@@ -225,7 +226,7 @@ initialContainer: {
 },
   hostelName: {
     fontSize: 16,
-    fontWeight: "600",
+    fontFamily:'Gilroy-Semibold',
     color: "#000",
   },
   locationRow: {
@@ -235,6 +236,7 @@ initialContainer: {
   },
   locationText: {
     fontSize: 14,
+    fontFamily:'Gilroy-Regular',
     color: "#555",
     marginLeft: 4,
   },
@@ -254,7 +256,7 @@ initialContainer: {
   goButtonText: {
     color: "#fff",
     fontSize: 16,
-    fontWeight: "600",
+    fontFamily:'Gilroy-Semibold',
   },
 });
 
