@@ -422,6 +422,7 @@ function Dashboard(props) {
   };
 
   const handleDownload = (invoiceId) => {
+    console.log(invoiceId)
 
     if (selected === "invoice") {
       getInvoiceDownload(context.getHostelDetail.hostelId, invoiceId, loginContext.getToken).then(r => {
@@ -445,6 +446,7 @@ function Dashboard(props) {
 
 
   const sharePdf = (invoiceId) => {
+    console.log(invoiceId)
     console.log("calling share pdf function")
     getInvoiceDownload(context.getHostelDetail.hostelId, invoiceId, loginContext.getToken).then(r => {
       console.log(r)

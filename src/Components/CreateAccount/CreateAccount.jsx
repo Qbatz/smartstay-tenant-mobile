@@ -6,12 +6,16 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
+  TouchableWithoutFeedback,
+  ScrollView,
 } from "react-native";
 import { verifyPhoneNo } from "../../Action/LoginAction";
 import SuccessModal from "../ToastFile/TostFilePage";
 import { LoginContexts } from "../../Context/LoginContext";
 import ErrorMessage from "../ToastFile/ErrorMessage";
 import AppLogo from "../../assets/Images/AppLogo.png"
+import Ionicons from 'react-native-vector-icons/Ionicons'
+
 
 const CreateAccount = ({ navigation }) => {
 
@@ -21,8 +25,18 @@ const CreateAccount = ({ navigation }) => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [otp, setOtp] = useState();
   const [modelTpe, setModelType] = useState()
-  const [phoneNoError, setPhoneNoError]=useState()
+  const [phoneNoError, setPhoneNoError] = useState()
+  const [showDropdown, setShowDropdown] = useState(false)
+  const [isFocus, setIsFocus] = useState(false)
 
+  const countries = [
+    { name: "India", code: "IN", dial_code: "+91" },
+    { name: "United States", code: "US", dial_code: "+1" },
+    { name: "United Kingdom", code: "GB", dial_code: "+44" },
+    { name: "Australia", code: "AU", dial_code: "+61" },
+  ];
+
+  const [selectedCountry, setSelectedCountry] = useState(countries[0]);
 
   const handlePhoneChange = (text) => {
     const numericText = text.replace(/[^0-9]/g, '');
@@ -32,14 +46,14 @@ const CreateAccount = ({ navigation }) => {
 
   };
 
-  const validateForm=()=>{
-    let valid= true
+  const validateForm = () => {
+    let valid = true
 
     setPhoneNoError("")
 
-    if(phoneNumber.length != 10){
-       setPhoneNoError("Please enter valid mobile Number")
-       valid =false;
+    if (phoneNumber.length != 10) {
+      setPhoneNoError("Please enter valid mobile Number")
+      valid = false;
     }
 
     return valid;
@@ -47,7 +61,7 @@ const CreateAccount = ({ navigation }) => {
 
 
   const handleGetOtp = async () => {
-    if(!validateForm()) return;
+    if (!validateForm()) return;
 
     if (phoneNumber.length === 10) {
 
@@ -85,7 +99,7 @@ const CreateAccount = ({ navigation }) => {
         }, 2000);
       }
     }
-    else{
+    else {
       setShowSuccessModal(true)
       setOtp("Please enter Valid Number")
       setModelType('error')
@@ -119,17 +133,61 @@ const CreateAccount = ({ navigation }) => {
         </Text>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.countryCode}>+91</Text>
+          <TouchableOpacity
+            style={styles.codeContainer}
+            onPress={() => {
+              if (!showDropdown) {
+                setShowDropdown(true)
+              } else {
+                setShowDropdown(false)
+              }
+            }}
+          >
+            <Text style={styles.countryCode}>{selectedCountry.dial_code}</Text>
+            <Ionicons
+              name={isFocus ? "chevron-up" : "chevron-down"}
+              size={22}
+              color="#000"
+              style={{ paddingRight: 3 }}
+            />
+
+          </TouchableOpacity>
+
           <TextInput
             style={styles.input}
             keyboardType="number-pad"
             placeholder="98765 43210"
             value={phoneNumber}
             onChangeText={handlePhoneChange}
+            onFocus={() => setIsFocus(true)}
             maxLength={10}
           />
         </View>
-        {phoneNoError && <ErrorMessage message={phoneNoError} type="error"/>}
+        {
+          showDropdown && (
+            <>
+              <TouchableWithoutFeedback onPress={() => setShowDropdown(false)}>
+                <View style={styles.dropdownOverlay} />
+              </TouchableWithoutFeedback>
+              <View style={styles.overlay}>
+                <ScrollView keyboardShouldPersistTaps="handled"
+                  style={styles.dropdownBox}>
+                  {
+                    countries.map((item, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        style={styles.countryItem}
+                        onPress={() => setSelectedCountry(item)}>
+                        <Text style={{ fontFamily: 'Gilroy-Medium', fontSize: 15 }}>{item.name} {item.dial_code}</Text>
+                      </TouchableOpacity>
+                    ))
+                  }
+                </ScrollView>
+              </View>
+            </>
+          )
+        }
+        {phoneNoError && <ErrorMessage message={phoneNoError} type="error" />}
       </View>
 
       <View style={styles.centerButtonContainer}>
@@ -159,24 +217,24 @@ const styles = StyleSheet.create({
   },
   logo: {
     marginBottom: 10,
-    width:45,
-    height:45,
-    resizeMode:'contain'
+    width: 45,
+    height: 45,
+    resizeMode: 'contain'
   },
   title: {
     fontSize: 22,
-   fontFamily:'Gilroy-Semibold',
+    fontFamily: 'Gilroy-Semibold',
     color: "#000",
     marginBottom: 5,
-    marginTop:14
+    marginTop: 14
   },
   subtitle: {
     color: "#555",
     marginBottom: 25,
-    fontFamily:'Gilroy-Medium'
+    fontFamily: 'Gilroy-Medium'
   },
   label: {
-    fontFamily:'Gilroy-Medium',
+    fontFamily: 'Gilroy-Medium',
     color: "#000",
     marginBottom: 8,
   },
@@ -192,6 +250,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 5,
   },
+  codeContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginRight: 10
+  },
+
   countryCode: {
     fontWeight: "600",
     fontSize: 16,
@@ -201,7 +265,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
-    fontFamily:'Gilroy-Medium',
+    fontFamily: 'Gilroy-Medium',
     color: "#000",
   },
   centerButtonContainer: {
@@ -224,7 +288,30 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontSize: 16,
-    fontFamily:'Gilroy-Semibold',
+    fontFamily: 'Gilroy-Semibold',
+  },
+  overlay: {
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 12,
+    zIndex: 1000,
+    marginTop: 1,
+  },
+
+  dropdownBox: {
+    //  width: 260,
+    height: 200,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    paddingVertical: 10,
+    elevation: 5,
+  },
+  countryItem: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderBottomWidth: 0.5,
+    borderColor: "#eee",
   },
 });
 

@@ -421,7 +421,7 @@ const EditProfile = (route) => {
                       <TouchableOpacity
                         key={index}
                         style={styles.countryItem}
-                        onPress={() => selectedCountry(item)}>
+                        onPress={() => setSelectedCountry(item)}>
                         <Text style={{ fontFamily: 'Gilroy-Medium', fontSize: 15 }}>{item.name} {item.dial_code}</Text>
                       </TouchableOpacity>
                     ))
@@ -538,7 +538,7 @@ const EditProfile = (route) => {
               data={documents}
               renderItem={(item,index)=>{
                 <View>
-                  
+
                 </View>
               }}
               />
