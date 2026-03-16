@@ -73,7 +73,7 @@ const CustomerProfile = (route) => {
   useEffect(() => {
     const onBackPress = () => {
 
-      if(penditnActionBottomSheet){
+      if (penditnActionBottomSheet) {
         setPendingActionSheet(false);
         return true;
       }
@@ -81,10 +81,10 @@ const CustomerProfile = (route) => {
       return true;
     }
 
-    const backHandler=BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', onBackPress);
 
     return () => backHandler.remove();
-  }, [navigation,penditnActionBottomSheet])
+  }, [navigation, penditnActionBottomSheet])
 
 
   useEffect(() => {
@@ -263,8 +263,8 @@ const CustomerProfile = (route) => {
 
           <View style={styles.profileCard}>
 
-            <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'center', position: 'relative' }}>
-              <View style={{ padding: 5, alignItems: 'center', justifyContent: 'center', position: "relative" }}>
+            <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'center', position: 'relative', height: "60" }}>
+              {/* <View style={{width:200, padding: 5, alignItems: 'center', justifyContent: 'center', position: "relative" }}>
                 <Svg width={110} height={110}>
                   <Circle stroke="#E6E6E6"
                     fill="none"
@@ -306,6 +306,23 @@ const CustomerProfile = (route) => {
                 }}>
                   <Text style={{ fontSize: 9.5, color: '#FF9900' }}>{percent}%</Text>
                 </View>
+
+
+              </View> */}
+
+              <View style={{ padding: 5, alignItems: 'center', justifyContent: 'center', position: "relative", marginTop: 15, marginBottom: 1 }}>
+
+                {context.getCustomerDetail?.profilePic ? (
+                  <Image
+                    source={{ uri: context.getCustomerDetail?.profilePic }}
+                    style={[styles.profileImage, { position: "absolute", }]} />
+                ) : (
+                  <View style={[styles.profileImage, styles.initialContainer, { position: "absolute", }]}>
+                    <Text style={styles.initialText}>
+                      {context.getCustomerDetail?.initials}
+                    </Text>
+                  </View>
+                )}
 
 
               </View>
@@ -374,8 +391,8 @@ const CustomerProfile = (route) => {
                 style={{ height: 20, width: 20 }} />
             </TouchableOpacity> */}
             </View>
-            <TouchableOpacity 
-            // onPress={() => setPendingActionSheet(true)}
+            <TouchableOpacity
+              // onPress={() => setPendingActionSheet(true)}
               style={{
                 marginTop: 18, borderColor: '#E27625', borderWidth: 1, backgroundColor: '#FFF8EA', width: '100%', alignItems: 'center',
                 justifyContent: 'center', paddingHorizontal: 10, paddingVertical: 12, borderRadius: 10
@@ -423,16 +440,23 @@ const CustomerProfile = (route) => {
               <Image source={sideframe} style={{ width: 23, height: 23 }} />
             </TouchableOpacity>
 
-            <View style={styles.divider} />
+            {
+              context.getCustomerDetail?.bookingDetails?.currentStatus != "BOOKED" && (
+                <>
+                  <View style={styles.divider} />
 
-            <TouchableOpacity onPress={() => navigation.navigate('ComingSoonPage')} style={styles.row}>
-              <View style={{ flexDirection: 'row' }}>
-                <Image source={paperclip} style={{ width: 20, height: 20 }} />
-                <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', marginLeft: 5 }}>Rental Agreement</Text>
-              </View>
+                  <TouchableOpacity onPress={() => navigation.navigate('ComingSoonPage')} style={styles.row}>
+                    <View style={{ flexDirection: 'row' }}>
+                      <Image source={paperclip} style={{ width: 20, height: 20 }} />
+                      <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', marginLeft: 5 }}>Rental Agreement</Text>
+                    </View>
 
-              <Image source={sideframe} style={{ width: 23, height: 23 }} />
-            </TouchableOpacity>
+                    <Image source={sideframe} style={{ width: 23, height: 23 }} />
+                  </TouchableOpacity>
+                </>
+
+              )
+            }
 
           </View>
         </View>
@@ -507,7 +531,7 @@ const CustomerProfile = (route) => {
 
               <View style={styles.dragindictor} />
 
-              <View style={{ marginTop: 5,marginBottom:20 }}>
+              <View style={{ marginTop: 5, marginBottom: 20 }}>
 
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                   <Text style={{ fontSize: 20, fontFamily: 'Gilroy-Semibold' }}>Pending Action</Text>
@@ -530,24 +554,24 @@ const CustomerProfile = (route) => {
                   <View style={[styles.progressFill, { width: `${percent}%` }]} />
                 </View>
 
-                <View style={{ width: '100%', borderWidth: 0.8, borderColor: '#E5E7EB',marginTop:20,marginBottom:10 }} />
+                <View style={{ width: '100%', borderWidth: 0.8, borderColor: '#E5E7EB', marginTop: 20, marginBottom: 10 }} />
 
                 <TouchableOpacity onPress={handleEditProfile}
-                style={styles.touchableAction}>
+                  style={styles.touchableAction}>
                   <Text style={styles.actionText}>Update profile</Text>
-                  <Image source={GreenAddIcon} style={{width:24,height:24}}/>
+                  <Image source={GreenAddIcon} style={{ width: 24, height: 24 }} />
                 </TouchableOpacity>
 
-                <TouchableOpacity  onPress={() => navigation.navigate("ComingSoonPage")}
-                style={styles.touchableAction}>
+                <TouchableOpacity onPress={() => navigation.navigate("ComingSoonPage")}
+                  style={styles.touchableAction}>
                   <Text style={styles.actionText}>Kyc Verification</Text>
-                   <Image source={GreenAddIcon} style={{width:24,height:24}}/>
+                  <Image source={GreenAddIcon} style={{ width: 24, height: 24 }} />
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={() => navigation.navigate('ComingSoonPage')}
-                style={styles.touchableAction}>
+                  style={styles.touchableAction}>
                   <Text style={styles.actionText}>Rental Aggrement</Text>
-                   <Image source={GreenAddIcon} style={{width:24,height:24}}/>
+                  <Image source={GreenAddIcon} style={{ width: 24, height: 24 }} />
                 </TouchableOpacity>
 
               </View>
@@ -883,13 +907,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#F58B00",
     borderRadius: 10
   },
-  touchableAction:{ 
+  touchableAction: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    backgroundColor: '#F9FAFB', paddingVertical: 10, marginTop: 10,borderRadius:10,
-    paddingHorizontal:10 
+    backgroundColor: '#F9FAFB', paddingVertical: 10, marginTop: 10, borderRadius: 10,
+    paddingHorizontal: 10
   },
-  actionText:{
-    fontSize:16,fontFamily:'Gilroy-Semibold'
+  actionText: {
+    fontSize: 16, fontFamily: 'Gilroy-Semibold'
   }
-  
+
 });

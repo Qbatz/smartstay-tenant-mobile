@@ -29,6 +29,7 @@ export const getPaymentReceiptDetails=async(hostelId,token,transactionId)=>{
 }
 
 export const getInvoiceDownload=async(hostelId, invoiceId, token)=>{
+    console.log(invoiceId)
     try{
         const axios=getAxios()
         const response=await axios.get('/v2/invoices/pdf/' + hostelId + "/" + invoiceId, {

@@ -13,7 +13,8 @@ import { compliantContexts } from "../../Context/ComplaintContext";
 import { amenitiesContexts } from "../../Context/AmenitiesContext";
 import { useFocusEffect } from "@react-navigation/native";
 import ComplaintsPic from '../../assets/Images/ComplaintsPic.png'
-import AccessRestricted from "../../assets/Images/AccessRestricted.png"
+import AccessRestricted from "../../assets/Images/AccessRestricted.png";
+import ExclamationCircle from "../../assets/Images/ExclamationCircle.png"
 
 function Services(props) {
 
@@ -345,6 +346,16 @@ function Services(props) {
                             <View style={{ paddingTop: 12 }}>
                                 <Text style={{ fontSize: 14,fontFamily:'Gilroy-Medium'}}>Available Amenities</Text>
                             </View>
+
+                            {commonContext?.getCustomerDetail?.bookingDetails?.currentStatus == "BOOKED" && (
+                                <View style={{backgroundColor:'#F5F9FF',paddingVertical:15,borderRadius:5,paddingHorizontal:10,
+                                             flexDirection:'row',marginTop:10,alignItems:'center'}}>
+                                    <Image source={ExclamationCircle} style={{width:14.06,height:14.06}}/>
+                                    <Text style={{color:'#1E45E1',fontSize:12,fontFamily:'Gilroy-Medium',marginLeft:8,lineHeight:21}}>
+                                        Do add on Request to admin priorly. If you need an added amenities.
+                                    </Text>
+                                </View>
+                            )}
 
                             <FlatList
                                 data={amenitiesContext.getUnassignedAmenities}

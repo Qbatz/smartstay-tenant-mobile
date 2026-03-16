@@ -164,7 +164,7 @@ function MyStay(props) {
 
 
                             <Text style={{fontSize:14,fontWeight:600}}>
-                                3 sharing
+                                N/A
                             </Text>                       
                         </View>
 
@@ -175,7 +175,7 @@ function MyStay(props) {
 
 
                             <Text style={{fontSize:14,fontWeight:600}}>
-                                99898992320
+                                N/A
                             </Text>                       
                         </View>
                     </View>

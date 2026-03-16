@@ -120,11 +120,36 @@ const EnterMPin = (props) => {
         }
     }
 
-    const handleKeyPress = (e, index) => {
-        if (e.nativeEvent.key === "Backspace" && createMpin[index] === "" && index > 0) {
-            inputs.current[index - 1].focus();
+
+     const handleKeyPress = (e, index) => {
+        if (e.nativeEvent.key === "Backspace") {
+            const newPin = [...createMpin];
+
+            if (newPin[index] === "" && index > 0) {
+                inputs.current[index - 1].focus();
+
+                newPin[index - 1] = "";
+                setCreateMpin(newPin)
+            } else {
+                newPin[index] = "";
+                setCreateMpin(newPin)
+            }
+        }
+    }
+
+    const handleFocus = (index) => {
+        const firstEmptyIndex = createMpin.findIndex((digit) => digit === "");
+
+        if (firstEmptyIndex !== -1 && index > firstEmptyIndex) {
+            inputs.current[firstEmptyIndex].focus();
         }
     };
+
+    // const handleKeyPress = (e, index) => {
+    //     if (e.nativeEvent.key === "Backspace" && createMpin[index] === "" && index > 0) {
+    //         inputs.current[index - 1].focus();
+    //     }
+    // };
 
     const validateForm = () => {
         let valid = true;
@@ -248,6 +273,7 @@ const EnterMPin = (props) => {
                         maxLength={1}
                         value={digit}
                         onChangeText={(text) => handlePinChange(text, index)}
+                         onFocus={() => handleFocus(index)}
                         onKeyPress={(e) => handleKeyPress(e, index)}
                     />
                 ))}
