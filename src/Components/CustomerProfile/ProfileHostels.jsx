@@ -12,6 +12,8 @@ import LeftArrow from "../../assets/Images/LeftArrow.png"
 import { UsersContext } from "../../Context/UserContext";
 import { getHostelRentalDetails, getRentalDetials } from "../../Action/CustomerAction";
 import { LoginContexts } from "../../Context/LoginContext";
+import rightArrow from "../../assets/Images/LeftArrow.png"
+import exclamation from "../../assets/Images/ExclamationCircle.png"
 
 
 const ProfileHostels = () => {
@@ -194,6 +196,18 @@ const ProfileHostels = () => {
           />
           <Text style={styles.detailValue}>{selectedHostel?.currentStatus !="INACTIVE" ? selectedHostel?.rentalDetails?.dueDate : "N/A"}</Text>
         </View>
+      </View>
+
+      <TouchableOpacity style={{paddingVertical:16,backgroundColor:'#FFF6F4',justifyContent:'space-between',borderRadius:5,
+                alignItems:"center", flexDirection:'row',paddingHorizontal:12,marginTop:20}}>
+        <Text style={{color:'#FF0000',fontSize:16,fontFamily:'Gilroy-Medium'}}>Request Notice Period</Text>
+        <Image source={LeftArrow} style={{width:18,height:18,tintColor:'#FF0000',transform: [{rotate: '180deg'}]}}/>
+      </TouchableOpacity>
+
+      <View style={{flexDirection:'row',alignItems:'center',marginTop:15}}>
+        <Image source={exclamation} style={{width:16,height:16,tintColor:'#4B4B4B'}}/>
+        <Text style={{fontSize:12,fontFamily:'Gilroy-Regular',color:'#4B4B4B',marginLeft:10}}>
+          Notice Period Serving Days is must be 30 Days from the Request</Text>
       </View>
     </View>
 

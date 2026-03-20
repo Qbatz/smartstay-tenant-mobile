@@ -31,9 +31,9 @@ import CameraPic from "../../assets/Images/cameraPic.png"
 import { Dropdown } from "react-native-element-dropdown";
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { pick } from "@react-native-documents/picker";
-
-
-
+import Pdf from "../../assets/Images/pdf.png";
+import EyeIcon from "../../assets/Images/view.png";
+import DownloadIcon from "../../assets/Images/download.png"
 
 const EditProfile = (route) => {
 
@@ -97,6 +97,23 @@ const EditProfile = (route) => {
   const relationship = [{ id: 0, relationType: "Father" }, { id: 1, relationType: "Mother" }, { id: 2, relationType: "Others" }]
 
   const employmentTypes = [{ id: 0, employmentType: 'Self employment' }, { id: 1, employmentType: 'Private Job' }, { id: 2, employmentType: 'Public Job' }]
+
+
+  const pickFiles = async () => {
+    try {
+      const results = await pick({
+        allowMultiSelection: true,
+        type: ['*/*'],
+        copyTo: 'cachesDirectory',
+      });
+      setDocuments(results)
+      console.log(results)
+    } catch (err) {
+      console.log("Cancelled or error", err);
+    }
+  };
+
+  console.log("Doucmn", documents)
 
   const handleSave = () => {
 
@@ -517,10 +534,11 @@ const EditProfile = (route) => {
         <View style={{ marginTop: 10 }}>
           {
             documents.length === 0 && (
-              <TouchableOpacity style={{
-                paddingVertical: 15, borderWidth: 1, backgroundColor: "#EEF1FA", paddingHorizontal: 15,
-                borderColor: "#E5E7EB", borderRadius: 14, flexDirection: 'row', alignItems: 'center'
-              }}>
+              <TouchableOpacity onPress={pickFiles}
+                style={{
+                  paddingVertical: 15, borderWidth: 1, backgroundColor: "#EEF1FA", paddingHorizontal: 15,
+                  borderColor: "#E5E7EB", borderRadius: 14, flexDirection: 'row', alignItems: 'center'
+                }}>
                 <Image source={CameraPic} style={{ width: 32.77, height: 32.77 }} />
 
                 <View style={{ marginLeft: 10 }}>
@@ -535,15 +553,39 @@ const EditProfile = (route) => {
           {
             documents.length > 0 && (
               <FlatList
-              data={documents}
-              renderItem={(item,index)=>{
-                <View>
+                data={documents}
+                scrollEnabled={false}
+                nestedScrollEnabled
+                renderItem={({ item }) => {
+                  return (
+                    <View
+                      style={{
+                        borderWidth: 1,paddingVertical: 20,borderColor: '#eaeaec',borderRadius: 10,paddingHorizontal: 10,
+                        backgroundColor: "#f9fafc",flexDirection: "row",alignItems: "center",marginBottom: 5,
+                        justifyContent:'space-between'}}>
 
-                </View>
-              }}
+                      <View style={{ flexDirection: 'row',alignItems:'center' }}>
+                        <Image source={Pdf} style={{ width: 18, height: 18, marginRight: 8 }} />
+
+                        <Text>{item.name}</Text>
+                      </View>
+
+                      <View style={{ flexDirection: 'row',alignItems:'center' }}>
+                        <TouchableOpacity>
+                             <Image source={EyeIcon} style={{width:20,height:20,tintColor:'#61636f',marginRight:5}}/>
+                        </TouchableOpacity>
+                       
+
+                        <Image source={DownloadIcon} style={{width:20,height:20,marginLeft:8,tintColor:'#61636f'}}/>
+                      </View>
+
+
+                    </View>
+                  );
+                }}
               />
             )
-           }
+          }
         </View>
 
         <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold', marginTop: 20, marginBottom: 18 }}>Parent/Guardian Details</Text>
@@ -657,7 +699,7 @@ const EditProfile = (route) => {
         </View>
       </ScrollView >
 
-      <View style={[styles.bottomButtonContainer,{paddingBottom:20}]}>
+      <View style={[styles.bottomButtonContainer, { paddingBottom: 20 }]}>
         <TouchableOpacity style={styles.saveButton}>
           <Text style={styles.saveButtonText}>Save Changes</Text>
         </TouchableOpacity>
@@ -802,27 +844,27 @@ const styles = StyleSheet.create({
     fontSize: 16
   },
   bottomButtonContainer: {
-  position: "absolute",
-  bottom: 0,
-  left: 0,
-  right: 0,
-  padding: 16,
-  backgroundColor: "#fff",
-  borderTopWidth: 1,
-  borderColor: "#eee"
-},
-saveButton: {
-  backgroundColor: "#1E45E1",
-  paddingVertical: 14,
-  borderRadius: 12,
-  alignItems: "center"
-},
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 16,
+    backgroundColor: "#fff",
+    borderTopWidth: 1,
+    borderColor: "#eee"
+  },
+  saveButton: {
+    backgroundColor: "#1E45E1",
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center"
+  },
 
-saveButtonText: {
-  color: "#fff",
-  fontSize: 16,
-  fontFamily: "Gilroy-Semibold"
-}
+  saveButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontFamily: "Gilroy-Semibold"
+  }
 
 
 });

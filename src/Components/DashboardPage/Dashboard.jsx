@@ -54,6 +54,9 @@ import ErrorMessage from "../ToastFile/ErrorMessage";
 import DeleteComplaint from "./Popup/DeleteComplaint";
 import { getInvoiceDownload, getReceiptDownload } from "../../Action/PaymentAction";
 import ComplaintBottomSheet from "./BottomSheet/ComplaintBottomSheet";
+import walkinImage from "../../assets/Images/walkinImage.png"
+import callIcon from "../../assets/Images/call.png"
+import gobackIcon from "../../assets/Images/logout.png"
 
 const { width, height } = Dimensions.get("window");
 
@@ -258,7 +261,7 @@ function Dashboard(props) {
     })
 
     customerDetails(loginContext.getToken).then(r => {
-      console.log(r.data)
+      console.log("haha",r.data)
       context.updateCustomer(r.data)
     }).catch(error => {
       console.log(error)
@@ -564,16 +567,21 @@ function Dashboard(props) {
           </View>
 
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <TouchableOpacity onPress={handleNotificationShow} style={{ marginRight: 10 }}>
-              <Image source={require("../../assets/Images/notification.png")} style={{ height: 46, width: 46 }} />
+            <TouchableOpacity onPress={handleNotificationShow} 
+            style={{ marginRight: 10, opacity: context?.getCustomerDetail?.currentStatus === "INACTIVE" ? 0.4 : 1,  }}
+            disabled={context?.getCustomerDetail?.currentStatus === "INACTIVE"}>
+              <Image source={require("../../assets/Images/notification.png")} style={{ height: 44, width: 44 }} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={handleProfile}>
+            <TouchableOpacity onPress={handleProfile}
+            style={{opacity: context?.getCustomerDetail?.currentStatus === "INACTIVE" ? 0.4 : 1}}
+            // disabled={context?.getCustomerDetail?.currentStatus === "INACTIVE"}
+            >
               {context.getCustomerDetail?.profilePic ? (
                 <Image
                   source={{ uri: context.getCustomerDetail?.profilePic }}
-                  style={{ width: 46, height: 46, borderRadius: 23, marginRight: 10, }} />
+                  style={{ width: 44, height: 44, borderRadius: 22, marginRight: 10, }} />
               ) : (
-                <View style={{ width: 46, height: 46, borderRadius: 23, marginRight: 10, backgroundColor: '#eef1ff', justifyContent: 'center', alignItems: 'center', }}>
+                <View style={{ width: 44, height: 44, borderRadius: 22, marginRight: 10, backgroundColor: '#eef1ff', justifyContent: 'center', alignItems: 'center', }}>
                   <Text style={style.initialText}>
                     {context.getCustomerDetail?.initials}
                   </Text>
@@ -586,7 +594,42 @@ function Dashboard(props) {
 
     </LinearGradient>
 
-    <View style={{ flex: 1, paddingLeft: 20, paddingRight: 20, }}>
+ 
+    {
+      context?.getCustomerDetail?.currentStatus === "INACTIVE" && (
+        <View style={{flex:1,backgroundColor:'greens',alignItems:'center',justifyContent:'center',paddingHorizontal:20}}>
+          <Image source={walkinImage} style={{width:227,height:292,resizeMode:'contain',marginBottom:18}}/>
+          <Text style={{fontSize:24,fontFamily:'Gilroy-Semibold',}}>You're resgistered !</Text>
+
+          <Text style={{fontSize:14,fontFamily:'Gilroy-Regular',color:'#4B4B4B',textAlign:'center',marginTop:18}}>
+            The hostel has registered your enquiry.
+          </Text>
+          <Text style={{fontSize:14,fontFamily:'Gilroy-Regular',color:'#4B4B4B',textAlign:'center',lineHeight:21,marginTop:8}}>
+            Complete the booking process with the admin to activate your stay access
+          </Text>
+
+        <View style={{marginTop:15,width:'100%',marginBottom:10}}>
+          <TouchableOpacity style={{backgroundColor:'#1E45E1',borderRadius:8,justifyContent:'center',alignItems:'center',
+            marginTop:20,flexDirection:'row',paddingVertical:20,paddingHorizontal:40}}>
+            <Image source={callIcon} style={{width:20,height:20,tintColor:'#ffffff'}}/>
+            <Text style={{fontSize:16,fontFamily:'Gilroy-Medium',marginLeft:8,color:'#ffffff'}}>
+              Contact Hostel Admin</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={()=>navigation.goBack()}
+          style={{borderWidth:1,borderRadius:8,justifyContent:'center',alignItems:'center',
+          marginTop:15,flexDirection:'row',paddingVertical:20,paddingHorizontal:40}}>
+            <Image source={gobackIcon} style={{width:18,height:18,tintColor:'#4B4B4B'}}/>
+            <Text style={{fontSize:16,fontFamily:'Gilroy-Medium',color:'#4B4B4B',marginLeft:8}} >Go back</Text>
+          </TouchableOpacity>
+          </View>
+        </View>
+      )
+    } 
+
+    {
+       context?.getCustomerDetail?.currentStatus !== "INACTIVE" && (
+        <View style={{ flex: 1, paddingLeft: 20, paddingRight: 20, }}>
       <TabView navigationState={{ index: index, routes }}
         commonOptions={{
           icon: ({ route, color }) => (<Image source={route.icon} style={{ width: 21.12, height: 21.12, tintColor: color }} />)
@@ -598,6 +641,10 @@ function Dashboard(props) {
         style={{ flex: 1, justifyContent: 'center' }} />
 
     </View>
+       )
+    }
+
+    
 
     {/* <ComplaintBottomSheet
     visible={showSheet}
