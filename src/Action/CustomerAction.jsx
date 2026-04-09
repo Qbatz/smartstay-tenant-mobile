@@ -17,7 +17,7 @@ export const customerDetails=async(token)=>{
 export const editProfile=async(token,formData)=>{
     try{
         const axios = getAxios()
-        const response=await axios.put('/v2/customer/', formData, {
+        const response=await axios.put('/v2/customer', formData, {
         headers: {
             Authorization: 'Bearer ' + token,
             "Content-Type": "multipart/form-data",
@@ -190,4 +190,51 @@ export const deleteImage=async(imageId,complaintId,token,hostelId)=>{
             console.log(error.response)
             return{status: error.response.status, message: error.response.data}
         }
+}
+
+export const postDocuments=async(token, formData)=>{
+    try{
+        const axios =getAxios();
+        const response= await axios.post("/v2/customer-document", formData, {
+            headers: {
+                Authorization: "Bearer " + token,
+                 "Content-Type": "multipart/form-data",
+            },
+        })
+        return response;
+    }catch (error){
+        console.log(error.response)
+            return{status: error.response.status, message: error.response.data}
+    }
+}
+
+export const deleteDocuments=async(token, documentId)=>{
+    try{
+        const axios=getAxios();
+        const response =await axios.delete("/v2/customer-document", {
+            headers:{
+                Authorization: 'Bearer ' + token,
+            },
+            data: [{
+                 documentId: documentId
+            }]
+        })
+        return response;
+    } catch(error){
+          return{status: error.response.status, message: error.response.data}
+    }
+}
+
+export const removeProfilePic=async(token)=>{
+    try{
+        const axios=getAxios();
+        const response= await axios.put("/v2/customer/remove-profile-picture",{}, {
+            headers:{
+                Authorization: "Bearer " + token,
+            }
+        })
+        return response;
+    } catch(error){
+         return{status: error.response.status, message: error.response.data}
+    }
 }

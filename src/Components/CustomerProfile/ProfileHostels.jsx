@@ -1,5 +1,5 @@
-import React, { useContext, useState,useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image,ScrollView } from "react-native";
+import React, { useContext, useState, useEffect } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import HostelImage from "../../assets/Images/Group 1.png"
 import LocationIcon from "../../assets/Images/location.png";
@@ -20,13 +20,13 @@ const ProfileHostels = () => {
 
 
   const navigation = useNavigation();
-  const userContext=useContext(UsersContext)
-  const loginContext=useContext(LoginContexts)
+  const userContext = useContext(UsersContext)
+  const loginContext = useContext(LoginContexts)
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [selectedHostel, setSelectedHostel] = useState();
-  const [rentDetails,setRentalDetails]=useState();
-  const[hostelRental,setHostelRental]=useState([])
-  const [hostelList,setHostelList]=useState([])
+  const [rentDetails, setRentalDetails] = useState();
+  const [hostelRental, setHostelRental] = useState([])
+  const [hostelList, setHostelList] = useState([])
 
   console.log(selectedHostel?.rentalDetails)
 
@@ -37,14 +37,14 @@ const ProfileHostels = () => {
     { id: 3, name: "ComfortNest", location: "Thoraipakkam" },
   ];
 
-  useEffect(()=>{
+  useEffect(() => {
 
-    getHostelRentalDetails(loginContext.getUserId,loginContext.getToken).then(r=>{
+    getHostelRentalDetails(loginContext.getUserId, loginContext.getToken).then(r => {
       setHostelList(r.data)
-        console.log(r)
-        const newRentals=r.data.find(i => i.hostelId === userContext?.getHostelDetail?.hostelId)
-        setSelectedHostel(newRentals)
-        console.log(newRentals)
+      console.log(r)
+      const newRentals = r.data.find(i => i.hostelId === userContext?.getHostelDetail?.hostelId)
+      setSelectedHostel(newRentals)
+      console.log(newRentals)
 
     })
 
@@ -56,7 +56,7 @@ const ProfileHostels = () => {
     // })
 
 
-  },[])
+  }, [])
 
   const handleSelectHostel = (hostel) => {
     console.log(hostel)
@@ -64,21 +64,21 @@ const ProfileHostels = () => {
     setDropdownVisible(false);
 
     console.log(hostel.hostelId)
-   
+
 
   };
 
 
 
-//   useEffect(() => {
-//   if (!selectedHostel?.hostelId) return;
+  //   useEffect(() => {
+  //   if (!selectedHostel?.hostelId) return;
 
-//   getRentalDetials(selectedHostel.hostelId, loginContext.getToken)
-//     .then(res => {
-//       setRentalDetails(res.data);
-//     })
-//     .catch(err => console.log("Error:", err));
-// }, [selectedHostel]); 
+  //   getRentalDetials(selectedHostel.hostelId, loginContext.getToken)
+  //     .then(res => {
+  //       setRentalDetails(res.data);
+  //     })
+  //     .catch(err => console.log("Error:", err));
+  // }, [selectedHostel]); 
 
   const handleBack = () => navigation.goBack();
   return <View style={styles.container}>
@@ -100,18 +100,18 @@ const ProfileHostels = () => {
         activeOpacity={0.8}
       >
         {selectedHostel?.hostelPic ? (
-                      <Image
-                        source={{ uri:selectedHostel?.hostelPic }}
-                        style={styles.profileImage} />
-                    ) : (
-                      <View style={[styles.profileImage, styles.initialContainer]}>
-                        <Text style={styles.initialText}>
-                          {selectedHostel?.hostelInitial}
-                        </Text>
-                      </View>
-                    )}
-       
-        <View style={{ flex: 1,paddingLeft:5 }}>
+          <Image
+            source={{ uri: selectedHostel?.hostelPic }}
+            style={styles.profileImage} />
+        ) : (
+          <View style={[styles.profileImage, styles.initialContainer]}>
+            <Text style={styles.initialText}>
+              {selectedHostel?.hostelInitial}
+            </Text>
+          </View>
+        )}
+
+        <View style={{ flex: 1, paddingLeft: 5 }}>
           <Text style={styles.hostelTitle}>{selectedHostel?.hostelName}</Text>
           <View style={styles.locationRow}>
             <Image
@@ -158,7 +158,7 @@ const ProfileHostels = () => {
             source={DateIcon}
             resizeMode="contain" style={{ width: 20, height: 20 }}
           />
-          <Text style={styles.detailValue}>{selectedHostel?.rentalDetails?.joiningDate !=null ? selectedHostel?.rentalDetails?.joiningDate : "N/A"}</Text>
+          <Text style={styles.detailValue}>{selectedHostel?.rentalDetails?.joiningDate != null ? selectedHostel?.rentalDetails?.joiningDate : "N/A"}</Text>
         </View>
       </View>
 
@@ -170,7 +170,7 @@ const ProfileHostels = () => {
             source={MoneyIcon}
             resizeMode="contain" style={{ width: 20, height: 20 }}
           />
-          <Text style={styles.detailValue}>{selectedHostel?.rentalDetails?.advancePaidAmount !=0? selectedHostel?.rentalDetails?.advancePaidAmount:'N/A'}</Text>
+          <Text style={styles.detailValue}>{selectedHostel?.rentalDetails?.advancePaidAmount != 0 ? selectedHostel?.rentalDetails?.advancePaidAmount : 'N/A'}</Text>
         </View>
       </View>
 
@@ -194,20 +194,40 @@ const ProfileHostels = () => {
             source={DateIcon}
             resizeMode="contain" style={{ width: 20, height: 20 }}
           />
-          <Text style={styles.detailValue}>{selectedHostel?.currentStatus !="INACTIVE" ? selectedHostel?.rentalDetails?.dueDate : "N/A"}</Text>
+          <Text style={styles.detailValue}>{selectedHostel?.currentStatus != "INACTIVE" ? selectedHostel?.rentalDetails?.dueDate : "N/A"}</Text>
         </View>
       </View>
 
-      <TouchableOpacity style={{paddingVertical:16,backgroundColor:'#FFF6F4',justifyContent:'space-between',borderRadius:5,
-                alignItems:"center", flexDirection:'row',paddingHorizontal:12,marginTop:20}}>
-        <Text style={{color:'#FF0000',fontSize:16,fontFamily:'Gilroy-Medium'}}>Request Notice Period</Text>
-        <Image source={LeftArrow} style={{width:18,height:18,tintColor:'#FF0000',transform: [{rotate: '180deg'}]}}/>
-      </TouchableOpacity>
+      {
+        selectedHostel?.currentStatus != "BOOKED" && (
+          <TouchableOpacity style={{
+            paddingVertical: 16, backgroundColor: '#FFF6F4', justifyContent: 'space-between', borderRadius: 5,
+            alignItems: "center", flexDirection: 'row', paddingHorizontal: 12, marginTop: 20
+          }}>
+            <Text style={{ color: '#FF0000', fontSize: 16, fontFamily: 'Gilroy-Medium' }}>Request Notice Period</Text>
+            <Image source={LeftArrow} style={{ width: 18, height: 18, tintColor: '#FF0000', transform: [{ rotate: '180deg' }] }} />
+          </TouchableOpacity>
 
-      <View style={{flexDirection:'row',alignItems:'center',marginTop:15}}>
-        <Image source={exclamation} style={{width:16,height:16,tintColor:'#4B4B4B'}}/>
-        <Text style={{fontSize:12,fontFamily:'Gilroy-Regular',color:'#4B4B4B',marginLeft:10}}>
-          Notice Period Serving Days is must be 30 Days from the Request</Text>
+        )
+      }
+
+
+
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 15 }}>
+        <Image source={exclamation} style={{ width: 16, height: 16, tintColor: '#4B4B4B' }} />
+        {
+          selectedHostel?.currentStatus != "BOOKED" && (
+            <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#4B4B4B', marginLeft: 10 }}>
+              Notice Period Serving Days is must be 30 Days from the Request</Text>
+          )
+        }
+          {
+          selectedHostel?.currentStatus == "BOOKED" && (
+            <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#4B4B4B', marginLeft: 10 }}>
+              Please be check-in on time</Text>
+          )
+        }
+
       </View>
     </View>
 
@@ -216,17 +236,17 @@ const ProfileHostels = () => {
 
 const styles = StyleSheet.create({
 
-  textdesign:{
-      color:'grey'
+  textdesign: {
+    color: 'grey'
   },
   container: {
     flex: 1,
     backgroundColor: "#fff",
     paddingTop: 30,
-    paddingVertical:20,
-    paddingHorizontal:20
+    paddingVertical: 20,
+    paddingHorizontal: 20
   },
-  
+
   backButton: {
     flexDirection: "row",
     alignItems: "center",
@@ -235,7 +255,7 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: 20,
-    fontFamily:'Gilroy-Semibold',
+    fontFamily: 'Gilroy-Semibold',
     marginLeft: 10,
   },
   profileCard: {
@@ -286,7 +306,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#eee",
     marginBottom: 12,
-    marginTop:20
+    marginTop: 20
   },
   cardRow: {
     flexDirection: "row",
@@ -331,7 +351,7 @@ const styles = StyleSheet.create({
   },
   hostelTitle: {
     fontSize: 16,
-    fontFamily:'Gilroy-Semibold',
+    fontFamily: 'Gilroy-Semibold',
     color: "#000",
   },
   locationRow: {
@@ -343,7 +363,7 @@ const styles = StyleSheet.create({
     marginLeft: 4,
     color: "#555",
     fontSize: 13,
-    fontFamily:'Gilroy-Regular'
+    fontFamily: 'Gilroy-Regular'
   },
   divider: {
     height: 1,
@@ -353,24 +373,24 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 15,
-    fontFamily:'Gilroy-Semibold',
+    fontFamily: 'Gilroy-Semibold',
     color: "#000",
     marginBottom: 8,
   },
   detailRow: {
     alignItems: "left",
     marginBottom: 8,
-    marginTop:8,
+    marginTop: 8,
   },
   detailLabel: {
     marginBottom: 5,
     color: "#555",
-    fontSize:13,
-    fontFamily:'Gilroy-Medium',
+    fontSize: 13,
+    fontFamily: 'Gilroy-Medium',
   },
   detailValue: {
     color: "#000",
-    fontFamily:'Gilroy-Semibold',fontSize:16,
+    fontFamily: 'Gilroy-Semibold', fontSize: 16,
     marginLeft: 8
   },
   dropdown: {
@@ -389,11 +409,11 @@ const styles = StyleSheet.create({
   },
   dropdownText: {
     fontSize: 15,
-    fontFamily:'Gilroy-Semibold',
+    fontFamily: 'Gilroy-Semibold',
   },
   dropdownSub: {
     fontSize: 13,
-    fontFamily:'Gilroy-Regular',
+    fontFamily: 'Gilroy-Regular',
     color: "#777",
   },
 })

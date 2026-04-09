@@ -1,0 +1,573 @@
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { View, Text, Image, StyleSheet, TextInput, ScrollView, TouchableOpacity, Pressable, PanResponder, Animated, Dimensions } from "react-native";
+import LeftArrow from "../../assets/Images/LeftArrow.png"
+import { useNavigation } from "@react-navigation/native";
+import { customerDetails, editProfile, removeProfilePic } from "../../Action/CustomerAction";
+import { UsersContext } from "../../Context/UserContext";
+import { LoginContexts } from "../../Context/LoginContext";
+import AppLoader from "../ToastFile/LoaderPage";
+import SuccessModal from "../ToastFile/TostFilePage";
+import CameraIcon from "../../assets/Images/camera_Icon.png"
+import { launchCamera, launchImageLibrary } from "react-native-image-picker";
+import CameraPic from "../../assets/Images/CameraIcon.png";
+import Gallery from "../../assets/Images/gallery-add.png";
+import CloseIcon from "../../assets/Images/close.png";
+import sideframe from '../../assets/Images/sideframe.png';
+import RemoveIcon from "../../assets/Images/removeIcon.png";
+import EditSmallIcon from "../../assets/Images/editSmallIcon.png"
+
+
+
+const PersonalDetails = (route) => {
+
+    const navigation = useNavigation();
+    const context = useContext(UsersContext)
+    const loginContext = useContext(LoginContexts)
+
+    const [firstname, setfirstName] = useState(route.route?.params?.customer?.firstName);
+    const [lastName, setLastName] = useState(route.route?.params?.customer?.lastName || "");
+    const [mailId, setMailId] = useState(route.route?.params?.customer?.emailId || "");
+    const [mobile, setMobileNo] = useState(route.route?.params?.customer?.mobile || "");
+    const [houseNo, setHouseNo] = useState(route.route?.params?.customer?.houseNo || "");
+    const [streetName, setStreetName] = useState(route.route?.params?.customer?.street || "");
+    const [landmark, setLandmark] = useState(route.route?.params?.customer?.landmark || "");
+    const [city, setCity] = useState(route.route?.params?.customer?.city || "");
+    const [pincode, setPincode] = useState(route.route?.params?.customer?.pincode || "");
+    const [state, setState] = useState(route.route?.params?.customer?.state || "")
+    const [initials, setInitials] = useState(route.route?.params?.customer?.initials)
+    const [profileImage, setProfileImage] = useState(null);
+    const [profilePic, setProfilePic] = useState(route.route?.params?.customer?.profilePic || null)
+
+    const [loading, setLoading] = useState(false)
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [toastMessage, setToastMessage] = useState()
+    const [modelType, setModelType] = useState();
+
+    const [showCameraIcon, setShowCameraIcon] = useState(false);
+    const [selectPicUpload, setSelectPicUpload] = useState(false);
+    const SCREEN_HEIGHT = Dimensions.get("window").height;
+    const translateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
+
+
+    const openSheet = () => {
+        Animated.timing(translateY, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+        }).start();
+    }
+
+    const closeSheet = () => {
+        Animated.timing(translateY, {
+            toValue: SCREEN_HEIGHT,
+            duration: 250,
+            useNativeDriver: true,
+        }).start(() => setSelectPicUpload(false));
+    }
+
+    useEffect(() => {
+        if (selectPicUpload) {
+            openSheet();
+        }
+    }, [selectPicUpload]);
+
+    const panResponder = useRef(
+        PanResponder.create({
+            onMoveShouldSetPanResponder: (_, gesture) => gesture.dy > 10,
+
+            onPanResponderMove: (_, gesture) => {
+                if (gesture.dy > 0) {
+                    translateY.setValue(gesture.dy);
+                }
+            },
+
+            onPanResponderRelease: (_, gesture) => {
+                if (gesture.dy > 120) {
+                    closeSheet();
+                } else {
+                    openSheet();
+                }
+            }
+        })
+    ).current;
+
+
+    const handleImagePick = async () => {
+        try {
+            const result = await launchImageLibrary({
+                mediaTypes: 'photo',
+                allowsEditing: true,
+                aspect: [1, 1],
+                quality: 0.5,
+            });
+            setProfileImage({ uri: result.assets[0] })
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const openCamera = async () => {
+        const options = {
+            mediaType: 'photo',
+            quality: 0.8,
+            saveToPhotos: true,
+        };
+
+        const result = await launchCamera(options);
+
+        if (result.didCancel) {
+            console.log("User cancelled camera");
+        } else if (result.errorCode) {
+            console.log("Camera Error:", result.errorMessage);
+        } else {
+            console.log("Camera Image:", result.assets);
+            setProfileImage(result?.assets[0])
+            // 👉 use result.assets[0]
+        }
+    };
+
+    const openGallery = async () => {
+        const options = {
+            mediaType: 'photo',
+            quality: 0.8,
+        };
+
+        const result = await launchImageLibrary(options);
+
+        if (result.didCancel) {
+            console.log("User cancelled gallery");
+        } else if (result.errorCode) {
+            console.log("Gallery Error:", result.errorMessage);
+        } else {
+            console.log("Gallery Image:", result.assets);
+            setProfileImage(result?.assets[0])
+            // 👉 use result.assets[0]
+        }
+    };
+
+    const removePic=()=>{
+        setProfileImage("")
+        setProfilePic("")
+
+        removeProfilePic(loginContext.getToken).then(r=>{
+            console.log(r)
+
+            if(r.status ==200){
+                 customerDetails(loginContext.getToken).then(r => {
+                            console.log(r.data)
+                            context.updateCustomer(r.data)                       
+                        })
+            }
+        })
+    }
+
+    const handleEdit = () => {
+
+        const payload = {
+            firstName: firstname,
+            lastName: lastName,
+            emailId: mailId,
+            houseNo: houseNo,
+            street: streetName,
+            landmark: landmark,
+            city: city,
+            state: state,
+        }
+
+        const formData = new FormData();
+
+        const jsonBase64 = btoa(JSON.stringify(payload))
+
+        formData.append("payloads", {
+            uri: "data:application/json;base64," + jsonBase64,
+            type: "application/json",
+            name: "payload.json",
+        })
+
+        if (profileImage) {
+            formData.append("profilePic", {
+                uri: profileImage.uri,
+                type: "image/jpeg",
+                name: "profile.jpg",
+            })
+        }
+
+        editProfile(loginContext.getToken, formData).then(r => {
+            console.log(r)
+            setLoading(true)
+
+            setTimeout(() => {
+                setLoading(false)
+
+                if (r.status == 200) {
+                    setShowSuccessModal(true)
+                    setToastMessage('Updated Successfully')
+                    setModelType('success')
+
+                    setTimeout(() => {
+                        customerDetails(loginContext.getToken).then(r => {
+                            console.log(r.data)
+                            context.updateCustomer(r.data)
+                        })
+                        navigation.goBack();
+                    }, 2000);
+                }
+            }, 2000);
+
+        })
+
+    }
+
+    console.log(route)
+
+    // const imageSource = profileImage ? profileImage.uri : profilePic ? profilePic : null;
+
+    const imageSource = profileImage ? { uri: profileImage.uri } : profilePic
+        ? { uri: profilePic } : null;
+
+    console.log(imageSource)
+    return <View style={{ backgroundColor: '#ffffff', flex: 1, }}>
+        <AppLoader visible={loading} />
+        <SuccessModal
+            visible={showSuccessModal}
+            onClose={() => setShowSuccessModal(false)}
+            message={toastMessage}
+            type={modelType}
+        />
+
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 30 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <Image source={LeftArrow} style={{ height: 25, width: 25 }} />
+                </TouchableOpacity>
+                <Text style={{ fontSize: 20, fontFamily: 'Gilroy-Semibold', marginLeft: 8 }}>Personal Details</Text>
+            </View>
+
+            <TouchableOpacity onPress={handleEdit}
+                style={{ backgroundColor: '#E7F1FF', paddingVertical:5,paddingHorizontal:10, borderRadius: 5,flexDirection:'row' }}>
+                <Image source={EditSmallIcon} style={{width:16,height:16}}/>
+                <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#1E45E1',marginLeft:6 }}>Edit</Text>
+            </TouchableOpacity>
+        </View>
+        <ScrollView showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ paddingHorizontal: 20,paddingBottom:80 }}>
+
+            <View style={{ alignItems: 'center', paddingVertical: 15 }}>
+                <TouchableOpacity
+                    activeOpacity={0.9}
+                    onPress={() => setSelectPicUpload(true)}
+                    onPressIn={() => setShowCameraIcon(true)}
+                    onPressOut={() => setShowCameraIcon(false)}
+                >
+                    <View style={styles.imageWrapper}>
+
+                        {
+                            imageSource ? <Image source={imageSource} style={styles.profileImage} /> :
+                                <View style={[styles.profileImage, { alignItems: 'center', justifyContent: 'center', backgroundColor: '#eef1ff', }]}>
+                                    <Text style={{ fontSize: 20, fontFamily: 'Gilroy-Bold' }}>{initials}</Text>
+
+
+                                    {showCameraIcon && (
+                                        <View style={styles.cameraOverlay}>
+                                            <Image
+                                                source={CameraIcon}
+                                                style={{ width: 28, height: 28, tintColor: "#fff" }}
+                                            />
+                                        </View>
+                                    )}
+                                </View>
+
+
+                        }
+                    </View>
+                </TouchableOpacity>
+            </View>
+
+
+            <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold', marginTop: 15 }}>Basic Info</Text>
+
+            <View style={[styles.fieldContainer, { marginTop: 15 }]}>
+                <Text style={styles.label}>First name</Text>
+
+                <TextInput
+                    value={firstname}
+                    placeholder="Enter first name"
+                    style={styles.input}
+                    onChangeText={(text) => {
+                        const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
+                        setfirstName(onlyLetters)
+                    }}
+                />
+            </View>
+
+            <View style={styles.fieldContainer}>
+                <Text style={styles.label}>Last name</Text>
+
+                <TextInput
+                    value={lastName}
+                    placeholder="Enter last name"
+                    style={styles.input}
+                    onChangeText={(text) => {
+                        const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
+                        setLastName(onlyLetters)
+                    }}
+                />
+            </View>
+
+            <View style={styles.fieldContainer}>
+                <Text style={styles.label}>Mail Id</Text>
+
+                <TextInput
+                    value={mailId}
+                    placeholder="Enter mailId"
+                    style={styles.input}
+                    onChangeText={(text) => {
+                        const noEmojis = text.replace(
+                            /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, "");
+                        setMailId(noEmojis)
+                    }}
+                />
+            </View>
+
+            <View style={styles.fieldContainer}>
+                <Text style={styles.label}>Mobile No</Text>
+
+                <TextInput
+                    value={mobile}
+                    placeholder="Enter first name"
+                    style={styles.input}
+                    disableFullscreenUI
+                />
+            </View>
+            <View style={{paddingHorizontal:10,paddingVertical:5,backgroundColor:"#F5F9FF",alignSelf:"flex-start",borderRadius:8}}>
+                <Text style={{fontSize:12,fontFamily:'Gilroy-Regular',color:'#1E45E1'}}>Mobile No not editable</Text>
+            </View>
+
+            <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold', marginTop: 15 }}>Address Details</Text>
+
+            <View style={[styles.fieldContainer, { marginTop: 15 }]}>
+                <Text style={styles.label}>House No / Apartment</Text>
+
+                <TextInput
+                    value={houseNo}
+                    placeholder="Enter house No"
+                    style={styles.input}
+                    onChangeText={(text) => {
+                        const noEmojis = text.replace(
+                            /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, "");
+                        setHouseNo(noEmojis)
+                    }}
+                />
+            </View>
+
+            <View style={styles.fieldContainer}>
+                <Text style={styles.label}>Street / Area</Text>
+
+                <TextInput
+                    value={streetName}
+                    placeholder="Enter street name"
+                    style={styles.input}
+                    onChangeText={(text) => {
+                        const noEmojis = text.replace(/[^A-Za-z\s]/g, "");
+                        setStreetName(noEmojis)
+                    }}
+                />
+            </View>
+
+            <View style={styles.fieldContainer}>
+                <Text style={styles.label}>Landmark</Text>
+
+                <TextInput
+                    value={landmark}
+                    placeholder="Enter landmark"
+                    style={styles.input}
+                />
+            </View>
+
+            <View style={styles.fieldContainer}>
+                <Text style={styles.label}>City</Text>
+
+                <TextInput
+                    value={city}
+                    placeholder="Enter city name"
+                    style={styles.input}
+                    onChangeText={(text) => {
+                        const noEmojis = text.replace(/[^A-Za-z\s]/g, "");
+                        setCity(noEmojis)
+                    }}
+
+                />
+            </View>
+
+            <View style={styles.fieldContainer}>
+                <Text style={styles.label}>Pincode</Text>
+
+                <TextInput
+                    value={pincode}
+                    placeholder="Enter pincode"
+                    style={styles.input}
+                    keyboardType="numeric"
+                    onChangeText={(text) => {
+                        const onlyNum = text.replace(/[^0-9]/g, "")
+                        setPincode(onlyNum)
+                    }}
+                />
+            </View>
+
+            <View style={styles.fieldContainer}>
+                <Text style={styles.label}>State</Text>
+
+                <TextInput
+                    value={state}
+                    placeholder="Enter state"
+                    style={styles.input}
+                    onChangeText={(text) => {
+                        const noEmojis = text.replace(/[^A-Za-z\s]/g, "");
+                        setState(noEmojis)
+                    }}
+                />
+            </View>
+        </ScrollView>
+
+        {
+            selectPicUpload && (
+                <View style={styles.overlay}>
+                    <Pressable
+                        style={StyleSheet.absoluteFillObject}
+                        onPress={closeSheet}
+                    />
+
+                    <Animated.View
+                        {...panResponder.panHandlers}
+                        style={[styles.sheet,
+                        {
+                            transform: [{ translateY }]
+                        }]}>
+
+
+                        <View style={styles.dragindictor} />
+
+                        <View style={{ marginTop: 5, marginBottom: 20 }}>
+
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <Text style={{ fontSize: 20, fontFamily: 'Gilroy-Semibold' }}>Change Profile Picture</Text>
+
+                                <TouchableOpacity onPress={closeSheet}>
+                                    <Image source={CloseIcon} style={{ width: 22, height: 22 }} />
+                                </TouchableOpacity>
+                            </View>
+
+
+                            <View style={{ width: '100%', borderWidth: 0.8, borderColor: '#E5E7EB', marginTop: 20, marginBottom: 10 }} />
+
+                            <TouchableOpacity onPress={openCamera}
+                                style={styles.touchableAction}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <Image source={CameraPic} style={{ width: 24, height: 24 }} />
+                                    <Text style={styles.actionText}>Take Picture</Text>
+                                </View>
+
+                                <Image source={sideframe} style={{ width: 23, height: 23 }} />
+                            </TouchableOpacity>
+
+                            <TouchableOpacity onPress={openGallery}
+                                style={styles.touchableAction}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <Image source={Gallery} style={{ width: 24, height: 24 }} />
+                                    <Text style={styles.actionText}>Select from Gallery</Text>
+                                </View>
+
+                                <Image source={sideframe} style={{ width: 23, height: 23 }} />
+                            </TouchableOpacity>
+
+                            <TouchableOpacity onPress={removePic}
+                                style={styles.touchableAction}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <Image source={RemoveIcon} style={{ width: 24, height: 24 }} />
+                                    <Text style={styles.actionText}>Remove Picture</Text>
+                                </View>
+
+
+                            </TouchableOpacity>
+
+                        </View>
+
+                    </Animated.View>
+
+                </View>
+            )
+        }
+    </View>
+
+}
+
+const styles = StyleSheet.create({
+    fieldContainer: {
+        marginBottom: 18,
+        borderBottomWidth: 1,
+        borderBottomColor: '#E5E7EB', // light gray line
+        paddingBottom: 6,
+        // marginTop:15
+    },
+
+    label: {
+        fontSize: 14,
+        color: '#4B4B4B',
+        marginBottom: 4,
+        fontFamily: 'Gilroy-Medium',
+    },
+
+    input: {
+        fontSize: 15,
+        color: '#111827',
+        paddingVertical: 4,
+        fontFamily: 'Gilroy-Regular',
+    },
+    cameraOverlay: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: "rgba(0,0,0,0.4)",
+        borderRadius: 50,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    profileImage: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+    },
+    imageWrapper: {
+        position: "relative",
+
+    },
+    sheet: {
+        backgroundColor: "#fff",
+        borderTopLeftRadius: 25,
+        borderTopRightRadius: 25,
+        padding: 16,
+        maxHeight: "90%",
+        overflow: 'hidden'
+        // dynamic height limit
+    },
+    overlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: "rgba(0,0,0,0.4)",
+        justifyContent: "flex-end",
+        zIndex: 999
+    },
+    dragindictor: { width: 50, height: 4, backgroundColor: "#ccc", borderRadius: 2, alignSelf: "center", marginBottom: 10 },
+    touchableAction: {
+        flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+        backgroundColor: '#F9FAFB', paddingVertical: 10, marginTop: 10, borderRadius: 10,
+        paddingHorizontal: 10
+    },
+    actionText: {
+        fontSize: 16, fontFamily: 'Gilroy-Semibold', marginLeft: 8
+    }
+
+})
+export default PersonalDetails;

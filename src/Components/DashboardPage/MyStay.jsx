@@ -17,6 +17,12 @@ import Clippath from '../../assets/Images/Clippath.png'
 import RoomIcon from "../../assets/Images/Room.png"
 import BedIcon from "../../assets/Images/Bed_Icon.png"
 import ExclamationCircle from "../../assets/Images/ExclamationCircle.png"
+import callIcon from "../../assets/Images/call.png"
+import WaveIcon from '../../assets/Images/HiIcon.png'
+import { SkeletonLoader } from "../ToastFile/SkeletonLoader";
+
+
+
 
 
 function MyStay(props) {
@@ -30,6 +36,7 @@ function MyStay(props) {
     const [rentBill, setRentBill] = useState([])
     const [request, setRequest] = useState([])
 
+    const [isLoading,setIsLoading]=useState(false)
 
     console.log(context.getRequestRaised)
 
@@ -39,10 +46,16 @@ function MyStay(props) {
         { id: 3, text: 'field3' }
     ];
 
+    useEffect(()=>{
+        setIsLoading(true)
+        setTimeout(() => {
+            setIsLoading(false)
+        }, 500);
+    },[])
     const fetchMystayData = () => {
         hostelDetails(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
             console.log(r.data)
-            setComplaints(r.data.complaints)
+            setComplaints(r.data?.complaints)
             setRentBill(r.data.currentMonthBills)
             context.updateCurrentMonthBills(r.data.currentMonthBills)
             context.updatePreviousMonth(r.data.previousMonthBills)
@@ -104,6 +117,7 @@ function MyStay(props) {
 
     return (
         <>
+     <SkeletonLoader loading={isLoading}>
             {context.getCustomerDetail?.bookingDetails?.currentStatus === "BOOKED" && (
                 <ScrollView style={{ backgroundColor: '#ffffff', flex: 1, width: '100%' }}>
 
@@ -116,9 +130,13 @@ function MyStay(props) {
 
                                 <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} colors={['#10267B', '#0227B5']}
                                     style={{ width: width * 0.9, height: '65%', borderRadius: 10, paddingHorizontal: 20, paddingTop: 10 }} >
-                                    <Text style={{ color: '#ffffff', fontSize: 17, lineHeight: 24 }}>
+                                    <View style={{flexDirection:'row',alignItems:'center'}}>
+                                         <Text style={{ color: '#ffffff', fontSize: 17, lineHeight: 24 }}>
                                         Hi, {context.getCustomerDetail?.firstName} {context.getCustomerDetail?.lastName}
                                     </Text>
+                                    <Image source={WaveIcon} style={{width:18.13,height:18.13,marginLeft:8}}/>
+                                    </View>
+                                   
 
                                     <Text style={{ color: '#ffffff', fontSize: 14, fontWeight: 400, lineHeight: 24, marginTop: 10 }}>
                                         Your Bed have been reserved
@@ -129,63 +147,74 @@ function MyStay(props) {
                     </View>
 
                     <View>
-                        <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-                            <Text style={{fontSize:14,fontWeight:400,color:'#3C3C4399'}}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <Text style={{ fontSize: 14, fontWeight: 400, color: '#3C3C4399' }}>
                                 Room No/ Bed No
                             </Text>
 
-                            <View style={{flexDirection:'row',alignItems:'center'}}>
-                                <Image source={RoomIcon} style={{width:17,height:17,resizeMode:'contain'}}/>
-                                <Text style={{fontSize:14,fontWeight:400,marginRight:4,marginLeft:3}}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <Image source={RoomIcon} style={{ width: 17, height: 17, resizeMode: 'contain' }} />
+                                <Text style={{ fontSize: 14, fontWeight: 400, marginRight: 4, marginLeft: 3 }}>
                                     {context.getCustomerDetail?.bookingDetails?.roomName}</Text>
 
-                                <Image source={BedIcon} style={{width:17,height:17,resizeMode:'contain',marginLeft:4}}/>
-                                <Text style={{fontSize:14,fontWeight:400,marginLeft:3}}>
+                                <Image source={BedIcon} style={{ width: 17, height: 17, resizeMode: 'contain', marginLeft: 4 }} />
+                                <Text style={{ fontSize: 14, fontWeight: 400, marginLeft: 3 }}>
                                     {context.getCustomerDetail?.bookingDetails?.bedName}
-                                    </Text>
+                                </Text>
                             </View>
                         </View>
 
-                        <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between',marginTop:15}}>
-                            <Text style={{fontSize:14,fontWeight:400,color:'#3C3C4399'}}>
-                               Check in date
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 15 }}>
+                            <Text style={{ fontSize: 14, fontWeight: 400, color: '#3C3C4399' }}>
+                                Check in date
                             </Text>
 
 
-                            <Text style={{fontSize:14,fontWeight:600}}>
+                            <Text style={{ fontSize: 14, fontWeight: 600 }}>
                                 {context.getCustomerDetail?.expJoiningDate}
-                            </Text>                       
+                            </Text>
                         </View>
 
-                        <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between',marginTop:15}}>
-                            <Text style={{fontSize:14,fontWeight:400,color:'#3C3C4399'}}>
-                               Room Type
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 15 }}>
+                            <Text style={{ fontSize: 14, fontWeight: 400, color: '#3C3C4399' }}>
+                                Room Type
                             </Text>
 
 
-                            <Text style={{fontSize:14,fontWeight:600}}>
+                            <Text style={{ fontSize: 14, fontWeight: 600 }}>
                                 N/A
-                            </Text>                       
+                            </Text>
                         </View>
 
-                        <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between',marginTop:15}}>
-                            <Text style={{fontSize:14,fontWeight:400,color:'#3C3C4399'}}>
-                              PG Contact Number
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 15 }}>
+                            <Text style={{ fontSize: 14, fontWeight: 400, color: '#3C3C4399' }}>
+                                PG Contact Number
                             </Text>
 
 
-                            <Text style={{fontSize:14,fontWeight:600}}>
-                                N/A
-                            </Text>                       
+                            <Text style={{ fontSize: 14, fontWeight: 600 }}>
+                                {context.getCustomerDetail?.hostel?.mobile ? `+91 ${context.getCustomerDetail?.hostel?.mobile}` : "N/A"}
+                            </Text>
                         </View>
                     </View>
 
-                    <View style={{backgroundColor:'#F5F9FF',paddingVertical:15,flexDirection:'row',alignItems:'center',
-                                borderRadius:5,paddingRight:25,paddingLeft:14,marginTop:20}}>
-                        <Image source={ExclamationCircle} style={{width:14,height:14,resizeMode:'contain'}}/>
-                        <Text style={{fontSize:12,fontWeight:400,color:'#1E45E1',marginLeft:7,lineHeight:20}}>
+                    <View style={{
+                        backgroundColor: '#F5F9FF', paddingVertical: 15, flexDirection: 'row', alignItems: 'center',
+                        borderRadius: 5, paddingRight: 25, paddingLeft: 14, marginTop: 20
+                    }}>
+                        <Image source={ExclamationCircle} style={{ width: 14, height: 14, resizeMode: 'contain' }} />
+                        <Text style={{ fontSize: 12, fontWeight: 400, color: '#1E45E1', marginLeft: 7, lineHeight: 20 }}>
                             Tenants have beed must follow the PG Rules and checkin on date properly</Text>
                     </View>
+
+                    <TouchableOpacity style={{
+                        backgroundColor: '#1E45E1', borderRadius: 8, justifyContent: 'center', alignItems: 'center',
+                        marginTop: 25, flexDirection: 'row', paddingVertical: 20, paddingHorizontal: 40,marginHorizontal:10
+                    }}>
+                        <Image source={callIcon} style={{ width: 20, height: 20, tintColor: '#ffffff' }} />
+                        <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium', marginLeft: 8, color: '#ffffff',marginLeft:10 }}>
+                            Contact Hostel Admin</Text>
+                    </TouchableOpacity>
                 </ScrollView>
             )}
 
@@ -422,7 +451,7 @@ function MyStay(props) {
 
                     <View>
                         <View style={{ marginTop: 20 }}>
-                            <Text style={{ fontSize: 14, fontFamily:'Gilroy-Semibold' }}>Quick Links</Text>
+                            <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Semibold' }}>Quick Links</Text>
                         </View>
                         <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'space-between' }}>
                             <TouchableOpacity onPress={() => props.onSheet()}
@@ -433,7 +462,7 @@ function MyStay(props) {
                                 <View style={{ marginBottom: 10 }}>
                                     <Image source={Receipt} style={{ width: 26, height: 26 }} />
                                 </View>
-                                <Text style={{ fontSize: 10, marginTop: 5,fontFamily:'Gilroy-Medium'}}>Complaint</Text>
+                                <Text style={{ fontSize: 10, marginTop: 5, fontFamily: 'Gilroy-Medium' }}>Complaint</Text>
                             </TouchableOpacity>
 
                             <TouchableOpacity onPress={() => props.onRequestBedChange()}
@@ -445,8 +474,8 @@ function MyStay(props) {
                                     <Image source={FrameAdd} style={{ width: 24, height: 24 }} />
                                 </View>
                                 <View style={{ justifyContent: 'center', alignItems: 'center', paddingTop: 5 }}>
-                                    <Text style={{ fontSize: 10,fontFamily:'Gilroy-Regular' }}>Request</Text>
-                                    <Text style={{ fontSize: 10,fontFamily:'Gilroy-Regular' }}>Bed change</Text>
+                                    <Text style={{ fontSize: 10, fontFamily: 'Gilroy-Regular' }}>Request</Text>
+                                    <Text style={{ fontSize: 10, fontFamily: 'Gilroy-Regular' }}>Bed change</Text>
                                 </View>
                             </TouchableOpacity>
                         </View>
@@ -454,7 +483,7 @@ function MyStay(props) {
                     </View>
 
                     <View style={{ paddingTop: 15 }}>
-                        <Text style={{ fontSize: 16,fontFamily:'Gilroy-Semibold' }}>Request</Text>
+                        <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold' }}>Request</Text>
 
 
                         {context.getRequestRaised && context.getRequestRaised.length > 0 ?
@@ -466,26 +495,26 @@ function MyStay(props) {
                                         borderColor: '#EFF2FF', justifyContent: 'space-between', marginTop: 10
                                     }}>
                                     <View style={{ paddingLeft: 12, paddingRight: 10 }}>
-                                        <Text style={{ fontSize: 16,fontFamily:'Gilroy-Semibold', marginBottom: 5 }}>
+                                        <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold', marginBottom: 5 }}>
                                             {i.type}
                                         </Text>
 
                                         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
                                             <Image source={Clippath} style={{ width: 20, height: 20 }} />
 
-                                            <Text style={{ fontSize: 14,fontFamily:'Gilroy-Medium', marginLeft: 10 }}>
+                                            <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', marginLeft: 10 }}>
                                                 {i.title}</Text>
                                         </View>
 
                                     </View>
 
                                     <View style={{ paddingRight: 10 }}>
-                                        <Text style={{ color: '#9C9C9C', fontSize: 11,fontFamily:'Gilroy-Medium', marginBottom: 5 }}>
+                                        <Text style={{ color: '#9C9C9C', fontSize: 11, fontFamily: 'Gilroy-Medium', marginBottom: 5 }}>
                                             {i.requestedDateDisplay}
                                         </Text>
 
                                         <Text style={{
-                                            fontSize: 12,fontFamily:'Gilroy-Medium', paddingHorizontal: 8, paddingVertical: 4, backgroundColor: '#FFF8EC',
+                                            fontSize: 12, fontFamily: 'Gilroy-Medium', paddingHorizontal: 8, paddingVertical: 4, backgroundColor: '#FFF8EC',
                                             color: '#FF9500', borderRadius: 28, textAlign: 'center', textAlignVertical: 'center', marginTop: 8
                                         }}>
                                             {i.status}
@@ -499,10 +528,10 @@ function MyStay(props) {
                                 justifyContent: 'space-between', marginTop: 10
                             }}>
                                 <View style={{ paddingLeft: 12, paddingRight: 10 }}>
-                                    <Text style={{ fontSize: 16,fontFamily:'Gilroy-Semibold', marginBottom: 5 }}>
+                                    <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold', marginBottom: 5 }}>
                                         No Request yet
                                     </Text>
-                                    <Text style={{ fontSize: 14,fontFamily:'Gilroy-Medium', color: '#4B4B4B', marginTop: 5 }}>
+                                    <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#4B4B4B', marginTop: 5 }}>
                                         You have'nt raised any request</Text>
                                 </View>
 
@@ -512,9 +541,9 @@ function MyStay(props) {
                     </View>
 
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 12 }}>
-                        <Text style={{ fontSize: 16,fontFamily:'Gilroy-Semibold' }}>Complaints</Text>
+                        <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold' }}>Complaints</Text>
                         <TouchableOpacity onPress={viewallclick}>
-                            <Text style={{ color: '#1E45E1', marginRight: 2, fontSize: 14,fontFamily:'Gilroy-Semibold'}}>view all</Text>
+                            <Text style={{ color: '#1E45E1', marginRight: 2, fontSize: 14, fontFamily: 'Gilroy-Semibold' }}>view all</Text>
                         </TouchableOpacity>
 
                     </View>
@@ -540,7 +569,7 @@ function MyStay(props) {
                                                 numberOfLines={1}
                                                 ellipsizeMode="tail"
                                                 style={{
-                                                    fontSize: 17,fontFamily:'Gilroy-Semibold', color: '#1C1C1E', maxWidth: '90%'
+                                                    fontSize: 17, fontFamily: 'Gilroy-Semibold', color: '#1C1C1E', maxWidth: '90%'
                                                 }}
                                             >
                                                 {i.description}
@@ -552,7 +581,7 @@ function MyStay(props) {
                                                     style={{ width: 18, height: 18 }}
                                                 />
                                                 <Text style={{
-                                                    marginLeft: 8, fontSize: 14,fontFamily:'Gilroy-Medium', color: '#6C6C70'
+                                                    marginLeft: 8, fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#6C6C70'
                                                 }}>
                                                     {i.complaintTypeName}
                                                 </Text>
@@ -564,7 +593,7 @@ function MyStay(props) {
                                             justifyContent: 'center', alignItems: 'flex-end', paddingRight: 18, paddingTop: 18, paddingBottom: 20
                                         }}>
                                             <Text style={{
-                                                color: '#9C9C9C', fontSize: 12,fontFamily:'Gilroy-Medium', marginBottom: 18
+                                                color: '#9C9C9C', fontSize: 12, fontFamily: 'Gilroy-Medium', marginBottom: 18
                                             }}>
                                                 {i?.complaintDateDisplay}
                                             </Text>
@@ -572,7 +601,7 @@ function MyStay(props) {
                                             <View style={{
                                                 borderRadius: 20, paddingHorizontal: 12, paddingVertical: 4, backgroundColor: backgroundColor
                                             }}>
-                                                <Text style={{ fontSize: 12,fontFamily:'Gilroy-Medium', color: textColor }}>
+                                                <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Medium', color: textColor }}>
                                                     {i.status}
                                                 </Text>
                                             </View>
@@ -587,10 +616,10 @@ function MyStay(props) {
                             justifyContent: 'space-between', marginTop: 10
                         }}>
                             <View style={{ paddingLeft: 12, paddingRight: 10 }}>
-                                <Text style={{ fontSize: 16,fontFamily:'Gilroy-Semibold', marginBottom: 5 }}>
+                                <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold', marginBottom: 5 }}>
                                     No Complaints yet
                                 </Text>
-                                <Text style={{ fontSize: 14,fontFamily:'Gilroy-Medium', color: '#4B4B4B', marginTop: 5 }}>
+                                <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#4B4B4B', marginTop: 5 }}>
                                     You have'nt raised any Complaints</Text>
                             </View>
 
@@ -601,6 +630,7 @@ function MyStay(props) {
 
                 </ScrollView>
             )}
+            </SkeletonLoader>
         </>
     )
 
@@ -646,8 +676,8 @@ const style = StyleSheet.create({
         minHeight: 110,
         borderWidth: 1,
         borderColor: '#E5E5EA',
-         elevation:2,
-         shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
+        elevation: 2,
+        shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.08, shadowRadius: 4,
     },
 
@@ -657,7 +687,7 @@ const style = StyleSheet.create({
 
     amount: {
         fontSize: 20,
-        fontFamily:"Gilroy-Bold",
+        fontFamily: "Gilroy-Bold",
         // fontWeight: '700',
         color: '#1C1C1E',
     },
@@ -666,14 +696,14 @@ const style = StyleSheet.create({
         fontSize: 13,
         color: '#AEAEB2',
         marginTop: 4,
-        fontFamily:'Gilroy-Medium'
+        fontFamily: 'Gilroy-Medium'
     },
 
     highlightText: {
         fontSize: 13,
         color: '#FF9500',
         marginTop: 4,
-        fontFamily:'Gilroy-Medium'
+        fontFamily: 'Gilroy-Medium'
     },
 
     inlineRow: {
@@ -686,12 +716,12 @@ const style = StyleSheet.create({
     label: {
         fontSize: 11,
         color: '#8E8E93',
-        fontFamily:'Gilroy-Medium'
+        fontFamily: 'Gilroy-Medium'
     },
 
     value: {
         fontSize: 12,
-       fontFamily:'Gilroy-Semibold',
+        fontFamily: 'Gilroy-Semibold',
         marginLeft: 4,
         flexShrink: 1,
     },
