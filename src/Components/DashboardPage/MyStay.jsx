@@ -494,7 +494,7 @@ function MyStay(props) {
                                         borderWidth: 1, borderRadius: 10, flexDirection: 'row', paddingVertical: 15,
                                         borderColor: '#EFF2FF', justifyContent: 'space-between', marginTop: 10
                                     }}>
-                                    <View style={{ paddingLeft: 12, paddingRight: 10 }}>
+                                    <View style={{ paddingLeft: 12, paddingRight: 10,flex:1 }}>
                                         <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold', marginBottom: 5 }}>
                                             {i.type}
                                         </Text>
@@ -503,7 +503,7 @@ function MyStay(props) {
                                             <Image source={Clippath} style={{ width: 20, height: 20 }} />
 
                                             <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', marginLeft: 10 }}>
-                                                {i.title}</Text>
+                                                {i.reason}</Text>
                                         </View>
 
                                     </View>

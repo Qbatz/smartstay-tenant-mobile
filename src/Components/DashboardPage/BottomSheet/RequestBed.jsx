@@ -52,6 +52,8 @@ const RequestBedChange = ({ visible,
     const [bedTypeError, setBedTypeError] = useState()
     const [urgencyError, setUrgencyError] = useState()
 
+    console.log(changeBed,urgencyType,bedType)
+
 
     useEffect(() => {
         if (!visible) {
@@ -97,6 +99,10 @@ const RequestBedChange = ({ visible,
         const data = {
             title: changeBed,
             description: bedType,
+            reason: changeBed,
+            // startFrom: urgencyType,
+            // preferredType: bedType,
+           
         }
 
         if (changeBed != null && bedType != null && urgencyType != null) {
