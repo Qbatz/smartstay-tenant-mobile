@@ -29,6 +29,11 @@ import ComingSoon from "./Components/RentalAggreements/ComingSoon";
 import ComplaintUpdatesScreen from "./Components/ComplaintUpdates/Updates";
 import BookingInvoice from "./Components/InvoiceReceipt/BookingInvoice";
 import BookingReceipt from "./Components/InvoiceReceipt/BookingReceipt";
+import CustomerProfileNew from "./Components/CustomerProfile/CustomerProfileNew"
+import AccountDetails from "./Components/CustomerProfile/AccountDetails";
+import PersonalDetails from "./Components/EditProfileFolder/PersonalDetails";
+import BackgroundDetails from "./Components/EditProfileFolder/BackgroundDetails";
+import DocumentsUpload from "./Components/EditProfileFolder/DocumentUpload";
 
 const SuccessFlow = ({props, MpinVerified}) => {
   console.log(props)
@@ -61,8 +66,13 @@ const SuccessFlow = ({props, MpinVerified}) => {
           <Navigation.Screen name="KycSuccess" component={KycSuccessDesign} />
           <Navigation.Screen name='Dashboard' component={Dashboard} />
           <Navigation.Screen name="CustomerProfile" component={CustomerProfile} />
+          <Navigation.Screen name="CustomerProfileNew" component={CustomerProfileNew}/>
           <Navigation.Screen name='ProfileHostels' component={ProfileHostels} />
           <Navigation.Screen name='RentalAgreement' component={RentalAgreement} />
+          <Navigation.Screen name="AccountDetails" component={AccountDetails}/>
+          <Navigation.Screen name="PersonalDetails" component={PersonalDetails}/>
+          <Navigation.Screen name="BackgroundDetails" component={BackgroundDetails}/>
+          <Navigation.Screen name="DocumentUpload" component={DocumentsUpload}/>
           <Navigation.Screen name="ComingSoonPage" component={ComingSoon}/>
           <Navigation.Screen name="Updates" component={ComplaintUpdatesScreen}/>
           <Navigation.Screen name="Notification" component={Notification} />

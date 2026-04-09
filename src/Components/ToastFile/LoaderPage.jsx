@@ -9,9 +9,7 @@ const AppLoader = ({ visible }) => {
       visible={visible}
     >
       <View style={styles.overlay}>
-        <View style={styles.loaderContainer}>
-          <ActivityIndicator size="large" color="#4CAF50" />
-        </View>
+          <ActivityIndicator size="large" color="#1E45E1" />
       </View>
     </Modal>
   );

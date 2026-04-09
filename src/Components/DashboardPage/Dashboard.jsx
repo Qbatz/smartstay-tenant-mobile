@@ -57,6 +57,8 @@ import ComplaintBottomSheet from "./BottomSheet/ComplaintBottomSheet";
 import walkinImage from "../../assets/Images/walkinImage.png"
 import callIcon from "../../assets/Images/call.png"
 import gobackIcon from "../../assets/Images/logout.png"
+import PaymentBottomSheet from "./BottomSheet/PaymentBottomSheet";
+import CancelledBookingPic from "../../assets/Images/CancelledBookingPic.png"
 
 const { width, height } = Dimensions.get("window");
 
@@ -261,12 +263,26 @@ function Dashboard(props) {
     })
 
     customerDetails(loginContext.getToken).then(r => {
-      console.log("haha",r.data)
+      console.log("haha", r.data)
       context.updateCustomer(r.data)
     }).catch(error => {
       console.log(error)
     })
   }, [])
+
+  const formatDate = (inputDate) => {
+    if (!inputDate) return "";
+
+    const normalized = inputDate.replace(/-/g, "/");
+
+    const [day, month, year] = normalized.split("/");
+
+    const date = new Date(`${year}-${month}-${day}`);
+
+    const options = { day: "2-digit", month: "short", year: "numeric" };
+
+    return date.toLocaleDateString("en-GB", options);
+  };
 
 
 
@@ -279,7 +295,7 @@ function Dashboard(props) {
   };
 
   const handleProfile = () => {
-    navigation.navigate("CustomerProfile");
+    navigation.navigate("CustomerProfileNew");
   };
 
   const handle = (complaint) => {
@@ -415,13 +431,20 @@ function Dashboard(props) {
     console.log("item", item);
 
     setSelectedPayment(item);
-    setModalVisible(true);
+
+    paymentContext.updateInvoice(null)
+
+
 
     getInvoices(context.getHostelDetail.hostelId, item.invoiceId, loginContext.getToken).then(r => {
       console.log(r)
 
-      paymentContext.updateInvoice(r.data)
+      if (r.status === 200) {
+        paymentContext.updateInvoice(r.data);
+      }
+
     })
+    setModalVisible(true);
   };
 
   const handleDownload = (invoiceId) => {
@@ -500,9 +523,11 @@ function Dashboard(props) {
     indicatorStyle={{ backgroundColor: '#0227B5' }} style={{ backgroundColor: '#ffffff' }}
     inactiveColor="black"
     activeColor="blue"
-    renderLabel={({ route, color }) => (<Text style={{ color: color }}>
+    renderLabel={({ route, color }) => (<Text style={{ color: color, }}>
       {route.title}
-    </Text>)} />)
+    </Text>)}
+  />
+  )
 
   const renderScene = ({ route, jumpTo }) => {
     switch (route.key) {
@@ -525,7 +550,7 @@ function Dashboard(props) {
 
   return <SafeAreaView style={style.mainDashb}>
 
-    <StatusBar backgroundColor="#DAEEFF" barStyle="dark-content"/>
+    <StatusBar backgroundColor="#DAEEFF" barStyle="dark-content" />
 
     <LinearGradient
       colors={["#DAEEFF", "#FFFFFF"]}
@@ -567,13 +592,13 @@ function Dashboard(props) {
           </View>
 
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <TouchableOpacity onPress={handleNotificationShow} 
-            style={{ marginRight: 10, opacity: context?.getCustomerDetail?.currentStatus === "INACTIVE" ? 0.4 : 1,  }}
-            disabled={context?.getCustomerDetail?.currentStatus === "INACTIVE"}>
+            <TouchableOpacity onPress={handleNotificationShow}
+              style={{ marginRight: 10, opacity: context?.getCustomerDetail?.currentStatus === "INACTIVE" ? 0.4 : 1, }}
+              disabled={context?.getCustomerDetail?.currentStatus === "INACTIVE"}>
               <Image source={require("../../assets/Images/notification.png")} style={{ height: 44, width: 44 }} />
             </TouchableOpacity>
             <TouchableOpacity onPress={handleProfile}
-            style={{opacity: context?.getCustomerDetail?.currentStatus === "INACTIVE" ? 0.4 : 1}}
+              style={{ opacity: context?.getCustomerDetail?.currentStatus === "INACTIVE" ? 0.4 : 1 }}
             // disabled={context?.getCustomerDetail?.currentStatus === "INACTIVE"}
             >
               {context.getCustomerDetail?.profilePic ? (
@@ -594,57 +619,75 @@ function Dashboard(props) {
 
     </LinearGradient>
 
- 
-    {
-      context?.getCustomerDetail?.currentStatus === "INACTIVE" && (
-        <View style={{flex:1,backgroundColor:'greens',alignItems:'center',justifyContent:'center',paddingHorizontal:20}}>
-          <Image source={walkinImage} style={{width:227,height:292,resizeMode:'contain',marginBottom:18}}/>
-          <Text style={{fontSize:24,fontFamily:'Gilroy-Semibold',}}>You're resgistered !</Text>
 
-          <Text style={{fontSize:14,fontFamily:'Gilroy-Regular',color:'#4B4B4B',textAlign:'center',marginTop:18}}>
-            The hostel has registered your enquiry.
-          </Text>
-          <Text style={{fontSize:14,fontFamily:'Gilroy-Regular',color:'#4B4B4B',textAlign:'center',lineHeight:21,marginTop:8}}>
-            Complete the booking process with the admin to activate your stay access
-          </Text>
+    {["INACTIVE", "CANCELLED_BOOKING"].includes(context?.getCustomerDetail?.currentStatus) && (
+      <View style={{ flex: 1, backgroundColor: 'greens', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 20 }}>
+        {context?.getCustomerDetail?.currentStatus === "INACTIVE" && (
+          <>
+            <Image source={walkinImage} style={{ width: 227, height: 292, resizeMode: 'contain', marginBottom: 18 }} />
+            <Text style={{ fontSize: 24, fontFamily: 'Gilroy-Semibold', }}>You're resgistered !</Text>
 
-        <View style={{marginTop:15,width:'100%',marginBottom:10}}>
-          <TouchableOpacity style={{backgroundColor:'#1E45E1',borderRadius:8,justifyContent:'center',alignItems:'center',
-            marginTop:20,flexDirection:'row',paddingVertical:20,paddingHorizontal:40}}>
-            <Image source={callIcon} style={{width:20,height:20,tintColor:'#ffffff'}}/>
-            <Text style={{fontSize:16,fontFamily:'Gilroy-Medium',marginLeft:8,color:'#ffffff'}}>
+            <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Regular', color: '#4B4B4B', textAlign: 'center', marginTop: 18 }}>
+              The hostel has registered your enquiry.
+            </Text>
+            <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Regular', color: '#4B4B4B', textAlign: 'center', lineHeight: 21, marginTop: 6 }}>
+              Complete the booking process with the admin to activate your stay access
+            </Text>
+          </>)
+        }
+
+        {context?.getCustomerDetail?.currentStatus === "CANCELLED_BOOKING" && (
+          <>
+            <Image source={CancelledBookingPic} style={{ width: 227, height: 292, resizeMode: 'contain', marginBottom: 18 }} />
+            <Text style={{ fontSize: 24, fontFamily: 'Gilroy-Semibold', textAlign: 'center', lineHeight: 34 }}>Your Account is {`\n`}Inactivated !</Text>
+
+            <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Regular', color: '#4B4B4B', textAlign: 'center', lineHeight: 21, marginTop: 6 }}>
+              Your Booking has been inactivated due to{`\n`} absence of check-in longdays
+            </Text>
+          </>)
+        }
+
+
+        <View style={{ marginTop: 15, width: '100%', marginBottom: 10 }}>
+          <TouchableOpacity style={{
+            backgroundColor: '#1E45E1', borderRadius: 8, justifyContent: 'center', alignItems: 'center',
+            marginTop: 20, flexDirection: 'row', paddingVertical: 20, paddingHorizontal: 40
+          }}>
+            <Image source={callIcon} style={{ width: 20, height: 20, tintColor: '#ffffff' }} />
+            <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium', marginLeft: 8, color: '#ffffff' }}>
               Contact Hostel Admin</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={()=>navigation.goBack()}
-          style={{borderWidth:1,borderRadius:8,justifyContent:'center',alignItems:'center',
-          marginTop:15,flexDirection:'row',paddingVertical:20,paddingHorizontal:40}}>
-            <Image source={gobackIcon} style={{width:18,height:18,tintColor:'#4B4B4B'}}/>
-            <Text style={{fontSize:16,fontFamily:'Gilroy-Medium',color:'#4B4B4B',marginLeft:8}} >Go back</Text>
+          <TouchableOpacity onPress={() => navigation.goBack()}
+            style={{
+              borderWidth: 1, borderRadius: 8, justifyContent: 'center', alignItems: 'center',
+              marginTop: 15, flexDirection: 'row', paddingVertical: 20, paddingHorizontal: 40
+            }}>
+            <Image source={gobackIcon} style={{ width: 18, height: 18, tintColor: '#4B4B4B' }} />
+            <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium', color: '#4B4B4B', marginLeft: 8 }} >Go back</Text>
           </TouchableOpacity>
-          </View>
         </View>
-      )
-    } 
-
-    {
-       context?.getCustomerDetail?.currentStatus !== "INACTIVE" && (
-        <View style={{ flex: 1, paddingLeft: 20, paddingRight: 20, }}>
-      <TabView navigationState={{ index: index, routes }}
-        commonOptions={{
-          icon: ({ route, color }) => (<Image source={route.icon} style={{ width: 21.12, height: 21.12, tintColor: color }} />)
-        }}
-        renderTabBar={renderTabBar}
-        renderScene={renderScene}
-        onIndexChange={setindex}
-        initialLayout={{ width: Dimensions.get('window').width }}
-        style={{ flex: 1, justifyContent: 'center' }} />
-
-    </View>
-       )
+      </View>
+    )
     }
 
-    
+    {!["INACTIVE", "CANCELLED_BOOKING"].includes(context?.getCustomerDetail?.currentStatus) && (
+      <View style={{ flex: 1, paddingLeft: 20, paddingRight: 20, }}>
+        <TabView navigationState={{ index: index, routes }}
+          commonOptions={{
+            icon: ({ route, color }) => (<Image source={route.icon} style={{ width: 21.12, height: 21.12, tintColor: color }} />)
+          }}
+          renderTabBar={renderTabBar}
+          renderScene={renderScene}
+          onIndexChange={setindex}
+          initialLayout={{ width: Dimensions.get('window').width }}
+          style={{ flex: 1, justifyContent: 'center' }} />
+
+      </View>
+    )
+    }
+
+
 
     {/* <ComplaintBottomSheet
     visible={showSheet}
@@ -711,7 +754,7 @@ function Dashboard(props) {
                               </Text>
                               <Text style={{ flex: 1, fontSize: 10, fontFamily: 'Gilroy-Regular', color: '#6E6E6E', textAlign: 'right', }}
                                 numberOfLines={1}>
-                                {item.commentedAt} - {item?.time}
+                                {formatDate(item.commentedAt)} - {item?.time}
                               </Text>
                             </View>
                             <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', marginTop: 5, marginRight: 10 }}>{item.comment}</Text>
@@ -1033,557 +1076,12 @@ function Dashboard(props) {
 
     {/* ----------Payment------ */}
 
-    {modalVisible && (
-      <View style={style.sheetOverlay}>
+    <PaymentBottomSheet
+      visible={modalVisible}
+      onClose={() => setModalVisible(false)}
+    />
 
-        {/* Tap outside to close */}
-        <TouchableWithoutFeedback onPress={onClose}>
-          <View style={StyleSheet.absoluteFill} />
-        </TouchableWithoutFeedback>
 
-        <Animated.View
-          style={[(paymentContext.getInvoiceDetail?.status === "Partial Payment" ||
-            paymentContext.getInvoiceDetail?.status === "Paid") ? style.bottomSheetPaid : style.bottomSheetPay,
-          { transform: [{ translateY: sheetY }] }]}
-          {...panResponder.panHandlers}
-        >
-          <View {...panResponder.panHandlers}>
-            <View style={style.dragindictor} />
-          </View>
-
-          <ScrollView showsVerticalScrollIndicator={false}>
-            {paymentContext.getInvoiceDetail && ["Rent", "Advance", "Booking", "Reassign_rent"].includes(
-              paymentContext.getInvoiceDetail.invoiceType
-            ) ? (
-              <>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <Text style={style.modalTitle}>{paymentContext.getInvoiceDetail?.invoiceType}</Text>
-
-                  <View style={{ flexDirection: "row" }}>
-                    <Text style={style.invoiceId}>{paymentContext.getInvoiceDetail?.invoiceNumber}</Text>
-                    {/* <TouchableOpacity
-                      onPress={() => handleReceiptPdfDownload(paymentContext.getInvoiceDetail.invoiceType)}
-                    > */}
-                    {/* <Image
-                      source={ViewIcon}
-                      style={{ width: 15, height: 15, marginLeft: 5, marginTop: 2 }}
-                    /> */}
-                    {/* </TouchableOpacity> */}
-                  </View>
-                </View>
-
-
-                {/* Amount Section */}
-                <View style={style.amountSection}>
-                  <Text style={style.label}>Total Amount</Text>
-
-                  <View style={{ alignItems: 'flex-end' }}>
-                    <Text style={style.totalAmount}>
-                      ₹{new Intl.NumberFormat('en-IN', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      }).format(
-                        paymentContext.getInvoiceDetail?.totalAmount
-                      )}
-                    </Text>
-
-                    {paymentContext.getInvoiceDetail?.status === "Pending" && (
-                      <View
-                        style={[
-                          style.statusBadge,
-                          { backgroundColor: "rgba(254,243,198,1)" },
-                        ]}
-                      >
-                        <Text
-                          style={[
-                            style.statusText,
-                            { color: "rgba(187,77,0,1)" },
-                          ]}
-                        >
-                          Pending
-                        </Text>
-                      </View>
-                    )}
-
-                    {(paymentContext.getInvoiceDetail?.status === "Partial Payment" ||
-                      paymentContext.getInvoiceDetail?.status === "Paid") && (
-                        <View style={{ flexDirection: "row", marginTop: 6 }}>
-                          <Image
-                            source={PaidIcon}
-                            style={{ width: 20, height: 20 }}
-                          />
-                          <Text style={{ fontSize: 14, marginLeft: 6,fontFamily:'Gilroy-Medium' }}>
-                            {paymentContext.getInvoiceDetail.status === "Paid"
-                              ? "Full Paid"
-                              : "Partial Payment"}
-                          </Text>
-                        </View>
-                      )}
-                  </View>
-                </View>
-
-
-
-                {/* Details */}
-                <View style={style.detailsSection}>
-                  {(paymentContext.getInvoiceDetail?.status === "Partial Payment" ||
-                    paymentContext.getInvoiceDetail?.status === "Paid") && (
-                      paymentContext.getInvoiceDetail?.invoiceItems.map(i => {
-                        return (
-                          <View style={style.row}>
-                            <TouchableOpacity >
-                              <Text style={style.detailLabel}>{i.invoiceItem}</Text>
-                            </TouchableOpacity>
-                            <Text style={style.detailValue}>₹{new Intl.NumberFormat('en-IN').format(i.amount)}</Text>
-                          </View>
-                        )
-                      })
-                    )}
-                  {/* <View style={style.row}>
-                    <Text style={style.detailLabel}>Actual Rent</Text>
-                    <Text style={style.detailValue}>₹{ }</Text>
-                  </View>
-
-                  <View style={style.row}>
-                    <Text style={style.detailLabel}>Taxes GST 10%</Text>
-                    <Text style={style.detailValue}>₹{paymentContext.getInvoiceDetail.gst}</Text>
-                  </View> */}
-
-                  {(paymentContext.getInvoiceDetail?.status === "Partial Payment" ||
-                    paymentContext.getInvoiceDetail?.status === "Paid") && (
-                      <>
-                        <Text style={[style.detailLabel, { marginTop: 10 }]}>Paid Amount</Text>
-                        {paymentContext.getInvoiceDetail?.receipts.map(i => {
-                          return (
-                            <View key={i.transactionId} style={style.row}>
-                              <TouchableOpacity
-                                onPress={() =>
-                                  handlePaymentReceipt(i.transactionId, paymentContext.getInvoiceDetail.invoiceType, paymentContext.getInvoiceDetail?.status)}
-                                style={{ flexDirection: 'row' }}>
-                                <Text style={{ fontSize: 12, color: "#1e45e2",fontFamily:'Gilroy-Semibold' }}>{i.transactionNumber}</Text>
-                                <Image source={ReceiptPic} style={{ width: 14, height: 14, marginLeft: 5 }} resizeMode="contain" />
-                              </TouchableOpacity>
-                              <Text style={style.detailValue}>₹{new Intl.NumberFormat('en-IN').format(i.paidAmount)}</Text>
-                            </View>
-                          )
-                        })}
-
-                      </>
-                    )}
-
-                  {paymentContext.getInvoiceDetail.status === "Partial Payment" && (
-                    <>
-                      <View style={style.row}>
-                        <Text style={style.detailLabel}>Remain</Text>
-                      </View>
-                      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                        <Text style={style.payBillText}>Pay Bill</Text>
-                        <Text style={style.detailValue}>₹{new Intl.NumberFormat('en-IN').format(paymentContext.getInvoiceDetail?.dueAmount)}</Text>
-                      </View>
-                    </>
-                  )
-                  }
-                </View>
-
-                <View
-                  style={{
-                    borderBottomWidth: 0.4,
-                    borderBottomColor: "grey",
-                    opacity: 0.4,
-                    marginVertical: 10,
-                  }}
-                />
-
-                {/* Paid / Due Date */}
-                <View style={style.Billbottom}>
-                  <Text style={style.paiddetailLabel}>
-                    {paymentContext.getInvoiceDetail.status === "Pending" ? "Due Date" : "Paid Date"}
-                  </Text>
-                  <Text style={style.paiddetailValue}>
-                    {paymentContext.getInvoiceDetail.status === "Pending" ?
-                      paymentContext?.getInvoiceDetail?.dueDate ? paymentContext?.getInvoiceDetail?.dueDate : "N/A"
-                      : paymentContext.getInvoiceDetail.lastPaidDate ? paymentContext.getInvoiceDetail.lastPaidDate : "N/A"}
-                  </Text>
-                </View>
-
-                {paymentContext.getInvoiceDetail.status === "Partial Payment" &&
-                  <View style={[style.Billbottom, { paddingTop: 7 }]}>
-                    <Text style={style.paiddetailLabel}>
-                      Due Date
-                    </Text>
-                    <Text style={style.paiddetailValue}>
-                      {paymentContext.getInvoiceDetail.dueDate}
-                    </Text>
-                  </View>
-                }
-
-
-                {/* Notes */}
-                {paymentContext.getInvoiceDetail.status === "Pending" && (
-                  <View style={{ marginTop: 10 }}>
-                    <Text style={{ fontSize: 14, color: "rgba(60,60,67,0.6)",fontFamily:'Gilroy-Medium' }}>
-                      Notes & Instructions
-                    </Text>
-                    <Text style={{fontSize:16,fontFamily:'Gilroy-Semibold',marginTop:8}}>
-                      Kindly pay on or before the due date
-                    </Text>
-                    <Text style={{fontSize:16,fontFamily:'Gilroy-Semibold'}}>
-                      Late fee may apply after 3 days of due date
-                    </Text>
-                    <Text style={{fontSize:16,fontFamily:'Gilroy-Semibold'}}>
-                      For any billing errors, contact hostel admin
-                    </Text>
-                  </View>
-                )}
-
-                {/* Payment mode section */}
-                {paymentContext.getInvoiceDetail.status !== "Pending" && (
-                  <View style={{ marginTop: 10 }}>
-                    <View style={style.Billbottom}>
-                      <Text style={style.paiddetailLabel}>Payment Mode</Text>
-                      <Text style={style.paiddetailValue}>
-                        {paymentContext?.getInvoiceDetail?.receipts[0]?.paymentMode ? paymentContext?.getInvoiceDetail?.receipts[0]?.paymentMode : "N/A"}
-                      </Text>
-                      {/* {paymentContext.getInvoiceDetail.receipts.map(i => {
-                        console.log(i)
-                        return (
-
-                          <Text key={i.transactionId} style={style.paiddetailValue}>{i.paymentMode}</Text>
-                        )
-
-                      })} */}
-
-                    </View>
-                    {console.log(paymentContext.getInvoiceDetail.receipts)}
-                    <View style={[style.Billbottom, { paddingTop: 10 }]}>
-                      <Text style={style.paiddetailLabel}>Reference number</Text>
-                      <Text style={style.paiddetailValue}>
-                        {paymentContext?.getInvoiceDetail?.lastReferenceId ? paymentContext?.getInvoiceDetail?.lastReferenceId : "N/A"}
-                      </Text>
-                      {/* {paymentContext.getInvoiceDetail.receipts.map(i => {
-                        return (
-                          <Text key={i.transactionId} style={style.paiddetailValue}>{i.referenceNumber}</Text>
-                        )
-
-                      })} */}
-                    </View>
-                  </View>
-                )}
-
-                {/* Buttons */}
-                <View style={style.buttonRow}>
-                  {paymentContext.getInvoiceDetail.status === "Pending" ? (
-                    <>
-                      <TouchableOpacity
-                        style={style.shareBtn}
-                        onPress={() => handleDownload(paymentContext.getInvoiceDetail.invoiceId)}
-                      >
-                        <Text style={{ fontFamily:'Gilroy-Semibold',fontSize:16, color: "#071C70" }}>
-                          Download Bill
-                        </Text>
-                        <Image
-                          source={DownloadBlueIcon}
-                          style={{ width: 17, height: 17, marginLeft: 8 }}
-                        />
-                      </TouchableOpacity>
-
-                      <TouchableOpacity style={style.downloadBtn}>
-                        <Text style={style.downloadText}>Pay Now</Text>
-                        <Image
-                          source={ArrowRightIcon}
-                          style={{ width: 20, height: 20, marginLeft: 8 }}
-                        />
-                      </TouchableOpacity>
-                    </>
-                  ) : (
-                    <>
-                      <TouchableOpacity style={style.shareBtn} onPress={() => sharePdf(paymentContext.getInvoiceDetail.invoiceId)}>
-                        <Text style={style.shareText}>Share</Text>
-                        <Image
-                          source={ShareIcon}
-                          style={{ width: 17, height: 17, marginLeft: 8 }}
-                        />
-                      </TouchableOpacity>
-
-                      <TouchableOpacity
-                        style={style.downloadBtn}
-                        onPress={() => handleDownload(paymentContext.getInvoiceDetail.invoiceId)}
-                      // handleDownload
-                      >
-                        <Text style={style.downloadText}>Download</Text>
-                        <Image
-                          source={DownloadIcon}
-                          style={{ width: 20, height: 20, marginLeft: 8 }}
-                        />
-                      </TouchableOpacity>
-                    </>
-                  )}
-                </View>
-              </>
-            ) :
-              <>
-                <View style={style.row}>
-                  <Text style={style.modalTitle}>{paymentContext?.getInvoiceDetail?.invoiceType}</Text>
-
-                  {/* <TouchableOpacity
-                    onPress={() => handleReceiptPdfDownload(paymentContext.getInvoiceDetail.invoiceType)}
-                    style={{
-                      flexDirection: "row", backgroundColor: '#F1F4FF', paddingVertical: 3, paddingHorizontal: 5,
-                      borderRadius: 5, alignItems: 'center'
-                    }}> */}
-                  <View style={{
-                    flexDirection: "row", backgroundColor: '#F1F4FF', paddingVertical: 3, paddingHorizontal: 5,
-                    borderRadius: 5, alignItems: 'center'
-                  }}>
-                    <Text style={{ fontSize: 13, color: "#0057FF", fontWeight: "600" }}>{paymentContext?.getInvoiceDetail?.invoiceNumber}</Text>
-
-                    {/* <Image
-                      source={ViewIcon}
-                      style={{ width: 15, height: 15, marginLeft: 5, marginTop: 2 }}
-                    /> */}
-                  </View>
-                  {/* </TouchableOpacity> */}
-                </View>
-
-                <View
-                  style={{
-                    borderBottomWidth: 0.4,
-                    borderBottomColor: "grey",
-                    opacity: 0.4,
-                    marginVertical: 10,
-                  }}
-                />
-
-                <View style={style.row}>
-                  <Text style={style.modalTitle}>Total Refund</Text>
-
-                  <Text style={{ fontSize: 16, fontWeight: 700 }}>₹ {paymentContext?.getInvoiceDetail?.totalAmount}</Text>
-                </View>
-
-                <View style={{ alignItems: 'flex-end' }}>
-                  {/* <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    {/* <Text style={{ fontSize: 14, fontWeight: 400, color: '#1E45E1' }}>{paymentContext?.}</Text> */}
-                  {/* <Image source={ReceiptPic} style={{ width: 16, height: 16, marginLeft: 5 }} resizeMode="contain" /> */}
-                  {/* </View> */}
-
-
-                  <Text style={{ fontSize: 12, fontWeight: 400, color: '#038C3D' }}>{paymentContext?.getInvoiceDetail?.status}</Text>
-                </View>
-
-                {paymentContext.getInvoiceDetail?.receipts.map(i => {
-                  return (
-                    <View key={i.transactionId} style={style.row}>
-                      <TouchableOpacity onPress={() =>
-                        handlePaymentReceipt(i.transactionId, paymentContext?.getInvoiceDetail.invoiceType, paymentContext.getInvoiceDetail?.status)}
-                        style={{ flexDirection: 'row' }}>
-                        <Text style={{ fontSize: 10, color: "#1e45e2" }}>{i.transactionNumber}</Text>
-                        <Image source={ReceiptPic} style={{ width: 14, height: 14, marginLeft: 5 }} resizeMode="contain" />
-                      </TouchableOpacity>
-                      <Text style={style.detailValue}>₹{new Intl.NumberFormat('en-IN').format(i.paidAmount)}</Text>
-                    </View>
-                  )
-                })}
-
-
-
-                <View style={[style.row, { paddingTop: 10 }]}>
-                  <Text style={{ fontSize: 14, fontWeight: 400 }}>Advance paid</Text>
-
-                  <Text style={{ fontSize: 16, fontWeight: 700 }}>
-                    ₹ {paymentContext?.getInvoiceDetail?.advanceInfo?.totalAdvancePaid}</Text>
-                </View>
-
-                <View style={style.row}>
-                  <TouchableOpacity onPress={() => setShowVisible(!showVisible)}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                      <Text style={{ fontSize: 14, fontWeight: 400 }}>Refundable Rent</Text>
-                      <Ionicons
-                        name={showVisible ? "chevron-up" : "chevron-down"}
-                        size={20}
-                        color="#007FFF"
-                        style={{ marginLeft: 6, padding: 2, borderRadius: 5, backgroundColor: '#EFF6FF', }}
-                      />
-                    </View>
-                  </TouchableOpacity>
-
-                  {/* <Text style={{ fontSize: 16, fontWeight: 700 }}>₹ 5000</Text> */}
-                </View>
-
-
-                {showVisible && (
-                  <>
-                    <View style={style.row}>
-                      <Text style={{ fontSize: 14, fontWeight: 300, color: '#2F2F2F' }}>
-                        Last Rent Paid(30 days)
-                      </Text>
-                      <Text style={{ fontSize: 14, fontWeight: 300, color: '#2F2F2F' }}>
-                        ₹ {new Intl.NumberFormat('en-IN').format(
-                          paymentContext?.getInvoiceDetail?.currentMonthInfo?.lastRentPaid && paymentContext?.getInvoiceDetail?.currentMonthInfo?.lastRentPaid)}
-                      </Text>
-                    </View>
-
-                    <View style={style.row}>
-                      <TouchableOpacity onPress={() => setRentAmountVisible(!rentAmountVisible)}>
-                        <View style={{ flexDirection: 'row' }}>
-                          <Text style={{ fontSize: 14, fontWeight: 300, color: '#2F2F2F' }}>
-                            Actual Stay days ({paymentContext?.getInvoiceDetail?.currentMonthInfo?.noOfDaysStayed} days)
-                          </Text>
-
-                          <Ionicons
-                            name={rentAmountVisible ? "chevron-up" : "chevron-down"}
-                            size={20}
-                            color="#007FFF"
-                            style={{ marginLeft: 6, padding: 2, borderRadius: 5, backgroundColor: '#EFF6FF', }}
-                          />
-                        </View>
-
-
-                      </TouchableOpacity>
-                      <Text style={{ fontSize: 14, fontWeight: 300, color: '#2F2F2F' }}>
-                        ₹ {new Intl.NumberFormat('en-IN').format(
-                          paymentContext?.getInvoiceDetail?.currentMonthInfo?.payableRent ? paymentContext?.getInvoiceDetail?.currentMonthInfo?.payableRent : "N/A")}
-                      </Text>
-                    </View>
-                    {rentAmountVisible && (
-                      <>
-                        <View style={{ marginBottom: 10 }}>
-                          {paymentContext?.getInvoiceDetail?.currentMonthInfo?.bedHistories.map((r, index) => {
-                            return <View key={index} style={{ paddingTop: 5, flexDirection: 'row', alignItems: 'center' }}>
-
-                              <Text style={{ fontSize: 12, fontWeight: 400, color: '#1e45e2' }}>
-                                {r?.floorName}{"  "}{r?.roomName}{"  "}{r?.bedName}</Text>
-
-                              <Text style={{ fontSize: 12, fontWeight: 400, marginLeft: 5 }}>({r?.noOfDaysStayed} days = {r?.rent})</Text>
-                            </View>
-
-                          })}
-
-
-                        </View>
-                      </>
-                    )}
-                  </>
-
-
-                  // paymentContext?.getInvoiceDetail?.currentMonthInfo.map(i => {
-                  //   return (
-                  //     <View style={style.row}>
-                  //       <Text style={{ fontSize: 14, fontWeight: 300, color: '#2F2F2F' }}>{i.list}</Text>
-                  //       <Text style={{ fontSize: 14, fontWeight: 300, color: '#2F2F2F' }}>₹ {new Intl.NumberFormat('en-IN').format(i.amount)}</Text>
-                  //     </View>
-                  //   )
-                  // })
-
-                )}
-
-                <View style={{ flexDirection: 'row', paddingTop: 10 }}>
-                  <Text style={{ fontSize: 14, fontWeight: 400 }}>Non Refundable Rent</Text>
-                  <TouchableOpacity onPress={() => setNonrefundable(!showNonrefundable)}
-                    style={{ padding: 2, backgroundColor: 'green', marginLeft: 6, borderRadius: 5, backgroundColor: '#EFF6FF', }}>
-                    <Ionicons
-                      name={showNonrefundable ? "chevron-up" : "chevron-down"}
-                      size={20}
-                      color="#007FFF"
-                    />
-                  </TouchableOpacity>
-
-                </View>
-
-                {showNonrefundable && (
-                  <>
-                    <View>
-                      {paymentContext?.getInvoiceDetail?.advanceInfo?.deductions.length > 0 && (
-                        paymentContext?.getInvoiceDetail?.advanceInfo?.deductions.map((i, index) => {
-
-                          return <View key={index}
-                            style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 8, alignItems: 'center' }}>
-                            <Text style={{ fontSize: 14, fontWeight: 400 }}>{i.name}</Text>
-
-                            <Text style={{ fontSize: 16, fontWeight: 700 }}>₹ {i.amount}</Text>
-                          </View>
-                        })
-                      )}
-
-                    </View>
-                  </>
-                )}
-
-
-
-
-
-                <View
-                  style={{
-                    borderBottomWidth: 0.4,
-                    borderBottomColor: "grey",
-                    opacity: 0.4,
-                    marginVertical: 10,
-                  }}
-                />
-
-                <View style={style.Billbottom}>
-                  <Text style={style.paiddetailLabel}>
-                    Paid Date
-                  </Text>
-                  <Text style={style.paiddetailValue}>
-                    {paymentContext?.getInvoiceDetail?.lastPaidDate ? paymentContext?.getInvoiceDetail?.lastPaidDate : "N/A"}
-                  </Text>
-                </View>
-
-                <View style={{ marginTop: 10 }}>
-                  <View style={style.Billbottom}>
-                    <Text style={style.paiddetailLabel}>Payment Mode</Text>
-                    <Text style={style.paiddetailValue}>
-                      {paymentContext?.getInvoiceDetail?.lastPaymentMode ? paymentContext?.getInvoiceDetail?.lastPaymentMode : "N/A"}</Text>
-
-                  </View>
-
-                  <View style={[style.Billbottom, { paddingTop: 10 }]}>
-                    <Text style={style.paiddetailLabel}>Reference number</Text>
-
-                    <Text style={style.paiddetailValue}>
-                      {paymentContext?.getInvoiceDetail?.lastReferenceId ? paymentContext?.getInvoiceDetail?.lastReferenceId : "N/A"}
-                    </Text>
-                    {/* {paymentContext.getInvoiceDetail.receipts.map(i => {
-                      return (
-                        <Text key={i.transactionId} style={style.paiddetailValue}>{i.referenceNumber}</Text>
-                      )
-
-                    })} */}
-                  </View>
-                </View>
-
-                {/* {---------Button--} */}
-
-                <View style={style.buttonRow}>
-                  <TouchableOpacity style={style.shareBtn} onPress={() => sharePdf(paymentContext.getInvoiceDetail.invoiceId)}>
-                    <Text style={style.shareText}>Share</Text>
-                    <Image
-                      source={ShareIcon}
-                      style={{ width: 17, height: 17, marginLeft: 8 }}
-                    />
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={style.downloadBtn}
-                    onPress={() => handleDownload(paymentContext.getInvoiceDetail.invoiceId)}
-                  // handleDownload
-                  >
-                    <Text style={style.downloadText}>Download</Text>
-                    <Image
-                      source={DownloadIcon}
-                      style={{ width: 20, height: 20, marginLeft: 8 }}
-                    />
-                  </TouchableOpacity>
-
-                </View>
-
-              </>
-            }
-          </ScrollView>
-        </Animated.View>
-      </View>
-    )}
 
     {showDownloadOption && (
       <View style={style.sheetOverlay}>
@@ -1786,15 +1284,15 @@ const style = StyleSheet.create({
     alignSelf: "center",
     marginBottom: 10,
   },
-  modalTitle: { fontSize: 20,fontFamily:'Gilroy-Semibold', color: "#000" },
+  modalTitle: { fontSize: 20, fontFamily: 'Gilroy-Semibold', color: "#000" },
   invoiceId: {
     fontSize: 13,
     color: "#0057FF",
     fontWeight: "600",
     marginBottom: 6,
-    fontFamily:'Gilroy-Semibold',
-    paddingVertical:5,backgroundColor:'#F1F4FF',paddingHorizontal:8,
-    borderRadius:10
+    fontFamily: 'Gilroy-Semibold',
+    paddingVertical: 5, backgroundColor: '#F1F4FF', paddingHorizontal: 8,
+    borderRadius: 10
   },
   amountSection: {
     marginTop: 10,
@@ -1802,8 +1300,8 @@ const style = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  label: { fontSize: 20, color: "rgba(31, 38, 51, 1)",fontFamily:'Gilroy-Semibold'},
-  totalAmount: { fontSize: 18,fontFamily:'Gilroy-Bold', color: "#000" },
+  label: { fontSize: 20, color: "rgba(31, 38, 51, 1)", fontFamily: 'Gilroy-Semibold' },
+  totalAmount: { fontSize: 18, fontFamily: 'Gilroy-Bold', color: "#000" },
   detailsSection: { marginVertical: 10 },
   row: {
     flexDirection: "row",
@@ -1811,11 +1309,11 @@ const style = StyleSheet.create({
     marginVertical: 9,
     alignItems: 'center'
   },
-  detailLabel: { fontSize: 14, color: "rgba(31, 38, 51, 1)",fontFamily:'Gilroy-Medium' },
-  detailValue: { fontSize: 16, fontFamily:'Gilroy-Semibold', color: "rgba(31, 38, 51, 1)" },
-  payBillText: { fontSize: 13, color: "#0057FF",fontFamily:'Gilroy-Semibold'},
-  paiddetailLabel: { fontSize: 14, color: "rgba(60, 60, 67, 0.6)",fontFamily:'Gilroy-Medium' },
-  paiddetailValue: { fontSize: 14, color: "black", fontFamily:'Gilroy-Semibold'},
+  detailLabel: { fontSize: 14, color: "rgba(31, 38, 51, 1)", fontFamily: 'Gilroy-Medium' },
+  detailValue: { fontSize: 16, fontFamily: 'Gilroy-Semibold', color: "rgba(31, 38, 51, 1)" },
+  payBillText: { fontSize: 13, color: "#0057FF", fontFamily: 'Gilroy-Semibold' },
+  paiddetailLabel: { fontSize: 14, color: "rgba(60, 60, 67, 0.6)", fontFamily: 'Gilroy-Medium' },
+  paiddetailValue: { fontSize: 14, color: "black", fontFamily: 'Gilroy-Semibold' },
   Billbottom: { display: 'flex', flexDirection: 'row', justifyContent: "space-between", },
   buttonRow: {
     flexDirection: "row",
@@ -1833,7 +1331,7 @@ const style = StyleSheet.create({
     marginRight: 10,
     justifyContent: 'center'
   },
-  shareText: { color: "#000",fontFamily:'Gilroy-Semibold',fontSize:16},
+  shareText: { color: "#000", fontFamily: 'Gilroy-Semibold', fontSize: 16 },
   downloadBtn: {
     flex: 1,
     backgroundColor: "#0057FF",
@@ -1881,7 +1379,7 @@ const style = StyleSheet.create({
     marginTop: 6,
     alignItems: 'center'
   },
-  statusText: { fontSize: 14,fontFamily:'Gilroy-Medium'},
+  statusText: { fontSize: 14, fontFamily: 'Gilroy-Medium' },
   hostelImage: {
     width: 50,
     height: 50,
@@ -2029,6 +1527,6 @@ const style = StyleSheet.create({
   },
 
   downloadContent: { alignItems: 'center', justifyContent: 'center', flexDirection: 'row' },
-  downloadText: { color: '#FFFFFF', fontSize: 16, fontFamily:'Gilroy-Semibold'},
+  downloadText: { color: '#FFFFFF', fontSize: 16, fontFamily: 'Gilroy-Semibold' },
 })
 export default Dashboard;

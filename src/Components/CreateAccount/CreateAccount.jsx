@@ -89,9 +89,18 @@ const CreateAccount = ({ navigation }) => {
         }
 
       }
+      else if (dat.status == 400) {
+        setShowSuccessModal(true)
+        setOtp(dat.message || "You are not belongs to any hostels")
+        setModelType('error')
+
+        setTimeout(() => {
+          setShowSuccessModal(false)
+        }, 2000);
+      }
       else if (dat.status == dat.status) {
         setShowSuccessModal(true)
-        setOtp(dat.message)
+        setOtp(dat.message || "Something Went Wrong")
         setModelType('error')
 
         setTimeout(() => {
