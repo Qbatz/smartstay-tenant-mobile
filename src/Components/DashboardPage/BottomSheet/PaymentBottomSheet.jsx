@@ -256,25 +256,39 @@ export default function PaymentBottomSheet({
                                 {/* Details */}
                                 <View style={style.detailsSection}>
                                     {(paymentContext.getInvoiceDetail?.status === "Partial Payment" ||
-                                        paymentContext.getInvoiceDetail?.status === "Paid") && (
-                                            paymentContext.getInvoiceDetail?.invoiceItems.map(i => {
+                                        paymentContext.getInvoiceDetail?.status === "Paid" || paymentContext.getInvoiceDetail?.status == "Pending") && (
+                                            paymentContext.getInvoiceDetail?.invoiceItems.map((i, index) => {
                                                 return (
-                                                    <View style={style.row}>
-                                                        <TouchableOpacity >
-                                                            <Text style={style.detailLabel}>{i.invoiceItem}</Text>
-                                                        </TouchableOpacity>
+                                                    <View style={style.row} key={index}>
+                                                        {/* <TouchableOpacity > */}
+                                                        <Text style={style.detailLabel}>{i.invoiceItem}</Text>
+                                                        {/* </TouchableOpacity> */}
                                                         <Text style={style.detailValue}>₹{new Intl.NumberFormat('en-IN').format(i.amount)}</Text>
                                                     </View>
                                                 )
                                             })
                                         )}
 
-                                         { paymentContext.getInvoiceDetail?.discountAmount !== 0  && (
-                                        <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-                                            <Text style={style.detailLabel}>Discount Amount</Text>
-                                            <Text style={style.detailValue}>{paymentContext.getInvoiceDetail?.discountAmount}</Text>
+                                    {paymentContext.getInvoiceDetail?.discountAmount !== 0 && (
+                                        <View style={{ backgroundColor: '#F8F8F8', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 10 }}>
+                                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                <Text style={style.detailLabel}>Actual Amount</Text>
+                                                <Text style={style.detailValue}> ₹ {paymentContext.getInvoiceDetail?.discountAmount}</Text>
+                                            </View>
+                                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }}>
+                                                <Text style={style.detailLabel}>Discount</Text>
+                                                <Text style={style.detailValue}> ₹ {paymentContext.getInvoiceDetail?.discountAmount}</Text>
+                                            </View>
+
+                                            <View style={{
+                                                alignSelf: "flex-end", marginTop: 10, backgroundColor: '#00A63E', paddingHorizontal: 10,
+                                                paddingVertical: 5, borderRadius: 12
+                                            }}>
+                                                <Text style={{ fontSize: 13, fontFamily: 'Gilroy-Medium', color: '#FFFFFF' }}>
+                                                    Discount Applied</Text>
+                                            </View>
                                         </View>
-                                       )}
+                                    )}
                                     {/* <View style={style.row}>
                                             <Text style={style.detailLabel}>Actual Rent</Text>
                                             <Text style={style.detailValue}>₹{ }</Text>
@@ -284,10 +298,11 @@ export default function PaymentBottomSheet({
                                             <Text style={style.detailLabel}>Taxes GST 10%</Text>
                                             <Text style={style.detailValue}>₹{paymentContext.getInvoiceDetail.gst}</Text>
                                           </View> */}
-
-                                    {(paymentContext.getInvoiceDetail?.status === "Partial Payment" ||
-                                        paymentContext.getInvoiceDetail?.status === "Paid") && (
+                                    {paymentContext.getInvoiceDetail?.receipts.length > 0  && (
+                                        (paymentContext.getInvoiceDetail?.status === "Partial Payment" ||
+                                            paymentContext.getInvoiceDetail?.status === "Paid") && (
                                             <>
+
                                                 <Text style={[style.detailLabel, { marginTop: 10 }]}>Paid Amount</Text>
                                                 {paymentContext.getInvoiceDetail?.receipts.map(i => {
                                                     return (
@@ -305,9 +320,10 @@ export default function PaymentBottomSheet({
                                                 })}
 
                                             </>
-                                        )}
+                                        )
+                                    )}
 
-                                      
+
 
                                     {paymentContext.getInvoiceDetail.status === "Partial Payment" && (
                                         <>
@@ -473,7 +489,7 @@ export default function PaymentBottomSheet({
                                         flexDirection: "row", backgroundColor: '#F1F4FF', paddingVertical: 3, paddingHorizontal: 5,
                                         borderRadius: 5, alignItems: 'center'
                                     }}>
-                                        <Text style={{ fontSize: 14, color: "#0057FF", fontFamily:'Gilroy-Semibold'}}>{paymentContext?.getInvoiceDetail?.invoiceNumber}</Text>
+                                        <Text style={{ fontSize: 14, color: "#0057FF", fontFamily: 'Gilroy-Semibold' }}>{paymentContext?.getInvoiceDetail?.invoiceNumber}</Text>
 
                                         {/* <Image
                                               source={ViewIcon}
@@ -495,7 +511,7 @@ export default function PaymentBottomSheet({
                                 <View style={style.row}>
                                     <Text style={style.modalTitle}>Total Refund</Text>
 
-                                    <Text style={{ fontSize: 18,fontFamily:'Gilroy-Bold' }}>₹ {paymentContext?.getInvoiceDetail?.totalAmount}</Text>
+                                    <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Bold' }}>₹ {paymentContext?.getInvoiceDetail?.totalAmount}</Text>
                                 </View>
 
                                 <View style={{ alignItems: 'flex-end' }}>
@@ -505,7 +521,7 @@ export default function PaymentBottomSheet({
                                     {/* </View> */}
 
 
-                                    <Text style={{ fontSize: 13,fontFamily:'Gilroy-Semibold', color: '#038C3D' }}>{paymentContext?.getInvoiceDetail?.status}</Text>
+                                    <Text style={{ fontSize: 13, fontFamily: 'Gilroy-Semibold', color: '#038C3D' }}>{paymentContext?.getInvoiceDetail?.status}</Text>
                                 </View>
 
                                 {paymentContext.getInvoiceDetail?.receipts.map(i => {
@@ -514,7 +530,7 @@ export default function PaymentBottomSheet({
                                             <TouchableOpacity onPress={() =>
                                                 handlePaymentReceipt(i.transactionId, paymentContext?.getInvoiceDetail.invoiceType, paymentContext.getInvoiceDetail?.status)}
                                                 style={{ flexDirection: 'row' }}>
-                                                <Text style={{ fontSize: 13,fontFamily:'Gilroy-Semibold',color: "#1e45e2" }}>{i.transactionNumber}</Text>
+                                                <Text style={{ fontSize: 13, fontFamily: 'Gilroy-Semibold', color: "#1e45e2" }}>{i.transactionNumber}</Text>
                                                 <Image source={ReceiptPic} style={{ width: 14, height: 14, marginLeft: 5 }} resizeMode="contain" />
                                             </TouchableOpacity>
                                             <Text style={style.detailValue}>₹{new Intl.NumberFormat('en-IN').format(i.paidAmount)}</Text>
@@ -525,16 +541,16 @@ export default function PaymentBottomSheet({
 
 
                                 <View style={[style.row, { paddingTop: 10 }]}>
-                                    <Text style={{ fontSize: 16,fontFamily:'Gilroy-Medium'}}>Advance paid</Text>
+                                    <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium' }}>Advance paid</Text>
 
-                                    <Text style={{ fontSize: 18,fontFamily:'Gilroy-Semibold'}}>
+                                    <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold' }}>
                                         ₹ {paymentContext?.getInvoiceDetail?.advanceInfo?.totalAdvancePaid}</Text>
                                 </View>
 
                                 <View style={style.row}>
                                     <TouchableOpacity onPress={() => setShowVisible(!showVisible)}>
                                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                            <Text style={{ fontSize: 16,fontFamily:'Gilroy-Medium'}}>Refundable Rent</Text>
+                                            <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium' }}>Refundable Rent</Text>
                                             <Ionicons
                                                 name={showVisible ? "chevron-up" : "chevron-down"}
                                                 size={20}
@@ -551,10 +567,10 @@ export default function PaymentBottomSheet({
                                 {showVisible && (
                                     <>
                                         <View style={style.row}>
-                                            <Text style={{ fontSize: 14,fontFamily:'Gilroy-Regular', color: '#2F2F2F' }}>
+                                            <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Regular', color: '#2F2F2F' }}>
                                                 Last Rent Paid(30 days)
                                             </Text>
-                                            <Text style={{ fontSize: 14,fontFamily:'Gilroy-Regular', color: '#2F2F2F' }}>
+                                            <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Regular', color: '#2F2F2F' }}>
                                                 ₹ {new Intl.NumberFormat('en-IN').format(
                                                     paymentContext?.getInvoiceDetail?.currentMonthInfo?.lastRentPaid && paymentContext?.getInvoiceDetail?.currentMonthInfo?.lastRentPaid)}
                                             </Text>
@@ -563,7 +579,7 @@ export default function PaymentBottomSheet({
                                         <View style={style.row}>
                                             <TouchableOpacity onPress={() => setRentAmountVisible(!rentAmountVisible)}>
                                                 <View style={{ flexDirection: 'row' }}>
-                                                    <Text style={{ fontSize: 14,fontFamily:'Gilroy-Regular', color: '#2F2F2F' }}>
+                                                    <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Regular', color: '#2F2F2F' }}>
                                                         Actual Stay days ({paymentContext?.getInvoiceDetail?.currentMonthInfo?.noOfDaysStayed} days)
                                                     </Text>
 
@@ -577,7 +593,7 @@ export default function PaymentBottomSheet({
 
 
                                             </TouchableOpacity>
-                                            <Text style={{ fontSize: 14,fontFamily:'Gilroy-Regular', color: '#2F2F2F' }}>
+                                            <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Regular', color: '#2F2F2F' }}>
                                                 ₹ {new Intl.NumberFormat('en-IN').format(
                                                     paymentContext?.getInvoiceDetail?.currentMonthInfo?.payableRent ? paymentContext?.getInvoiceDetail?.currentMonthInfo?.payableRent : "N/A")}
                                             </Text>
@@ -588,10 +604,10 @@ export default function PaymentBottomSheet({
                                                     {paymentContext?.getInvoiceDetail?.currentMonthInfo?.bedHistories.map((r, index) => {
                                                         return <View key={index} style={{ paddingTop: 5, flexDirection: 'row', alignItems: 'center' }}>
 
-                                                            <Text style={{ fontSize: 12,fontFamily:'Gilroy-Regular', color: '#1e45e2' }}>
+                                                            <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#1e45e2' }}>
                                                                 {r?.floorName}{"  "}{r?.roomName}{"  "}{r?.bedName}</Text>
 
-                                                            <Text style={{ fontSize: 12,fontFamily:'Gilroy-Regular', marginLeft: 5 }}>({r?.noOfDaysStayed} days = {r?.rent})</Text>
+                                                            <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', marginLeft: 5 }}>({r?.noOfDaysStayed} days = {r?.rent})</Text>
                                                         </View>
 
                                                     })}
@@ -615,7 +631,7 @@ export default function PaymentBottomSheet({
                                 )}
 
                                 <View style={{ flexDirection: 'row', paddingTop: 10 }}>
-                                    <Text style={{ fontSize: 16,fontFamily:'Gilroy-Medium'}}>Non Refundable Rent</Text>
+                                    <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium' }}>Non Refundable Rent</Text>
                                     <TouchableOpacity onPress={() => setNonrefundable(!showNonrefundable)}
                                         style={{ padding: 2, backgroundColor: 'green', marginLeft: 6, borderRadius: 5, backgroundColor: '#EFF6FF', }}>
                                         <Ionicons
@@ -635,9 +651,9 @@ export default function PaymentBottomSheet({
 
                                                     return <View key={index}
                                                         style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 8, alignItems: 'center' }}>
-                                                        <Text style={{ fontSize: 14,fontFamily:'Gilroy-Regular'}}>{i.name}</Text>
+                                                        <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Regular' }}>{i.name}</Text>
 
-                                                        <Text style={{ fontSize: 14,fontFamily:'Gilroy-Regular' }}>₹ {i.amount}</Text>
+                                                        <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Regular' }}>₹ {i.amount}</Text>
                                                     </View>
                                                 })
                                             )}
@@ -774,6 +790,7 @@ const style = StyleSheet.create({
     },
     label: { fontSize: 20, color: "rgba(31, 38, 51, 1)", fontFamily: 'Gilroy-Semibold' },
     totalAmount: { fontSize: 18, fontFamily: 'Gilroy-Bold', color: "#000" },
+    statusBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, marginTop: 6 },
     detailsSection: { marginVertical: 10 },
     row: {
         flexDirection: "row",
