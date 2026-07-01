@@ -47,6 +47,12 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="com.qbatz.smartstay.activity.KYCVerification"
+            android:launchMode="singleTask"
+            android:taskAffinity=""
+            android:excludeFromRecents="true">
+        </activity>
+
         <service
             android:name=".FireBaseServices"
             android:exported="false">

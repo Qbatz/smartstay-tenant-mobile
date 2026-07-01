@@ -12,10 +12,11 @@ import android.os.Build;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.app.TaskStackBuilder;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-import com.qbatz.smartstay.tenant.R;
+import com.qbatz.smartstay.activity.KYCVerification;
 
 import org.jspecify.annotations.NonNull;
 
@@ -185,6 +186,17 @@ public class FireBaseServices extends FirebaseMessagingService {
                     NotificationManagerCompat.from(FireBaseServices.this).notify(1000, builder.build());
                 }
                 if (type != null && type.equalsIgnoreCase("KYC_REQUESTS")) {
+
+                    Intent resultIntent = new Intent(this, KYCVerification.class);
+                    resultIntent.putExtra("mobile", data.get("mobile"));
+                    resultIntent.putExtra("request_id", data.get("documentId"));
+                    resultIntent.putExtra("token", data.get("token_id"));
+                    TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+                    stackBuilder.addNextIntentWithParentStack(resultIntent);
+                    PendingIntent resultPendingIntent =
+                            stackBuilder.getPendingIntent(0,
+                                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
                     String title = data.get("title");
                     String description = data.get("description");
                     NotificationCompat.Builder builder = new NotificationCompat.Builder(FireBaseServices.this, "My_notification")
@@ -193,7 +205,7 @@ public class FireBaseServices extends FirebaseMessagingService {
                             .setContentText(description)
                             .setStyle(new NotificationCompat.BigTextStyle()
                                     .bigText(description))
-                            .setContentIntent(pendingIntent)
+                            .setContentIntent(resultPendingIntent)
                             .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

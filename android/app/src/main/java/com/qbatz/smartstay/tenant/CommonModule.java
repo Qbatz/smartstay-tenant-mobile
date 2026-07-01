@@ -128,11 +128,29 @@ public class CommonModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void storeCredentials(String customerId, String token) {
+    public void storeCredentials(String token) {
+        SharedPreferences mpref = context.getSharedPreferences("user_credentials", MODE_PRIVATE);
+        SharedPreferences.Editor edt = mpref.edit();
+        edt.putString("token", token);
+
+        edt.apply();
+    }
+
+    @ReactMethod
+    public void updateCustomerId(String customerId) {
         SharedPreferences mpref = context.getSharedPreferences("user_credentials", MODE_PRIVATE);
         SharedPreferences.Editor edt = mpref.edit();
         edt.putString("customerId", customerId);
-        edt.putString("token", token);
+
+        edt.apply();
+    }
+
+    @ReactMethod
+    public void logout(String customerId) {
+        SharedPreferences mpref = context.getSharedPreferences("user_credentials", MODE_PRIVATE);
+        SharedPreferences.Editor edt = mpref.edit();
+        edt.remove("customerId");
+        edt.remove("token");
 
         edt.apply();
     }
