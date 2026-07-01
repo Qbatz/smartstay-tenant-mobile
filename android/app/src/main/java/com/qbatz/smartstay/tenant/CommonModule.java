@@ -1,7 +1,10 @@
 package com.qbatz.smartstay.tenant;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -12,6 +15,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.content.FileProvider;
+import androidx.core.content.SharedPreferencesKt;
 
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -122,7 +126,34 @@ public class CommonModule extends ReactContextBaseJavaModule {
 
         return file;
     }
-     ;
+
+    @ReactMethod
+    public void storeCredentials(String token) {
+        SharedPreferences mpref = context.getSharedPreferences("user_credentials", MODE_PRIVATE);
+        SharedPreferences.Editor edt = mpref.edit();
+        edt.putString("token", token);
+
+        edt.apply();
+    }
+
+    @ReactMethod
+    public void updateCustomerId(String customerId) {
+        SharedPreferences mpref = context.getSharedPreferences("user_credentials", MODE_PRIVATE);
+        SharedPreferences.Editor edt = mpref.edit();
+        edt.putString("customerId", customerId);
+
+        edt.apply();
+    }
+
+    @ReactMethod
+    public void logout(String customerId) {
+        SharedPreferences mpref = context.getSharedPreferences("user_credentials", MODE_PRIVATE);
+        SharedPreferences.Editor edt = mpref.edit();
+        edt.remove("customerId");
+        edt.remove("token");
+
+        edt.apply();
+    }
 
 
 }
