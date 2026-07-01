@@ -28,7 +28,7 @@ const HostelList = (route) => {
   const [showVerifyKyc,setShowVerifyKyc]=useState(false)
   const navigation = useNavigation()
   const [fcmToken, setFcmToken] = useState();
-  const { NotificationModule } = NativeModules;
+  const { NotificationModule,CommonModule } = NativeModules;
 
   console.log(context?.getHostelList[0].hostelId)
     console.log(context?.getHostelList)
@@ -76,12 +76,13 @@ const HostelList = (route) => {
     console.log(data)
 
     getToken(data).then(r => {
+      console.log("token",r)
       if (r?.status == 200) {
         fetchFCMToken(r.data);
         loginContext.updateToken(r.data)
         context.updateHostelDetail(selectedHostel)
         navigation.navigate("Dashboard");
-      
+        await CommonModule.storeCredentials(r.data)
 
 
       }

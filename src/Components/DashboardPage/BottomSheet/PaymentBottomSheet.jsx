@@ -50,6 +50,8 @@ export default function PaymentBottomSheet({
     const { CommonModule } = NativeModules;
     const context = useContext(UsersContext)
     const loginContext = useContext(LoginContexts)
+    const [showRedeemTo,setShowRedeemTo]=useState(false);
+    const [showRedeemFrom,setShowRedeemFrom]=useState(true)
 
     // useEffect(() => {
     //     if (visible && selectedComplaintSend) {
@@ -94,6 +96,10 @@ export default function PaymentBottomSheet({
             },
         })
     ).current;
+
+
+    const showRedeemedTo = paymentContext?.getInvoiceDetail?.showRedeemedTo;
+    const showRedeemedFrom = paymentContext?.getInvoiceDetail?.showRedeemedFrom;
 
     const handleDownload = (invoiceId) => {
         console.log(invoiceId)
@@ -298,7 +304,7 @@ export default function PaymentBottomSheet({
                                             <Text style={style.detailLabel}>Taxes GST 10%</Text>
                                             <Text style={style.detailValue}>₹{paymentContext.getInvoiceDetail.gst}</Text>
                                           </View> */}
-                                    {paymentContext.getInvoiceDetail?.receipts.length > 0  && (
+                                    {paymentContext.getInvoiceDetail?.receipts.length > 0 && (
                                         (paymentContext.getInvoiceDetail?.status === "Partial Payment" ||
                                             paymentContext.getInvoiceDetail?.status === "Paid") && (
                                             <>
@@ -338,6 +344,74 @@ export default function PaymentBottomSheet({
                                     )
                                     }
                                 </View>
+
+                                {showRedeemedTo && paymentContext.getInvoiceDetail.redeemedTo.length>0 && (
+                                    <>
+                                        <TouchableOpacity onPress={()=>setShowRedeemTo(!showRedeemTo)}
+                                         style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
+                                            <Text style={style.appldTo}>Applied to</Text>
+                                            <Ionicons
+                                                name={showRedeemTo ? "chevron-up" : "chevron-down"}
+                                                size={20}
+                                                style={{ marginRight:5}}
+                                            />
+                                        </TouchableOpacity>
+
+
+                                        {showRedeemTo && (
+                                         paymentContext?.getInvoiceDetail?.redeemedTo.map((i,index)=>(
+                                            <View style={style.shwRedeem} key={index}>
+                                                <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
+                                                    <Text style={style.redeemIncNo}>{i?.invoiceNumber}</Text>
+                                                    <Text style={style.redeemAmntTxt}>₹ {i?.redemptionAmount}</Text>
+                                                </View>
+
+                                                <View style={{marginVertical:9,borderWidth:1,borderColor:'#F2F2F2'}}/>
+
+                                                <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
+                                                    <Text style={ style.redeemDateTxt}>Date</Text>
+                                                    <Text style={style.redeemDate}>{i?.redeemedAtDate}</Text>
+                                                </View>
+                                            </View>
+                                         ))
+                                        )}
+                                    </>
+
+                                )}
+
+                                {showRedeemedFrom && paymentContext.getInvoiceDetail.redeemedFrom.length>0 && (
+                                    <>
+                                        <TouchableOpacity onPress={()=>setShowRedeemFrom(!showRedeemFrom)}
+                                         style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between',marginTop:10}}>
+                                            <Text style={style.appldTo}>Adjusted From</Text>
+                                            <Ionicons
+                                                name={showRedeemFrom ? "chevron-up" : "chevron-down"}
+                                                size={20}
+                                                style={{ marginRight:5}}
+                                            />
+                                        </TouchableOpacity>
+
+
+                                        {showRedeemFrom && (
+                                         paymentContext?.getInvoiceDetail?.redeemedFrom.map((i,index)=>(
+                                            <View style={style.shwRedeem} key={index}>
+                                                <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
+                                                    <Text style={style.redeemIncNo}>{i?.invoiceNumber}</Text>
+                                                    <Text style={style.redeemAmntTxt}>₹ {i?.redemptionAmount}</Text>
+                                                </View>
+
+                                                <View style={{marginVertical:9,borderWidth:1,borderColor:'#F2F2F2'}}/>
+
+                                                <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
+                                                    <Text style={ style.redeemDateTxt}>Date</Text>
+                                                    <Text style={style.redeemDate}>{i?.redeemedAtDate}</Text>
+                                                </View>
+                                            </View>
+                                         ))
+                                        )}
+                                    </>
+
+                                )}
 
                                 <View
                                     style={{
@@ -832,4 +906,13 @@ const style = StyleSheet.create({
         justifyContent: 'center'
     },
     downloadText: { color: '#FFFFFF', fontSize: 16, fontFamily: 'Gilroy-Semibold' },
+    appldTo:{fontSize:16,fontFamily:'Gilroy-Semibold'},
+    shwRedeem:{
+        borderWidth:1,borderColor:"#E7E7E7",borderRadius:8,marginTop:8,
+        paddingVertical:8,paddingHorizontal:14
+    },
+    redeemIncNo:{fontSize:15,fontFamily:'Gilroy-Semibold'},
+    redeemAmntTxt:{fontSize:18,fontFamily:'Gilroy-Semibold'},
+    redeemDateTxt:{fontSize:14,fontFamily:'Gilroy-Regular',color:'#3C3C4399'},
+    redeemDate:{fontSize:14,fontFamily:'Gilroy-Semibold'}
 });
