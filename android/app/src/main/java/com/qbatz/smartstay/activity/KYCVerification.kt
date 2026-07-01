@@ -1,10 +1,12 @@
 package com.qbatz.smartstay.activity
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import com.qbatz.smartstay.networking.NetworkService
 import `in`.digio.sdk.gateway.enums.DigioEnvironment
 import `in`.digio.sdk.gateway.enums.KycMode
 import `in`.digio.sdk.gateway.event.model.GatewayEvent
@@ -13,35 +15,70 @@ import `in`.digio.sdk.gateway.model.DigioTheme
 import `in`.digio.sdk.kyc.DigioWorkflowSession
 import `in`.digio.sdk.kyc.workflow.WorkflowResponseListener
 import `in`.digio.sdk.kyc.workflow.model.WorkflowResponse
+import retrofit2.Call
+
+import retrofit2.Callback
+import retrofit2.Response
 
 
 class KYCVerification: ComponentActivity(), WorkflowResponseListener {
 
 
     private lateinit var digioWorkflowSession: DigioWorkflowSession
-
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val bundle = intent.extras
-        var documetId: String = ""
-        var identifier: String = ""
-        var tokenId: String = ""
+        var documetId: String = "" //KID260701214403703NWY1JPWP3TFJN8
+        var identifier: String = "" //7022736579
+        var tokenId: String = "" //GWT260701214403731JEEJBX5EOR9GXS
+
+        var acessToken: String = ""
+        var customerId: String = ""
+
+        sharedPreferences = getSharedPreferences("user_credentials", MODE_PRIVATE)
+        sharedPreferences?.let { it ->
+            acessToken = it.getString("token", "").toString()
+            customerId = it.getString("customerId", "").toString()
+        }
 
         bundle?.let { it ->
-            documetId = it.getString("documentId", "")
+            documetId = it.getString("request_id", "")
             identifier = it.getString("mobile", "")
             tokenId = it.getString("token", "")
-
         }
 
-        try {
-            initDigio()
-            startDigioKyc(documetId, identifier, tokenId)
-        } catch (e: Exception) {
-            Log.e("KycApp", "Error initializing Digio", e)
-        }
+
+        initDigio()
+        NetworkService.getNetworkConfig(acessToken)
+            .getInitializeKYC()
+            .enqueue(object: Callback<String>{
+            override fun onResponse(
+                p0: Call<String?>,
+                p1: Response<String?>
+            ) {
+                if (p1.isSuccessful) {
+                    try {
+                        startDigioKyc(documetId, identifier, tokenId)
+                    } catch (e: Exception) {
+                        Log.e("KycApp", "Error initializing Digio", e)
+                    }
+                }
+                else {
+                    val errorMessage = p1.errorBody()?.string() ?: "Unknown error"
+                    Toast.makeText(application, errorMessage, Toast.LENGTH_LONG).show()
+                }
+            }
+
+            override fun onFailure(p0: Call<String?>, p1: Throwable) {
+                Log.e("Retrofit", "Failure", p1)
+
+                Toast.makeText(application, "Error available", Toast.LENGTH_LONG).show()
+            }
+        })
+
 
         setContent {
             
@@ -55,6 +92,7 @@ class KYCVerification: ComponentActivity(), WorkflowResponseListener {
     }
 
     override fun onWorkflowSuccess(workflowResponse: WorkflowResponse) {
+        Toast.makeText(application, "Workflow is success", Toast.LENGTH_LONG).show()
     }
 
     private fun initDigio() {
@@ -78,18 +116,12 @@ class KYCVerification: ComponentActivity(), WorkflowResponseListener {
         try {
             // Set KycMode to WORKFLOW as we are using "DigioWorkflowSession"
             digioConfig.kycMode = KycMode.WORKFLOW
-            Log.d("KycApp", "Configured KycMode: WORKFLOW")
-
-            // We are NOT setting ServiceMode locally. Letting the Workflow ID drive the flow.
-            // digioConfig.serviceMode = DigioServiceMode.FACE
 
         } catch (e: Exception) {
-            Log.e("KycApp", "Failed to set modes", e)
         }
 
         try {
             digioWorkflowSession.init(this, digioConfig)
-            Log.d("KycApp", "DigioWorkflowSession initialized successfully")
         } catch (e: Exception) {
             e.printStackTrace()
             Toast.makeText(this, "Failed to init Digio: ${e.message}", Toast.LENGTH_LONG).show()
@@ -99,12 +131,10 @@ class KYCVerification: ComponentActivity(), WorkflowResponseListener {
     private fun startDigioKyc(documentId: String, identifier: String, tokenId: String?) {
         try {
             val document = if (documentId.startsWith("KID") || documentId.startsWith("RID")) documentId else "KID$documentId"
-            Toast.makeText(this, "Requesting: $document", Toast.LENGTH_LONG).show()
-            digioWorkflowSession.start("KID251219000010890V6IK9DR38IR18D", identifier, tokenId)
+
+            digioWorkflowSession.start(documentId, identifier, tokenId)
         } catch (e: Exception) {
-            System.out.println("KYCC Failed")
-            e.printStackTrace()
-            Toast.makeText(this, "Start Failed: ${e.message}", Toast.LENGTH_LONG).show()
+
 //            viewModel.onKycFailure(-1, "Exception starting SDK: ${e.message}", null)
         }
     }

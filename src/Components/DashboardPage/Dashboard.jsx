@@ -265,7 +265,7 @@ function Dashboard(props) {
     customerDetails(loginContext.getToken).then(r => {
       console.log("haha", r.data)
       context.updateCustomer(r.data)
-      await CommonModule.updateCustomerId(r.data.customerId)
+      CommonModule.updateCustomerId(r.data.customerId)
     }).catch(error => {
       console.log(error)
     })
