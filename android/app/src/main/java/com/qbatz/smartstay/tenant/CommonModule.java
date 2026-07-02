@@ -17,6 +17,8 @@ import androidx.annotation.RequiresApi;
 import androidx.core.content.FileProvider;
 import androidx.core.content.SharedPreferencesKt;
 
+import com.qbatz.smartstay.activity.KYCVerification;
+
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -155,5 +157,13 @@ public class CommonModule extends ReactContextBaseJavaModule {
         edt.apply();
     }
 
+    @ReactMethod
+    public void verifyKyc(String mobile, String documentId, String token) {
+        Intent intent = new Intent(context, KYCVerification.class);
+        intent.putExtra("mobile", mobile);
+        intent.putExtra("request_id", documentId);
+        intent.putExtra("token", token);
+        context.startActivity(intent);
+    }
 
 }

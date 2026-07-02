@@ -2,6 +2,7 @@ package com.qbatz.smartstay.activity
 
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -16,9 +17,11 @@ import `in`.digio.sdk.kyc.DigioWorkflowSession
 import `in`.digio.sdk.kyc.workflow.WorkflowResponseListener
 import `in`.digio.sdk.kyc.workflow.model.WorkflowResponse
 import retrofit2.Call
+import com.qbatz.smartstay.tenant.MainActivity
 
 import retrofit2.Callback
 import retrofit2.Response
+import kotlin.jvm.java
 
 
 class KYCVerification: ComponentActivity(), WorkflowResponseListener {
@@ -26,21 +29,22 @@ class KYCVerification: ComponentActivity(), WorkflowResponseListener {
 
     private lateinit var digioWorkflowSession: DigioWorkflowSession
     private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var accessToken: String
+    private lateinit var customerId: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
 
         val bundle = intent.extras
         var documetId: String = "" //KID260701214403703NWY1JPWP3TFJN8
         var identifier: String = "" //7022736579
         var tokenId: String = "" //GWT260701214403731JEEJBX5EOR9GXS
 
-        var acessToken: String = ""
-        var customerId: String = ""
 
         sharedPreferences = getSharedPreferences("user_credentials", MODE_PRIVATE)
         sharedPreferences?.let { it ->
-            acessToken = it.getString("token", "").toString()
+            accessToken = it.getString("token", "").toString()
             customerId = it.getString("customerId", "").toString()
         }
 
@@ -52,7 +56,7 @@ class KYCVerification: ComponentActivity(), WorkflowResponseListener {
 
 
         initDigio()
-        NetworkService.getNetworkConfig(acessToken)
+        NetworkService.getNetworkConfig(accessToken)
             .getInitializeKYC()
             .enqueue(object: Callback<String>{
             override fun onResponse(
@@ -75,7 +79,7 @@ class KYCVerification: ComponentActivity(), WorkflowResponseListener {
             override fun onFailure(p0: Call<String?>, p1: Throwable) {
                 Log.e("Retrofit", "Failure", p1)
 
-                Toast.makeText(application, "Error available", Toast.LENGTH_LONG).show()
+                Toast.makeText(application, "Something went wrong. Please try again.", Toast.LENGTH_LONG).show()
             }
         })
 
@@ -89,10 +93,29 @@ class KYCVerification: ComponentActivity(), WorkflowResponseListener {
     }
 
     override fun onWorkflowFailure(workflowResponse: WorkflowResponse) {
+        Toast.makeText(application, "Something went wrong. Please try again.", Toast.LENGTH_LONG).show()
     }
 
     override fun onWorkflowSuccess(workflowResponse: WorkflowResponse) {
-        Toast.makeText(application, "Workflow is success", Toast.LENGTH_LONG).show()
+        Toast.makeText(application, "KYC is completed", Toast.LENGTH_LONG).show()
+        NetworkService.getNetworkConfig(accessToken)
+            .updateStatus()
+            .enqueue(object: Callback<String> {
+                override fun onResponse(
+                    p0: Call<String?>,
+                    p1: Response<String?>
+                ) {
+                    if (p1.isSuccessful) {
+                        val intent = Intent(application, MainActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
+                    }
+                }
+
+                override fun onFailure(p0: Call<String?>, p1: Throwable) {
+                    Toast.makeText(application, "Something went wrong. Please try again.", Toast.LENGTH_LONG).show()
+                }
+            })
     }
 
     private fun initDigio() {
