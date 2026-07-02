@@ -93,6 +93,7 @@ class KYCVerification: ComponentActivity(), WorkflowResponseListener {
     }
 
     override fun onWorkflowFailure(workflowResponse: WorkflowResponse) {
+        Toast.makeText(application, "Something went wrong. Please try again.", Toast.LENGTH_LONG).show()
     }
 
     override fun onWorkflowSuccess(workflowResponse: WorkflowResponse) {
@@ -106,12 +107,13 @@ class KYCVerification: ComponentActivity(), WorkflowResponseListener {
                 ) {
                     if (p1.isSuccessful) {
                         val intent = Intent(application, MainActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         startActivity(intent)
                     }
                 }
 
                 override fun onFailure(p0: Call<String?>, p1: Throwable) {
-
+                    Toast.makeText(application, "Something went wrong. Please try again.", Toast.LENGTH_LONG).show()
                 }
             })
     }
