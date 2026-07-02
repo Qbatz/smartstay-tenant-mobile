@@ -82,7 +82,7 @@ const HostelList = (route) => {
         loginContext.updateToken(r.data)
         context.updateHostelDetail(selectedHostel)
         navigation.navigate("Dashboard");
-        await CommonModule.storeCredentials(r.data)
+        CommonModule.storeCredentials(r.data)
 
 
       }

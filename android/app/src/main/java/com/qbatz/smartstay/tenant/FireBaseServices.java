@@ -189,7 +189,7 @@ public class FireBaseServices extends FirebaseMessagingService {
 
                     Intent resultIntent = new Intent(this, KYCVerification.class);
                     resultIntent.putExtra("mobile", data.get("mobile"));
-                    resultIntent.putExtra("request_id", data.get("documentId"));
+                    resultIntent.putExtra("request_id", data.get("request_id"));
                     resultIntent.putExtra("token", data.get("token_id"));
                     TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
                     stackBuilder.addNextIntentWithParentStack(resultIntent);
