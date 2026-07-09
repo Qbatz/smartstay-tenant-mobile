@@ -1,5 +1,5 @@
-import React, { useContext, useState } from "react";
-import { View, Text, StyleSheet, Image, TextInput, ScrollView, TouchableOpacity } from "react-native";
+import React, { useContext, useEffect, useState } from "react";
+import { View, Text, StyleSheet, Image, TextInput, ScrollView, TouchableOpacity, FlatList } from "react-native";
 import LeftArrow from "../../assets/Images/LeftArrow.png"
 import { useNavigation } from "@react-navigation/native";
 import { customerDetails, editProfile } from "../../Action/CustomerAction";
@@ -10,6 +10,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import EditSmallIcon from "../../assets/Images/editSmallIcon.png"
 import AppLoader from "../ToastFile/LoaderPage";
 import SuccessModal from "../ToastFile/TostFilePage";
+import ErrorMessage from "../ToastFile/ErrorMessage";
 
 
 
@@ -33,23 +34,87 @@ const BackgroundDetails = (route) => {
     const [toastMessage, setToastMessage] = useState()
     const [modelType, setModelType] = useState();
     const [selectedRelationType, setSelectedRelationType] = useState(route.route?.params?.customer?.additionalContacts[0]?.relationship || "");
+    const [selectedRelation, setSelectedRelation] = useState("")
     const [selectedEmployment, setSelectedEmployment] = useState(0);
     const [isFocus, setIsFocus] = useState(false);
-    const [contactId, setContactId]=useState(route.route?.params?.customer?.additionalContacts[0]?.contactId)
+    const [contactId, setContactId] = useState(route.route?.params?.customer?.additionalContacts[0]?.contactId)
+    const [errorMsg, setErrorMsg] = useState({})
+    const itemsBox = {
+        guardianName: "",
+        guardianRelation: "",
+        guardianOccupation: "",
+        guardianMobile: "",
+    }
+    const [items, setItems] = useState([itemsBox])
+    console.log(items)
     console.log(selectedRelationType)
+    console.log(route.route?.params?.customer?.additionalContacts[0]?.relationship)
 
     const relationshipList = [{ id: 0, relationType: "Father" }, { id: 1, relationType: "Mother" }, { id: 2, relationType: "Others" }]
 
     const employmentTypes = [{ id: 0, employmentType: 'Self employment' }, { id: 1, employmentType: 'Private Job' }, { id: 2, employmentType: 'Public Job' }]
 
+    console.log(errorMsg)
+    useEffect(() => {
+        const relation =
+            route.route?.params?.customer?.additionalContacts[0]?.relationship;
+
+
+        const selected = relationshipList.find(
+            item => item.relationType === relation
+        );
+
+        if (selected) {
+            setSelectedRelationType(selected.id);
+        }
+    }, []);
+
+    const handleChange=(index, key, value)=>{
+        console.log(index,key,value)
+        const updated=[...items];
+        console.log(updated)
+
+        updated[index][key]= value;
+        setItems(updated);
+    }
+
+    const validateForm = () => {
+
+        let newErrors = {};
+
+        if (!guardianFullName && !guardianFullName.trim()) {
+            newErrors.fullName = "Please Enter name"
+        }
+
+        if (!selectedRelationType) {
+            newErrors.relationType = "Please Select Relation"
+        }
+
+        if (!occupation && !occupation.trim()) {
+            newErrors.occupation = "Please Select Relation"
+        }
+
+        if (!guardianMobileNo && !guardianMobileNo.trim()) {
+            newErrors.guardianNumber = "Please Enter Number"
+        }
+
+
+
+        setErrorMsg(newErrors)
+        return;
+    }
     const handleEdit = () => {
+
+        if (!validateForm()) return;
+
+
 
         const payload = {
             additionalContacts: [
                 {
                     contactId: contactId,
                     name: guardianFullName,
-                    relationship: selectedRelationType,
+                    relationship: selectedRelation,
                     occupation: occupation,
                     mobile: guardianMobileNo,
                 }
@@ -97,7 +162,7 @@ const BackgroundDetails = (route) => {
 
 
     return <View style={{ backgroundColor: '#ffffff', flex: 1 }}>
-         <AppLoader visible={loading} />
+        <AppLoader visible={loading} />
         <SuccessModal
             visible={showSuccessModal}
             onClose={() => setShowSuccessModal(false)}
@@ -121,59 +186,73 @@ const BackgroundDetails = (route) => {
         </View>
         <ScrollView showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
+            nestedScrollEnabled
             contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 80 }}>
 
-            <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold', marginTop: 15 }}>Parent/Guardian Details</Text>
 
-            <View style={[styles.fieldContainer, { marginTop: 15 }]}>
-                <Text style={styles.label}>Guardian Full Name</Text>
+            <FlatList nestedScrollEnabled
+                data={items}
+                renderItem={({item, index}) => {
+{console.log(index)}
+                    return (
+                  
+                    <View style={{borderWidth:1,borderRadius:10,padding:10}} key={index}>
+                        <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold', marginTop: 15 }}>Parent/Guardian Details</Text>
+  
+                        <View style={[styles.fieldContainer, { marginTop: 15 }]}>
+                            <Text style={styles.label}>Guardian Full Name</Text>
 
-                <TextInput
-                    value={guardianFullName}
-                    placeholder="Enter fullName"
-                    style={styles.input}
-                    onChangeText={(text) => {
-                        const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
-                        setGuardianFullName(onlyLetters)
-                    }}
-                />
-            </View>
+                            <TextInput
+                                value={item.guardianName}
+                                placeholder="Enter fullName"
+                                style={styles.input}
+                                onChangeText={(text) => {
+                                    const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
+                                    handleChange(index, "guardianName", text)
+                                    setGuardianFullName(onlyLetters)
+                                    setErrorMsg((prev) => ({ ...prev, fullName: "" }))
+                                }}
+                            />
+                        </View>
 
-            <View style={styles.fieldContainer}>
-                <Text style={styles.label}>Relationship</Text>
+                        {errorMsg.fullName && (<ErrorMessage message={errorMsg.fullName} type="error" />)}
+
+                        <View style={styles.fieldContainer}>
+                            <Text style={styles.label}>Relationship</Text>
 
 
-                <Dropdown
-                    style={{
-                        marginTop: 5,
-                        borderColor: '#e5e5e5',
-                        paddingLeft: 5,
-                    }}
-                    onFocus={() => setIsFocus(true)}
-                    onBlur={() => setIsFocus(false)}
-                    data={relationshipList}
-                    containerStyle={{ borderRadius: 10 }}
-                    placeholderStyle={{ fontSize: 15, fontFamily: 'Gilroy-Medium', color: '#9C9C9C' }}
-                    selectedTextStyle={{ fontSize: 15, fontFamily: 'Gilroy-Medium' }}
-                    itemTextStyle={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}
-                    placeholder="Select a relation"
-                    labelField="relationType"
-                    valueField="id"
-                    value={selectedRelationType}
-                    onChange={item => {
-                        setSelectedRelationType(item.id);
-                    }}
-                    renderRightIcon={() => (
-                        <Ionicons
-                            name={isFocus ? "chevron-up" : "chevron-down"}
-                            size={22}
-                            color="#000"
-                            style={{ paddingRight: 10 }}
-                        />
-                    )}
-                />
+                            <Dropdown
+                                style={{
+                                    marginTop: 5,
+                                    borderColor: '#e5e5e5',
+                                    paddingLeft: 5,
+                                }}
+                                onFocus={() => setIsFocus(true)}
+                                onBlur={() => setIsFocus(false)}
+                                data={relationshipList}
+                                containerStyle={{ borderRadius: 10 }}
+                                placeholderStyle={{ fontSize: 15, fontFamily: 'Gilroy-Medium', color: '#9C9C9C' }}
+                                selectedTextStyle={{ fontSize: 15, fontFamily: 'Gilroy-Medium' }}
+                                itemTextStyle={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}
+                                placeholder="Select a relation"
+                                labelField="relationType"
+                                valueField="id"
+                                value={selectedRelationType}
+                                onChange={item => {
+                                    setSelectedRelationType(item.id);
+                                    setErrorMsg((prev) => ({ ...prev, relationType: "" }))
+                                }}
+                                renderRightIcon={() => (
+                                    <Ionicons
+                                        name={isFocus ? "chevron-up" : "chevron-down"}
+                                        size={22}
+                                        color="#000"
+                                        style={{ paddingRight: 10 }}
+                                    />
+                                )}
+                            />
 
-                {/* <TextInput
+                            {/* <TextInput
                     value={relationship}
                     placeholder="Enter relationship"
                     style={styles.input}
@@ -182,36 +261,46 @@ const BackgroundDetails = (route) => {
                         setRelationship(onlyLetters)
                     }}
                 /> */}
-            </View>
+                        </View>
+                        {errorMsg.relationType && (<ErrorMessage message={errorMsg.relationType} type="error" />)}
 
-            <View style={styles.fieldContainer}>
-                <Text style={styles.label}>Guardian Occupation</Text>
+                        <View style={styles.fieldContainer}>
+                            <Text style={styles.label}>Guardian Occupation</Text>
 
-                <TextInput
-                    value={occupation}
-                    placeholder="Enter Occupation"
-                    style={styles.input}
-                    onChangeText={(text) => {
-                        const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
-                        setOccupation(onlyLetters)
-                    }}
-                />
-            </View>
+                            <TextInput
+                                value={occupation}
+                                placeholder="Enter Occupation"
+                                style={styles.input}
+                                onChangeText={(text) => {
+                                    const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
+                                    setOccupation(onlyLetters)
+                                    setErrorMsg((prev) => ({ ...prev, occupation: "" }))
+                                }}
+                            />
+                        </View>
+                        {errorMsg.occupation && (<ErrorMessage message={errorMsg.occupation} type="error" />)}
 
-            <View style={styles.fieldContainer}>
-                <Text style={styles.label}>Mobile No</Text>
+                        <View style={styles.fieldContainer}>
+                            <Text style={styles.label}>Mobile No</Text>
 
-                <TextInput
-                    value={guardianMobileNo}
-                    placeholder="Enter mobileNo"
-                    style={styles.input}
-                    maxLength={10}
-                    onChangeText={(text) => {
-                        const onlyNum = text.replace(/[^0-9]/g, "")
-                        setGuardianMobileNo(onlyNum)
-                    }}
-                />
-            </View>
+                            <TextInput
+                                value={guardianMobileNo}
+                                placeholder="Enter mobileNo"
+                                style={styles.input}
+                                maxLength={10}
+                                onChangeText={(text) => {
+                                    const onlyNum = text.replace(/[^0-9]/g, "")
+                                    setGuardianMobileNo(onlyNum)
+                                    setErrorMsg((prev) => ({ ...prev, guardianMobileNo: "" }))
+                                }}
+                            />
+                        </View>
+
+                    </View>
+                    )
+                }} />
+
+            {errorMsg.guardianNumber && (<ErrorMessage message={errorMsg.guardianNumber} type="error" />)}
 
             {/* <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold', marginTop: 15 }}>Job Details</Text>
 
@@ -292,11 +381,12 @@ const BackgroundDetails = (route) => {
 
 const styles = StyleSheet.create({
     fieldContainer: {
-        marginBottom: 18,
+        // marginBottom: 18,
+
         borderBottomWidth: 1,
         borderBottomColor: '#E5E7EB', // light gray line
         paddingBottom: 6,
-        // marginTop:15
+        marginTop: 15
     },
 
     label: {

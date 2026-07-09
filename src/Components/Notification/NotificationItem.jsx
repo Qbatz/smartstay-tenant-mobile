@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity, NativeModules } from "react-native";
 import { notificationContexts } from "../../Context/NotificationContext";
+import { LoginContexts } from "../../Context/LoginContext";
 const NotificationItem = ({ item }) => {
   const iconMap = {
     alert: require("../../assets/Images/money-check.png"),
@@ -12,9 +13,24 @@ const NotificationItem = ({ item }) => {
   };
 
   const notificatioContext=useContext(notificationContexts)
+  const loginContext=useContext(LoginContexts)
+  const {CommonModule}=NativeModules;
+  console.log(CommonModule)
+  console.log(loginContext.getToken)
+
+  const handleKycRequest=(entityId,mobileNo,tokenId)=>{
+    console.log(entityId,mobileNo,tokenId)
+
+    CommonModule.verifyKyc(mobileNo,entityId,tokenId)
+
+
+  }
 
   return (
-    <View style={styles.card}>
+    <TouchableOpacity 
+    onPress={()=> item?.fullNotificationType == "KYC_REQUEST" && 
+      (handleKycRequest(item?.kycInfo?.entityId, item?.kycInfo?.tenantMobile,item?.kycInfo?.accessTokenId))}
+    style={styles.card}>
       <View style={styles.iconContainer}>
         {/* <Image source={iconMap[item.notificationType]} style={styles.iconImage} /> */}
         {notificatioContext?.getNotificationList?.hostelLogoUrl != null ?
@@ -32,7 +48,7 @@ const NotificationItem = ({ item }) => {
         <Text style={styles.description}>{item.description}</Text>
         <Text style={styles.time}>{item.createdDate}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

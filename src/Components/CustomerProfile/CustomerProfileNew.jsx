@@ -33,7 +33,7 @@ import LogoutIcon from "../../assets/Images/logout.png";
 import { UsersContext } from "../../Context/UserContext";
 import { remoteData, storeData } from "../../Utils/Storage";
 import { ACCESS_TOKEN, CUSTOMERDETAIL, CUSTOMERINITIALS, CUSTOMERPROFILEPIC, LOGGEDIN, LOGGEDOUT, PHONE_NO } from "../../Utils/Constant";
-import { customerDetails } from "../../Action/CustomerAction";
+import { customerDetails, verifyNowKyc } from "../../Action/CustomerAction";
 import buildings from '../../assets/Images/buildings.png'
 import paperclip from '../../assets/Images/paperclip.png'
 import sideframe from '../../assets/Images/sideframe.png'
@@ -50,7 +50,7 @@ import MessageDocIcon from "../../assets/Images/MessageDocIcon.png"
 import UserAccountDetails from "../../assets/Images/userAccount.png";
 import Building from '../../assets/Images/buildin.png'
 import BedIconNew from "../../assets/Images/bedIconNew.png";
-import  RoomIconNew from "../../assets/Images/roomIconNew.png"
+import RoomIconNew from "../../assets/Images/roomIconNew.png"
 import RightArrow from "../../assets/Images/arrow-right.png"
 
 
@@ -63,7 +63,7 @@ const CustomerProfileNew = (route) => {
 
     const navigation = useNavigation();
     const [customer, setCustomers] = useState()
-    const { NotificationModule } = NativeModules;
+    const { NotificationModule, CommonModule } = NativeModules;
     const [penditnActionBottomSheet, setPendingActionSheet] = useState(false);
 
     const SCREEN_HEIGHT = Dimensions.get("window").height;
@@ -253,6 +253,22 @@ const CustomerProfileNew = (route) => {
 
     const handleBack = () => navigation.goBack();
 
+    const handleKyc = async () => {
+
+        const res = await verifyNowKyc(loginContext.getToken)
+
+        const accessTokenId = res?.data?.accessTokenId;
+        const entityId = res?.data?.entityId;
+        const tenantMobileNo = res?.data?.tenantMobile;
+
+        console.log("Thata", res)
+        if (res?.status === 200) {
+            CommonModule.verifyKyc(entityId, tenantMobileNo, accessTokenId)
+        } else {
+            console.log(res.message)
+        }
+    }
+
 
     return (
         <View style={styles.container}>
@@ -291,12 +307,12 @@ const CustomerProfileNew = (route) => {
 
                             {/* Name */}
                             <View style={{ alignItems: 'center', marginTop: 20, paddingHorizontal: 30 }}>
-                                <View style={{ flexDirection: 'row',alignItems:'center' }}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                     <Text style={styles.profileName} numberOfLines={1}>
                                         {context.getCustomerDetail?.firstName}{" "}
                                         {context.getCustomerDetail?.lastName}
                                     </Text>
-                                    <Image source={VerifyIcon} style={{ marginLeft: 4, height: 20, width: 20,tintColor:'#1E45E1' }} />
+                                    <Image source={VerifyIcon} style={{ marginLeft: 4, height: 20, width: 20, tintColor: '#1E45E1' }} />
                                 </View>
 
                                 {/* Info */}
@@ -309,7 +325,7 @@ const CustomerProfileNew = (route) => {
                                             resizeMode="contain"
                                         />
                                         <Text numberOfLines={1} ellipsizeMode="clip"
-                                            style={{fontSize:14,color: 'black', textAlign: 'center', fontFamily: 'Gilroy-Medium',flexShrink:1 }}>
+                                            style={{ fontSize: 14, color: 'black', textAlign: 'center', fontFamily: 'Gilroy-Medium', flexShrink: 1 }}>
                                             {context.getCustomerDetail?.bookingDetails?.floorName}</Text>
                                     </View>
 
@@ -346,37 +362,42 @@ const CustomerProfileNew = (route) => {
 
                     <View style={{ paddingTop: 20, paddingHorizontal: 20 }}>
 
-                        <View style={{ borderRadius: 12, borderWidth: 1, borderColor: "#eee", padding: 20,marginTop:12 }}>
-                            <View style={{ flexDirection: 'row',alignItems:'center' }}>
-                                <View style={{flex:1}}>
-                                    <Text style={{ fontSize: 15, fontFamily: 'Gilroy-Medium', color: '#000000',flexShrink:1 }}>
-                                        Complete your KYC Verification</Text>
+                        {context.getCustomerDetail?.kyc?.currentStatus != "VERIFIED" && (
 
-                                    <Text style={{ fontSize: 11, fontFamily: 'Gilroy-Regular', color: '#4B4B4B',flexShrink:1,marginTop:8,lineHeight:16 }}>
-                                        Enter your Aadhar/PAN Documents and Complete the status</Text>
+                            <View style={{ borderRadius: 12, borderWidth: 1, borderColor: "#eee", padding: 20, marginTop: 12 }}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <View style={{ flex: 1 }}>
+                                        <Text style={{ fontSize: 15, fontFamily: 'Gilroy-Medium', color: '#000000', flexShrink: 1 }}>
+                                            Complete your KYC Verification</Text>
+
+                                        <Text style={{ fontSize: 11, fontFamily: 'Gilroy-Regular', color: '#4B4B4B', flexShrink: 1, marginTop: 8, lineHeight: 16 }}>
+                                            Enter your Aadhar/PAN Documents and Complete the status</Text>
+
+                                    </View>
+
+                                    <Image source={MessageDocIcon} style={{ width: 92, height: 51 }} />
+
 
                                 </View>
 
-                                <Image source={MessageDocIcon} style={{ width: 92, height: 51 }} />
-
-
-                            </View>
-
-                            <View style={{flexDirection:'row',justifyContent:'flex-end',marginTop:12,alignItems:'center'}}>
-                                {/* <View style={{backgroundColor:'#E5FFE0',paddingHorizontal:2.5,paddingVertical:2,borderRadius:5}}>
+                                <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 12, alignItems: 'center' }}>
+                                    {/* <View style={{backgroundColor:'#E5FFE0',paddingHorizontal:2.5,paddingVertical:2,borderRadius:5}}>
                                     <Text style={{fontSize:12,fontFamily:'Gilroy-Regular',color:'#00A32E'}}>
                                        ↑  50 %</Text>
                                 </View> */}
 
-                                <TouchableOpacity onPress={() => navigation.navigate("ComingSoonPage")}
-                                 style={{backgroundColor:'#1E45E1',paddingHorizontal:20,paddingVertical:16,
-                                 borderRadius:8,flexDirection:'row',alignItems:'center'}}>
-                                    <Text style={{fontSize:14,fontFamily:'Gilroy-Semibold',color:'#ffffff'}}>Verify now</Text>
-                                    <Image source={RightArrow} style={{width:14.06,height:14.06,marginLeft:5}}/>
-                                </TouchableOpacity>
-                            </View>
+                                    <TouchableOpacity onPress={handleKyc}
+                                        style={{
+                                            backgroundColor: '#1E45E1', paddingHorizontal: 20, paddingVertical: 16,
+                                            borderRadius: 8, flexDirection: 'row', alignItems: 'center'
+                                        }}>
+                                        <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Semibold', color: '#ffffff' }}>Verify now</Text>
+                                        <Image source={RightArrow} style={{ width: 14.06, height: 14.06, marginLeft: 5 }} />
+                                    </TouchableOpacity>
+                                </View>
 
-                        </View>
+                            </View>
+                        )}
 
 
 
@@ -385,7 +406,7 @@ const CustomerProfileNew = (route) => {
                         <View style={styles.cards}>
 
                             <TouchableOpacity onPress={HostelClick} style={styles.row}>
-                                <View style={{ flexDirection: 'row',alignItems:'center' }}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                     <Image source={buildings} style={{ width: 25, height: 25 }} />
                                     <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium', marginLeft: 5 }}>
                                         Hostels</Text>
@@ -396,9 +417,9 @@ const CustomerProfileNew = (route) => {
 
                             <View style={styles.divider} />
 
-                            <TouchableOpacity onPress={()=>navigation.navigate("AccountDetails",{ customer: context.getCustomerDetail})}
-                             style={styles.row}>
-                                <View style={{ flexDirection: 'row',alignItems:'center' }}>
+                            <TouchableOpacity onPress={() => navigation.navigate("AccountDetails", { customer: context.getCustomerDetail })}
+                                style={styles.row}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                     <Image source={UserAccountDetails} style={{ width: 25, height: 25 }} />
                                     <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium', marginLeft: 5 }}>
                                         Account Details</Text>
@@ -413,7 +434,7 @@ const CustomerProfileNew = (route) => {
                                         <View style={styles.divider} />
 
                                         <TouchableOpacity onPress={() => navigation.navigate('ComingSoonPage')} style={styles.row}>
-                                            <View style={{ flexDirection: 'row',alignItems:'center' }}>
+                                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                                 <Image source={paperclip} style={{ width: 25, height: 25 }} />
                                                 <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium', marginLeft: 5 }}>Rental Agreement</Text>
                                             </View>
@@ -464,7 +485,7 @@ const CustomerProfileNew = (route) => {
 
                 {/* </View> */}
                 {/* </View> */}
-                <View style={{ justifyContent: 'flex-end',paddingHorizontal:20 }}>
+                <View style={{ justifyContent: 'flex-end', paddingHorizontal: 20 }}>
                     <View style={styles.helpRow}>
                         <Image source={InfoIcon} resizeMode="contain" style={{ width: 20, height: 20 }} />
                         <Text style={styles.helpText}>Help & Information</Text>
@@ -628,8 +649,8 @@ const styles = StyleSheet.create({
         gap: 5,
         flex: 1,
         marginTop: 10,
-        backgroundColor:'#F3F5FF',paddingHorizontal:10,
-        paddingVertical:5,borderRadius:12
+        backgroundColor: '#F3F5FF', paddingHorizontal: 10,
+        paddingVertical: 5, borderRadius: 12
     },
     infoText: {
         color: "#555",
@@ -666,7 +687,7 @@ const styles = StyleSheet.create({
         // borderRadius: 20,
         alignItems: 'center',
         flex: 1,
-        flexDirection:'row'
+        flexDirection: 'row'
     },
     statusText: {
         color: "white",
@@ -697,7 +718,7 @@ const styles = StyleSheet.create({
         // borderWidth: 1,
         borderColor: "#eee",
         marginBottom: 12,
-        marginTop:30
+        marginTop: 30
     },
     hostelImage: {
         width: 45,
@@ -848,7 +869,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Gilroy-Medium', fontSize: 16,
         marginLeft: 6,
     },
-    row: { flexDirection: 'row', justifyContent: 'space-between',alignItems:'center' },
+    row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
     overlay: {
         ...StyleSheet.absoluteFillObject,
         backgroundColor: "rgba(0,0,0,0.4)",

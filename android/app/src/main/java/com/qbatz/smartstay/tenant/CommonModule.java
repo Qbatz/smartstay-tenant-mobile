@@ -163,6 +163,7 @@ public class CommonModule extends ReactContextBaseJavaModule {
         intent.putExtra("mobile", mobile);
         intent.putExtra("request_id", documentId);
         intent.putExtra("token", token);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         context.startActivity(intent);
     }
 

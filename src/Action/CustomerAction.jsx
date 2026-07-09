@@ -238,3 +238,20 @@ export const removeProfilePic=async(token)=>{
          return{status: error.response.status, message: error.response.data}
     }
 }
+
+export const verifyNowKyc=async(token)=>{
+    console.log(token)
+    try{
+        const axios=getAxios();
+        const res = await axios.post("/v2/kyc/initiate",{}, {
+            headers:{
+                Authorization: "Bearer " + token,
+            }
+        })
+        return res;
+    }catch(error){
+        console.log( error.response.status,error.response.data)
+        console.log(error.message)
+        return{status: error.response.status, message: error.response.data}
+    }
+}

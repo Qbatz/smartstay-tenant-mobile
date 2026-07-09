@@ -182,7 +182,7 @@ function MyStay(props) {
 
 
                             <Text style={{ fontSize: 14, fontWeight: 600 }}>
-                                N/A
+                                {context.getCustomerDetail?.bookingDetails?.roomSharingType ||  "N/A"}
                             </Text>
                         </View>
 
@@ -503,7 +503,7 @@ function MyStay(props) {
                                             <Image source={Clippath} style={{ width: 20, height: 20 }} />
 
                                             <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', marginLeft: 10 }}>
-                                                {i.reason}</Text>
+                                                {i.reason || "N/A"}</Text>
                                         </View>
 
                                     </View>
