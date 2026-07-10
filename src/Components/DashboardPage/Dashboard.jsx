@@ -59,6 +59,7 @@ import callIcon from "../../assets/Images/call.png"
 import gobackIcon from "../../assets/Images/logout.png"
 import PaymentBottomSheet from "./BottomSheet/PaymentBottomSheet";
 import CancelledBookingPic from "../../assets/Images/CancelledBookingPic.png"
+import AppLoader from "../ToastFile/LoaderPage";
 
 const { width, height } = Dimensions.get("window");
 
@@ -435,17 +436,24 @@ function Dashboard(props) {
 
     paymentContext.updateInvoice(null)
 
+    try {
+      paymentContext.updateLoading(true)
+      getInvoices(context.getHostelDetail.hostelId, item.invoiceId, loginContext.getToken).then(r => {
+        console.log(r)
 
+        if (r.status === 200) {
+          paymentContext.updateInvoice(r.data);
+          setTimeout(() => {
+             paymentContext.updateLoading(false)
+          }, 1000);
+        }
 
-    getInvoices(context.getHostelDetail.hostelId, item.invoiceId, loginContext.getToken).then(r => {
-      console.log(r)
-
-      if (r.status === 200) {
-        paymentContext.updateInvoice(r.data);
-      }
-
-    })
-    setModalVisible(true);
+      })
+      setModalVisible(true);
+      
+    } catch (error) {
+      console.log(error)
+    }
   };
 
   const handleDownload = (invoiceId) => {
@@ -550,6 +558,7 @@ function Dashboard(props) {
 
 
   return <SafeAreaView style={style.mainDashb}>
+    <AppLoader visible={loading} />
 
     <StatusBar backgroundColor="#DAEEFF" barStyle="dark-content" />
 

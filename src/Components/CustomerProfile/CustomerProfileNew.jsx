@@ -52,6 +52,7 @@ import Building from '../../assets/Images/buildin.png'
 import BedIconNew from "../../assets/Images/bedIconNew.png";
 import RoomIconNew from "../../assets/Images/roomIconNew.png"
 import RightArrow from "../../assets/Images/arrow-right.png"
+import SuccessModal from "../ToastFile/TostFilePage";
 
 
 
@@ -65,6 +66,9 @@ const CustomerProfileNew = (route) => {
     const [customer, setCustomers] = useState()
     const { NotificationModule, CommonModule } = NativeModules;
     const [penditnActionBottomSheet, setPendingActionSheet] = useState(false);
+    const [showSuccessModal, setShowSuccessModal]=useState(false);
+    const [showSuccessMessage, setShowSuccessMessage]=useState("");
+    const [showModalType, setShowModalType]=useState("")
 
     const SCREEN_HEIGHT = Dimensions.get("window").height;
 
@@ -261,17 +265,34 @@ const CustomerProfileNew = (route) => {
         const entityId = res?.data?.entityId;
         const tenantMobileNo = res?.data?.tenantMobile;
 
+        console.log(accessTokenId)
+        console.log(entityId)
+        console.log(tenantMobileNo)
+
         console.log("Thata", res)
         if (res?.status === 200) {
-            CommonModule.verifyKyc(entityId, tenantMobileNo, accessTokenId)
+            CommonModule.verifyKyc(tenantMobileNo, entityId, accessTokenId)
         } else {
             console.log(res.message)
+            setShowSuccessModal(true)
+            setShowSuccessMessage(res?.message || "Something Failed")
+            setShowModalType("error")
+
+            setTimeout(() => {
+                setShowSuccessModal(false)
+            }, 1000);
         }
     }
 
 
     return (
+      
         <View style={styles.container}>
+              <SuccessModal
+              visible={showSuccessModal}
+              onClose={()=>setShowSuccessModal(false)}
+              message={showSuccessMessage}
+              type={showModalType}/>
             <ScrollView contentContainerStyle={styles.scrollContainer} >
                 <View>
                     <LinearGradient
