@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { View, Text, Image, StyleSheet, TextInput, ScrollView, TouchableOpacity, Pressable, PanResponder, Animated, Dimensions } from "react-native";
+import { View, Text, Image, StyleSheet, TextInput, ScrollView, TouchableOpacity, Pressable, PanResponder, Animated, Dimensions, KeyboardAvoidingView, Platform } from "react-native";
 import LeftArrow from "../../assets/Images/LeftArrow.png"
 import { useNavigation } from "@react-navigation/native";
 import { customerDetails, editProfile, removeProfilePic } from "../../Action/CustomerAction";
@@ -47,6 +47,38 @@ const PersonalDetails = (route) => {
     const [selectPicUpload, setSelectPicUpload] = useState(false);
     const SCREEN_HEIGHT = Dimensions.get("window").height;
     const translateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
+    // const scrollRef = useRef(null);
+    const scrollRef = React.useRef(null);
+    const handleFocus = (event) => {
+        event.target.measure((x, y, width, height, pageX, pageY) => {
+            scrollRef.current?.scrollTo({
+                y: pageY - 180, // Adjust this value if needed
+                animated: true,
+            });
+        });
+    };
+    const houseNoRef=useRef(null);
+    const streetRef=useRef(null);
+    const landmarkRef=useRef(null);
+    const cityRef=useRef(null);
+    const PincodeRef = useRef(null);
+    const stateRef=useRef(null);
+
+    const scrollToField = (ref) => {
+        if (!ref?.current || !scrollRef.current) return;
+
+        ref.current.measureLayout(
+            scrollRef.current,
+            (x, y) => {
+                scrollRef.current.scrollTo({
+                    y: y - 100,
+                    animated: true,
+                });
+            },
+            () => { }
+        );
+    };
+
 
 
     const openSheet = () => {
@@ -145,18 +177,18 @@ const PersonalDetails = (route) => {
         }
     };
 
-    const removePic=()=>{
+    const removePic = () => {
         setProfileImage("")
         setProfilePic("")
 
-        removeProfilePic(loginContext.getToken).then(r=>{
+        removeProfilePic(loginContext.getToken).then(r => {
             console.log(r)
 
-            if(r.status ==200){
-                 customerDetails(loginContext.getToken).then(r => {
-                            console.log(r.data)
-                            context.updateCustomer(r.data)                       
-                        })
+            if (r.status == 200) {
+                customerDetails(loginContext.getToken).then(r => {
+                    console.log(r.data)
+                    context.updateCustomer(r.data)
+                })
             }
         })
     }
@@ -244,191 +276,225 @@ const PersonalDetails = (route) => {
             </View>
 
             <TouchableOpacity onPress={handleEdit}
-                style={{ backgroundColor: '#E7F1FF', paddingVertical:5,paddingHorizontal:10, borderRadius: 5,flexDirection:'row' }}>
-                <Image source={EditSmallIcon} style={{width:16,height:16}}/>
-                <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#1E45E1',marginLeft:6 }}>Edit</Text>
+                style={{ backgroundColor: '#E7F1FF', paddingVertical: 5, paddingHorizontal: 10, borderRadius: 5, flexDirection: 'row' }}>
+                <Image source={EditSmallIcon} style={{ width: 16, height: 16 }} />
+                <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#1E45E1', marginLeft: 6 }}>Edit</Text>
             </TouchableOpacity>
         </View>
-        <ScrollView showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{ paddingHorizontal: 20,paddingBottom:80 }}>
+        <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
+            style={{ flex: 1 }}>
+            <ScrollView
+                ref={scrollRef}
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+                keyboardDismissMode="on-drag"
+                contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 80 }}>
 
-            <View style={{ alignItems: 'center', paddingVertical: 15 }}>
-                <TouchableOpacity
-                    activeOpacity={0.9}
-                    onPress={() => setSelectPicUpload(true)}
-                    onPressIn={() => setShowCameraIcon(true)}
-                    onPressOut={() => setShowCameraIcon(false)}
-                >
-                    <View style={styles.imageWrapper}>
+                <View style={{ alignItems: 'center', paddingVertical: 15 }}>
+                    <TouchableOpacity
+                        activeOpacity={0.9}
+                        onPress={() => setSelectPicUpload(true)}
+                        onPressIn={() => setShowCameraIcon(true)}
+                        onPressOut={() => setShowCameraIcon(false)}
+                    >
+                        <View style={styles.imageWrapper}>
 
-                        {
-                            imageSource ? <Image source={imageSource} style={styles.profileImage} /> :
-                                <View style={[styles.profileImage, { alignItems: 'center', justifyContent: 'center', backgroundColor: '#eef1ff', }]}>
-                                    <Text style={{ fontSize: 20, fontFamily: 'Gilroy-Bold' }}>{initials}</Text>
-
-
-                                    {showCameraIcon && (
-                                        <View style={styles.cameraOverlay}>
-                                            <Image
-                                                source={CameraIcon}
-                                                style={{ width: 28, height: 28, tintColor: "#fff" }}
-                                            />
-                                        </View>
-                                    )}
-                                </View>
+                            {
+                                imageSource ? <Image source={imageSource} style={styles.profileImage} /> :
+                                    <View style={[styles.profileImage, { alignItems: 'center', justifyContent: 'center', backgroundColor: '#eef1ff', }]}>
+                                        <Text style={{ fontSize: 20, fontFamily: 'Gilroy-Bold' }}>{initials}</Text>
 
 
-                        }
-                    </View>
-                </TouchableOpacity>
-            </View>
+                                        {showCameraIcon && (
+                                            <View style={styles.cameraOverlay}>
+                                                <Image
+                                                    source={CameraIcon}
+                                                    style={{ width: 28, height: 28, tintColor: "#fff" }}
+                                                />
+                                            </View>
+                                        )}
+                                    </View>
 
 
-            <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold', marginTop: 15 }}>Basic Info</Text>
+                            }
+                        </View>
+                    </TouchableOpacity>
+                </View>
 
-            <View style={[styles.fieldContainer, { marginTop: 15 }]}>
-                <Text style={styles.label}>First name</Text>
 
-                <TextInput
-                    value={firstname}
-                    placeholder="Enter first name"
-                    style={styles.input}
-                    onChangeText={(text) => {
-                        const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
-                        setfirstName(onlyLetters)
-                    }}
-                />
-            </View>
+                <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold', marginTop: 15 }}>Basic Info</Text>
 
-            <View style={styles.fieldContainer}>
-                <Text style={styles.label}>Last name</Text>
+                <View style={[styles.fieldContainer, { marginTop: 15 }]}>
+                    <Text style={styles.label}>First name</Text>
 
-                <TextInput
-                    value={lastName}
-                    placeholder="Enter last name"
-                    style={styles.input}
-                    onChangeText={(text) => {
-                        const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
-                        setLastName(onlyLetters)
-                    }}
-                />
-            </View>
+                    <TextInput
+                        value={firstname}
+                        placeholder="Enter first name"
+                        style={styles.input}
+                        onChangeText={(text) => {
+                            const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
+                            setfirstName(onlyLetters)
+                        }}
+                    />
+                </View>
 
-            <View style={styles.fieldContainer}>
-                <Text style={styles.label}>Mail Id</Text>
+                <View style={styles.fieldContainer}>
+                    <Text style={styles.label}>Last name</Text>
 
-                <TextInput
-                    value={mailId}
-                    placeholder="Enter mailId"
-                    style={styles.input}
-                    onChangeText={(text) => {
-                        const noEmojis = text.replace(
-                            /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, "");
-                        setMailId(noEmojis)
-                    }}
-                />
-            </View>
+                    <TextInput
+                        value={lastName}
+                        placeholder="Enter last name"
+                        style={styles.input}
+                        onChangeText={(text) => {
+                            const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
+                            setLastName(onlyLetters)
+                        }}
+                    />
+                </View>
 
-            <View style={styles.fieldContainer}>
-                <Text style={styles.label}>Mobile No</Text>
+                <View style={styles.fieldContainer}>
+                    <Text style={styles.label}>Mail Id</Text>
 
-                <TextInput
-                    value={mobile}
-                    placeholder="Enter first name"
-                    style={styles.input}
-                    disableFullscreenUI
-                />
-            </View>
-            <View style={{paddingHorizontal:10,paddingVertical:5,backgroundColor:"#F5F9FF",alignSelf:"flex-start",borderRadius:8}}>
-                <Text style={{fontSize:12,fontFamily:'Gilroy-Regular',color:'#1E45E1'}}>Mobile No not editable</Text>
-            </View>
+                    <TextInput
+                        value={mailId}
+                        placeholder="Enter mailId"
+                        style={styles.input}
+                        onChangeText={(text) => {
+                            const noEmojis = text.replace(
+                                /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, "");
+                            setMailId(noEmojis)
+                        }}
+                    />
+                </View>
 
-            <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold', marginTop: 15 }}>Address Details</Text>
+                <View style={styles.fieldContainer}>
+                    <Text style={styles.label}>Mobile No</Text>
 
-            <View style={[styles.fieldContainer, { marginTop: 15 }]}>
-                <Text style={styles.label}>House No / Apartment</Text>
+                    <TextInput
+                        value={mobile}
+                        placeholder="Enter first name"
+                        style={styles.input}
+                        disableFullscreenUI
+                    />
+                </View>
+                <View style={{ paddingHorizontal: 10, paddingVertical: 5, backgroundColor: "#F5F9FF", alignSelf: "flex-start", borderRadius: 8 }}>
+                    <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#1E45E1' }}>Mobile No not editable</Text>
+                </View>
 
-                <TextInput
-                    value={houseNo}
-                    placeholder="Enter house No"
-                    style={styles.input}
-                    onChangeText={(text) => {
-                        const noEmojis = text.replace(
-                            /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, "");
-                        setHouseNo(noEmojis)
-                    }}
-                />
-            </View>
+                <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold', marginTop: 15 }}>Address Details</Text>
 
-            <View style={styles.fieldContainer}>
-                <Text style={styles.label}>Street / Area</Text>
+                <View ref={houseNoRef} style={[styles.fieldContainer, { marginTop: 15 }]}>
+                    <Text style={styles.label}>House No / Apartment</Text>
 
-                <TextInput
-                    value={streetName}
-                    placeholder="Enter street name"
-                    style={styles.input}
-                    onChangeText={(text) => {
-                        const noEmojis = text.replace(/[^A-Za-z\s]/g, "");
-                        setStreetName(noEmojis)
-                    }}
-                />
-            </View>
+                    <TextInput
+                        value={houseNo}
+                        placeholder="Enter house No"
+                        style={styles.input}
+                        onFocus={() => {
+                            setTimeout(() => {
+                                scrollToField(houseNoRef);
+                            }, 200);
+                        }}
+                        onChangeText={(text) => {
+                            const noEmojis = text.replace(
+                                /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, "");
+                            setHouseNo(noEmojis)
+                        }}
+                    />
+                </View>
 
-            <View style={styles.fieldContainer}>
-                <Text style={styles.label}>Landmark</Text>
+                <View  ref={streetRef} style={styles.fieldContainer}>
+                    <Text style={styles.label}>Street / Area</Text>
 
-                <TextInput
-                    value={landmark}
-                    placeholder="Enter landmark"
-                    style={styles.input}
-                />
-            </View>
+                    <TextInput
+                        value={streetName}
+                        placeholder="Enter street name"
+                        style={styles.input}
+                        onFocus={() => {
+                            setTimeout(() => {
+                                scrollToField(streetRef);
+                            }, 200);
+                        }}
+                        onChangeText={(text) => {
+                            const noEmojis = text.replace(/[^A-Za-z\s]/g, "");
+                            setStreetName(noEmojis)
+                        }}
+                    />
+                </View>
 
-            <View style={styles.fieldContainer}>
-                <Text style={styles.label}>City</Text>
+                <View ref={landmarkRef} style={styles.fieldContainer}>
+                    <Text style={styles.label}>Landmark</Text>
 
-                <TextInput
-                    value={city}
-                    placeholder="Enter city name"
-                    style={styles.input}
-                    onChangeText={(text) => {
-                        const noEmojis = text.replace(/[^A-Za-z\s]/g, "");
-                        setCity(noEmojis)
-                    }}
+                    <TextInput
+                        value={landmark}
+                        placeholder="Enter landmark"
+                        style={styles.input}
+                        onFocus={() => {
+                            setTimeout(() => {
+                                scrollToField(landmarkRef);
+                            }, 200);
+                        }}
+                    />
+                </View>
 
-                />
-            </View>
+                <View ref={cityRef} style={styles.fieldContainer}>
+                    <Text style={styles.label}>City</Text>
 
-            <View style={styles.fieldContainer}>
-                <Text style={styles.label}>Pincode</Text>
+                    <TextInput
+                        value={city}
+                        placeholder="Enter city name"
+                        style={styles.input}
+                        onFocus={() => {
+                            setTimeout(() => {
+                                scrollToField(cityRef);
+                            }, 200);
+                        }}
+                        onChangeText={(text) => {
+                            const noEmojis = text.replace(/[^A-Za-z\s]/g, "");
+                            setCity(noEmojis)
+                        }}
 
-                <TextInput
-                    value={pincode}
-                    placeholder="Enter pincode"
-                    style={styles.input}
-                    keyboardType="numeric"
-                    onChangeText={(text) => {
-                        const onlyNum = text.replace(/[^0-9]/g, "")
-                        setPincode(onlyNum)
-                    }}
-                />
-            </View>
+                    />
+                </View>
 
-            <View style={styles.fieldContainer}>
-                <Text style={styles.label}>State</Text>
+                <View ref={PincodeRef} style={styles.fieldContainer} >
+                    <Text style={styles.label}>Pincode</Text>
 
-                <TextInput
-                    value={state}
-                    placeholder="Enter state"
-                    style={styles.input}
-                    onChangeText={(text) => {
-                        const noEmojis = text.replace(/[^A-Za-z\s]/g, "");
-                        setState(noEmojis)
-                    }}
-                />
-            </View>
-        </ScrollView>
+                    <TextInput
+                        value={pincode}
+                        placeholder="Enter pincode"
+                        style={styles.input}
+                        maxLength={6}             
+                        onFocus={() => {
+                            setTimeout(() => {
+                                scrollToField(PincodeRef);
+                            }, 200);
+                        }}
+                        keyboardType="numeric"
+                        onChangeText={(text) => {
+                            const onlyNum = text.replace(/[^0-9]/g, "")
+                            setPincode(onlyNum)
+                        }}
+                    />
+                </View>
+
+                <View style={styles.fieldContainer}>
+                    <Text style={styles.label}>State</Text>
+
+                    <TextInput
+                        value={state}
+                        placeholder="Enter state"
+                        style={styles.input}
+                        onChangeText={(text) => {
+                            const noEmojis = text.replace(/[^A-Za-z\s]/g, "");
+                            setState(noEmojis)
+                        }}
+                    />
+                </View>
+            </ScrollView>
+        </KeyboardAvoidingView>
 
         {
             selectPicUpload && (

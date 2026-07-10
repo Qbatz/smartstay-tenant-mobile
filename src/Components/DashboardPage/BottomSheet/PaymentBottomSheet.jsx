@@ -29,6 +29,7 @@ import { useNavigation } from "@react-navigation/native";
 import { getInvoiceDownload, getReceiptDownload } from "../../../Action/PaymentAction";
 import { UsersContext } from "../../../Context/UserContext";
 import { LoginContexts } from "../../../Context/LoginContext";
+import AppLoader from "../../ToastFile/LoaderPage";
 
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
@@ -160,12 +161,13 @@ export default function PaymentBottomSheet({
 
     }
 
-
+console.log(paymentContext.getLoading,"ballu")
 
     if (!visible) return null;
 
     return (
         <View style={style.overlay}>
+            <AppLoader visible={paymentContext.getLoading}/>
             <TouchableWithoutFeedback onPress={onClose}>
                 <View style={StyleSheet.absoluteFillObject} />
             </TouchableWithoutFeedback>
@@ -382,7 +384,7 @@ export default function PaymentBottomSheet({
                                 {showRedeemedFrom && paymentContext.getInvoiceDetail.redeemedFrom.length>0 && (
                                     <>
                                         <TouchableOpacity onPress={()=>setShowRedeemFrom(!showRedeemFrom)}
-                                         style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between',marginTop:10}}>
+                                         style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between',marginTop:10,marginBottom:8}}>
                                             <Text style={style.appldTo}>Adjusted From</Text>
                                             <Ionicons
                                                 name={showRedeemFrom ? "chevron-up" : "chevron-down"}
@@ -621,6 +623,15 @@ export default function PaymentBottomSheet({
                                         ₹ {paymentContext?.getInvoiceDetail?.advanceInfo?.totalAdvancePaid}</Text>
                                 </View>
 
+                                {paymentContext?.getInvoiceDetail?.status === "Partially Paid" && (
+                                <View style={[style.row, { paddingTop: 3}]}>
+                                    <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium' }}>Balance Amount</Text>
+
+                                    <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold' }}>
+                                        ₹ {paymentContext?.getInvoiceDetail?.dueAmount || "N/A"}</Text>
+                                </View>
+                                )}
+
                                 <View style={style.row}>
                                     <TouchableOpacity onPress={() => setShowVisible(!showVisible)}>
                                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -749,6 +760,8 @@ export default function PaymentBottomSheet({
                                     }}
                                 />
 
+                                {["Partially Paid", "Paid"].includes(paymentContext?.getInvoiceDetail?.status) && (
+
                                 <View style={style.Billbottom}>
                                     <Text style={style.paiddetailLabel}>
                                         Paid Date
@@ -757,6 +770,20 @@ export default function PaymentBottomSheet({
                                         {paymentContext?.getInvoiceDetail?.lastPaidDate ? paymentContext?.getInvoiceDetail?.lastPaidDate : "N/A"}
                                     </Text>
                                 </View>
+                                )}
+
+                                 {paymentContext?.getInvoiceDetail?.status === "Pending" && (
+
+                                <View style={style.Billbottom}>
+                                    <Text style={style.paiddetailLabel}>
+                                        Due Date
+                                    </Text>
+                                    <Text style={style.paiddetailValue}>
+                                        {paymentContext?.getInvoiceDetail?.dueDate || "N/A"}
+                                    </Text>
+                                </View>
+                                )}
+
 
                                 <View style={{ marginTop: 10 }}>
                                     <View style={style.Billbottom}>
@@ -909,7 +936,7 @@ const style = StyleSheet.create({
     appldTo:{fontSize:16,fontFamily:'Gilroy-Semibold'},
     shwRedeem:{
         borderWidth:1,borderColor:"#E7E7E7",borderRadius:8,marginTop:8,
-        paddingVertical:8,paddingHorizontal:14
+        paddingVertical:12,paddingHorizontal:16
     },
     redeemIncNo:{fontSize:15,fontFamily:'Gilroy-Semibold'},
     redeemAmntTxt:{fontSize:18,fontFamily:'Gilroy-Semibold'},
