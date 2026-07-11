@@ -73,6 +73,7 @@ class KYCVerification: ComponentActivity(), WorkflowResponseListener {
                 else {
                     val errorMessage = p1.errorBody()?.string() ?: "Unknown error"
                     Toast.makeText(application, errorMessage, Toast.LENGTH_LONG).show()
+                    finish()
                 }
             }
 
