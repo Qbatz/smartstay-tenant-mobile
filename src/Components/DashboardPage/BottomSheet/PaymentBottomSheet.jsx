@@ -161,7 +161,7 @@ export default function PaymentBottomSheet({
 
     }
 
-console.log(paymentContext.getLoading,"ballu")
+
 
     if (!visible) return null;
 
