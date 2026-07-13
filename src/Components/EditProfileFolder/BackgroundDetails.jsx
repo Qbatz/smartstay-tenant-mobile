@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { View, Text, StyleSheet, Image, TextInput, ScrollView, TouchableOpacity, FlatList, KeyboardAvoidingView, Platform } from "react-native";
+import { View, Text, StyleSheet, Image, TextInput, ScrollView, TouchableOpacity, FlatList, KeyboardAvoidingView, Platform, Dimensions } from "react-native";
 import LeftArrow from "../../assets/Images/LeftArrow.png"
 import { useNavigation } from "@react-navigation/native";
 import { customerDetails, editProfile } from "../../Action/CustomerAction";
@@ -11,7 +11,8 @@ import EditSmallIcon from "../../assets/Images/editSmallIcon.png"
 import AppLoader from "../ToastFile/LoaderPage";
 import SuccessModal from "../ToastFile/TostFilePage";
 import ErrorMessage from "../ToastFile/ErrorMessage";
-import AddCircle  from "../../assets/Images/add-circle.png"
+import AddCircle from "../../assets/Images/add-circle.png"
+import NoResultPic from "../../assets/Images/NoResultPic.png"
 
 
 
@@ -21,12 +22,16 @@ const BackgroundDetails = (route) => {
     const navigation = useNavigation();
     const context = useContext(UsersContext)
     const loginContext = useContext(LoginContexts)
+    const { getCustomerDetail, updateCustomer } = useContext(UsersContext)
+
+    console.log("sillu", getCustomerDetail)
 
     console.log(route)
+    const { width } = Dimensions.get("window")
 
-    const [guardianFullName, setGuardianFullName] = useState(route.route?.params?.customer?.additionalContacts[0]?.name || "");
+    const [guardianFullName, setGuardianFullName] = useState(getCustomerDetail?.additionalContacts[0]?.name || "");
     // const [relationship, setRelationship] = useState("");
-    const [occupation, setOccupation] = useState(route.route?.params?.customer?.additionalContacts[0]?.occupation || "")
+    const [occupation, setOccupation] = useState(getCustomerDetail?.additionalContacts[0]?.occupation || "")
     const [guardianMobileNo, setGuardianMobileNo] = useState(route.route?.params?.customer?.additionalContacts[0]?.mobile || "");
     const [countyCode, setCountryCode] = useState("");
 
@@ -40,7 +45,7 @@ const BackgroundDetails = (route) => {
     const [isFocus, setIsFocus] = useState(false);
     const [contactId, setContactId] = useState(route.route?.params?.customer?.additionalContacts[0]?.contactId)
     const [mode, setMode] = useState("add")
-    const [isEmplyFocus, setIsEmpyFocus]=useState(false)
+    const [isEmplyFocus, setIsEmpyFocus] = useState(false)
     console.log(mode)
 
     const [errorMsg, setErrorMsg] = useState({})
@@ -51,8 +56,8 @@ const BackgroundDetails = (route) => {
         guardianMobile: "",
     }
     const [items, setItems] = useState(() => {
-        const contact = route.route?.params?.customer?.additionalContacts;
-        
+        const contact = getCustomerDetail?.additionalContacts;
+
 
         if (contact?.length > 0) {
             return contact.map(contact => ({
@@ -64,12 +69,13 @@ const BackgroundDetails = (route) => {
             }))
         }
 
-        return [{
-            guardianName: "",
-            guardianRelation: "",
-            guardianOccupation: "",
-            guardianMobile: "",
-        }]
+        return [];
+        // return [{
+        //     guardianName: "",
+        //     guardianRelation: "",
+        //     guardianOccupation: "",
+        //     guardianMobile: "",
+        // }]
     })
     console.log(items)
     console.log(selectedRelationType)
@@ -77,48 +83,30 @@ const BackgroundDetails = (route) => {
     const relationshipList = [{ id: 0, relationType: "Father" }, { id: 1, relationType: "Mother" }, { id: 2, relationType: "Others" }]
 
     const employmentTypes = [{ id: 0, employmentType: 'Govt Employee' }, { id: 1, employmentType: 'Private Employee' },
-                             { id: 2, employmentType: 'Business / Self-employed'},{ id: 3, employmentType: 'Farmer'},{ id: 4, employmentType: 'Daily wage / Labor'},
-                             { id: 5, employmentType: 'Homemaker' },{ id: 6, employmentType: 'Retired Employee'},{ id: 7, employmentType: 'Abroad (Working Overseas' },
-                             { id: 8, employmentType: 'Other' }
+    { id: 2, employmentType: 'Business / Self-employed' }, { id: 3, employmentType: 'Farmer' }, { id: 4, employmentType: 'Daily wage / Labor' },
+    { id: 5, employmentType: 'Homemaker' }, { id: 6, employmentType: 'Retired Employee' }, { id: 7, employmentType: 'Abroad (Working Overseas' },
+    { id: 8, employmentType: 'Other' }
     ]
 
     console.log(errorMsg)
-    // useEffect(() => {
-    //     const relation =
-    //         route.route?.params?.customer?.additionalContacts[0]?.relationship;
-
-
-    //     const selected = relationshipList.find(
-    //         item => item.relationType === relation
-    //     );
-
-    //     if (selected) {
-    //         setSelectedRelationType(selected.id);
-    //     }
-
-
-    // }, []);
     useEffect(() => {
-  const contacts = route.route?.params?.customer?.additionalContacts || [];
+        const contacts = getCustomerDetail.additionalContacts || [];
 
-  if (contacts.length > 0) {
-    const formatted = contacts.map(contact => {
-      const relation = relationshipList.find(
-        r => r.relationType === contact.relationship
-      );
+        if (contacts.length > 0) {
+            const formatted = contacts.map(contact => {
 
-      return {
-        contactId: contact.contactId,
-        guardianName: contact.name,
-        guardianRelation: relation?.id ?? null, // Store dropdown id
-        guardianOccupation: contact.occupation,
-        guardianMobile: contact.mobile,
-      };
-    });
+                return {
+                    contactId: contact.contactId,
+                    guardianName: contact.name,
+                    guardianRelation: contact?.relationship,
+                    guardianOccupation: contact.occupation,
+                    guardianMobile: contact.mobile,
+                };
+            });
 
-    setItems(formatted);
-  }
-}, []);
+            setItems(formatted);
+        }
+    }, [getCustomerDetail?.additionalContacts]);
 
 
     const handleChange = (index, key, value) => {
@@ -153,8 +141,8 @@ const BackgroundDetails = (route) => {
 
         return (
 
-            <View style={{ borderWidth: 1, borderRadius: 10, padding: 16, borderColor: '#E7E7E7', width: '100%',marginVertical:10}}
-             key={index}>
+            <View style={{ borderWidth: 1, borderRadius: 10, padding: 16, borderColor: '#E7E7E7', marginVertical: 10 }}
+                key={index}>
                 <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold', marginTop: 6 }}>Contact - {count}</Text>
 
                 <View style={[styles.fieldContainer, { marginTop: 15 }]}>
@@ -177,11 +165,13 @@ const BackgroundDetails = (route) => {
                 {errorMsg.fullName && (<ErrorMessage message={errorMsg.fullName} type="error" />)}
 
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <View style={[styles.rltnOccptField,{marginRight:3}]}>
+                    <View style={[styles.rltnOccptField, { marginRight: 3 }]}>
                         <Text style={styles.label}>Relationship</Text>
 
+                        <Text style={styles.input}>{item.guardianRelation || "N/A"}</Text>
 
-                        <Dropdown
+
+                        {/* <Dropdown
                             style={{
                                 marginTop: 12,
                                 borderColor: '#e5e5e5',
@@ -212,27 +202,17 @@ const BackgroundDetails = (route) => {
                                     style={{ paddingRight: 10 }}
                                 />
                             )}
-                        />
+                        /> */}
 
 
                     </View>
                     {errorMsg.relationType && (<ErrorMessage message={errorMsg.relationType} type="error" />)}
 
-                    <View style={[styles.rltnOccptField,{marginLeft:3}]}>
+                    <View style={[styles.rltnOccptField, { marginLeft: 3 }]}>
                         <Text style={styles.label}>Guardian Occupation</Text>
 
-                        {/* <TextInput
-                            value={item?.guardianOccupation}
-                            placeholder="Enter Occupation"
-                            style={styles.input}
-                            onChangeText={(text) => {
-                                const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
-                                // setOccupation(onlyLetters)
-                                handleChange(index, "guardianOccupation", onlyLetters)
-                                setErrorMsg((prev) => ({ ...prev, occupation: "" }))
-                            }}
-                        /> */}
-                        <Dropdown
+                        <Text style={styles.input}>{item.guardianOccupation || "N/A"}</Text>
+                        {/* <Dropdown
                             style={{
                                 marginTop: 12,
                                 borderColor: '#e5e5e5',
@@ -263,7 +243,7 @@ const BackgroundDetails = (route) => {
                                     style={{ paddingRight: 10 }}
                                 />
                             )}
-                        />
+                        /> */}
                     </View>
                 </View>
                 {errorMsg.occupation && (<ErrorMessage message={errorMsg.occupation} type="error" />)}
@@ -271,19 +251,22 @@ const BackgroundDetails = (route) => {
                 <View style={styles.fieldContainer}>
                     <Text style={styles.label}>Mobile No</Text>
 
-                    <TextInput
-                        value={item?.guardianMobile}
-                        placeholder="Enter mobileNo"
-                        editable={mode == "edit" ? true : false}
-                        style={styles.input}
-                        maxLength={10}
-                        onChangeText={(text) => {
-                            const onlyNum = text.replace(/[^0-9]/g, "")
-                            // setGuardianMobileNo(onlyNum)
-                            handleChange(index, "guardianMobile", onlyNum)
-                            setErrorMsg((prev) => ({ ...prev, guardianMobileNo: "" }))
-                        }}
-                    />
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
+                        <Text style={{ fontSize: 15, fontFamily: 'Gilroy-Medium', color: '#0A0A0A' }}>+91</Text>
+                        <TextInput
+                            value={item?.guardianMobile}
+                            placeholder="Enter mobileNo"
+                            editable={mode == "edit" ? true : false}
+                            style={styles.mobileInpt}
+                            maxLength={10}
+                            onChangeText={(text) => {
+                                const onlyNum = text.replace(/[^0-9]/g, "")
+                                // setGuardianMobileNo(onlyNum)
+                                handleChange(index, "guardianMobile", onlyNum)
+                                setErrorMsg((prev) => ({ ...prev, guardianMobileNo: "" }))
+                            }}
+                        />
+                    </View>
                 </View>
 
             </View>
@@ -404,7 +387,7 @@ const BackgroundDetails = (route) => {
                     Background Details</Text>
             </View>
 
-            {mode == "edit" ?
+            {/* {mode == "edit" ?
                 <TouchableOpacity onPress={handleEdit}
                     style={{ backgroundColor: '#E7F1FF', paddingVertical: 5, paddingHorizontal: 10, borderRadius: 5, flexDirection: 'row' }}>
                     <Image source={EditSmallIcon} style={{ width: 16, height: 16 }} />
@@ -417,19 +400,30 @@ const BackgroundDetails = (route) => {
                     <Image source={EditSmallIcon} style={{ width: 16, height: 16 }} />
                     <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#1E45E1', marginLeft: 6 }}>Edit</Text>
                 </TouchableOpacity>
-            }
+            } */}
         </View>
-        <KeyboardAvoidingView 
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{flex:1}}>
-        <ScrollView showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-            nestedScrollEnabled={true}
-            contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 80 }}>
+        <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={{ flex: 1 }}>
+            <ScrollView showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+                nestedScrollEnabled={true}
+                contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 80 }}>
 
-            <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold', marginTop: 15, marginBottom: 10 }}>Parent/Guardian Details</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold', marginTop: 15, marginBottom: 10 }}>Parent/Guardian Details</Text>
 
-            {mode === "edit" ? (
+
+                    {items.length > 0 && (
+                        <TouchableOpacity onPress={() => navigation.navigate("AddGuardianDetails", { mode: "edit" })}
+                            style={{ backgroundColor: '#E7F1FF', paddingVertical: 5, paddingHorizontal: 10, borderRadius: 5, flexDirection: 'row' }}>
+                            <Image source={EditSmallIcon} style={{ width: 16, height: 16 }} />
+                            <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#1E45E1', marginLeft: 6 }}>Edit</Text>
+                        </TouchableOpacity>
+                    )
+                    }
+                </View>
+                {/* {mode === "edit" ? (
                 <>
                     {items.map((item, index) => (
                         <View key={index}>
@@ -437,24 +431,77 @@ const BackgroundDetails = (route) => {
                         </View>
                     ))}
                 </>
-            ) : (
-                <FlatList
-                    horizontal
-                    pagingEnabled
-                    data={items}
-                    contentContainerStyle={{ flex: 1 }}
-                    keyExtractor={(item, index) => index.toString()}
-                    renderItem={({ item, index }) => renderContactCard(item, index)}
-                    showsHorizontalScrollIndicator={false}
-                />
-            )}
+            ) : ( */}
 
-            {mode == "edit" &&
-                <TouchableOpacity style={styles.addRowField} onPress={handleAddRow}>
-                    <Image source={AddCircle} style={{ width: 17.35, height: 17.35, tintColor: '#1E45E1' }} />
-                    <Text style={styles.addRowTxt}>Add New Row</Text>
-                </TouchableOpacity>}
-            {/* <FlatList nestedScrollEnabled={true}
+                {/* )} */}
+
+                {items.length > 0 ? (
+                    <>
+                        <FlatList
+                            horizontal
+                            pagingEnabled
+                            snapToAlignment="start"
+                            decelerationRate="fast"
+                            data={items}
+                            keyExtractor={(item, index) => index.toString()}
+                            showsHorizontalScrollIndicator={false}
+                            renderItem={({ item, index }) => (
+                                <View
+                                    style={{
+                                        width: width - 40,
+                                        marginRight: 10,
+                                    }}
+                                >
+                                    {renderContactCard(item, index)}
+                                </View>
+                            )}
+                        />
+
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }}>
+                            <TouchableOpacity onPress={() => navigation.navigate("AddGuardianDetails", { mode: "add" })}
+                                style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <Ionicons
+                                    name="add-circle-outline"
+                                    size={18}
+                                    color="#1E45E1"
+                                />
+                                <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#1E45E1', marginLeft: 5 }}>
+                                    Add New Row</Text>
+                            </TouchableOpacity>
+
+                            <View style={{flexDirection:'row',alignItems:'center'}}>
+                            <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#0D1B8E' }}>Swipe</Text>
+                            <View style={{ flexDirection: "row" }}>
+                                <Ionicons name="chevron-forward" size={14} color="#0D1B8E" />
+                                <Ionicons name="chevron-forward" size={14} color="#0D1B8E" style={{ marginLeft: -6 }} />
+                            </View>
+                            </View>
+                        </View>
+                    </>
+                ) : (
+                    <View style={{ borderWidth: 1, borderRadius: 10, padding: 16, borderColor: '#E7E7E7', alignItems: 'center', marginTop: 10 }}>
+                        <Image source={NoResultPic} style={{ width: 100, height: 100 }} />
+                        <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', textAlign: 'center', lineHeight: 20, marginTop: 12 }}>
+                            Parent/Guardians missing for {`\n`} Emergency contacts
+                        </Text>
+
+                        <TouchableOpacity onPress={() => navigation.navigate("AddGuardianDetails", { mode: "add" })}
+                        style={{
+                            backgroundColor: "#1E45E1", borderRadius: 10, width: '100%', paddingVertical: 10,
+                            marginHorizontal: 14, marginTop: 16, alignItems: 'center'
+                        }}>
+                            <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Semibold', color: '#FFFFFF' }}>
+                                Add Guardian Details</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
+
+                {mode == "edit" &&
+                    <TouchableOpacity style={styles.addRowField} onPress={handleAddRow}>
+                        <Image source={AddCircle} style={{ width: 17.35, height: 17.35, tintColor: '#1E45E1' }} />
+                        <Text style={styles.addRowTxt}>Add New Row</Text>
+                    </TouchableOpacity>}
+                {/* <FlatList nestedScrollEnabled={true}
                 data={items}
                 contentContainerStyle={{flex:1}}
                
@@ -562,9 +609,9 @@ const BackgroundDetails = (route) => {
                 }} /> */}
 
 
-            {errorMsg.guardianNumber && (<ErrorMessage message={errorMsg.guardianNumber} type="error" />)}
+                {errorMsg.guardianNumber && (<ErrorMessage message={errorMsg.guardianNumber} type="error" />)}
 
-            {/* <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold', marginTop: 15 }}>Job Details</Text>
+                {/* <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold', marginTop: 15 }}>Job Details</Text>
 
             <View style={[styles.fieldContainer, { marginTop: 15 }]}>
                 <Text style={styles.label}>Employment Status</Text>
@@ -635,7 +682,7 @@ const BackgroundDetails = (route) => {
                     style={styles.input}
                 />
             </View> */}
-        </ScrollView>
+            </ScrollView>
         </KeyboardAvoidingView>
 
     </View>
@@ -666,10 +713,16 @@ const styles = StyleSheet.create({
 
     input: {
         fontSize: 15,
-        color: '#111827',
+        color: '#0A0A0A',
         paddingVertical: 4,
-        marginTop:10,
-        fontFamily: 'Gilroy-Regular',
+        marginTop: 10,
+        fontFamily: 'Gilroy-Medium',
+    },
+    mobileInpt: {
+        fontSize: 15,
+        color: '#0A0A0A',
+        paddingVertical: 4,
+        fontFamily: 'Gilroy-Medium',
     },
     addRowField: {
         flexDirection: 'row',

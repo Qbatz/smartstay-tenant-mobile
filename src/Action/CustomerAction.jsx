@@ -255,3 +255,33 @@ export const verifyNowKyc=async(token)=>{
         return{status: error.response.status, message: error.response.data}
     }
 }
+
+export const addGuardian=async(token,payload)=>{
+    console.log(token)
+    try{
+        const axios =getAxios();
+        const res= await axios.post("/v2/customer-additional-contacts", payload, {
+            headers: {
+                Authorization: "Bearer " + token,
+            }
+        })
+        return res;
+    }catch(error){
+        return{status: error.response.status, message: error.response.data}
+    }
+}
+
+export const deleteContact=async(token,payload)=>{
+    try{
+        const axios=getAxios();
+        const res=await axios.delete("/v2/customer-additional-contacts", {
+            data:payload,
+            headers: {
+                Authorization: "Bearer " + token
+            }
+        })
+        return res;
+    }catch(error){
+        return{status: error.response.status, message: error.response.data}
+    }
+}

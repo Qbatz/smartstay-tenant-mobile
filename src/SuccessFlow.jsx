@@ -34,6 +34,7 @@ import AccountDetails from "./Components/CustomerProfile/AccountDetails";
 import PersonalDetails from "./Components/EditProfileFolder/PersonalDetails";
 import BackgroundDetails from "./Components/EditProfileFolder/BackgroundDetails";
 import DocumentsUpload from "./Components/EditProfileFolder/DocumentUpload";
+import AddGuardianDetails from "./Components/EditProfileFolder/AddGuardianDetails";
 
 const SuccessFlow = ({props, MpinVerified}) => {
   console.log(props)
@@ -72,6 +73,7 @@ const SuccessFlow = ({props, MpinVerified}) => {
           <Navigation.Screen name="AccountDetails" component={AccountDetails}/>
           <Navigation.Screen name="PersonalDetails" component={PersonalDetails}/>
           <Navigation.Screen name="BackgroundDetails" component={BackgroundDetails}/>
+          <Navigation.Screen name="AddGuardianDetails" component={AddGuardianDetails}/>
           <Navigation.Screen name="DocumentUpload" component={DocumentsUpload}/>
           <Navigation.Screen name="ComingSoonPage" component={ComingSoon}/>
           <Navigation.Screen name="Updates" component={ComplaintUpdatesScreen}/>
