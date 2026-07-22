@@ -24,8 +24,6 @@ const BackgroundDetails = (route) => {
     const loginContext = useContext(LoginContexts)
     const { getCustomerDetail, updateCustomer } = useContext(UsersContext)
 
-    console.log("sillu", getCustomerDetail)
-
     console.log(route)
     const { width } = Dimensions.get("window")
 
@@ -300,7 +298,6 @@ const BackgroundDetails = (route) => {
     }
 
     const handleEdit = () => {
-        console.log("binthu")
 
         // if (!validateForm()) return;
 

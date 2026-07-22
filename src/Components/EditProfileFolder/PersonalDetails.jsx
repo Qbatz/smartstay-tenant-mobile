@@ -22,6 +22,7 @@ const PersonalDetails = (route) => {
 
     const navigation = useNavigation();
     const context = useContext(UsersContext)
+    const {getCustomerDetail} = useContext(UsersContext)
     const loginContext = useContext(LoginContexts)
 
     const [firstname, setfirstName] = useState(route.route?.params?.customer?.firstName);
@@ -32,7 +33,7 @@ const PersonalDetails = (route) => {
     const [streetName, setStreetName] = useState(route.route?.params?.customer?.street || "");
     const [landmark, setLandmark] = useState(route.route?.params?.customer?.landmark || "");
     const [city, setCity] = useState(route.route?.params?.customer?.city || "");
-    const [pincode, setPincode] = useState(route.route?.params?.customer?.pincode || "");
+    const [pincode, setPincode] = useState( String(route.route?.params?.customer?.pincode)|| "");
     const [state, setState] = useState(route.route?.params?.customer?.state || "")
     const [initials, setInitials] = useState(route.route?.params?.customer?.initials)
     const [profileImage, setProfileImage] = useState(null);
@@ -57,12 +58,12 @@ const PersonalDetails = (route) => {
             });
         });
     };
-    const houseNoRef=useRef(null);
-    const streetRef=useRef(null);
-    const landmarkRef=useRef(null);
-    const cityRef=useRef(null);
+    const houseNoRef = useRef(null);
+    const streetRef = useRef(null);
+    const landmarkRef = useRef(null);
+    const cityRef = useRef(null);
     const PincodeRef = useRef(null);
-    const stateRef=useRef(null);
+    const stateRef = useRef(null);
 
     const scrollToField = (ref) => {
         if (!ref?.current || !scrollRef.current) return;
@@ -78,6 +79,20 @@ const PersonalDetails = (route) => {
             () => { }
         );
     };
+
+    useEffect(()=>{
+        if(getCustomerDetail){
+            setfirstName(getCustomerDetail?.firstName)
+            setLastName(getCustomerDetail?.lastName)
+            setMailId(getCustomerDetail?.emailId)
+            setHouseNo(getCustomerDetail?.houseNo)
+            setStreetName(getCustomerDetail?.street)
+            setLandmark(getCustomerDetail?.landmark)
+            setCity(getCustomerDetail?.city)
+            setPincode(String(getCustomerDetail?.pincode))
+            setState(getCustomerDetail?.state)
+        }
+    },[getCustomerDetail])
 
 
 
@@ -268,18 +283,18 @@ const PersonalDetails = (route) => {
         />
 
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 30 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center',marginTop:12 }}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
                     <Image source={LeftArrow} style={{ height: 25, width: 25 }} />
                 </TouchableOpacity>
                 <Text style={{ fontSize: 20, fontFamily: 'Gilroy-Semibold', marginLeft: 8 }}>Personal Details</Text>
             </View>
 
-            <TouchableOpacity onPress={handleEdit}
+            {/* <TouchableOpacity onPress={handleEdit}
                 style={{ backgroundColor: '#E7F1FF', paddingVertical: 5, paddingHorizontal: 10, borderRadius: 5, flexDirection: 'row' }}>
                 <Image source={EditSmallIcon} style={{ width: 16, height: 16 }} />
                 <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#1E45E1', marginLeft: 6 }}>Edit</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
         </View>
         <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -323,14 +338,21 @@ const PersonalDetails = (route) => {
                     </TouchableOpacity>
                 </View>
 
-
-                <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold', marginTop: 15 }}>Basic Info</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: "space-between", marginTop: 15 }}>
+                    <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold', }}>Basic Info</Text>
+                    <TouchableOpacity onPress={() => navigation.navigate("EditBasicDetail")}
+                        style={{ backgroundColor: '#E7F1FF', paddingVertical: 5, paddingHorizontal: 10, borderRadius: 8, flexDirection: 'row' }}>
+                        <Image source={EditSmallIcon} style={{ width: 16, height: 16 }} />
+                        <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#1E45E1', marginLeft: 6 }}>Edit</Text>
+                    </TouchableOpacity>
+                </View>
 
                 <View style={[styles.fieldContainer, { marginTop: 15 }]}>
                     <Text style={styles.label}>First name</Text>
 
                     <TextInput
                         value={firstname}
+                        editable={false}
                         placeholder="Enter first name"
                         style={styles.input}
                         onChangeText={(text) => {
@@ -345,6 +367,7 @@ const PersonalDetails = (route) => {
 
                     <TextInput
                         value={lastName}
+                        editable={false}
                         placeholder="Enter last name"
                         style={styles.input}
                         onChangeText={(text) => {
@@ -360,6 +383,7 @@ const PersonalDetails = (route) => {
                     <TextInput
                         value={mailId}
                         placeholder="Enter mailId"
+                        editable={false}
                         style={styles.input}
                         onChangeText={(text) => {
                             const noEmojis = text.replace(
@@ -383,15 +407,24 @@ const PersonalDetails = (route) => {
                     <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#1E45E1' }}>Mobile No not editable</Text>
                 </View>
 
-                <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold', marginTop: 15 }}>Address Details</Text>
+                <View style={{flexDirection:'row',alignItems:'center',justifyContent:"space-between"}}>
+                    <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold', marginTop: 15 }}>Address Details</Text>
+                    <TouchableOpacity onPress={() => navigation.navigate("EditAddressDetail")}
+                        style={{ backgroundColor: '#E7F1FF', paddingVertical: 5, paddingHorizontal: 10, borderRadius: 8, flexDirection: 'row' }}>
+                        <Image source={EditSmallIcon} style={{ width: 16, height: 16 }} />
+                        <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#1E45E1', marginLeft: 6 }}>Edit</Text>
+                    </TouchableOpacity>
+                </View>
 
                 <View ref={houseNoRef} style={[styles.fieldContainer, { marginTop: 15 }]}>
                     <Text style={styles.label}>House No / Apartment</Text>
 
                     <TextInput
                         value={houseNo}
+                        disableFullscreenUI
                         placeholder="Enter house No"
                         style={styles.input}
+                        editable={false}
                         onFocus={() => {
                             setTimeout(() => {
                                 scrollToField(houseNoRef);
@@ -405,13 +438,14 @@ const PersonalDetails = (route) => {
                     />
                 </View>
 
-                <View  ref={streetRef} style={styles.fieldContainer}>
+                <View ref={streetRef} style={styles.fieldContainer}>
                     <Text style={styles.label}>Street / Area</Text>
 
                     <TextInput
                         value={streetName}
                         placeholder="Enter street name"
                         style={styles.input}
+                        editable={false}
                         onFocus={() => {
                             setTimeout(() => {
                                 scrollToField(streetRef);
@@ -431,6 +465,7 @@ const PersonalDetails = (route) => {
                         value={landmark}
                         placeholder="Enter landmark"
                         style={styles.input}
+                        editable={false}
                         onFocus={() => {
                             setTimeout(() => {
                                 scrollToField(landmarkRef);
@@ -446,6 +481,7 @@ const PersonalDetails = (route) => {
                         value={city}
                         placeholder="Enter city name"
                         style={styles.input}
+                        editable={false}
                         onFocus={() => {
                             setTimeout(() => {
                                 scrollToField(cityRef);
@@ -464,9 +500,10 @@ const PersonalDetails = (route) => {
 
                     <TextInput
                         value={pincode}
+                        editable={false}
                         placeholder="Enter pincode"
                         style={styles.input}
-                        maxLength={6}             
+                        maxLength={6}
                         onFocus={() => {
                             setTimeout(() => {
                                 scrollToField(PincodeRef);
@@ -485,6 +522,7 @@ const PersonalDetails = (route) => {
 
                     <TextInput
                         value={state}
+                        editable={false}
                         placeholder="Enter state"
                         style={styles.input}
                         onChangeText={(text) => {

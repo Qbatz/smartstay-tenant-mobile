@@ -8,6 +8,7 @@ import calenderTick from '../../../assets/Images/calendar-tick.png'
 import { UsersContext } from "../../../Context/UserContext";
 import { LoginContexts } from "../../../Context/LoginContext";
 import { postRquestAmenties } from "../../../Action/HostelAction";
+import { paymentContexts } from "../../../Context/PaymentContext";
 
 
 const AmenitiesBottomSheet = ({
@@ -23,6 +24,7 @@ const AmenitiesBottomSheet = ({
 
   const context = useContext(UsersContext)
   const loginContext = useContext(LoginContexts)
+  const {getLoading}=useContext(paymentContexts)
 
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [toastMessage, setToastMessage] = useState()
@@ -105,7 +107,6 @@ const AmenitiesBottomSheet = ({
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={StyleSheet.absoluteFill} />
       </TouchableWithoutFeedback>
-
       <Animated.View style={[style.amenitiesBottomSheet, { transform: [{ translateY: sheetY }] }]}
         {...panResponder.panHandlers}>
 
@@ -115,7 +116,7 @@ const AmenitiesBottomSheet = ({
             <View style={style.dragindictor} />
           </View>
 
-          <AppLoader visible={loading} />
+          <AppLoader visible={loading || getLoading} />
           <SuccessModal
             visible={showSuccessModal}
             onClose={() => setShowSuccessModal(false)}
@@ -152,15 +153,15 @@ const AmenitiesBottomSheet = ({
                     </View>
 
                     <View>
-                      <Text style={{ fontSize: 12,fontFamily:'Gilroy-Regular', color: '#4B4B4B' }}>Description</Text>
+                      <Text style={{ fontSize: 13,fontFamily:'Gilroy-Regular', color: '#4B4B4B' }}>Description</Text>
                       <Text style={{ marginTop: 13, fontSize: 16,fontFamily:'Gilroy-Medium'}}>
-                        {myAmenitis?.description}
+                        {myAmenitis?.description || myAmenitis?.reason || "N/A"}
                       </Text>
                     </View>
 
                     <View style={{ paddingTop: 18 }}>
                       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                        <Text style={{ fontSize: 12,fontFamily:'Gilroy-Regular', color: '#4B4B4B' }}>Price plans</Text>
+                        <Text style={{ fontSize: 13,fontFamily:'Gilroy-Regular', color: '#4B4B4B' }}>Price plans</Text>
                         <TouchableOpacity>
                           <Text style={{ fontSize: 12, color: '#1E45E1',fontFamily:'Gilroy-Medium' }}>Change Plan</Text>
                         </TouchableOpacity>
@@ -169,7 +170,7 @@ const AmenitiesBottomSheet = ({
                     </View>
 
                     <View style={{ paddingTop: 15 }}>
-                      <Text style={{ fontSize: 12,fontFamily:'Gilroy-Regular',color: '#4B4B4B' }}>Next Bill</Text>
+                      <Text style={{ fontSize: 13,fontFamily:'Gilroy-Regular',color: '#4B4B4B' }}>Next Bill</Text>
                       <Text style={{ fontSize: 16,fontFamily:'Gilroy-Semibold', marginTop: 9 }}>{formatDate(myAmenitis?.nextBillStartDate)}</Text>
                     </View>
 
@@ -188,19 +189,19 @@ const AmenitiesBottomSheet = ({
                   <Text style={{ fontSize: 23,fontFamily:'Gilroy-Semibold'}}>{available.amenityName}</Text>
                   <View style={{ width: '100%', height: 1, backgroundColor: "#eee", marginTop: 18 }} />
                   <View style={{ justifyContent: 'space-between', flex: 1 }}>
-                    <View style={{ paddingTop: 10 }}>
-                      <Text style={{ fontSize: 12,fontFamily:'Gilroy-Regular', color: '#4B4B4B' }}>Description</Text>
+                    <View style={{ paddingTop: 14 }}>
+                      <Text style={{ fontSize: 13,fontFamily:'Gilroy-Regular', color: '#4B4B4B' }}>Description</Text>
 
                       <View style={{ paddingTop: 14 }}>
-                        <Text style={{ fontSize: 16, fontFamily:'Gilroy-Medium', marginBottom: 2 }}>{available?.description}</Text>
+                        <Text style={{ fontSize: 16, fontFamily:'Gilroy-Medium', marginBottom: 2 }}>{available?.description || "N/A"}</Text>
                         {/* <Text style={{ fontSize: 16, fontWeight: 400, marginTop: 2 }}>24/7 Access, pickup lopp from lobby</Text> */}
                       </View>
 
                       <View style={{ paddingTop: 20 }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                          <Text style={{ fontSize: 12,fontFamily:'Gilroy-Regular', color: '#4B4B4B' }}>Price Plans</Text>
+                          <Text style={{ fontSize: 13,fontFamily:'Gilroy-Regular', color: '#4B4B4B' }}>Price Plans</Text>
                           <TouchableOpacity>
-                            <Text style={{ fontSize: 12,fontFamily:'Gilroy-Medium', color: '#1E45E1', textDecorationLine: 'underline' }}>Select plan</Text>
+                            <Text style={{ fontSize: 13,fontFamily:'Gilroy-Medium', color: '#1E45E1', textDecorationLine: 'underline' }}>Select plan</Text>
                           </TouchableOpacity>
                         </View>
 
@@ -229,7 +230,7 @@ const AmenitiesBottomSheet = ({
                     </View>
                     <View >
                       <TouchableOpacity onPress={() => onRequestAmenities(available.amenityId)}
-                        style={{ backgroundColor: '#1d41d5', paddingVertical: 12, alignItems: 'center', borderRadius: 20 }}>
+                        style={{ backgroundColor: '#1d41d5', paddingVertical: 12, alignItems: 'center', borderRadius: 10 }}>
                         <Text style={{ fontSize: 14.11,fontFamily:'Gilroy-Semibold', color: '#ffffff' }}>Request Amenity</Text>
                       </TouchableOpacity>
                     </View>

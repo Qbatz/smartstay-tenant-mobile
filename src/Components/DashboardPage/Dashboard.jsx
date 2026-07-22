@@ -60,6 +60,9 @@ import gobackIcon from "../../assets/Images/logout.png"
 import PaymentBottomSheet from "./BottomSheet/PaymentBottomSheet";
 import CancelledBookingPic from "../../assets/Images/CancelledBookingPic.png"
 import AppLoader from "../ToastFile/LoaderPage";
+import { storeData } from "../../Utils/Storage";
+import { CUSTOMERDETAIL } from "../../Utils/Constant";
+import RequestViewSheet from "./BottomSheet/RequestViewSheet";
 
 const { width, height } = Dimensions.get("window");
 
@@ -118,6 +121,14 @@ function Dashboard(props) {
   const [reopenComplaint, setReopenComplaint] = useState(false)
   const [deletComplaintError, setDeleteComplaintError] = useState()
   const [selectedInvoiceId, setSelectedIvoiceId] = useState();
+
+  const tabBarTranslateY = useRef(new Animated.Value(0)).current;
+  const tabBarHeight = useRef(new Animated.Value(50)).current;
+  const lastScrollY = useRef(0);
+  const isHidden = useRef(false);
+  const [showTopNavigationBar, setShowTopNavigationBar] = useState(true)
+  const [showRequestView, setShowRequestView] = useState(false)
+  const [selectedRequest, setSelectedRequest] = (useState(""))
 
   const { CommonModule } = NativeModules;
 
@@ -266,11 +277,123 @@ function Dashboard(props) {
     customerDetails(loginContext.getToken).then(r => {
       console.log("haha", r.data)
       context.updateCustomer(r.data)
+      storeData(CUSTOMERDETAIL, JSON.stringify(r.data))
       CommonModule.updateCustomerId(r.data.customerId)
     }).catch(error => {
       console.log(error)
     })
-  }, [])
+  }, [context.getHostelDetail, loginContext.getToken])
+
+  //   const handleScroll = (event) => {
+  //   const currentY = event.nativeEvent.contentOffset.y;
+
+  //   if (currentY > lastScrollY.current + 15 && !isHidden.current) {
+  //     isHidden.current = true;
+
+  //     Animated.timing(tabBarTranslateY, {
+  //       toValue: -60,
+  //       duration: 250,
+  //       useNativeDriver: true,
+  //     }).start();
+  //   }
+
+  //   if (currentY < lastScrollY.current - 15 && isHidden.current) {
+  //     isHidden.current = false;
+
+  //     Animated.timing(tabBarTranslateY, {
+  //       toValue: 0,
+  //       duration: 250,
+  //       useNativeDriver: true,
+  //     }).start();
+  //   }
+
+  //   lastScrollY.current = currentY;
+  // };
+  // const handleScroll = (event) => {
+  //   const currentY = event.nativeEvent.contentOffset.y;
+
+  //   if (currentY > lastScrollY.current + 15 && !isHidden.current) {
+  //     isHidden.current = true;
+
+  //     Animated.parallel([
+  //       Animated.timing(tabBarHeight, {
+  //         toValue: 0,
+  //         duration: 250,
+  //         useNativeDriver: false,
+  //       }),
+  //       Animated.timing(tabBarTranslateY, {
+  //         toValue: -50,
+  //         duration: 250,
+  //         useNativeDriver: true,
+  //       }),
+  //     ]).start();
+  //   }
+
+  //   if (currentY < lastScrollY.current - 15 && isHidden.current) {
+  //     isHidden.current = false;
+
+  //     Animated.parallel([
+  //       Animated.timing(tabBarHeight, {
+  //         toValue: 50,
+  //         duration: 250,
+  //         useNativeDriver: false,
+  //       }),
+  //       Animated.timing(tabBarTranslateY, {
+  //         toValue: 0,
+  //         duration: 250,
+  //         useNativeDriver: true,
+  //       }),
+  //     ]).start();
+  //   }
+
+  //   lastScrollY.current = currentY;
+  // };
+
+  // const handleScroll = (event) => {
+  //   const currentY = event.nativeEvent.contentOffset.y;
+
+  //   // Hide while scrolling down
+  //   if (currentY > lastScrollY.current + 10 && showTopNavigationBar) {
+  //     setShowTopNavigationBar(false);
+  //   }
+
+  //   // Show while scrolling up
+  //   if (currentY < lastScrollY.current - 10 && !showTopNavigationBar) {
+  //     setShowTopNavigationBar(true);
+  //   }
+
+  //   lastScrollY.current = currentY;
+  // };
+  const lastOffset = useRef(0);
+  const scrollDirection = useRef(null);
+
+  const handleScroll = (event) => {
+    const currentY = event.nativeEvent.contentOffset.y;
+
+    // Ignore top area
+    if (currentY < 0) return;
+
+    const diff = currentY - lastScrollY.current;
+
+    // Ignore tiny movements
+    if (Math.abs(diff) < 15) return;
+
+    if (diff > 0) {
+      // Scrolling DOWN
+      if (scrollDirection.current !== "down") {
+        scrollDirection.current = "down";
+        setShowTopNavigationBar(false);
+      }
+    } else {
+      // Scrolling UP
+      if (scrollDirection.current !== "up") {
+        scrollDirection.current = "up";
+        setShowTopNavigationBar(true);
+      }
+    }
+
+    lastScrollY.current = currentY;
+  };
 
   const formatDate = (inputDate) => {
     if (!inputDate) return "";
@@ -320,8 +443,14 @@ function Dashboard(props) {
       complaintContext.updateComplaint(r.data)
       complaintContext.updateComments(r.data?.comments)
     })
+  }
 
-
+  const handleViewRequest = (item) => {
+    console.log("srithi", item)
+    if (item) {
+      setShowRequestView(true)
+      setSelectedRequest(item)
+    }
   }
 
   const commentclick = () => {
@@ -410,19 +539,44 @@ function Dashboard(props) {
       setShowAmenities(true)
       setTag(tag)
 
-      getAmenties(context.getHostelDetail.hostelId, item.amenityId, loginContext.getToken).then(r => {
-        console.log(r)
-        setmyAminites(r.data)
-      })
+      paymentContext.updateLoading(true)
+      try {
+
+        getAmenties(context.getHostelDetail.hostelId, item.amenityId, loginContext.getToken).then(r => {
+          console.log(r)
+          if (r.status == 200) {
+            setmyAminites(r.data)
+            paymentContext.updateLoading(false)
+          } else {
+            paymentContext.updateLoading(false)
+          }
+        })
+      } catch (error) {
+        console.log(error)
+        paymentContext.updateLoading(false)
+      }
 
     }
     else {
       setShowAmenities(true)
       setTag(null)
-      getAmenties(context.getHostelDetail.hostelId, item.amenityId, loginContext.getToken).then(r => {
-        console.log(r)
-        setAvailable(r.data)
-      })
+      paymentContext.updateLoading(true)
+      try {
+        getAmenties(context.getHostelDetail.hostelId, item.amenityId, loginContext.getToken).then(r => {
+          console.log(r)
+          if (r.status === 200) {
+            setAvailable(r.data)
+            paymentContext.updateLoading(false)
+          }
+          else {
+            paymentContext.updateLoading(false)
+          }
+
+        })
+      } catch (error) {
+        console.log(error)
+        paymentContext.updateLoading(false)
+      }
 
     }
   }
@@ -444,13 +598,13 @@ function Dashboard(props) {
         if (r.status === 200) {
           paymentContext.updateInvoice(r.data);
           setTimeout(() => {
-             paymentContext.updateLoading(false)
+            paymentContext.updateLoading(false)
           }, 1000);
         }
 
       })
       setModalVisible(true);
-      
+
     } catch (error) {
       console.log(error)
     }
@@ -528,25 +682,54 @@ function Dashboard(props) {
 
   // ---------------------------
   const routes = [{ key: 'mystay', title: 'MyStay', icon: Building }, { key: 'services', title: 'Services', icon: Flash }, { key: 'payment', title: 'Payment', icon: MobilePayment }]
-  const renderTabBar = props => (<TabBar {...props}
-    indicatorStyle={{ backgroundColor: '#0227B5' }} style={{ backgroundColor: '#ffffff' }}
-    inactiveColor="black"
-    activeColor="blue"
-    renderLabel={({ route, color }) => (<Text style={{ color: color, }}>
-      {route.title}
-    </Text>)}
-  />
-  )
+  // const renderTabBar = props => (<TabBar {...props}
+  //   indicatorStyle={{ backgroundColor: '#0227B5' }} style={{ backgroundColor: '#ffffff' }}
+  //   inactiveColor="black"
+  //   activeColor="blue"
+  //   renderLabel={({ route, color }) => (<Text style={{ color: color, }}>
+  //     {route.title}
+  //   </Text>)}
+  // />
+  // )
+  const renderTabBar = (props) => (
+    <TabBar
+      {...props}
+      indicatorStyle={{ backgroundColor: '#0227B5' }}
+      style={{ backgroundColor: '#fff' }}
+      inactiveColor="black"
+      activeColor="blue"
+      renderLabel={({ route, color }) => (
+        <Text style={{ color }}>{route.title}</Text>
+      )}
+    />
+  );
+  // const renderTabBar = (props) => (
+  //   <Animated.View
+  //     style={{
+  //       height: tabBarHeight,
+  //       overflow: "hidden",
+  //       transform: [{ translateY: tabBarTranslateY }],
+  //     }}
+  //   >
+  //     <TabBar
+  //       {...props}
+  //       indicatorStyle={{ backgroundColor: "#0227B5" }}
+  //       style={{ backgroundColor: "#fff" }}
+  //     />
+  //   </Animated.View>
+  // );
 
   const renderScene = ({ route, jumpTo }) => {
     switch (route.key) {
       case 'mystay':
         return <MyStay onRequestBedChange={bedfn} onSheet={addComplaint} hostel={props?.route?.params?.hostel} jumpTo={jumpTo}
-          onViewComplaint={handleViewComplaint} />;
+          onViewComplaint={handleViewComplaint} onScroll={handleScroll} onHandleViewRequest={handleViewRequest} />;
       case 'services':
-        return <Services onOpen={handle} onSheet={addComplaint} onAmenities={handleAmenity} jumpTo={jumpTo} hostel={props?.route?.params?.hostel} />;
+        return <Services onOpen={handle} onSheet={addComplaint} onAmenities={handleAmenity} jumpTo={jumpTo} hostel={props?.route?.params?.hostel}
+          onScroll={handleScroll} />;
       case 'payment':
-        return <Payment onPayment={viewPay} onFilterPayment={filterpay} hostel={props?.route?.params?.hostel} jumpTo={jumpTo} />;
+        return <Payment onPayment={viewPay} onFilterPayment={filterpay} hostel={props?.route?.params?.hostel} jumpTo={jumpTo}
+          onScroll={handleScroll} />;
       default:
         return null;
     }
@@ -681,20 +864,29 @@ function Dashboard(props) {
     )
     }
 
-    {!["INACTIVE", "CANCELLED_BOOKING"].includes(context?.getCustomerDetail?.currentStatus) && (
-      <View style={{ flex: 1, paddingLeft: 20, paddingRight: 20, }}>
-        <TabView navigationState={{ index: index, routes }}
-          commonOptions={{
-            icon: ({ route, color }) => (<Image source={route.icon} style={{ width: 21.12, height: 21.12, tintColor: color }} />)
-          }}
-          renderTabBar={renderTabBar}
-          renderScene={renderScene}
-          onIndexChange={setindex}
-          initialLayout={{ width: Dimensions.get('window').width }}
-          style={{ flex: 1, justifyContent: 'center' }} />
 
-      </View>
-    )
+
+    {
+
+      !["INACTIVE", "CANCELLED_BOOKING"].includes(context?.getCustomerDetail?.currentStatus) && (
+        <View style={{ flex: 1, paddingLeft: 20, paddingRight: 20, }}>
+
+          <TabView navigationState={{ index: index, routes }}
+            commonOptions={{
+              icon: ({ route, color }) => (<Image source={route.icon} style={{ width: 21.12, height: 21.12, tintColor: color }} />)
+            }}
+
+            // renderTabBar={renderTabBar}
+            renderTabBar={(props) =>
+              showTopNavigationBar ? renderTabBar(props) : null
+            }
+            renderScene={renderScene}
+            onIndexChange={setindex}
+            initialLayout={{ width: Dimensions.get('window').width }}
+            style={{ flex: 1, justifyContent: 'center' }} />
+
+        </View>
+      )
     }
 
 
@@ -869,12 +1061,12 @@ function Dashboard(props) {
 
                                 <TouchableOpacity onPress={() => imageclick(item.imageId)}>
                                   <Image source={{ uri: item.imageUrl }} style={{ width: 90, height: 70, borderRadius: 5 }} />
-                                  {imageid === item.imageId && deletevisible && (
+                                  {/* {imageid === item.imageId && deletevisible && (
                                     <TouchableOpacity onPress={() => onImageDelete(item.imageId, selectedComplaint.complaintId)}
                                       style={{ position: "absolute", bottom: 25, right: 35, }} >
                                       <Image source={Trash} style={{ width: 21.09, height: 21.09, }} />
                                     </TouchableOpacity>
-                                  )}
+                                  )} */}
                                 </TouchableOpacity>
                               </View>
                             }}
@@ -1208,6 +1400,11 @@ function Dashboard(props) {
       onClose={() => { setFilterBottomSheet(false) }}
       sheetY={sheetY}
       panResponder={panResponder} />
+
+    <RequestViewSheet
+      visible={showRequestView}
+      onClose={() => setShowRequestView(false)}
+      requestDetail={selectedRequest} />
 
   </SafeAreaView >
 

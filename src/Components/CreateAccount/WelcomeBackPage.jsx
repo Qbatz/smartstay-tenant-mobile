@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, Image } from "react-native";
 import SmartStayLogo from "../../assets/Images/SmartStayLogo.png"
 import CustometIcon from "../../assets/Images/Customer_Icon.png"
 import { remoteData, retriveData, storeData } from "../../Utils/Storage";
-import { CUSTOMERDETAIL, CUSTOMERINITIALS, CUSTOMERPROFILEPIC, LOGGEDIN, LOGGEDOUT, PHONE_NO } from "../../Utils/Constant";
+import { ACCESS_TOKEN, CUSTOMERDETAIL, CUSTOMERINITIALS, CUSTOMERPROFILEPIC, HOSTELDETAIL, HOSTELLIST, LOGGEDIN, LOGGEDOUT, PHONE_NO } from "../../Utils/Constant";
 import { LoginContexts } from "../../Context/LoginContext";
 import { UsersContext } from "../../Context/UserContext";
 import RightArrow from "../../assets/Images/arrow-right.png"
@@ -22,8 +22,8 @@ const WelcomeBackPage = () => {
 
     useEffect(() => {
         retriveData(CUSTOMERDETAIL).then(r => {
-            console.log(r)
-            setCustomerName(r)
+            const customerDetail= r ? JSON.parse(r) : null;
+            setCustomerName(customerDetail?.firstName)
         })
          retriveData(CUSTOMERPROFILEPIC).then(r=>{
             console.log(r)
@@ -33,6 +33,11 @@ const WelcomeBackPage = () => {
          retriveData(CUSTOMERINITIALS).then(r=>{
             console.log(r)
             setCustomerInitials(r)
+         })
+
+         retriveData(ACCESS_TOKEN).then(r=>{
+            console.log("accessToken",r)
+            loginContext.updateToken(r)
          })
     }, [])
 
@@ -59,6 +64,11 @@ const WelcomeBackPage = () => {
         remoteData(CUSTOMERPROFILEPIC)
         storeData(LOGGEDOUT, "false")
         remoteData(CUSTOMERINITIALS)
+        remoteData(HOSTELDETAIL)
+        remoteData(HOSTELLIST)
+        remoteData(ACCESS_TOKEN)
+        remoteData(CUSTOMERDETAIL)
+         loginContext.updateToken(null)
 
         loginContext.logout("temp");
         setTimeout(() => {

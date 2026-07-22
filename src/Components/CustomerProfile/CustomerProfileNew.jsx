@@ -66,9 +66,9 @@ const CustomerProfileNew = (route) => {
     const [customer, setCustomers] = useState()
     const { NotificationModule, CommonModule } = NativeModules;
     const [penditnActionBottomSheet, setPendingActionSheet] = useState(false);
-    const [showSuccessModal, setShowSuccessModal]=useState(false);
-    const [showSuccessMessage, setShowSuccessMessage]=useState("");
-    const [showModalType, setShowModalType]=useState("")
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [showSuccessMessage, setShowSuccessMessage] = useState("");
+    const [showModalType, setShowModalType] = useState("")
 
     const SCREEN_HEIGHT = Dimensions.get("window").height;
 
@@ -103,7 +103,7 @@ const CustomerProfileNew = (route) => {
         customerDetails(loginContext.getToken).then(r => {
             console.log(r.data)
             context.updateCustomer(r.data)
-            storeData(CUSTOMERDETAIL, r.data.firstName)
+            storeData(CUSTOMERDETAIL, JSON.stringify(r.data))
 
             storeData(CUSTOMERINITIALS, r.data.initials)
             if (r.data.profilePic != null) {
@@ -112,7 +112,7 @@ const CustomerProfileNew = (route) => {
         }).catch(error => {
             console.log(error)
         })
-    }, [])
+    }, [context.getHostelDetail, loginContext.getToken])
 
     const openSheet = () => {
         Animated.timing(translateY, {
@@ -237,10 +237,10 @@ const CustomerProfileNew = (route) => {
         })
         storeData(LOGGEDOUT, "true")
         loginContext.logout('false')
-        remoteData(ACCESS_TOKEN)
+        // remoteData(ACCESS_TOKEN)
         // remoteData(PHONE_NO) 
         storeData(LOGGEDIN, "false")
-        loginContext.updateToken(null)
+        // loginContext.updateToken(null)
         NotificationModule.logout();
 
 
@@ -269,7 +269,6 @@ const CustomerProfileNew = (route) => {
         console.log(entityId)
         console.log(tenantMobileNo)
 
-        console.log("Thata", res)
         if (res?.status === 200) {
             CommonModule.verifyKyc(tenantMobileNo, entityId, accessTokenId)
         } else {
@@ -286,13 +285,13 @@ const CustomerProfileNew = (route) => {
 
 
     return (
-      
+
         <View style={styles.container}>
-              <SuccessModal
-              visible={showSuccessModal}
-              onClose={()=>setShowSuccessModal(false)}
-              message={showSuccessMessage}
-              type={showModalType}/>
+            <SuccessModal
+                visible={showSuccessModal}
+                onClose={() => setShowSuccessModal(false)}
+                message={showSuccessMessage}
+                type={showModalType} />
             <ScrollView contentContainerStyle={styles.scrollContainer} >
                 <View>
                     <LinearGradient
@@ -385,8 +384,14 @@ const CustomerProfileNew = (route) => {
 
                         {context.getCustomerDetail?.kyc?.currentStatus != "VERIFIED" && (
 
-                            <View style={{ borderRadius: 12, borderWidth: 1, borderColor: "#eee", padding: 20, marginTop: 12 }}>
-                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <View style={{
+                                borderRadius: 12, borderWidth: 1, borderColor: "#DCDCDC", padding: 20, marginTop: 12, elevation: 2,
+                                shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
+                                shadowOpacity: 0.08, shadowRadius: 4, backgroundColor: '#ffffff'
+                            }}>
+
+                                <Image source={MessageDocIcon} style={{ width: 92, height: 51 }} />
+                                <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 11 }}>
                                     <View style={{ flex: 1 }}>
                                         <Text style={{ fontSize: 15, fontFamily: 'Gilroy-Medium', color: '#000000', flexShrink: 1 }}>
                                             Complete your KYC Verification</Text>
@@ -396,7 +401,7 @@ const CustomerProfileNew = (route) => {
 
                                     </View>
 
-                                    <Image source={MessageDocIcon} style={{ width: 92, height: 51 }} />
+
 
 
                                 </View>
@@ -409,7 +414,7 @@ const CustomerProfileNew = (route) => {
 
                                     <TouchableOpacity onPress={handleKyc}
                                         style={{
-                                            backgroundColor: '#1E45E1', paddingHorizontal: 20, paddingVertical: 16,
+                                            backgroundColor: '#1E45E1', paddingHorizontal: 22, paddingVertical: 10,
                                             borderRadius: 8, flexDirection: 'row', alignItems: 'center'
                                         }}>
                                         <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Semibold', color: '#ffffff' }}>Verify now</Text>
@@ -436,10 +441,10 @@ const CustomerProfileNew = (route) => {
                                 <Image source={sideframe} style={{ width: 23, height: 23 }} />
                             </TouchableOpacity>
 
-                            <View style={styles.divider} />
+                            {/* <View style={styles.divider} /> */}
 
                             <TouchableOpacity onPress={() => navigation.navigate("AccountDetails", { customer: context.getCustomerDetail })}
-                                style={styles.row}>
+                                style={[styles.row, { marginTop: 30 }]}>
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                     <Image source={UserAccountDetails} style={{ width: 25, height: 25 }} />
                                     <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium', marginLeft: 5 }}>
@@ -452,9 +457,9 @@ const CustomerProfileNew = (route) => {
                             {
                                 context.getCustomerDetail?.bookingDetails?.currentStatus != "BOOKED" && (
                                     <>
-                                        <View style={styles.divider} />
+                                        {/* <View style={styles.divider} /> */}
 
-                                        <TouchableOpacity onPress={() => navigation.navigate('ComingSoonPage')} style={styles.row}>
+                                        <TouchableOpacity onPress={() => navigation.navigate('ComingSoonPage')} style={[styles.row, { marginTop: 30 }]}>
                                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                                 <Image source={paperclip} style={{ width: 25, height: 25 }} />
                                                 <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium', marginLeft: 5 }}>Rental Agreement</Text>
@@ -466,6 +471,17 @@ const CustomerProfileNew = (route) => {
 
                                 )
                             }
+
+                            <TouchableOpacity onPress={() => navigation.navigate("Privacy&Security")}
+                                style={[styles.row, { marginTop: 30 }]}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <Image source={UserAccountDetails} style={{ width: 25, height: 25 }} />
+                                    <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium', marginLeft: 5 }}>
+                                        Privacy & Security</Text>
+                                </View>
+
+                                <Image source={sideframe} style={{ width: 23, height: 23 }} />
+                            </TouchableOpacity>
 
                         </View>
                     </View>
@@ -506,7 +522,8 @@ const CustomerProfileNew = (route) => {
 
                 {/* </View> */}
                 {/* </View> */}
-                <View style={{ justifyContent: 'flex-end', paddingHorizontal: 20 }}>
+                <View style={styles.divider} />
+                <View style={{ paddingHorizontal: 20, marginLeft: 5 }}>
                     <View style={styles.helpRow}>
                         <Image source={InfoIcon} resizeMode="contain" style={{ width: 20, height: 20 }} />
                         <Text style={styles.helpText}>Help & Information</Text>
@@ -514,7 +531,7 @@ const CustomerProfileNew = (route) => {
 
                     <View style={{ marginTop: 20, }}>
                         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-                            <Image source={LogoutIcon} resizeMode="contain" style={{ width: 20, height: 20 }} />
+                            <Image source={LogoutIcon} resizeMode="contain" style={{ width: 25, height: 25, transform: [{ rotate: '180deg' }] }} />
                             <Text style={styles.logoutText}>Logout</Text>
                         </TouchableOpacity>
                     </View>
@@ -608,7 +625,7 @@ const styles = StyleSheet.create({
         // padding: 20,
         paddingBottom: 50,
         flexGrow: 1,
-        justifyContent: "space-between"
+        // justifyContent: "space-between"
     },
     backButton: {
         flexDirection: "row",
@@ -765,7 +782,7 @@ const styles = StyleSheet.create({
     divider: {
         height: 1,
         backgroundColor: "#eee",
-        marginVertical: 20
+        marginVertical: 12, marginHorizontal: 14,
 
     },
     sectionTitle: {
@@ -866,29 +883,30 @@ const styles = StyleSheet.create({
     },
     helpRow: {
         flexDirection: "row",
-        alignItems: "left",
+        alignItems: "center",
         justifyContent: "left",
         marginTop: 20,
         gap: 5,
     },
     helpText: {
-        color: "#555",
-        fontFamily: 'Gilroy-Medium'
+        color: "#4B4B4B", fontSize: 16,
+        fontFamily: 'Gilroy-Medium', marginLeft: 7
     },
     logoutButton: {
         width: "100%",
         flexDirection: "row",
         paddingVertical: 15,
-        borderTopWidth: 1,
-        borderColor: "#eee",
-        backgroundColor: "#FFF0F0",
-        paddingLeft: 5,
+        alignItems: 'center',
+        // borderTopWidth: 1,
+        // borderColor: "#eee",
+        // backgroundColor: "#FFF0F0",
+        // paddingLeft: 5,
         borderRadius: 7
     },
     logoutText: {
-        color: "#ff3b30",
+        // color: "#ff3b30",
         fontFamily: 'Gilroy-Medium', fontSize: 16,
-        marginLeft: 6,
+        marginLeft: 7,
     },
     row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
     overlay: {

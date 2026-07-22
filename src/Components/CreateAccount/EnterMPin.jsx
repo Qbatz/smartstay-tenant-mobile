@@ -6,7 +6,7 @@ import { UsersContext } from "../../Context/UserContext";
 import { verifyMPin } from "../../Action/LoginAction";
 import SuccessModal from "../ToastFile/TostFilePage";
 import { retriveData, storeData } from "../../Utils/Storage";
-import { ACCESS_TOKEN, CUSTOMERDETAIL, LOGGEDIN } from "../../Utils/Constant";
+import { ACCESS_TOKEN, CUSTOMERDETAIL, HOSTELLIST, LOGGEDIN } from "../../Utils/Constant";
 import { LoginContexts } from "../../Context/LoginContext";
 import WaveIcon from '../../assets/Images/HiIcon.png';
 import ErrorMessage from "../ToastFile/ErrorMessage";
@@ -28,11 +28,13 @@ const EnterMPin = (props) => {
     const [hostelList, setHostelList] = useState([]);
     const [enterPinError, setEnterPinError] = useState()
 
-     const [customerName, setCustomerName] = useState();
+    const [customerName, setCustomerName] = useState();
 
     const rotation = useRef(new Animated.Value(0)).current;
 
     console.log(createMpin)
+    console.log(loginContext)
+    console.log(context)
 
     useEffect(() => {
         Animated.loop(
@@ -51,12 +53,12 @@ const EnterMPin = (props) => {
         ).start();
     }, []);
 
-    useEffect(()=>{
-        retriveData(CUSTOMERDETAIL).then(r=>{
-            console.log(r)
-            setCustomerName(r)
+    useEffect(() => {
+        retriveData(CUSTOMERDETAIL).then(r => {
+            const customerDetail= r ? JSON.parse(r) : null
+            setCustomerName(customerDetail?.firstName)
         })
-    },[])
+    }, [])
 
     const rotateInterpolate = rotation.interpolate({
         inputRange: [-1, 1],
@@ -101,6 +103,7 @@ const EnterMPin = (props) => {
                         storeData(LOGGEDIN, "true")
                         loginContext.loggedin('true')
                         context.updateHostelList(r.data)
+                        storeData(HOSTELLIST, JSON.stringify(r.data))
                         // navigation.navigate('HostelList')
                         props.callbackMpin()
                     }, 2000);
@@ -109,9 +112,11 @@ const EnterMPin = (props) => {
                     setShowSuccessModal(true)
                     setShowModelMessage("Incorrect MPIN")
                     setModelType('error')
+                    setCreateMpin(["","","",""])
 
                     setTimeout(() => {
                         setShowSuccessModal(false);
+                         inputs.current[0].focus();
                     }, 2000);
                 }
             })
@@ -121,7 +126,7 @@ const EnterMPin = (props) => {
     }
 
 
-     const handleKeyPress = (e, index) => {
+    const handleKeyPress = (e, index) => {
         if (e.nativeEvent.key === "Backspace") {
             const newPin = [...createMpin];
 
@@ -139,6 +144,8 @@ const EnterMPin = (props) => {
 
     const handleFocus = (index) => {
         const firstEmptyIndex = createMpin.findIndex((digit) => digit === "");
+
+        console.log(firstEmptyIndex)
 
         if (firstEmptyIndex !== -1 && index > firstEmptyIndex) {
             inputs.current[firstEmptyIndex].focus();
@@ -218,7 +225,7 @@ const EnterMPin = (props) => {
         navigation.navigate('EnterNumber')
     }
 
-    return <View style={{ paddingHorizontal: 20, flex: 1 }}>
+    return <View style={{ paddingHorizontal: 20, flex: 1, backgroundColor: '#FFFFFF' }}>
         <SuccessModal
             visible={showSuccessModal}
             onClose={() => setShowSuccessModal(false)}
@@ -253,9 +260,16 @@ const EnterMPin = (props) => {
 
                 {/* <Text style={style.createText}>Hi,{customerName}</Text> */}
 
-                <Text style={style.createText}>Welcome to SmartStay</Text>
+                <Text style={style.createText} numberOfLines={2}>
+                    {customerName ? `Hi,${customerName}` : "Welcome to SmartStay"}</Text>
 
-                <Text style={style.subtitle}>Please enter 4 Digit the mPIN </Text>
+                <Text style={style.subtitle}>{loginContext?.getPhoneNo ? "Enter 4 Digit mPin for" : "Please enter 4 Digit the mPIN"}
+                    {loginContext?.getPhoneNo &&
+                        <Text
+                            style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold', color: '#222222' }}>
+                           {""} +91 {loginContext?.getPhoneNo}
+                        </Text>}
+                </Text>
 
 
 
@@ -273,7 +287,7 @@ const EnterMPin = (props) => {
                         maxLength={1}
                         value={digit}
                         onChangeText={(text) => handlePinChange(text, index)}
-                         onFocus={() => handleFocus(index)}
+                        onFocus={() => handleFocus(index)}
                         onKeyPress={(e) => handleKeyPress(e, index)}
                     />
                 ))}
@@ -282,7 +296,7 @@ const EnterMPin = (props) => {
             <View style={{ alignItems: 'flex-end', paddingTop: 20, paddingRight: 20 }}>
                 <TouchableOpacity onPress={forgotMpinClick}
                 >
-                    <Text style={{ color: '#1E45E1', fontSize: 14,fontFamily:'Gilroy-Medium', textDecorationLine: 'underline', }}>
+                    <Text style={{ color: '#1E45E1', fontSize: 14, fontFamily: 'Gilroy-Medium', textDecorationLine: 'underline', }}>
                         Forgot Mpin</Text>
                 </TouchableOpacity>
             </View>
@@ -306,12 +320,15 @@ const EnterMPin = (props) => {
 
 const style = StyleSheet.create({
     logo: { width: 66.32, height: 66.25, resizeMode: 'contain' },
-    createText: { fontSize: 27,fontFamily:'Gilroy-Semibold', color: '#222222', marginTop: 20},
-    subtitle: { fontSize: 14,fontFamily:'Gilroy-Medium', color: '#4B4B4B', marginTop: 15 },
-    pinContainer: { flexDirection: 'row', justifyContent: 'space-between', paddingTop: 40, paddingLeft: 10, paddingRight: 10, marginBottom: 5 },
+    createText: { fontSize: 24, fontFamily: 'Gilroy-Semibold', color: '#222222', marginTop: 20, textAlign: 'center' },
+    subtitle: { fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#4B4B4B', marginTop: 15 },
+    pinContainer: {
+        flexDirection: 'row', justifyContent: 'space-between', paddingLeft: 10,
+        paddingRight: 10, marginBottom: 5, marginTop: 40, height: 60
+    },
     pinBox: {
-        width: 60, heiht: 70, borderWidth: 1, borderColor: "#ccc", borderRadius: 8, textAlign: "center",
-        fontSize: 20, color: "#000",fontFamily:'Gilroy-Medium'
+        width: 60, heiht: 60, borderWidth: 1, borderColor: "#ccc", borderRadius: 12, textAlign: "center",
+        fontSize: 20, color: "#000", fontFamily: 'Gilroy-Medium'
     },
     nextButton: { backgroundColor: '#1A73E8', borderRadius: 8, paddingVertical: 20, alignItems: 'center' },
     nextText: { color: '#ffffff', fontSize: 16, fontWeight: 600 },
