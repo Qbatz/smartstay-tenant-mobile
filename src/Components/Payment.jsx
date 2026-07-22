@@ -55,7 +55,7 @@ const Payment = (props) => {
 
   useEffect(() => {
     fetchPaymentData();
-  }, [])
+  }, [context.getHostelDetail.hostelId, loginContext.getToken])
 
 
 
@@ -151,7 +151,9 @@ const Payment = (props) => {
 
   return (
     <>
-      {paymentContext.getInvoiceList?.invoices?.length > 0 ? <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      {paymentContext.getInvoiceList?.invoices?.length > 0 ? 
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false} contentContainerStyle={{paddingBottom:110}}
+       onScroll={props.onScroll}>
         {paymentContext.getInvoiceList?.invoices?.map((item, index) => (
           <React.Fragment key={index}>
             <TouchableOpacity onPress={() => props.onPayment(item)} style={styles.card}>

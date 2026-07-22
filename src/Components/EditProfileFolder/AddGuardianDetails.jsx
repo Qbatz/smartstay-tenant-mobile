@@ -222,7 +222,6 @@ const AddGuardianDetails = ({ route }) => {
     }
 
     const handleEdit = () => {
-        console.log("binthu")
 
         // if (!validateForm()) return;
 
@@ -278,7 +277,6 @@ const AddGuardianDetails = ({ route }) => {
 
                     setTimeout(() => {
                         customerDetails(getToken).then(r => {
-                            console.log("geetha", r.data)
                             updateCustomer(r.data)
                         })
                         navigation.goBack();

@@ -53,12 +53,13 @@ function MyStay(props) {
         }, 500);
     },[])
     const fetchMystayData = () => {
+        console.log("sooru",context.getHostelDetail)
         hostelDetails(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
             console.log(r.data)
             setComplaints(r.data?.complaints)
             setRentBill(r.data.currentMonthBills)
-            context.updateCurrentMonthBills(r.data.currentMonthBills)
-            context.updatePreviousMonth(r.data.previousMonthBills)
+            context.updateCurrentMonthBills(r?.data?.currentMonthBills)
+            context.updatePreviousMonth(r?.data?.previousMonthBills)
         })
 
         getRequestRaised(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
@@ -68,7 +69,7 @@ function MyStay(props) {
     }
     useEffect(() => {
         fetchMystayData();
-    }, [])
+    }, [context.getHostelDetail])
 
     // useFocusEffect(
     //     useCallback(()=>{
@@ -119,7 +120,7 @@ function MyStay(props) {
         <>
      <SkeletonLoader loading={isLoading}>
             {context.getCustomerDetail?.bookingDetails?.currentStatus === "BOOKED" && (
-                <ScrollView style={{ backgroundColor: '#ffffff', flex: 1, width: '100%' }}>
+                <ScrollView style={{ backgroundColor: '#ffffff', flex: 1, width: '100%' }} onScroll={props.onScroll}>
 
                     <View style={{ height: 130, marginTop: 15, marginRight: width * 0.10, overflow: 'hidden', width: width * 0.97 }}>
                         <View style={{ marginRight: 10, flex: 1 }}>
@@ -221,7 +222,7 @@ function MyStay(props) {
             {context.getCustomerDetail?.bookingDetails?.currentStatus != "BOOKED" && (
                 <ScrollView style={{ backgroundColor: '#ffffff', flex: 1, width: '100%' }}
                     showsVerticalScrollIndicator={false}
-                    contentContainerStyle={{ paddingBottom: 20 }}>
+                    contentContainerStyle={{ paddingBottom: 20 }} onScroll={props.onScroll}>
 
                     {/* <View style={{height:130, marginTop: 15,marginRight:width*0.10,overflow: 'hidden', width: width*0.97  }}>
             <View style={{marginRight:10,flex:1}}> 
@@ -489,7 +490,8 @@ function MyStay(props) {
                         {context.getRequestRaised && context.getRequestRaised.length > 0 ?
 
                             context.getRequestRaised.map(i => {
-                                return <View key={i?.requestId}
+                                return <TouchableOpacity onPress={()=>props.onHandleViewRequest(i)}
+                                 key={i?.requestId}
                                     style={{
                                         borderWidth: 1, borderRadius: 10, flexDirection: 'row', paddingVertical: 15,
                                         borderColor: '#EFF2FF', justifyContent: 'space-between', marginTop: 10
@@ -520,7 +522,7 @@ function MyStay(props) {
                                             {i.status}
                                         </Text>
                                     </View>
-                                </View>
+                                </TouchableOpacity>
                             })
                             :
                             <View style={{

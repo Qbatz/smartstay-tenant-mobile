@@ -184,38 +184,38 @@ const RequestBedChange = ({ visible,
                         contentContainerStyle={{ flexGrow: 1 }}>
                         <View style={{ paddingTop: 15, justifyContent: 'space-between', flex: 1 }}>
                             <View>
-                                <Text style={{ fontSize: 20, fontWeight: 600 }}>Request Bed Change</Text>
+                                <Text style={{ fontSize: 20,fontFamily:'Gilroy-Semibold'}}>Request Bed Change</Text>
 
                                 <View style={{ paddingTop: 20 }}>
-                                    <Text style={{ fontSize: 12, fontWeight: 400 }}>Current Bed</Text>
+                                    <Text style={{ fontSize: 13,fontFamily:'Gilroy-Medium' }}>Current Bed</Text>
 
                                     <View style={{
                                         backgroundColor: '#F6F8FF', borderRadius: 10, paddingVertical: 17,
                                         paddingHorizontal: 8, marginTop: 10, flexDirection: 'row'
                                     }}>
                                         <View style={{ backgroundColor: '#F9D796', flex: 1, paddingVertical: 4.64, paddingHorizontal: 9.28, alignSelf: 'flex-start', borderRadius: 46.38 }}>
-                                            <Text style={{ color: '#642B00', fontSize: 10.82, fontWeight: 400, textAlign: 'center' }}>
-                                                {context.getCustomerDetail?.bookingDetails?.floorName}</Text>
+                                            <Text style={{ color: '#642B00', fontSize: 12,fontFamily:'Gilroy-Medium', textAlign: 'center' }}>
+                                                {context.getCustomerDetail?.bookingDetails?.floorName || "N/A"}</Text>
                                         </View>
 
                                         <View style={{ flexDirection: 'row', paddingLeft: 20, flex: 1, alignItems: 'center' }}>
                                             <Image source={Room} style={{ width: 21.17, height: 21.17 }} />
-                                            <Text style={{ marginLeft: 10, fontSize: 15.97, fontWeight: 400 }}>
-                                                {context.getCustomerDetail?.bookingDetails?.roomName}
+                                            <Text style={{ marginLeft: 10, fontSize: 16,fontFamily:'Gilroy-Medium'}}>
+                                                {context.getCustomerDetail?.bookingDetails?.roomName || "N/A"}
                                             </Text>
                                         </View>
 
                                         <View style={{ flexDirection: 'row', paddingLeft: 10, alignItems: 'center', flex: 1 }}>
                                             <Image source={Bed} style={{ width: 21.17, height: 21.17 }} />
-                                            <Text style={{ marginLeft: 10, fontSize: 15.97, fontWeight: 400 }}>
-                                                {context.getCustomerDetail?.bookingDetails?.bedName}
+                                            <Text style={{ marginLeft: 10, fontSize: 16,fontFamily:'Gilroy-Medium'}}>
+                                                {context.getCustomerDetail?.bookingDetails?.bedName || "N/A"}
                                             </Text>
                                         </View>
                                     </View>
                                 </View>
 
                                 <View style={{ paddingTop: 15 }}>
-                                    <Text style={{ fontSize: 14, fontWeight: 400 }}>Reason for Bed change
+                                    <Text style={{ fontSize: 14,fontFamily:'Gilroy-Medium'}}>Reason for Bed change
                                         <Text style={{ color: 'red' }}> *</Text>
                                     </Text>
 
@@ -234,8 +234,8 @@ const RequestBedChange = ({ visible,
                                         valueField="value"
                                         value={changeBed}
                                         placeholder="Select Reason"
-                                        placeholderStyle={{ fontSize: 14, paddingRight: 10 }}
-                                        selectedTextStyle={{ fontSize: 15, fontWeight: '400' }}
+                                        placeholderStyle={{ fontSize: 14,fontFamily:'Gilroy-Medium',paddingRight: 10,color:'#9C9C9C' }}
+                                        selectedTextStyle={{ fontSize: 15,fontFamily:'Gilroy-Medium',fontWeight: '400' }}
                                         containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
 
                                         onFocus={() => setFocusReason(true)}
@@ -276,7 +276,7 @@ const RequestBedChange = ({ visible,
                                                         backgroundColor: isSelected ? '#1D4ED8' : '#F5F5F5',
                                                     }}
                                                 >
-                                                    <Text style={{ color: isSelected ? '#fff' : '#000', fontSize: 15 }}>
+                                                    <Text style={{ color: isSelected ? '#fff' : '#000', fontSize: 15,fontFamily:'Gilroy-Medium' }}>
                                                         {item.label}
                                                     </Text>
                                                 </TouchableOpacity>
@@ -289,7 +289,7 @@ const RequestBedChange = ({ visible,
                                 </View>
 
                                 <View style={{ paddingTop: 15 }}>
-                                    <Text style={{ fontSize: 14, fontWeight: 400 }}>Preffered Bed Type
+                                    <Text style={{ fontSize: 14,fontFamily:'Gilroy-Medium'}}>Preffered Bed Type
                                         <Text style={{ color: 'red' }}> *</Text>
                                     </Text>
 
@@ -301,8 +301,8 @@ const RequestBedChange = ({ visible,
                                         onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
                                         data={selectBed}
                                         containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
-                                        placeholderStyle={{ fontSize: 14, paddingRight: 10 }}
-                                        selectedTextStyle={{ fontSize: 15, fontWeight: 400 }}
+                                        placeholderStyle={{ fontSize: 14,fontFamily:'Gilroy-Medium',paddingRight: 10,color:'#9C9C9C' }}
+                                        selectedTextStyle={{ fontSize: 15,fontFamily:'Gilroy-Medium',fontWeight: 400 }}
                                         placeholder="Select Reason"
                                         labelField='label'
                                         valueField='value'
@@ -340,7 +340,7 @@ const RequestBedChange = ({ visible,
                                                     }}
                                                 >
                                                     <Text
-                                                        style={{ color: isSelected ? "#fff" : "#000", fontSize: 15, }}>
+                                                        style={{ color: isSelected ? "#fff" : "#000", fontSize: 15,fontFamily:'Gilroy-Medium'}}>
                                                         {item.label}
                                                     </Text>
                                                 </TouchableOpacity>
@@ -352,7 +352,7 @@ const RequestBedChange = ({ visible,
                                 </View>
 
                                 <View style={{ paddingTop: 15 }}>
-                                    <Text>Bed Change Urgency
+                                    <Text style={{fontSize:14,fontFamily:'Gilroy-Medium'}}>Bed Change Urgency
                                         <Text style={{ color: 'red' }}> *</Text>
                                     </Text>
 
@@ -364,8 +364,8 @@ const RequestBedChange = ({ visible,
                                         onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
                                         data={urgency}
                                         containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
-                                        placeholderStyle={{ fontSize: 14, paddingRight: 10 }}
-                                        selectedTextStyle={{ fontSize: 15, fontWeight: 400 }}
+                                        placeholderStyle={{ fontSize: 14,fontFamily:'Gilroy-Medium', paddingRight: 10,color:'#9C9C9C' }}
+                                        selectedTextStyle={{ fontSize: 15,fontFamily:'Gilroy-Medium', fontWeight: 400 }}
                                         placeholder="Select Reason"
                                         labelField="label"
                                         valueField="value"
@@ -399,7 +399,7 @@ const RequestBedChange = ({ visible,
                                                     }}
                                                 >
                                                     <Text
-                                                        style={{ color: isSelected ? "#fff" : "#000", fontSize: 15, fontWeight: 400 }}>
+                                                        style={{ color: isSelected ? "#fff" : "#000", fontSize: 15,fontFamily:'Gilroy-Medium'}}>
                                                         {item.label}
                                                     </Text>
                                                 </TouchableOpacity>
@@ -417,7 +417,7 @@ const RequestBedChange = ({ visible,
                                     backgroundColor: changeBed != null && bedType != null && urgencyType != null ? '#1E45E1' : '#788fed',
                                     alignItems: 'center', marginBottom: 15
                                 }}>
-                                <Text style={{ fontSize: 14, fontWeight: 600, color: '#FFFFFF' }}>Submit Request</Text>
+                                <Text style={{ fontSize: 14,fontFamily:'Gilroy-Semibold', color: '#FFFFFF' }}>Submit Request</Text>
                             </TouchableOpacity>
 
                         </View>

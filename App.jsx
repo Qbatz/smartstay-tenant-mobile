@@ -42,7 +42,7 @@ import AgreementViewScreen from './src/Components/RentalAggreements/AggreementVi
 import NOCBillPdf from './src/Components/NocBillPdf';
 import NOCReceiptPdf from './src/Components/NocReceipt';
 import InvoiceDesign from './src/Components/Payments/BillPDF';
-import { ACCESS_TOKEN, CUSTOMERDETAIL, CUSTOMERINITIALS, CUSTOMERPROFILEPIC, FCM_TOKEN, LOGGEDIN, LOGGEDOUT, PHONE_NO, SHOULD_TOKEN_UPDATE, USERID } from './src/Utils/Constant';
+import { ACCESS_TOKEN, CUSTOMERDETAIL, CUSTOMERINITIALS, CUSTOMERPROFILEPIC, FCM_TOKEN, HOSTELDETAIL, HOSTELLIST, LOGGEDIN, LOGGEDOUT, PHONE_NO, SHOULD_TOKEN_UPDATE, USERID } from './src/Utils/Constant';
 import CreateMpin from './src/Components/CreateAccount/CreateMpin';
 import ConfirmMPin from './src/Components/CreateAccount/ConfirmMPin';
 import LoginPage from './src/Components/CreateAccount/LoginPage';
@@ -199,7 +199,8 @@ function AppContent(props) {
     })
 
     retriveData(CUSTOMERDETAIL).then(r=>{
-      context.updateCustomer(r)
+      const customerDetail= r ? JSON.parse(r) : null
+      context.updateCustomer(customerDetail)
     })
 
     retriveData(CUSTOMERPROFILEPIC).then(r=>{
@@ -208,6 +209,16 @@ function AppContent(props) {
 
     retriveData(CUSTOMERINITIALS).then(r=>{
       console.log(r)
+    })
+
+    retriveData(HOSTELLIST).then(r=>{
+      const hostelList= r ? JSON.parse(r) : null;
+      context.updateHostelList(hostelList)
+    })
+
+    retriveData(HOSTELDETAIL).then(r=>{
+      const hostelDetail= r ? JSON.parse(r) : null;
+      context.updateHostelDetail(hostelDetail)
     })
   }, [loginContext.LoggedIn])
 

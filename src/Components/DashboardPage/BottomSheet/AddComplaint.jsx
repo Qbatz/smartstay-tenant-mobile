@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useContext } from "react";
-import { View, Text, Image, TouchableOpacity, Animated, StyleSheet, TouchableWithoutFeedback, ScrollView, TextInput, FlatList } from "react-native";
+import React, { useState, useEffect, useContext, useRef } from "react";
+import { View, Text, Image, TouchableOpacity, Animated, StyleSheet, TouchableWithoutFeedback, ScrollView, TextInput, FlatList, Dimensions, Modal } from "react-native";
 import { launchImageLibrary } from "react-native-image-picker";
 import AppLoader from "../../ToastFile/LoaderPage";
 import SuccessModal from "../../ToastFile/TostFilePage";
@@ -42,6 +42,13 @@ const AddComplaint = ({
     const [commentError, setCommentError] = useState()
     const [selectedIndex, setSelectedIndex] = useState(null);
     const [deleteVisible, setDeleteVisible] = useState(false);
+
+    const SCREEN_WIDTH = Dimensions.get("window").width;
+    const SCREEN_HEIGHT = Dimensions.get("window").height;
+
+    const flatListRef = useRef(null);
+    const [viewerVisible, setViewerVisible] = useState(false);
+    const [selectedViewIndex, setSelectedViewIndex] = useState(0);
 
     useEffect(() => {
         if (visible) {
@@ -88,6 +95,9 @@ const AddComplaint = ({
             console.log(error);
         }
     };
+
+    console.log("mediaimg", mediaimage)
+    console.log(imageuri)
 
 
 
@@ -282,10 +292,104 @@ const AddComplaint = ({
 
             }, 2000);
         });
-
-
-
     }
+
+    const openViewer = (index) => {
+        setSelectedViewIndex(index);
+        setViewerVisible(true);
+    }
+
+    const deleteImage = () => {
+        const deletedImage = mediaimage[selectedViewIndex];
+
+        console.log("Delete Image Id:", deletedImage.imageId);
+
+        const updatedImages = mediaimage.filter(
+            (_, index) => index !== selectedViewIndex
+        );
+
+        setmediaImage(updatedImages);
+        setImageuri(updatedImages)
+
+        if (updatedImages.length === 0) {
+            setViewerVisible(false);
+            return;
+        }
+
+        if (selectedViewIndex >= updatedImages.length) {
+            setSelectedViewIndex(updatedImages.length - 1);
+        }
+    };
+
+    // const replaceImage = async () => {
+
+    //     const result = await launchImageLibrary({
+    //         mediaType: "photo",
+    //         maxWidth: 500,
+    //         maxHeight: 500,
+    //         quality: 0.6,
+    //         // selectionLimit: 0,
+    //     });
+
+    //     if (result.didCancel) return;
+
+    //     if (!result.assets || result.assets.length === 0) return;
+
+    //     const newImage = result.assets[0];
+
+    //     const updatedImages = [...mediaimage];
+
+    //     updatedImages[selectedViewIndex] = {
+    //         ...updatedImages[selectedViewIndex],
+
+    //         imageUrl: newImage.uri,
+
+    //         fileName: newImage.fileName,
+    //         type: newImage.type,
+    //     };
+    //     const currentItem = updatedImages[selectedViewIndex];
+    //     updatedImages[selectedViewIndex] =
+    //         typeof currentItem === "string"
+    //             ? {
+    //                 imageUrl: newImage.uri,
+    //                 fileName: newImage.fileName,
+    //                 type: newImage.type,
+    //             }
+    //             : {
+    //                 ...currentItem,
+    //                 imageUrl: newImage.uri,
+    //                 fileName: newImage.fileName,
+    //                 type: newImage.type,
+    //             };
+
+    //     console.log("uploadedimg", updatedImages)
+
+    //     setmediaImage(updatedImages);
+    //     setImageuri(updatedImages)
+    // };
+
+    const replaceImage = async () => {
+    const result = await launchImageLibrary({
+        mediaType: "photo",
+        maxWidth: 500,
+        maxHeight: 500,
+        quality: 0.6,
+    });
+
+    if (result.didCancel) return;
+
+    if (!result.assets?.length) return;
+
+    const updatedImages = [...mediaimage];
+
+    // Replace the selected image URI
+    updatedImages[selectedViewIndex] = result.assets[0].uri;
+
+    setmediaImage(updatedImages);
+    setImageuri(updatedImages);
+
+    console.log(updatedImages);
+};
 
     if (!visible) return null;
 
@@ -319,10 +423,10 @@ const AddComplaint = ({
                         }}>
                         <View style={{ paddingTop: 10, justifyContent: 'space-between', flex: 1 }}>
                             <View>
-                                <Text style={{ fontSize: 20, fontWeight: 600 }}>Add complaint</Text>
+                                <Text style={{ fontSize: 20, fontFamily: 'Gilroy-Semibold' }}>Add complaint</Text>
 
                                 <View style={{ paddingTop: 20 }}>
-                                    <Text>Complaint type
+                                    <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>Complaint type
                                         <Text style={{ color: 'red' }}> *</Text>
                                     </Text>
 
@@ -339,12 +443,14 @@ const AddComplaint = ({
                                             onFocus={() => setIsFocus(true)}
                                             onBlur={() => setIsFocus(false)}
                                             data={complaintType}
-                                            containerStyle={{ borderRadius: 10 }}
-                                            placeholderStyle={{ fontSize: 14 }}
+                                            containerStyle={{ borderRadius: 15 }}
+                                            placeholderStyle={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}
+                                            selectedTextStyle={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}
                                             placeholder="Select a type"
                                             labelField="complaintTypeName"
                                             valueField="complaintTypeId"
                                             value={selectedComplaintTypeId}
+
                                             onChange={item => {
                                                 setSelectedComplaintTypeId(item.complaintTypeId);
                                                 setSelectedValue(item.value);
@@ -353,6 +459,28 @@ const AddComplaint = ({
                                                     setComplaintTypeError("");
                                                 }
                                             }}
+                                            renderItem={(item) => (
+                                                <View
+                                                    style={{
+                                                        padding: 15,
+                                                        borderRadius: 15,
+                                                        backgroundColor:
+                                                            item.complaintTypeId === selectedComplaintTypeId
+                                                                ? "#E8F0FE"
+                                                                : "#FFF",
+                                                    }}
+                                                >
+                                                    <Text
+                                                        style={{
+                                                            fontSize: 16,
+                                                            fontFamily: "Gilroy-Medium",
+                                                        }}
+                                                    >
+                                                        {item.complaintTypeName}
+                                                    </Text>
+                                                </View>
+                                            )}
+
                                             renderRightIcon={() => (
                                                 <Ionicons
                                                     name={isFocus ? "chevron-up" : "chevron-down"}
@@ -373,6 +501,7 @@ const AddComplaint = ({
                                                 borderColor: '#e5e5e5',
                                                 fontSize: 14,
                                                 color: '#9e9e9e',
+                                                fontFamily: 'Gilroy-Medium'
                                             }}
                                         >
                                             No data available
@@ -409,7 +538,7 @@ const AddComplaint = ({
                                 {compliantTypeError && <ErrorMessage message={compliantTypeError} type="error" />}
 
                                 <View style={{ paddingTop: 16 }}>
-                                    <Text style={{ fontSize: 14, fontWeight: 400 }}>Complaint message
+                                    <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>Complaint message
                                         <Text style={{ color: 'red' }}> *</Text>
                                     </Text>
                                     <View style={{ borderWidth: 1, borderRadius: 10, marginTop: 8, paddingTop: 7, paddingLeft: 10, borderColor: '#e5e5e5', height: 80 }}>
@@ -422,7 +551,7 @@ const AddComplaint = ({
                                             }}
                                             multiline
                                             textAlignVertical="top"
-                                            style={{ flex: 1, padding: 0 }} />
+                                            style={{ flex: 1, padding: 0, textAlignVertical: "top", fontSize: 14, fontFamily: "Gilroy-Medium", }} />
                                     </View>
                                 </View>
 
@@ -440,10 +569,10 @@ const AddComplaint = ({
                                             </View>
                                             <View style={{ paddingLeft: 22 }}>
                                                 <View style={{ flexDirection: 'row' }}>
-                                                    <Text style={{ color: '#1E45E1', fontSize: 12, fontWeight: 500 }}>Choose file</Text>
-                                                    <Text style={{ fontSize: 12, fontWeight: 500 }}> to Upload</Text>
+                                                    <Text style={{ color: '#1E45E1', fontSize: 13, fontFamily: 'Gilroy-Medium' }}>Choose file</Text>
+                                                    <Text style={{ fontSize: 13, fontFamily: 'Gilroy-Medium' }}> to Upload</Text>
                                                 </View>
-                                                <Text style={{ fontSize: 11, fontWeight: 400, marginTop: 5 }}>Must be in PNG, JPG Format </Text>
+                                                <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Medium', marginTop: 5 }}>Must be in PNG, JPG Format </Text>
                                             </View>
                                         </TouchableOpacity>
 
@@ -452,28 +581,27 @@ const AddComplaint = ({
 
 
                                 <View>
-                                    {mediaimage.length > 0 ? <FlatList horizontal showsHorizontalScrollIndicator={true} style={{ paddingTop: 20 }} key={(item) => item.id}
-                                        data={mediaimage}
-                                        // keyExtractor={(item, index) => index.toString()}
-                                        renderItem={({ item, index }) => {
-                                            console.log(item)
-                                            return <View style={{ padding: 5, position: 'relative' }}>
-                                                <TouchableOpacity onPress={() => { imageClick(index) }}>
-                                                    <Image source={{ uri: item }} style={{ width: 80, height: 70, borderRadius: 5 }} />
+                                    {mediaimage.length > 0 ?
+                                        <FlatList horizontal showsHorizontalScrollIndicator={true}
+                                            style={{ paddingTop: 20 }} key={(item) => item.id}
+                                            data={mediaimage}
+                                            // keyExtractor={(item, index) => index.toString()}
+                                            renderItem={({ item, index }) => (
+                                                <TouchableOpacity onPress={() => openViewer(index)}
+                                                    style={style.imageContainer}>
+                                                    <Image
+                                                        source={{ uri: item?.imageUrl || item }}
+                                                        style={style.image}
+                                                    />
 
-                                                    {selectedIndex === index && deleteVisible && (
-                                                        <TouchableOpacity onPress={() => removeImage(index)}
-                                                            style={{
-                                                                position: 'absolute', top: 0, bottom: 0, left: 0,
-                                                                right: 0, alignItems: 'center', justifyContent: 'center',
-                                                            }}>
-                                                            <Image source={Trash} style={{ width: 17.72, height: 17.72 }} />
-
-                                                        </TouchableOpacity>
-                                                    )}
+                                                    <TouchableOpacity
+                                                        onPress={() => removeImage(index)}
+                                                        style={style.deleteBtn}
+                                                    >
+                                                        <Image source={Trash} style={style.deleteIcon} />
+                                                    </TouchableOpacity>
                                                 </TouchableOpacity>
-                                            </View>
-                                        }} /> : null}
+                                            )} /> : null}
                                 </View>
 
                             </View>
@@ -486,7 +614,7 @@ const AddComplaint = ({
                                         backgroundColor: selectedComplaintTypeId === 0 || !complaintDescription || complaintDescription.trim().length < 15 ? '#9EB3FF' : '#1E45E1',
                                         alignItems: 'center'
                                     }}>
-                                    <Text style={{ fontSize: 14, fontWeight: 600, color: '#ffffff' }}>Submit</Text>
+                                    <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Semibold', color: '#ffffff' }}>Submit</Text>
                                 </TouchableOpacity>
                             </View>
 
@@ -494,6 +622,103 @@ const AddComplaint = ({
                     </ScrollView>
 
                 </SafeAreaView>
+
+                <Modal
+                    visible={viewerVisible}
+                    transparent={false}
+                    animationType="fade"
+                    onShow={() => {
+                        flatListRef.current?.scrollToIndex({
+                            index: selectedIndex,
+                            animated: false,
+                        });
+                    }}
+                >
+
+                    <View
+                        style={{
+                            marginTop: 50,
+                            paddingHorizontal: 20,
+                            flexDirection: "row",
+                            justifyContent: "space-between"
+                        }}
+                    >
+
+                        <TouchableOpacity
+                            onPress={() => setViewerVisible(false)}
+                        >
+                            <Text>←</Text>
+                        </TouchableOpacity>
+
+                        <Text>
+                            {selectedViewIndex + 1} / {mediaimage.length}
+                        </Text>
+
+                    </View>
+
+                    <FlatList
+                        ref={flatListRef}
+                        data={mediaimage}
+                        horizontal
+                        pagingEnabled
+                        showsHorizontalScrollIndicator={false}
+
+                        renderItem={({ item }) => (
+
+                            <Image
+                                source={{
+                                    uri: item.imageUrl || item
+                                }}
+                                resizeMode="contain"
+                                style={{
+                                    width: SCREEN_WIDTH,
+                                    height: SCREEN_HEIGHT - 150
+                                }}
+                            />
+
+                        )}
+
+                        keyExtractor={(item, index) => index.toString()}
+
+                        onMomentumScrollEnd={(e) => {
+
+                            const index = Math.round(
+                                e.nativeEvent.contentOffset.x /
+                                SCREEN_WIDTH
+                            );
+
+                            setSelectedViewIndex(index);
+
+                        }}
+                    />
+
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            justifyContent: 'space-around',
+                            marginBottom: 50, marginHorizontal: 20
+                        }}
+                    >
+
+                        <TouchableOpacity onPress={deleteImage}
+                            style={{
+                                borderWidth: 1, borderRadius: 10, paddingVertical: 14, flex: 1, alignItems: 'center',
+                                justifyContent: 'center', marginRight: 4
+                            }}>
+                            <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>Delete</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity onPress={replaceImage}
+                            style={{
+                                backgroundColor: "#0565FF", borderRadius: 10, paddingVertical: 14, flex: 1,
+                                alignItems: 'center', justifyContent: 'center', marginLeft: 4
+                            }}>
+                            <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#ffffff' }}>
+                                Replace</Text>
+                        </TouchableOpacity>
+
+                    </View>
+                </Modal>
 
 
             </Animated.View>
@@ -518,5 +743,43 @@ const style = StyleSheet.create({
     bottomsheets: {
         height: '90%', backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingHorizontal: 20,
         paddingTop: 20, paddingBottom: 10
+    },
+    imageContainer: {
+        width: 120,
+        height: 120,
+        marginRight: 12,
+        position: "relative",
+    },
+
+    image: {
+        width: "100%",
+        height: "100%",
+        borderRadius: 8,
+    },
+
+    deleteBtn: {
+        position: "absolute",
+        bottom: 8,
+        right: 8,
+        width: 34,
+        height: 34,
+        backgroundColor: "#FFFFFF",
+        borderRadius: 8,
+        justifyContent: "center",
+        alignItems: "center",
+
+        elevation: 4, // Android
+
+        shadowColor: "#000", // iOS
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 3,
+    },
+
+    deleteIcon: {
+        width: 18,
+        height: 18,
+        resizeMode: "contain",
+        tintColor: '#FF0000'
     },
 })
