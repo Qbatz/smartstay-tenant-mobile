@@ -40,6 +40,7 @@ import PrivacySecurity from "./Components/CustomerProfile/PrivacyFolder/Privacy&
 // import EditBasicDetail from "./Components/EditProfileFolder/EditBasicDetail";
 import EditBasicDetail from "./Components/EditProfileFolder/EditBasicDetail"
 import EditAddressDetail from "./Components/EditProfileFolder/EditAddressDetail";
+import AddJobDetails from "./Components/EditProfileFolder/AddJobDetails"
 
 const SuccessFlow = ({props, MpinVerified}) => {
   console.log(props)
@@ -62,12 +63,16 @@ const SuccessFlow = ({props, MpinVerified}) => {
   }
 
   useEffect(()=>{
-     const initialRouteName= getHostelList?.length == 1 && getHostelDetail ? "Dashboard" : "HostelList"
+    const hasHostelDetail =
+  getHostelDetail && Object.keys(getHostelDetail).length > 0;
+     const initialRouteName= getHostelList?.length == 1 && hasHostelDetail ? "Dashboard" : "HostelList"
      setInitialRoute(initialRouteName)
-  })
+  },[getHostelDetail,getHostelList])
 
  
 
+  console.log("hostelDetails",getHostelDetail)
+  console.log(intialRoute)
   
 
   console.log(isMpinVerified)
@@ -75,16 +80,16 @@ const SuccessFlow = ({props, MpinVerified}) => {
   return <View style={{ flex: 1 }}>
     {loginContext.getRoute === 'confirmMPin' || isMpinVerified ?
       <NavigationContainer>
-        <Navigation.Navigator screenOptions={{ headerShown: false }} initialRouteName= {"Dashboard"}>
-          {intialRoute === "Dashboard" ? (
+        <Navigation.Navigator screenOptions={{ headerShown: false }} initialRouteName= {"HostelList"}>
+          {intialRoute === "HostelList" ? (
     <>
-      <Navigation.Screen name="Dashboard" component={Dashboard} />
       <Navigation.Screen name="HostelList" component={HostelList} />
+      <Navigation.Screen name="Dashboard" component={Dashboard} />
     </>
   ) : (
     <>
-      <Navigation.Screen name="HostelList" component={HostelList} />
       <Navigation.Screen name="Dashboard" component={Dashboard} />
+      <Navigation.Screen name="HostelList" component={HostelList} />
     </>
   )}
           {/* <Navigation.Screen name='HostelList' component={HostelList} /> */}
@@ -101,6 +106,7 @@ const SuccessFlow = ({props, MpinVerified}) => {
           <Navigation.Screen name="EditBasicDetail" component={EditBasicDetail}/>
           <Navigation.Screen name="EditAddressDetail" component={EditAddressDetail}/>
           <Navigation.Screen name="BackgroundDetails" component={BackgroundDetails}/>
+          <Navigation.Screen name="AddJobDetails" component={AddJobDetails}/>
           <Navigation.Screen name="Privacy&Security" component={PrivacySecurity}/>
           <Navigation.Screen name="AddGuardianDetails" component={AddGuardianDetails}/>
           <Navigation.Screen name="DocumentUpload" component={DocumentsUpload}/>

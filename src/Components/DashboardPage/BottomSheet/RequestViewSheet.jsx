@@ -174,12 +174,12 @@ export default function RequestViewSheet({
                                                 <Text style={{ fontSize: 12, color: '#1E45E1', fontFamily: 'Gilroy-Medium' }}>Change Plan</Text>
                                             </TouchableOpacity> */}
                                         </View>
-                                        <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold', marginTop: 9 }}>{'\u20B9'}{requestDetail?.amenityAmount} /month</Text>
+                                        <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold', marginTop: 9 }}>{'\u20B9'} {requestDetail?.amenityPrice} /month</Text>
                                     </View>
 
                                     <View style={{ paddingTop: 15 }}>
                                         <Text style={{ fontSize: 13, fontFamily: 'Gilroy-Regular', color: '#4B4B4B' }}>Raised On</Text>
-                                        <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold', marginTop: 9 }}>{formatDate(requestDetail?.requestedDate)}</Text>
+                                        <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold', marginTop: 9 }}>{formatDate(requestDetail?.requestedDate) || "N/A"}</Text>
                                     </View>
 
                                     <TouchableOpacity style={{ paddingVertical: 13, borderWidth: 1, borderRadius: 10, alignItems: 'center', backgroundColor: '#FFFDF5', borderColor: '#E27625', marginTop: 30 }}>
@@ -230,23 +230,23 @@ export default function RequestViewSheet({
                                                 <Text style={{ fontSize: 12, color: '#1E45E1', fontFamily: 'Gilroy-Medium' }}>Change Plan</Text>
                                             </TouchableOpacity> */}
                                         </View>
-                                        <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold', marginTop: 9 }}>{'\u20B9'}{requestDetail?.amenityAmount} /month</Text>
+                                        <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold', marginTop: 9 }}>{requestDetail?.preferredBedType || "N/A"} </Text>
                                     </View>
 
 
                                     <View style={{ paddingTop: 15 }}>
                                         <Text style={{ fontSize: 13, fontFamily: 'Gilroy-Regular', color: '#4B4B4B' }}>Bed Change Urgency</Text>
-                                        <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold', marginTop: 9 }}>{formatDate(requestDetail?.requestedDate)}</Text>
+                                        <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold', marginTop: 9 }}>{requestDetail?.bedChangeStartsFrom || "N/A"}</Text>
                                     </View>
 
                                     <View style={{ paddingTop: 15 }}>
                                         <Text style={{ fontSize: 13, fontFamily: 'Gilroy-Regular', color: '#4B4B4B' }}>Raised On</Text>
-                                        <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold', marginTop: 9 }}>{formatDate(requestDetail?.requestedDate)}</Text>
+                                        <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold', marginTop: 9 }}>{formatDate(requestDetail?.requestedDate) || "N/A"}</Text>
                                     </View>
 
                                     <View style={{ paddingTop: 15 }}>
                                         <Text style={{ fontSize: 13, fontFamily: 'Gilroy-Regular', color: '#4B4B4B' }}>Current Status</Text>
-                                        <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold', marginTop: 9,color:'#EB6617' }}>{formatDate(requestDetail?.requestedDate)}</Text>
+                                        <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold', marginTop: 9,color:'#EB6617' }}>{requestDetail?.status == "Open" ? "Request Raised" : requestDetail?.status }</Text>
                                     </View>
 
                                     <TouchableOpacity style={{ paddingVertical: 13, borderRadius: 10, alignItems: 'center', backgroundColor: '#1E45E1', 

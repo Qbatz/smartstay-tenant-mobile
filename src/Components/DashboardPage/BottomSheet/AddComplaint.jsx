@@ -558,7 +558,7 @@ const AddComplaint = ({
                                 {commentError && <ErrorMessage message={commentError} type="error" />}
 
                                 <View style={{ paddingTop: 16 }}>
-                                    <Text>Add Proof</Text>
+                                    <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>Add Proof</Text>
                                     <View >
                                         <TouchableOpacity onPress={uploadimage} style={{
                                             borderWidth: 1, borderRadius: 9, paddingTop: 22, paddingBottom: 22,

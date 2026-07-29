@@ -285,3 +285,18 @@ export const deleteContact=async(token,payload)=>{
         return{status: error.response.status, message: error.response.data}
     }
 }
+
+export const addJobDetails=async(token,payload)=>{
+    try{
+        const axios=getAxios();
+        const res=await axios.post("/v2/customer-job-details", payload, {
+            headers: {
+                Authorization: "Bearer " + token
+            }
+        })
+        return res;
+    }catch(error){
+        console.log(res)
+        return{status: error.response.status, message: error.response.data}
+    }
+}

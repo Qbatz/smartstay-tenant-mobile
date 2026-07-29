@@ -13,6 +13,9 @@ import SuccessModal from "../ToastFile/TostFilePage";
 import ErrorMessage from "../ToastFile/ErrorMessage";
 import AddCircle from "../../assets/Images/add-circle.png"
 import NoResultPic from "../../assets/Images/NoResultPic.png"
+import Briefcase from "../../assets/Images/briefcase.png"
+import EditIcon from "../../assets/Images/edit.png"
+
 
 
 
@@ -44,6 +47,7 @@ const BackgroundDetails = (route) => {
     const [contactId, setContactId] = useState(route.route?.params?.customer?.additionalContacts[0]?.contactId)
     const [mode, setMode] = useState("add")
     const [isEmplyFocus, setIsEmpyFocus] = useState(false)
+    const [selectedJobDetails,setSelectedJobDetails]=useState("")
     console.log(mode)
 
     const [errorMsg, setErrorMsg] = useState({})
@@ -251,6 +255,7 @@ const BackgroundDetails = (route) => {
 
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
                         <Text style={{ fontSize: 15, fontFamily: 'Gilroy-Medium', color: '#0A0A0A' }}>+91</Text>
+                        <Ionicons name="chevron-down" size={16} style={{marginLeft:3}}/>
                         <TextInput
                             value={item?.guardianMobile}
                             placeholder="Enter mobileNo"
@@ -466,12 +471,12 @@ const BackgroundDetails = (route) => {
                                     Add New Row</Text>
                             </TouchableOpacity>
 
-                            <View style={{flexDirection:'row',alignItems:'center'}}>
-                            <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#0D1B8E' }}>Swipe</Text>
-                            <View style={{ flexDirection: "row" }}>
-                                <Ionicons name="chevron-forward" size={14} color="#0D1B8E" />
-                                <Ionicons name="chevron-forward" size={14} color="#0D1B8E" style={{ marginLeft: -6 }} />
-                            </View>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#0D1B8E' }}>Swipe</Text>
+                                <View style={{ flexDirection: "row" }}>
+                                    <Ionicons name="chevron-forward" size={14} color="#0D1B8E" />
+                                    <Ionicons name="chevron-forward" size={14} color="#0D1B8E" style={{ marginLeft: -6 }} />
+                                </View>
                             </View>
                         </View>
                     </>
@@ -483,10 +488,10 @@ const BackgroundDetails = (route) => {
                         </Text>
 
                         <TouchableOpacity onPress={() => navigation.navigate("AddGuardianDetails", { mode: "add" })}
-                        style={{
-                            backgroundColor: "#1E45E1", borderRadius: 10, width: '100%', paddingVertical: 10,
-                            marginHorizontal: 14, marginTop: 16, alignItems: 'center'
-                        }}>
+                            style={{
+                                backgroundColor: "#1E45E1", borderRadius: 10, width: '100%', paddingVertical: 10,
+                                marginHorizontal: 14, marginTop: 16, alignItems: 'center'
+                            }}>
                             <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Semibold', color: '#FFFFFF' }}>
                                 Add Guardian Details</Text>
                         </TouchableOpacity>
@@ -608,9 +613,9 @@ const BackgroundDetails = (route) => {
 
                 {errorMsg.guardianNumber && (<ErrorMessage message={errorMsg.guardianNumber} type="error" />)}
 
-                {/* <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold', marginTop: 15 }}>Job Details</Text>
+                <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold', marginTop: 25 }}>Employment Details</Text>
 
-            <View style={[styles.fieldContainer, { marginTop: 15 }]}>
+                {/* <View style={[styles.fieldContainer, { marginTop: 15 }]}>
                 <Text style={styles.label}>Employment Status</Text>
 
                 <TextInput
@@ -679,6 +684,67 @@ const BackgroundDetails = (route) => {
                     style={styles.input}
                 />
             </View> */}
+
+                {getCustomerDetail?.customerJobDetails.length > 0 ? (
+                    <View style={{marginTop:12}}>
+                        {getCustomerDetail?.customerJobDetails.map((i, index) => (
+                            <>
+                                <View style={{ flexDirection: 'row',flex:1,marginTop:14 }} key={index}>
+                                    <View style={{
+                                        backgroundColor: "#EFF0F1", borderRadius: 50, width: 45, height: 45, padding: 10,
+                                        alignItems: 'center', justifyContent: 'center',marginTop:2
+                                    }}>
+                                        <Image source={Briefcase} style={{ width: 24, height: 24 }} />
+                                    </View>
+
+                                    <View style={{ width: '100%',marginLeft:16,flex:1}}>
+                                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',flex:1 }}>
+                                            <Text style={{fontSize:16,fontFamily:'Gilroy-Semibold',flexShrink:1}}
+                                                numberOfLines={1} ellipsizeMode="tail">
+                                                {i?.organizationName}</Text>
+                                            <TouchableOpacity onPress={() => navigation.navigate("AddJobDetails", {
+                                                selectedJobDetails: i,
+                                                 mode: "edit" })}>                   
+                                            <Image source={EditIcon} style={{ width: 16, height: 16, tintColor: '#9C9C9C',marginRight:6 }} />
+                                            </TouchableOpacity>
+                                        </View>
+
+                                        <Text style={{fontSize:14,fontFamily:'Gilroy-Medium',color:'#1E293B',marginTop:12}}>
+                                            {i?.workLocation}</Text>
+
+                                        <Text style={{fontSize:13,fontFamily:'Girloy-Regular',color:'#475569',marginTop:10}}>
+                                            {i?.shiftFrom} - {i?.shiftTo}</Text>
+
+                                        <Text style={{fontSize:13,fontFamily:'Girloy-Regular',color:'#475569',marginTop:10}}>April 2025 - present</Text>
+                                    </View>
+                                </View>
+                            </>
+                        ))}
+
+                        <TouchableOpacity onPress={() => navigation.navigate("AddJobDetails", { mode: "add" })}
+                        style={{flexDirection:'row',alignItems:'center',marginTop:16}}>
+                            <Image source={AddCircle} style={{width:16,height:16,tintColor:'#031d7b'}}/>
+                            <Text style={{fontSize:14,fontFamily:'Gilroy-Medium',color:'#1E45E1',marginLeft:4}}>
+                                Add New Experience</Text>
+                        </TouchableOpacity>
+                    </View>
+                ) : (
+                    <View style={{ borderWidth: 1, borderRadius: 10, padding: 16, borderColor: '#E7E7E7', alignItems: 'center', marginTop: 20 }}>
+                        <Image source={NoResultPic} style={{ width: 100, height: 100 }} />
+                        <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', textAlign: 'center', lineHeight: 20, marginTop: 12 }}>
+                            Your Job Details are missing for {`\n`} Emergency contacts
+                        </Text>
+
+                        <TouchableOpacity onPress={() => navigation.navigate("AddJobDetails", { mode: "add" })}
+                            style={{
+                                backgroundColor: "#1E45E1", borderRadius: 10, width: '100%', paddingVertical: 10,
+                                marginHorizontal: 14, marginTop: 16, alignItems: 'center'
+                            }}>
+                            <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Semibold', color: '#FFFFFF' }}>
+                                Add Job Details</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
             </ScrollView>
         </KeyboardAvoidingView>
 
@@ -719,7 +785,7 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: '#0A0A0A',
         paddingVertical: 4,
-        fontFamily: 'Gilroy-Medium',
+        fontFamily: 'Gilroy-Medium',marginLeft:5
     },
     addRowField: {
         flexDirection: 'row',

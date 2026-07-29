@@ -45,7 +45,7 @@ export default function DocumentViewer({
   return () => backHandler.remove();
 }, [visible]);
 
-const imageDocs = documents.filter(doc => doc.documentFileType === "IMAGE");
+const imageDocs = documents.filter(doc => doc.documentFileType || doc?.docFileType === "IMAGE");
 
 
   return (
@@ -84,7 +84,7 @@ const imageDocs = documents.filter(doc => doc.documentFileType === "IMAGE");
   <View key={index} style={styles.imageContainer}>
 
     <Image
-      source={{ uri: doc.documentUrl }}
+      source={{ uri: doc.documentUrl ||doc?.docFileUrl }}
       style={styles.image}
       resizeMode="contain"
     />

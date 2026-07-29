@@ -6,7 +6,7 @@ import { postMPin } from "../../Action/LoginAction";
 import { UsersContext } from "../../Context/UserContext";
 import SuccessModal from "../ToastFile/TostFilePage";
 import { storeData } from "../../Utils/Storage";
-import { ACCESS_TOKEN,LOGGEDIN } from "../../Utils/Constant";
+import { ACCESS_TOKEN,HOSTELLIST,LOGGEDIN } from "../../Utils/Constant";
 import { LoginContexts } from "../../Context/LoginContext";
 import ErrorMessage from "../ToastFile/ErrorMessage";
 
@@ -78,6 +78,7 @@ const ConfirmMPin = (props) => {
                     storeData(LOGGEDIN, "true")
                     loginContext.updateRoute("confirmMPin")
                     context.updateHostelList(r.data)
+                    storeData(HOSTELLIST, JSON.stringify(r.data))
 
                     setShowSuccessModal(true)
                     setShowModelMessage("Login Successfully")
