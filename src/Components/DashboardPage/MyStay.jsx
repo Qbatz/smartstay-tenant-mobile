@@ -132,14 +132,14 @@ function MyStay(props) {
                                 <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} colors={['#10267B', '#0227B5']}
                                     style={{ width: width * 0.9, height: '65%', borderRadius: 10, paddingHorizontal: 20, paddingTop: 10 }} >
                                     <View style={{flexDirection:'row',alignItems:'center'}}>
-                                         <Text style={{ color: '#ffffff', fontSize: 17, lineHeight: 24 }}>
+                                         <Text style={{ color: '#ffffff', fontSize: 18,fontFamily:'Gilroy-Semibold',lineHeight: 24 }}>
                                         Hi, {context.getCustomerDetail?.firstName} {context.getCustomerDetail?.lastName}
                                     </Text>
                                     <Image source={WaveIcon} style={{width:18.13,height:18.13,marginLeft:8}}/>
                                     </View>
                                    
 
-                                    <Text style={{ color: '#ffffff', fontSize: 14, fontWeight: 400, lineHeight: 24, marginTop: 10 }}>
+                                    <Text style={{ color: '#ffffff', fontSize: 13,fontFamily:'Gilroy-Regular', lineHeight: 24, marginTop: 10 }}>
                                         Your Bed have been reserved
                                     </Text>
                                 </LinearGradient>
@@ -149,51 +149,51 @@ function MyStay(props) {
 
                     <View>
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <Text style={{ fontSize: 14, fontWeight: 400, color: '#3C3C4399' }}>
+                            <Text style={{ fontSize: 14, fontFamily:'Gilroy-Medium', color: '#3C3C4399' }}>
                                 Room No/ Bed No
                             </Text>
 
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 <Image source={RoomIcon} style={{ width: 17, height: 17, resizeMode: 'contain' }} />
-                                <Text style={{ fontSize: 14, fontWeight: 400, marginRight: 4, marginLeft: 3 }}>
+                                <Text style={{ fontSize: 14, fontFamily:'Gilroy-Medium', marginRight: 4, marginLeft: 3 }}>
                                     {context.getCustomerDetail?.bookingDetails?.roomName}</Text>
 
                                 <Image source={BedIcon} style={{ width: 17, height: 17, resizeMode: 'contain', marginLeft: 4 }} />
-                                <Text style={{ fontSize: 14, fontWeight: 400, marginLeft: 3 }}>
+                                <Text style={{ fontSize: 14, fontFamily:'Gilroy-Medium', marginLeft: 3 }}>
                                     {context.getCustomerDetail?.bookingDetails?.bedName}
                                 </Text>
                             </View>
                         </View>
 
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 15 }}>
-                            <Text style={{ fontSize: 14, fontWeight: 400, color: '#3C3C4399' }}>
+                            <Text style={{ fontSize: 14, fontFamily:'Gilroy-Medium', color: '#3C3C4399' }}>
                                 Check in date
                             </Text>
 
 
-                            <Text style={{ fontSize: 14, fontWeight: 600 }}>
+                            <Text style={{ fontSize: 14, fontFamily:'Gilroy-Medium' }}>
                                 {context.getCustomerDetail?.expJoiningDate}
                             </Text>
                         </View>
 
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 15 }}>
-                            <Text style={{ fontSize: 14, fontWeight: 400, color: '#3C3C4399' }}>
+                            <Text style={{ fontSize: 14, fontFamily:'Gilroy-Medium', color: '#3C3C4399' }}>
                                 Room Type
                             </Text>
 
 
-                            <Text style={{ fontSize: 14, fontWeight: 600 }}>
+                            <Text style={{ fontSize: 14, fontFamily:'Gilroy-Medium'}}>
                                 {context.getCustomerDetail?.bookingDetails?.roomSharingType ||  "N/A"}
                             </Text>
                         </View>
 
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 15 }}>
-                            <Text style={{ fontSize: 14, fontWeight: 400, color: '#3C3C4399' }}>
+                            <Text style={{ fontSize: 14, fontFamily:'Gilroy-Medium', color: '#3C3C4399' }}>
                                 PG Contact Number
                             </Text>
 
 
-                            <Text style={{ fontSize: 14, fontWeight: 600 }}>
+                            <Text style={{ fontSize: 14, fontFamily:'Gilroy-Medium' }}>
                                 {context.getCustomerDetail?.hostel?.mobile ? `+91 ${context.getCustomerDetail?.hostel?.mobile}` : "N/A"}
                             </Text>
                         </View>
@@ -204,13 +204,13 @@ function MyStay(props) {
                         borderRadius: 5, paddingRight: 25, paddingLeft: 14, marginTop: 20
                     }}>
                         <Image source={ExclamationCircle} style={{ width: 14, height: 14, resizeMode: 'contain' }} />
-                        <Text style={{ fontSize: 12, fontWeight: 400, color: '#1E45E1', marginLeft: 7, lineHeight: 20 }}>
+                        <Text style={{ fontSize: 12, fontFamily:'Gilroy-Medium', color: '#1E45E1', marginLeft: 7, lineHeight: 20 }}>
                             Tenants have beed must follow the PG Rules and checkin on date properly</Text>
                     </View>
 
                     <TouchableOpacity style={{
                         backgroundColor: '#1E45E1', borderRadius: 8, justifyContent: 'center', alignItems: 'center',
-                        marginTop: 25, flexDirection: 'row', paddingVertical: 20, paddingHorizontal: 40,marginHorizontal:10
+                        marginTop: 25, flexDirection: 'row', paddingVertical: 14, paddingHorizontal: 40,marginHorizontal:10
                     }}>
                         <Image source={callIcon} style={{ width: 20, height: 20, tintColor: '#ffffff' }} />
                         <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium', marginLeft: 8, color: '#ffffff',marginLeft:10 }}>

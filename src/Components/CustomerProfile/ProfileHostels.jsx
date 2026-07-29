@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Animated, PanResponder, Dimensions, Keyboard, TouchableWithoutFeedback, NativeModules } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Animated, PanResponder, Dimensions, Keyboard, TouchableWithoutFeedback, NativeModules, Linking, FlatList } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import HostelImage from "../../assets/Images/Group 1.png"
 import LocationIcon from "../../assets/Images/location.png";
@@ -23,6 +23,14 @@ import SwitchIcon from "../../assets/Images/SwitchIcon.png"
 import AppLoader from "../ToastFile/LoaderPage";
 import UserIcon from "../../assets/Images/userIcon.png"
 import LocationGreyIcon from "../../assets/Images/locationIcon.png"
+import CalenderIcon from "../../assets/Images/calendar.png"
+import Pdf from "../../assets/Images/pdf.png";
+import Buildings from "../../assets/Images/buildings.png"
+import EyeIcon from "../../assets/Images/view.png";
+import DownloadIcon from "../../assets/Images/downloadDark.png"
+import DocumentViewer from "../DocumentsView/DocumentViewer";
+
+
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 const ProfileHostels = () => {
@@ -30,9 +38,9 @@ const ProfileHostels = () => {
 
   const navigation = useNavigation();
   const translateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
-  const {NotificationModule, CommonModule}= NativeModules;
+  const { NotificationModule, CommonModule } = NativeModules;
   const userContext = useContext(UsersContext)
-  const { getCustomerDetail,updateHostelDetail,getHostelList } = useContext(UsersContext)
+  const { getCustomerDetail, updateHostelDetail, getHostelList } = useContext(UsersContext)
   const loginContext = useContext(LoginContexts)
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [selectedHostel, setSelectedHostel] = useState("");
@@ -45,15 +53,18 @@ const ProfileHostels = () => {
   const [showSwithtoSheet, setShowSwithToSheet] = useState(false)
   const [selectedSwitchHostel, setSelectedSwithcHostel] = useState("")
   const [fcmToken, setFcmToken] = useState();
-  const [loading, setLoading]=useState(false)
+  const [loading, setLoading] = useState(false)
+  const [previousStay, setPreviousStay] = useState([])
+  const [docsViewerIndex,setDocsViewerIndex]=useState("")
+  const [docsViewer,setDocsViewer]=useState(false)
 
   console.log(selectedHostel?.rentalDetails)
   console.log(userContext)
   console.log(showMoreDetail)
   console.log(hostelList)
   console.log("otherHostel", otherHostel)
-  console.log("selectedSwitchHostel",selectedSwitchHostel)
-  console.log("loginContxt",loginContext)
+  console.log("selectedSwitchHostel", selectedSwitchHostel)
+  console.log("loginContxt", loginContext)
 
 
   const hostels = [
@@ -64,21 +75,22 @@ const ProfileHostels = () => {
 
   useEffect(() => {
     setLoading(true)
-    try{
-    getHostelRentalDetails(loginContext.getUserId, loginContext.getToken).then(r => {
-      setHostelList(r.data.activeStays)
-      console.log(r)
-      if(r.status === 200){
-      const newRentals = r.data?.activeStays.find(i => i?.hostelId === userContext?.getHostelDetail?.hostelId)
-      setSelectedHostel(newRentals)
-      console.log("newRent", newRentals)
+    try {
+      getHostelRentalDetails(loginContext.getUserId, loginContext.getToken).then(r => {
+        setHostelList(r.data.activeStays)
+        setPreviousStay(r?.data?.previousStays)
+        console.log(r)
+        if (r.status === 200) {
+          const newRentals = r.data?.activeStays.find(i => i?.hostelId === userContext?.getHostelDetail?.hostelId)
+          setSelectedHostel(newRentals)
+          console.log("newRent", newRentals)
+          setLoading(false)
+        }
+      })
+    } catch (error) {
+      console.log(error)
       setLoading(false)
-      }
-    })
-  }catch(error){
-    console.log(error)
-    setLoading(false)
-  }
+    }
 
 
     // getRentalDetials(userContext?.getHostelDetail?.hostelId, loginContext.getToken)
@@ -120,11 +132,11 @@ const ProfileHostels = () => {
     })
   ).current;
 
-    const fetchFcmTokenAsync = () => {
-      NotificationModule.fetchFcmToken().then(r => {
-        console.log(r)
-        setFcmToken(r)
-      })
+  const fetchFcmTokenAsync = () => {
+    NotificationModule.fetchFcmToken().then(r => {
+      console.log(r)
+      setFcmToken(r)
+    })
       .catch(error => {
         console.log(error);
         setFcmToken(null)
@@ -132,13 +144,13 @@ const ProfileHostels = () => {
 
   }
 
-   const fetchFCMToken =  async (authToken) => {
-      if (fcmToken != null) {
-        await updateFCMToken(loginContext.getUserId, fcmToken, authToken);
-      }
-     
+  const fetchFCMToken = async (authToken) => {
+    if (fcmToken != null) {
+      await updateFCMToken(loginContext.getUserId, fcmToken, authToken);
     }
-  
+
+  }
+
 
   const switchHostel = (hostelId) => {
     console.log(hostelId)
@@ -152,27 +164,27 @@ const ProfileHostels = () => {
 
   const handleSelectHostel = (hostel) => {
     console.log(hostel)
-    console.log("hanan",hostel)
-    if(hostel){
-      const data={
+    console.log("hanan", hostel)
+    if (hostel) {
+      const data = {
         xuid: loginContext?.getUserId,
         hostelId: hostel.hostelId,
       }
 
-      getToken(data).then(r=>{
-        console.log("token",r)
-        if(r.status ==200){
+      getToken(data).then(r => {
+        console.log("token", r)
+        if (r.status == 200) {
           fetchFCMToken(r.data);
           loginContext.updateToken(r.data)
           storeData(ACCESS_TOKEN, r.data)
-           CommonModule.storeCredentials(r.data)
-             updateHostelDetail(hostel)
+          CommonModule.storeCredentials(r.data)
+          updateHostelDetail(hostel)
         }
       })
-      const res = hostelList.find((item)=> item.hostelId === hostel.hostelId)
+      const res = hostelList.find((item) => item.hostelId === hostel.hostelId)
       console.log(res)
-    setSelectedHostel(res);
-  
+      setSelectedHostel(res);
+
     }
     setShowSwithToSheet(false);
     setDropdownVisible(false);
@@ -214,8 +226,10 @@ const ProfileHostels = () => {
   // }, [selectedHostel]); 
 
   const handleBack = () => navigation.goBack();
+
+  const previousHostelCount= previousStay.length + 1;
   return <View style={styles.container}>
-    <AppLoader visible={loading}/>
+    <AppLoader visible={loading} />
     <View style={{ flexDirection: "row", alignItems: "center" }}>
       <TouchableOpacity style={styles.backButton} onPress={handleBack}>
         <Image
@@ -227,7 +241,7 @@ const ProfileHostels = () => {
     </View>
 
     <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}
-      showsVerticalScrollIndicator={false}>
+      showsVerticalScrollIndicator={false} nestedScrollEnabled={true}>
       <View style={styles.card}>
         <View
           style={styles.hostelHeader}>
@@ -255,11 +269,11 @@ const ProfileHostels = () => {
           </View>
 
 
-          {hostelList.length > 1 &&(
-          <TouchableOpacity onPress={() => switchHostel(selectedHostel?.hostelId)}
-                            activeOpacity={0.8} style={{marginRight:8}}>
-              <Image source={SwitchIcon} style={{width:23,height:23}}/>
-          </TouchableOpacity>
+          {hostelList.length > 1 && (
+            <TouchableOpacity onPress={() => switchHostel(selectedHostel?.hostelId)}
+              activeOpacity={0.8} style={{ marginRight: 8 }}>
+              <Image source={SwitchIcon} style={{ width: 23, height: 23 }} />
+            </TouchableOpacity>
           )}
         </View>
 
@@ -343,7 +357,7 @@ const ProfileHostels = () => {
           </View>
           <View style={styles.hostelDetailBox}>
             <Text style={styles.hstlDtlHeaderTxt}>Joined</Text>
-            <Text style={styles.hstlDtlValueTxt}> {formatDate(selectedHostel?.rentalDetails?.joiningDate)}</Text>
+            <Text style={styles.hstlDtlValueTxt}> {formatDate(selectedHostel?.rentalDetails?.joiningDate) || "N/A"}</Text>
           </View>
         </View>
 
@@ -358,7 +372,7 @@ const ProfileHostels = () => {
           </View>
         </View>
 
-        <View style={{ display: 'flex', flexDirection: 'row', marginTop: 14,alignItems:'center' }}>
+        <View style={{ display: 'flex', flexDirection: 'row', marginTop: 14, alignItems: 'center' }}>
           <Image
             source={LocationGreyIcon}
             resizeMode="contain" style={{ width: 15, height: 15 }}
@@ -368,7 +382,7 @@ const ProfileHostels = () => {
         </View>
         {/* <Text style={styles.detailValue}>{selectedHostel?.state}, {selectedHostel?.pincode} </Text> */}
 
-        <View style={{ display: 'flex', flexDirection: 'row', marginTop: 16,alignItems:'center' }}>
+        <View style={{ display: 'flex', flexDirection: 'row', marginTop: 16, alignItems: 'center' }}>
           <Image
             source={UserIcon}
             resizeMode="contain" style={{ width: 14, height: 14 }}
@@ -376,10 +390,10 @@ const ProfileHostels = () => {
           <Text style={styles.detailValue}>{selectedHostel?.ownerName || "N/A"}</Text>
         </View>
 
-        <View style={{ flexDirection: 'row', marginTop: 16, alignItems: 'center',alignItems:'center' }}>
+        <View style={{ flexDirection: 'row', marginTop: 16, alignItems: 'center', alignItems: 'center' }}>
           <Image
             source={CallIcon}
-            resizeMode="contain" style={{ width: 15, height: 15,tintColor:'#4B4B4B' }}
+            resizeMode="contain" style={{ width: 15, height: 15, tintColor: '#4B4B4B' }}
           />
           <Text style={styles.detailValue}>{selectedHostel?.hostelMobile || "N/A"}</Text>
         </View>
@@ -399,17 +413,19 @@ const ProfileHostels = () => {
 
 
 
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 15 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 15,backgroundColor:'#E7F1FF',
+                    paddingVertical:10,paddingHorizontal:10,borderRadius:8,flex:1 }}>
           <Image source={exclamation} style={{ width: 16, height: 16, tintColor: '#4B4B4B' }} />
           {
             selectedHostel?.currentStatus != "BOOKED" && (
-              <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#4B4B4B', marginLeft: 10 }}>
+              <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#4B4B4B', marginLeft: 10,flexShrink:1,lineHeight:18 }}>
                 Notice Period Serving Days is must be 30 Days from the Request</Text>
             )
           }
           {
             selectedHostel?.currentStatus == "BOOKED" && (
-              <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#4B4B4B', marginLeft: 10 }}>
+              <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#4B4B4B', 
+                            marginLeft: 10,}}>
                 Please be check-in on time</Text>
             )
           }
@@ -419,118 +435,214 @@ const ProfileHostels = () => {
 
       <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 14, justifyContent: 'space-between', marginBottom: 15 }}>
         <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold' }}>Previous Stays</Text>
+
+        {previousStay.length>0 && (
         <Text style={{ paddingVertical: 3, paddingHorizontal: 5, fontSize: 12, fontFamily: 'Gilroy-Medium', color: '#1E45E1', backgroundColor: "#F3F5FF" }}>
-          3 hostel</Text>
+          {previousHostelCount} hostel</Text>
+          )}
       </View>
 
-      {hostels.map((item) => (
-        <View
-          key={item.id}
-          style={styles.prvsHostelList}
-        // onPress={() => handleSelectHostel(item)}
-        >
-          <Text style={styles.dropdownText}>{item.name}</Text>
-          <Text style={[styles.dropdownSub, { marginTop: 8 }]}>{item.checkin} - {item.checkout}</Text>
-
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 6 }}>
-            <Text style={{ fontSize: 13, fontFamily: 'Gilroy-Medium', color: '#1E45E1' }}>Stayed for {item.duration}</Text>
-
-            <TouchableOpacity onPress={() => handleShowDetail(item?.id)}>
-              <Ionicons name={showMoreDetail == item.id ? "chevron-up" : "chevron-down"} size={22}
-                color="#000" />
-            </TouchableOpacity>
-          </View>
-
-          {showMoreDetail == item.id && (
-            <>
-              <View style={{ borderWidth: 1, marginVertical: 14, borderColor: '#EEEEEE' }} />
-
-              <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Regular', color: '#1E45E1' }}>PROPERTY INFORMATION</Text>
-
-              <Text style={[styles.stayLabelTxt, { marginTop: 10 }]}>Hostels</Text>
-              <Text style={[styles.stayValueTxt, { marginTop: 7 }]}>{item.name}</Text>
-
-              <Text style={[styles.stayLabelTxt, { marginTop: 10 }]}>Address</Text>
-              <Text style={[styles.stayValueTxt, { marginTop: 7 }]}>{item?.location}</Text>
-
-              <View style={{ borderWidth: 1, marginVertical: 14, borderColor: '#EEEEEE' }} />
-
-
-              <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Regular', color: '#1E45E1' }}>STAY INFORMATION</Text>
-              <View style={styles.styInfoField}>
-                <Text style={styles.stayLabelTxt}>Stay</Text>
-                <Text style={styles.stayValueTxt}>{item?.floor}</Text>
+      {previousStay.length > 0 ? (
+        previousStay.map((item) => (
+          <View
+            key={item.customerId}
+            style={styles.prvsHostelList}
+          // onPress={() => handleSelectHostel(item)}
+          >
+            <View style={{ flexDirection: 'row', }}>
+              <View >
+                {item?.hostelPi ?
+                  <Image source={{ uri: item?.hostelPic }} style={{ width: 50, height: 50, borderRadius: 25 }} />
+                  :
+                  <View style={{ width: 50, height: 50, backgroundColor: '#F0F0F0', borderRadius: 25, justifyContent: 'center', alignItems: 'center' }}>
+                    <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold' }}>{item?.hostelInitial}</Text>
+                  </View>}
               </View>
-
-              <View style={styles.styInfoField}>
-                <Text style={styles.stayLabelTxt}>Bed</Text>
-                <Text style={styles.stayValueTxt}>{item?.bed}</Text>
-              </View>
-
-              <View style={styles.styInfoField}>
-                <Text style={styles.stayLabelTxt}>Check-In</Text>
-                <Text style={styles.stayValueTxt}>{item?.checkin}</Text>
-              </View>
-
-              <View style={styles.styInfoField}>
-                <Text style={styles.stayLabelTxt}>Check-Out</Text>
-                <Text style={styles.stayValueTxt}>{item?.checkout}</Text>
-              </View>
-
-              <View style={styles.styInfoField}>
-                <Text style={styles.stayLabelTxt}>Total Duration</Text>
-                <Text style={styles.stayValueTxt}>{item?.duration}</Text>
-              </View>
-
-              <View style={styles.styInfoField}>
-                <Text style={styles.stayLabelTxt}>Monthly Rent</Text>
-                <Text style={styles.stayValueTxt}>{item?.monthlyRent}</Text>
-              </View>
-
-              <View style={styles.styInfoField}>
-                <Text style={styles.stayLabelTxt}>Advance Paid</Text>
-                <Text style={styles.stayValueTxt}>{item?.advancePaid}</Text>
-              </View>
-
-              <View style={styles.styInfoField}>
-                <Text style={styles.stayLabelTxt}>Advance Refunded</Text>
-                <Text style={styles.stayValueTxt}>{item?.advancerefunded}</Text>
-              </View>
-
-              <View style={{
-                borderWidth: 1, borderColor: '#F0F0F0', backgroundColor: '#F2F2F29C',
-                marginTop: 8, padding: 10, borderRadius: 10
-              }}>
-                <Text style={{ fontSize: 13, fontFamily: 'Gilroy-Regular', color: '#4B4B4B' }}>
-                  Checkout Reason
-                </Text>
-                <Text style={{ fontSize: 15, fontFamily: 'Gilroy-Medium', marginTop: 8 }}>{item?.checkoutreson}</Text>
-              </View>
-
-              <View style={{ borderWidth: 1, marginVertical: 14, borderColor: '#EEEEEE' }} />
-
-              <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Regular', color: '#1E45E1' }}>DOCUMENTS</Text>
-
-              {documents.lenght > 0 ? (
-                <>
-
-                </>
-              ) : (
-                <>
+              <View style={{ flex: 1, marginLeft: 8 }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flex: 1 }}>
+                  <Text style={[styles.dropdownText, { flex: 1 }]} numberOfLines={1} ellipsizeMode="tail">
+                    {item.hostelName}</Text>
                   <View style={{
-                    borderWidth: 1, borderColor: '#F0F0F0', backgroundColor: '#F2F2F29C',
-                    marginTop: 10, padding: 10, borderRadius: 10
+                    paddingVertical: 3, paddingHorizontal: 10, backgroundColor: "#F0F0F0",
+                    borderRadius: 20, flexDirection: 'row', alignItems: 'center'
                   }}>
-                    <Text style={{ fontSize: 13, fontFamily: 'Gilroy-Medium', textAlign: 'center' }}>
-                      No documents available
+                    <View style={{ width: 6, height: 6, backgroundColor: '#4B4B4B', borderRadius: 3, marginRight: 4 }} />
+                    <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Medium', color: "#4B4B4B" }}>
+                      {item?.currentStatus === "VACATED" ? "Checked out" : item?.currentStatus}
                     </Text>
-
                   </View>
-                </>)}
-            </>
-          )}
+                </View>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
+                  <Image source={CalenderIcon} style={{ width: 14, height: 14, tintColor: '#292D32', marginRight: 4 }} />
+                  <Text style={styles.dropdownSub}>
+                    {item?.rentalDetails?.joiningDate} - {item?.rentalDetails?.checkoutDate}</Text>
+                </View>
+
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 6 }}>
+                  <Text style={{ fontSize: 13, fontFamily: 'Gilroy-Medium', color: '#1E45E1' }}>
+                    Stayed for {item?.rentalDetails?.displayDuration}</Text>
+
+                  <TouchableOpacity onPress={() => handleShowDetail(item?.customerId)}>
+                    <Ionicons name={showMoreDetail == item.customerId ? "chevron-up" : "chevron-down"} size={22}
+                      color="#000" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+
+
+            {showMoreDetail == item.customerId && (
+              <>
+                <View style={{ borderWidth: 1, marginVertical: 14, borderColor: '#EEEEEE' }} />
+
+                <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Regular', color: '#1E45E1' }}>PROPERTY INFORMATION</Text>
+
+                <Text style={[styles.stayLabelTxt, { marginTop: 10 }]}>Hostels</Text>
+                <Text style={{ fontSize: 15, fontFamily: 'Gilroy-Medium', color: "#222222", marginTop: 7 }}>
+                  {item.hostelName}</Text>
+
+                <Text style={[styles.stayLabelTxt, { marginTop: 10 }]}>Address</Text>
+                <Text style={{ fontSize: 15, fontFamily: 'Gilroy-Medium', color: "#222222", marginTop: 7 }}>
+                  {item?.fullAddress}</Text>
+
+                <View style={{ borderWidth: 1, marginVertical: 14, borderColor: '#EEEEEE' }} />
+
+
+                <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Regular', color: '#1E45E1' }}>STAY INFORMATION</Text>
+                <View style={styles.styInfoField}>
+                  <Text style={styles.stayLabelTxt}>Stay</Text>
+                  <Text style={styles.stayValueTxt}>{item?.rentalDetails?.floorName}, {item?.rentalDetails?.roomName}</Text>
+                </View>
+
+                <View style={styles.styInfoField}>
+                  <Text style={styles.stayLabelTxt}>Bed</Text>
+                  <Text style={styles.stayValueTxt}>{item?.rentalDetails?.bedName || "N/A"}</Text>
+                </View>
+
+                <View style={styles.styInfoField}>
+                  <Text style={styles.stayLabelTxt}>Check-In</Text>
+                  <Text style={styles.stayValueTxt}>{item?.rentalDetails?.joiningDate || "N/A"}</Text>
+                </View>
+
+                <View style={styles.styInfoField}>
+                  <Text style={styles.stayLabelTxt}>Check-Out</Text>
+                  <Text style={styles.stayValueTxt}>{item?.rentalDetails?.checkoutDate || "N/A"}</Text>
+                </View>
+
+                <View style={styles.styInfoField}>
+                  <Text style={styles.stayLabelTxt}>Total Duration</Text>
+                  <Text style={styles.stayValueTxt}>{item?.rentalDetails?.displayDuration || "N/A"}</Text>
+                </View>
+
+                <View style={styles.styInfoField}>
+                  <Text style={styles.stayLabelTxt}>Monthly Rent</Text>
+                  <Text style={styles.stayValueTxt}>{item?.rentalDetails?.rentAmount || "N/A"}</Text>
+                </View>
+
+                <View style={styles.styInfoField}>
+                  <Text style={styles.stayLabelTxt}>Advance Paid</Text>
+                  <Text style={styles.stayValueTxt}>{item?.rentalDetails?.advancePaidAmount || "N/A"}</Text>
+                </View>
+
+                <View style={styles.styInfoField}>
+                  <Text style={styles.stayLabelTxt}>Advance Refunded</Text>
+                  <Text style={styles.stayValueTxt}>{item?.rentalDetails?.advanceRefundedAmount || "N/A"}</Text>
+                </View>
+
+                <View style={{
+                  borderWidth: 1, borderColor: '#F0F0F0', backgroundColor: '#F2F2F29C',
+                  marginTop: 8, padding: 10, borderRadius: 10
+                }}>
+                  <Text style={{ fontSize: 13, fontFamily: 'Gilroy-Regular', color: '#4B4B4B' }}>
+                    Checkout Reason
+                  </Text>
+                  <Text style={{ fontSize: 15, fontFamily: 'Gilroy-Medium', marginTop: 8 }}>{item?.rentalDetails?.checkOutReason || "N/A"}</Text>
+                </View>
+
+                <View style={{ borderWidth: 1, marginVertical: 14, borderColor: '#EEEEEE' }} />
+
+                <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Regular', color: '#1E45E1' }}>DOCUMENTS</Text>
+
+                {item?.customerHostelDocs?.length > 0 ? (
+                   item?.customerHostelDocs.map((docs,index) => (
+                      <>
+                        <View key={index}
+                          style={{
+                            borderWidth: 1, paddingVertical: 20, borderColor: '#eaeaec', borderRadius: 10, paddingHorizontal: 10,
+                            backgroundColor: "#f9fafc", flexDirection: "row", alignItems: "center", marginBottom: 5,
+                            justifyContent: 'space-between', marginTop: 10
+                          }}>
+
+                          <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, marginRight: 5 }}>
+
+                            <View style={{backgroundColor:'#ffffff',padding:10,justifyContent:'center',marginRight:5,
+                                        alignItems:'center',borderRadius:10,elevation:2, shadowColor: '#000',
+                                        shadowOffset: { width: 0, height: 2,},shadowOpacity: 0.15,shadowRadius: 3,}}>
+                              <Image source={Buildings} style={{ width: 18, height: 18}} />
+                            </View>
+                            <View style={{ marginLeft: 3, flex: 1 }}>
+                              <Text style={{ fontSize: 13, color: "#111928", fontFamily: 'Gilroy-Medium', flexShrink: 1 }}>
+                                {docs?.docFileType}</Text>
+                              <Text style={{ fontSize: 12, color: "#6B7280", fontFamily: 'Gilroy-Semibold', marginTop: 4 }}>
+                                         {docs?.docFileSize} • PDF
+                              </Text>
+                            </View>
+
+                          </View>
+
+                          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <TouchableOpacity
+                              onPress={() => {
+                                if (docs?.docFileType === "PDF") {
+                                  Linking.openURL(docs?.docFileUrl)
+                                } else {
+                                  const index = selectedHostel?.customerHostelDocs.findIndex((i) =>
+                                    i.documentId === docs.documentId)
+                                  setDocsViewerIndex(index);
+                                  setDocsViewer(true);
+                                }
+                              }}>
+                              <Image source={EyeIcon} style={{ width: 20, height: 20, tintColor: '#28303F', marginRight: 5 }} />
+                            </TouchableOpacity>
+
+
+                            <Image source={DownloadIcon} style={{ width: 20, height: 20, marginLeft: 8, tintColor: '#28303F' }} />
+                          </View>
+
+
+                        </View>
+                        {/* <TouchableOpacity onPress={() => removeDocument(item?.documentId)}
+                          style={{
+                            position: "absolute", top: 2, right: 1, width: 20, height: 20, borderRadius: 10,
+                            alignItems: 'center', justifyContent: 'center', backgroundColor: "#E0E0E0"
+                          }}>
+                          <Text style={{ fontSize: 18, textAlign: 'center', lineHeight: 18 }}>x</Text>
+                        </TouchableOpacity> */}
+                      </>
+                   ))
+                ) : (
+                  <>
+                    <View style={{
+                      borderWidth: 1, borderColor: '#F0F0F0', backgroundColor: '#F2F2F29C',
+                      marginTop: 10, padding: 10, borderRadius: 10
+                    }}>
+                      <Text style={{ fontSize: 13, fontFamily: 'Gilroy-Medium', textAlign: 'center' }}>
+                        No documents available
+                      </Text>
+                    </View>
+                  </>)}
+              </>
+            )}
+          </View>
+        ))
+      ) : (
+        <View style={{alignItems:'center',justifyContent:'center',marginTop:15}}>
+
+          <Text style={{fontSize:14,fontFamily:'Gilroy-Medium'}}>No Previous hostel</Text>
+
         </View>
-      ))}
+      )
+      }
 
     </ScrollView>
 
@@ -554,7 +666,7 @@ const ProfileHostels = () => {
                 <TouchableOpacity onPress={() => setSelectedSwithcHostel(i)}
                   key={i?.hostelId} style={[styles.swthHostelCard, selectedSwitchHostel?.hostelId == i?.hostelId && { borderColor: "#1E45E1" }]}>
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    {i?.hostelPic ? <Image source={{ uri: i?.hostelPic }} style={{ width: 56, height: 56.5,borderRadius:28 }} /> :
+                    {i?.hostelPic ? <Image source={{ uri: i?.hostelPic }} style={{ width: 56, height: 56.5, borderRadius: 28 }} /> :
                       <View style={{
                         backgroundColor: '#e7e6ee', width: 56, height: 56, borderRadius: 28,
                         alignItems: 'center', justifyContent: 'center'
@@ -590,9 +702,10 @@ const ProfileHostels = () => {
             )}
 
             <View style={{ flexDirection: 'row', alignItems: "center", flex: 1, marginTop: 25 }}>
-              <TouchableOpacity onPress={() => {setShowSwithToSheet(false)
-                                                setSelectedSwithcHostel("")
-                                        }}
+              <TouchableOpacity onPress={() => {
+                setShowSwithToSheet(false)
+                setSelectedSwithcHostel("")
+              }}
                 style={{
                   flex: 1, borderWidth: 1, borderRadius: 10, borderColor: "#E7E7E7", paddingVertical: 18,
                   paddingHorizontal: 14, marginRight: 4, alignItems: 'center', justifyContent: 'center'
@@ -600,11 +713,11 @@ const ProfileHostels = () => {
                 <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium' }}>Cancel</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={()=>handleSelectHostel(selectedSwitchHostel)}
-              style={{
-                flex: 1, backgroundColor: '#1E45E1', borderRadius: 10, paddingVertical: 18,
-                paddingHorizontal: 14, marginLeft: 4, alignItems: 'center', justifyContent: 'center'
-              }}>
+              <TouchableOpacity onPress={() => handleSelectHostel(selectedSwitchHostel)}
+                style={{
+                  flex: 1, backgroundColor: '#1E45E1', borderRadius: 10, paddingVertical: 18,
+                  paddingHorizontal: 14, marginLeft: 4, alignItems: 'center', justifyContent: 'center'
+                }}>
                 <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium', color: '#FFFFFF' }}>Confirm</Text>
               </TouchableOpacity>
             </View>
@@ -615,6 +728,14 @@ const ProfileHostels = () => {
         </Animated.View>
       </View>
     )}
+     <DocumentViewer
+                visible={docsViewer}
+                documents={selectedHostel?.customerHostelDocs}
+                initialIndex={docsViewerIndex}
+                onClose={() => setDocsViewer(false)}
+            />
+    
+
   </View>
 }
 
@@ -819,7 +940,7 @@ const styles = StyleSheet.create({
     fontSize: 13, fontFamily: 'Gilroy-Regular', color: '#4B4B4B'
   },
   stayValueTxt: {
-    fontSize: 15, fontFamily: 'Gilroy-Medium', color: "#222222"
+    fontSize: 14, fontFamily: 'Gilroy-Medium', color: "#222222"
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
@@ -838,7 +959,7 @@ const styles = StyleSheet.create({
   dragindictor: { width: 50, height: 4, backgroundColor: "#ccc", borderRadius: 2, alignSelf: "center", marginBottom: 10 },
   swthHostelCard: {
     flexDirection: 'row', justifyContent: 'space-between', borderWidth: 1, borderColor: '#E7E7E7',
-    borderRadius: 10, paddingVertical: 14, paddingHorizontal: 16, alignItems: 'center',marginTop:8
+    borderRadius: 10, paddingVertical: 14, paddingHorizontal: 16, alignItems: 'center', marginTop: 8
   },
 })
 export default ProfileHostels;

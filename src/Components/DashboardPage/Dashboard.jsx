@@ -763,7 +763,7 @@ function Dashboard(props) {
             ) : (
               <View style={[style.hostelImage, style.initialContainer]}>
                 <Text style={style.initialText}>
-                  {context.getHostelDetail.hostelInitial}
+                  {context?.getHostelDetail?.hostelInitial}
                 </Text>
               </View>
             )}
@@ -771,14 +771,14 @@ function Dashboard(props) {
             <View style={{ paddingLeft: 2, flex: 1 }}>
               <Text numberOfLines={1} ellipsizeMode="tail"
                 style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold', color: '#1B1D21', flexShrink: 1 }}>
-                {context.getHostelDetail?.hostelName}
+                {context?.getHostelDetail?.hostelName || "N/A"}
                 {/* maxWidth: '90%' */}
               </Text>
 
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Image source={Location} style={{ width: 16, height: 16 }} />
                 <Text style={{ marginLeft: 7, fontSize: 14, color: '#4B4B4B', fontFamily: 'Gilroy-Regular' }}>
-                  {context.getHostelDetail.city}
+                  {context?.getHostelDetail?.city || "N/A"}
                 </Text>
               </View>
             </View>

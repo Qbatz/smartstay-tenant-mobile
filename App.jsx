@@ -42,7 +42,7 @@ import AgreementViewScreen from './src/Components/RentalAggreements/AggreementVi
 import NOCBillPdf from './src/Components/NocBillPdf';
 import NOCReceiptPdf from './src/Components/NocReceipt';
 import InvoiceDesign from './src/Components/Payments/BillPDF';
-import { ACCESS_TOKEN, CUSTOMERDETAIL, CUSTOMERINITIALS, CUSTOMERPROFILEPIC, FCM_TOKEN, HOSTELDETAIL, HOSTELLIST, LOGGEDIN, LOGGEDOUT, PHONE_NO, SHOULD_TOKEN_UPDATE, USERID } from './src/Utils/Constant';
+import { ACCESS_TOKEN, CUSTOMERDETAIL, CUSTOMERINITIALS, CUSTOMERPROFILEPIC, FCM_TOKEN, HOSTELDETAIL, HOSTELLIST, LOGGEDIN, LOGGEDOUT, LOGIN_ANOTHER_NUMBER, PHONE_NO, SHOULD_TOKEN_UPDATE, USERID } from './src/Utils/Constant';
 import CreateMpin from './src/Components/CreateAccount/CreateMpin';
 import ConfirmMPin from './src/Components/CreateAccount/ConfirmMPin';
 import LoginPage from './src/Components/CreateAccount/LoginPage';
@@ -149,7 +149,8 @@ function AppContent(props) {
   const [isLoggedIn, setIsLoggedIn] = useState()
   const [initialRoute, setInitialRoute] = useState()
   const [isAfterLogout, setIsAfterLogout] = useState()
-  const [isMpinVerified,setMpinVerified]=useState()
+  const [isMpinVerified, setMpinVerified] = useState()
+  const [isLoginWith, setIsLoginWith] = useState()
 
 
 
@@ -198,26 +199,26 @@ function AppContent(props) {
       loginContext.userId(r)
     })
 
-    retriveData(CUSTOMERDETAIL).then(r=>{
-      const customerDetail= r ? JSON.parse(r) : null
+    retriveData(CUSTOMERDETAIL).then(r => {
+      const customerDetail = r ? JSON.parse(r) : null
       context.updateCustomer(customerDetail)
     })
 
-    retriveData(CUSTOMERPROFILEPIC).then(r=>{
+    retriveData(CUSTOMERPROFILEPIC).then(r => {
       console.log(r)
     })
 
-    retriveData(CUSTOMERINITIALS).then(r=>{
+    retriveData(CUSTOMERINITIALS).then(r => {
       console.log(r)
     })
 
-    retriveData(HOSTELLIST).then(r=>{
-      const hostelList= r ? JSON.parse(r) : null;
+    retriveData(HOSTELLIST).then(r => {
+      const hostelList = r ? JSON.parse(r) : null;
       context.updateHostelList(hostelList)
     })
 
-    retriveData(HOSTELDETAIL).then(r=>{
-      const hostelDetail= r ? JSON.parse(r) : null;
+    retriveData(HOSTELDETAIL).then(r => {
+      const hostelDetail = r ? JSON.parse(r) : null;
       context.updateHostelDetail(hostelDetail)
     })
   }, [loginContext.LoggedIn])
@@ -233,6 +234,17 @@ function AppContent(props) {
       }
     })
   }, [isLoggedIn, isAfterLogout])
+
+  useEffect(() => {
+    retriveData(LOGIN_ANOTHER_NUMBER).then(r => {
+      console.log("loginWithAnother", r)
+      if (r === "true") {
+        setIsLoginWith(true)
+      } else {
+        setIsLoginWith(false)
+      }
+    })
+  }, [isLoggedIn, isAfterLogout, isLoginWith])
 
   const checkInternet = () => {
     if (Platform.OS == "android") {
@@ -271,23 +283,39 @@ function AppContent(props) {
               <Navigation.Screen name="ResetNewMpin" component={ResetNewMpin} />
             </Navigation.Navigator>
           </NavigationContainer>
-        ) : (
-          <NavigationContainer>
+        ) :
+          isLoginWith ?
+            (
+              <NavigationContainer>
 
-            <Navigation.Navigator screenOptions={{ headerShown: false }} initialRouteName='SplashScreen'>
-              {/* <Navigation.Screen name='WelcomeBack' component={LoginScreen}/> */}
-              <Navigation.Screen name="LogoScreen" component={LogoScreen} />
-              <Navigation.Screen name="SplashScreen" component={SplashScreen} />
-              <Navigation.Screen name="OnboardingScreen" component={OnboardingScreen} />
-              <Navigation.Screen name="CreateAccount" component={CreateAccount} />
-              <Navigation.Screen name="OtpDesign" component={OtpDesign} />
-              {/* <Navigation.Screen name='WelcomeBackPage' component={WelcomeBackPage}/> */}
-              <Navigation.Screen name='CreateMpin' component={CreateMpin} />
-              <Navigation.Screen name='ConfirmMPin' component={ConfirmMPin} />
-              <Navigation.Screen name='LoginPage' component={LoginMobileScreen} />
+                <Navigation.Navigator screenOptions={{ headerShown: false }} initialRouteName='CreateAccount'>
+                  <Navigation.Screen name="CreateAccount" component={CreateAccount} />
+                  <Navigation.Screen name="OtpDesign" component={OtpDesign} />
+                  {/* <Navigation.Screen name='WelcomeBackPage' component={WelcomeBackPage}/> */}
+                  <Navigation.Screen name='CreateMpin' component={CreateMpin} />
+                  <Navigation.Screen name='ConfirmMPin' component={ConfirmMPin} />
+                  <Navigation.Screen name='LoginPage' component={LoginMobileScreen} />
 
-            </Navigation.Navigator>
-          </NavigationContainer>)}
+                </Navigation.Navigator>
+              </NavigationContainer>)
+            :
+            (
+              <NavigationContainer>
+
+                <Navigation.Navigator screenOptions={{ headerShown: false }} initialRouteName='SplashScreen'>
+                  {/* <Navigation.Screen name='WelcomeBack' component={LoginScreen}/> */}
+                  <Navigation.Screen name="LogoScreen" component={LogoScreen} />
+                  <Navigation.Screen name="SplashScreen" component={SplashScreen} />
+                  <Navigation.Screen name="OnboardingScreen" component={OnboardingScreen} />
+                  <Navigation.Screen name="CreateAccount" component={CreateAccount} />
+                  <Navigation.Screen name="OtpDesign" component={OtpDesign} />
+                  {/* <Navigation.Screen name='WelcomeBackPage' component={WelcomeBackPage}/> */}
+                  <Navigation.Screen name='CreateMpin' component={CreateMpin} />
+                  <Navigation.Screen name='ConfirmMPin' component={ConfirmMPin} />
+                  <Navigation.Screen name='LoginPage' component={LoginMobileScreen} />
+
+                </Navigation.Navigator>
+              </NavigationContainer>)}
 
       {loginContext.getNetworkConnectivity != true && <View style={styles.noInternetContainer}>
         <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>

@@ -41,11 +41,12 @@ export default function PaymentBottomSheet({
 }) {
     const translateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
     const paymentContext = useContext(paymentContexts)
-    const [showVisible, setShowVisible] = useState(false);
-    const [rentAmountVisible, setRentAmountVisible] = useState(false)
+    const [showVisible, setShowVisible] = useState(true);
+    const [rentAmountVisible, setRentAmountVisible] = useState(true)
     const [showNonrefundable, setNonrefundable] = useState(false)
     const navigation = useNavigation();
     const [selected, setSelected] = useState("invoice");
+    const [showUnpaidInv,setShowUnpaidInv]=useState(true)
 
 
     const { CommonModule } = NativeModules;
@@ -161,8 +162,14 @@ export default function PaymentBottomSheet({
 
     }
 
+   
+   const totalUnpaidInvoice = paymentContext?.getInvoiceDetail?.unpaidInvoices?.reduce(
+  (sum, item) => sum + Number(item.totalAmount || 0),
+  0
+);
 
 
+console.log(totalUnpaidInvoice)
     if (!visible) return null;
 
     return (
@@ -663,7 +670,7 @@ export default function PaymentBottomSheet({
 
                                         <View style={style.row}>
                                             <TouchableOpacity onPress={() => setRentAmountVisible(!rentAmountVisible)}>
-                                                <View style={{ flexDirection: 'row' }}>
+                                                <View style={{ flexDirection: 'row',alignItems:'center' }}>
                                                     <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Regular', color: '#2F2F2F' }}>
                                                         Actual Stay days ({paymentContext?.getInvoiceDetail?.currentMonthInfo?.noOfDaysStayed} days)
                                                     </Text>
@@ -715,6 +722,7 @@ export default function PaymentBottomSheet({
 
                                 )}
 
+                                {paymentContext?.getInvoiceDetail?.advanceInfo?.deductions.length > 0 && (
                                 <View style={{ flexDirection: 'row', paddingTop: 10 }}>
                                     <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium' }}>Non Refundable Rent</Text>
                                     <TouchableOpacity onPress={() => setNonrefundable(!showNonrefundable)}
@@ -727,6 +735,7 @@ export default function PaymentBottomSheet({
                                     </TouchableOpacity>
 
                                 </View>
+                                )}
 
                                 {showNonrefundable && (
                                     <>
@@ -746,6 +755,45 @@ export default function PaymentBottomSheet({
                                         </View>
                                     </>
                                 )}
+
+
+                                <View style={style.row}>
+                                    
+                                        <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }}
+                                         onPress={() => setShowUnpaidInv(!showUnpaidInv)}>
+                                       
+                                            <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium' }}>Unpaid Invoices</Text>
+                                            <Ionicons
+                                                name={showUnpaidInv ? "chevron-up" : "chevron-down"}
+                                                size={20}
+                                                color="#007FFF"
+                                                style={{ marginLeft: 6, padding: 2, borderRadius: 5, backgroundColor: '#EFF6FF', }}
+                                            />    
+                                    </TouchableOpacity>
+
+                                    <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold' }}> ₹ {totalUnpaidInvoice}</Text>
+                                </View>
+
+                                {showUnpaidInv && (
+                                    <View>
+                                        {paymentContext.getInvoiceDetail?.unpaidInvoices.length>0 && (
+                                            paymentContext.getInvoiceDetail?.unpaidInvoices.map((i,index)=>(
+                                                <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between',paddingVertical:7,paddingHorizontal:2}} 
+                                                        key={index}>
+                                                    <TouchableOpacity style={{flexDirection:'row',alignItems:'center'}}>
+                                                        <Text style={{fontSize:14,fontFamily:'Gilroy-Medium',color:'#1E45E1'}}>
+                                                            {i?.invoiceNo}</Text>
+                                                        <Image source={ReceiptPic} style={{width:16,height:16,marginLeft:12}}/>
+                                                    </TouchableOpacity>
+
+                                                    <Text style={{fontSize:14,fontFamily:'Gilroy-Medium',color:'#2F2F2F'}}>
+                                                        ₹ {i?.balanceAmount}</Text>
+                                                </View>
+                                            ))
+                                        )}
+                                    </View>
+                                )}
+
 
 
 

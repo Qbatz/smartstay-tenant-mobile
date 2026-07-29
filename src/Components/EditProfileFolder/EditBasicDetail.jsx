@@ -10,6 +10,8 @@ import SuccessModal from "../ToastFile/TostFilePage";
 import { customerDetails, editProfile } from "../../Action/CustomerAction";
 import { LoginContexts } from "../../Context/LoginContext";
 import AppLoader from "../ToastFile/LoaderPage";
+import Ionicons from "react-native-vector-icons/Ionicons";
+
 
 
 const EditBasicDetail = ({ }) => {
@@ -50,7 +52,7 @@ const EditBasicDetail = ({ }) => {
             isValid = false;
         }
 
-        if ((firstName ?? "").trim() === (initialFirstName ?? "").trim() && 
+        if ((firstName ?? "").trim() === (initialFirstName ?? "").trim() &&
             (lastName ?? "").trim() === (initialLastName ?? "").trim() && (mailId ?? "").trim() === (initialMailid ?? "").trim()) {
             setShowSuccessModal(true)
             setShowSuccessMessage("No Changes Detected")
@@ -169,19 +171,29 @@ const EditBasicDetail = ({ }) => {
                     }} />
 
                 <Text style={[styles.labelTxt, { marginTop: 12 }]}>Mobile No</Text>
-                <TextInput
-                    value={mobileNo}
-                    style={styles.input}
-                    editable={false}
-                    placeholder="Enter mobileNo"
-                // onChangeText={(text) => {
-                //                 const onlyLetters = text.replace(/[^0-9\s]/g, "")
-                //                 setMobileNo(onlyLetters)
+                <View style={{
+                    flexDirection: 'row', alignItems: 'center',
+                    paddingVertical: 5, paddingHorizontal: 10, marginTop: 10, fontFamily: 'Gilroy-Regular',
+                    borderWidth: 1, borderColor: '#EEEEEE', borderRadius: 8,
+                }}>
+                    <Text style={{ fontSize: 15, color: '#111827', fontFamily: 'Gilroy-Regular', }}>+91</Text>
+                    <Ionicons name="chevron-down" size={16} />
+                    <TextInput
+                        value={mobileNo}
+                        style={{ fontSize: 15, color: '#111827', fontFamily: 'Gilroy-Regular',marginLeft:6 }}
+                        editable={false}
+                        placeholder="Enter mobileNo"
+                    // onChangeText={(text) => {
+                    //                 const onlyLetters = text.replace(/[^0-9\s]/g, "")
+                    //                 setMobileNo(onlyLetters)
 
-                //             }}
-                />
-                <View style={{ paddingHorizontal: 10, paddingVertical: 5, backgroundColor: "#F5F9FF", 
-                              alignSelf: "flex-start", borderRadius: 8,marginTop:5 }}>
+                    //             }}
+                    />
+                </View>
+                <View style={{
+                    paddingHorizontal: 10, paddingVertical: 5, backgroundColor: "#F5F9FF",
+                    alignSelf: "flex-start", borderRadius: 8, marginTop: 5
+                }}>
                     <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#1E45E1' }}>Mobile No not editable</Text>
                 </View>
             </View>
