@@ -1,8 +1,14 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, Image, TouchableWithoutFeedback, StyleSheet, Animated, ScrollView, TouchableOpacity, Platform } from "react-native";
+import React, { useContext, useState } from "react";
+import { View, Text, TextInput, Image, TouchableWithoutFeedback, StyleSheet, Animated, ScrollView, TouchableOpacity, Platform, Alert } from "react-native";
 import FilterSimpleIcon from '../../../assets/Images/filterSimple.png'
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { Calendar } from "react-native-calendars";
+import dayjs from "dayjs";
+import { getPaymentList } from "../../../Action/HostelAction";
+import { LoginContexts } from "../../../Context/LoginContext";
+import { UsersContext } from "../../../Context/UserContext";
+import { paymentContexts } from "../../../Context/PaymentContext";
 
 
 const FilterPayments = ({
@@ -13,50 +19,72 @@ const FilterPayments = ({
 
 }) => {
 
+    const { getToken } = useContext(LoginContexts)
+    const { getHostelDetail } = useContext(UsersContext)
+    const { updateInvoiceList } = useContext(paymentContexts)
+
     const [fromDate, setFromDate] = useState(null);
     const [toDate, setToDate] = useState(null);
 
     const [showPicker, setShowPicker] = useState(false);
     const [activeField, setActiveField] = useState(null);
+    const [openCalendar, setOpenCalendar] = useState(false);
+    const [calendarType, setCalendarType] = useState("");
+    const today = dayjs();
 
     const [tempDate, setTempDate] = useState(new Date());
+    const [selectedDays, setSelectedDays] = useState()
 
-    const openPicker = (field) => {
-        setActiveField(field);
 
-        if (field === 'from') {
-            setTempDate(fromDate || new Date());
-        } else {
-            setTempDate(toDate || new Date());
+    const onCloseFilter = () => {
+        setFromDate(null)
+        setToDate(null)
+        setSelectedDays("")
+        onClose()
+    }
+
+    const openStartCalendar = () => {
+        setCalendarType("start");
+        setOpenCalendar(true);
+    };
+    const openEndCalendar = () => {
+
+        if (!fromDate) {
+            Alert.alert("Please select Start Date first");
+            return;
         }
 
-        setShowPicker(true);
+        setCalendarType("end");
+        setOpenCalendar(true);
     };
 
-    const onDateChange = (event, selectedDate) => {
-    if (event.type === 'dismissed') {
-        setShowPicker(false);
-        return;
-    }
+    const onDateSelect = (day) => {
 
-    if (event.type === 'set' && selectedDate) {
-        setTempDate(selectedDate);
+        if (calendarType === "start") {
 
-        if (activeField === 'from') {
-            setFromDate(selectedDate);
+            setFromDate(new Date(day.dateString));
 
-            if (toDate && selectedDate > toDate) {
-                setToDate(null);
+            setToDate(null)
+        } else {
+
+            const selectedEnd = new Date(day.dateString);
+
+            if (selectedEnd < fromDate) {
+                Alert.alert("End Date cannot be before Start Date");
+                return;
             }
+
+            setToDate(selectedEnd);
         }
 
-        if (activeField === 'to') {
-            setToDate(selectedDate);
-        }
+        setOpenCalendar(false);
+    };
 
-        setShowPicker(false);
+    const resetAll=()=>{
+         setFromDate(null)
+        setToDate(null)
+        setSelectedDays("")
     }
-};
 
 
     const formatDate = (date) => {
@@ -67,12 +95,52 @@ const FilterPayments = ({
         return `${d}-${m}-${y}`;
     };
 
+    const onSelectDays = (value) => {
+        setSelectedDays(value)
+    }
+
+    const onApplyFilter = () => {
+        getPaymentList(getHostelDetail.hostelId, getToken, formatDate(fromDate), formatDate(toDate), String(selectedDays)).then(r => {
+            console.log("PaymentList", r)
+
+            if (r.status == 200) {
+                updateInvoiceList(r.data)
+                onClose()
+            }else{
+                updateInvoiceList("")
+                onClose()
+            }
+        })
+    }
+
+    const resetAllFilter=()=>{
+         setFromDate(null)
+        setToDate(null)
+        setSelectedDays("")
+       
+        setTimeout(() => {
+             getPaymentList(getHostelDetail.hostelId, getToken, formatDate(fromDate), formatDate(toDate), String(selectedDays)).then(r => {
+            console.log("PaymentList", r)
+
+            if (r.status == 200) {
+                updateInvoiceList(r.data)
+                onClose()
+            }else{
+                updateInvoiceList("")
+                onClose()
+            }
+        })
+            
+        }, 800);
+       
+    }
+
 
 
 
     if (!visible) return null;
     return <View style={styles.sheetOverlay}>
-        <TouchableWithoutFeedback onPress={onClose}>
+        <TouchableWithoutFeedback onPress={onCloseFilter}>
             <View style={StyleSheet.absoluteFill} />
         </TouchableWithoutFeedback>
 
@@ -91,14 +159,14 @@ const FilterPayments = ({
 
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                             <Image source={FilterSimpleIcon} style={{ width: 24, height: 24 }} />
-                            <Text style={{ fontSize: 20, fontWeight: 600, marginLeft: 10 }}>Filter by</Text>
+                            <Text style={{ fontSize: 20,fontFamily:'Gilroy-Semibold', marginLeft: 10 }}>Filter by</Text>
                         </View>
 
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 16 }}>
-                            <Text style={{ fontSize: 14, fontWeight: 400 }}>Date Range</Text>
+                            <Text style={{ fontSize: 14,fontFamily:'Gilroy-Medium' }}>Date Range</Text>
 
-                            <TouchableOpacity>
-                                <Text style={{ fontSize: 14, fontWeight: 400, color: '#1E45E1' }}>Reset</Text>
+                            <TouchableOpacity onPress={resetAll}>
+                                <Text style={{ fontSize: 14,fontFamily:'Gilroy-Medium', color: '#1E45E1' }}>Reset</Text>
                             </TouchableOpacity>
                         </View>
 
@@ -109,7 +177,7 @@ const FilterPayments = ({
                                 <Text style={styles.label}>From</Text>
                                 <TouchableOpacity
                                     style={styles.input}
-                                    onPress={() => openPicker('from')}
+                                    onPress={openStartCalendar}
                                 >
                                     <Text numberOfLines={1} ellipsizeMode="clip"
                                         style={[
@@ -138,7 +206,7 @@ const FilterPayments = ({
                                         !fromDate && styles.disabledInput,
                                     ]}
                                     disabled={!fromDate}
-                                    onPress={() => openPicker('to')}
+                                    onPress={openEndCalendar}
                                 >
                                     <Text numberOfLines={1} ellipsizeMode="clip"
                                         style={[
@@ -159,51 +227,57 @@ const FilterPayments = ({
                             </View>
                         </View>
 
-                        {showPicker && (
+                        {/* {showPicker && (
                             <DateTimePicker
                                 value={tempDate}
                                 mode="date"
                                 display="calendar"
                                 onChange={onDateChange}
                             />
-                        )}
+                        )} */}
+
+
 
                         <View>
-                            <View style={{ flexDirection: 'row',justifyContent: 'space-between', flex: 1, paddingTop: 15 }}>
-                                <View style={{ paddingRight:5, flex: 1 }}>
-                                    <TouchableOpacity
-                                        style={styles.daysContainer}>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', flex: 1, paddingTop: 15 }}>
+                                <View style={{ paddingRight: 5, flex: 1 }}>
+                                    <TouchableOpacity onPress={() => onSelectDays("Today")}
+                                       style={[styles.daysContainer, selectedDays === "Today" && {borderColor:'#1E45E1'}]}>
                                         <Text style={styles.daysText}>Today</Text>
                                     </TouchableOpacity>
                                 </View>
 
                                 <View style={{ paddingLeft: 5, flex: 1 }}>
-                                    <TouchableOpacity
-                                        style={styles.daysContainer}>
+                                    <TouchableOpacity onPress={() => onSelectDays("This Week")}
+                                        style={[styles.daysContainer, selectedDays === "This Week" && {borderColor:'#1E45E1'}]}>
                                         <Text style={styles.daysText}>This Week</Text>
                                     </TouchableOpacity>
                                 </View>
 
                                 <View style={{ paddingLeft: 10, flex: 1, }}>
-                                    <TouchableOpacity
-                                        style={styles.daysContainer}>
+                                    <TouchableOpacity onPress={() => onSelectDays("This Month")}
+                                        style={[styles.daysContainer, selectedDays === "This Month" && {borderColor:'#1E45E1'}]}>
                                         <Text style={styles.daysText}>This Month</Text>
                                     </TouchableOpacity>
                                 </View>
                             </View>
                         </View>
 
-                        <View style={{paddingTop:20}}>
-                            <View style={{flexDirection:'row',flex:1}}>
-                                <View style={{paddingRight:5,flex:1}}>
-                                    <TouchableOpacity style={{borderWidth:1,borderRadius:8, justifyContent: 'center', alignItems: 'center', padding: 10}}>
-                                        <Text>Reset all</Text>
+                        <View style={{ paddingTop: 20 }}>
+                            <View style={{ flexDirection: 'row', flex: 1 }}>
+                                <View style={{ paddingRight: 5, flex: 1 }}>
+                                    <TouchableOpacity onPress={resetAllFilter}
+                                    style={{ borderRadius: 8, justifyContent: 'center',  paddingHorizontal:10,
+                                                paddingVertical: 16, alignItems: 'center',backgroundColor:'#EFF2FF' }}>
+                                        <Text style={{fontSize:14,fontFamily:'Gilroy-Medium',color:'#1E45E1'}}>Reset all</Text>
                                     </TouchableOpacity>
                                 </View>
 
-                                <View style={{paddingLeft:5,flex:1}}>
-                                    <TouchableOpacity style={{borderWidth:1,borderRadius:8, justifyContent: 'center', alignItems: 'center', padding: 10}}>
-                                        <Text>Apply</Text>
+                                <View style={{ paddingLeft: 5, flex: 1 }}>
+                                    <TouchableOpacity onPress={onApplyFilter}
+                                        style={{borderRadius: 8, justifyContent: 'center', alignItems: 'center', paddingHorizontal:10,
+                                                paddingVertical: 16,backgroundColor:'#1E45E1' }}>
+                                        <Text style={{fontSize:14,fontFamily:'Gilroy-Medium',color:'#FFFFFF'}}>Apply</Text>
                                     </TouchableOpacity>
                                 </View>
 
@@ -218,6 +292,62 @@ const FilterPayments = ({
 
             </View>
         </Animated.View>
+        {openCalendar && (
+            <View style={styles.dateOverlay}>
+                <TouchableWithoutFeedback onPress={() => setOpenCalendar(false)}>
+                    <View style={styles.overlayBg} />
+                </TouchableWithoutFeedback>
+
+                <View style={styles.calendarContainer}>
+                    <Calendar
+                        current={
+                            calendarType === "start"
+                                ? (
+                                    fromDate
+                                        ? dayjs(fromDate).format("YYYY-MM-DD")
+                                        : today.format("YYYY-MM-DD")
+                                )
+                                : (
+                                    toDate
+                                        ? dayjs(toDate).format("YYYY-MM-DD")
+                                        : dayjs(fromDate).format("YYYY-MM-DD")
+                                )
+                        }
+
+                        minDate={
+                            calendarType === "end"
+                                ? dayjs(fromDate).format("YYYY-MM-DD")
+                                : undefined
+                        }
+
+                        onDayPress={onDateSelect}
+
+                        markedDates={{
+                            ...(fromDate && {
+                                [dayjs(formatDate).format("YYYY-MM-DD")]: {
+                                    selected: true,
+                                    selectedColor: "#2563EB",
+                                },
+                            }),
+
+                            ...(toDate && {
+                                [dayjs(toDate).format("YYYY-MM-DD")]: {
+                                    selected: true,
+                                    selectedColor: "#16A34A",
+                                },
+                            }),
+                        }}
+
+                        theme={{
+                            todayTextColor: "#2563EB",
+                            selectedDayBackgroundColor: "#2563EB",
+                            selectedDayTextColor: "#FFF",
+                            arrowColor: "#111827",
+                        }}
+                    />
+                </View>
+            </View>
+        )}
 
     </View>
 
@@ -250,6 +380,7 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 13,
         color: '#9AA0A6',
+        fontFamily:'Gilroy-Medium',
         marginBottom: 6,
     },
     input: {
@@ -265,11 +396,13 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingLeft: 14,
         fontSize: 15,
+        fontFamily:'Gilroy-Regular', 
         color: '#B0B4BB',
-        includeFontPadding:false,
+        includeFontPadding: false,
     },
     selectedText: {
         color: '#3C4043',
+        fontFamily:'Gilroy-Regular' 
     },
     iconBox: {
         width: 44,
@@ -280,8 +413,36 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    daysText:{
-        fontSize:12,fontWeight:400,color:'#555E67'
+    daysText: {
+        fontSize: 13,fontFamily:'Gilroy-Medium', color: '#555E67'
     },
-    daysContainer:{ borderRadius:10, borderWidth: 1, justifyContent: 'center', alignItems: 'center', padding: 10,borderColor:'#ECEDF0' }
+    daysContainer: {
+        borderRadius: 10, borderWidth: 1, justifyContent: 'center', alignItems: 'center',
+        paddingVertical: 14, borderColor: '#ECEDF0',paddingHorizontal:10
+    },
+    dateOverlay: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 9999,
+    },
+
+    overlayBg: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: "rgba(0,0,0,0.3)",
+    },
+
+    calendarContainer: {
+        backgroundColor: "#fff",
+        borderRadius: 20,
+        padding: 10,
+        width: "85%",
+        elevation: 10,
+    },
+
+
 })

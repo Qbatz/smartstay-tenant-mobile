@@ -103,3 +103,52 @@ export const updateFCMToken = async (xuid, token, authToken) => {
     }
 }
 
+export const changePostMpin = async (data,token) => {
+    console.log("checkmpin",data)
+    try {
+        const axios = getAxios();
+        const response = await axios.post('/v2/customer/change-mpin', data, {
+            headers: {
+                Authorization: "Bearer " + token
+            }
+        })
+        console.log("changempin",response)
+        return response;
+    } catch (error) {
+        return { status: error.response.status, message: error.response.data }
+    }
+}
+
+export const verifyOtpMpin = async (data,token) => {
+    console.log("checkmpin",data)
+    try {
+        const axios = getAxios();
+        const response = await axios.post('/v2/customer/verify-mpin-otp', data, {
+            headers: {
+                Authorization: "Bearer " + token
+            }
+        })
+        console.log("changempin",response)
+        return response;
+    } catch (error) {
+        return { status: error.response.status, message: error.response.data }
+    }
+}
+
+export const resendMpinOtp = async (token) => {
+    try {
+        const axios = getAxios();
+        const response = await axios.post('/v2/customer/resend-mpin-otp', {}, {
+            headers: {
+                Authorization: "Bearer " + token
+            }
+        })
+        console.log("changempin",response)
+        return response;
+    } catch (error) {
+        console.log(error)
+        console.log(error.response)
+        return { status: error.response.status, message: error.response.data }
+    }
+}
+

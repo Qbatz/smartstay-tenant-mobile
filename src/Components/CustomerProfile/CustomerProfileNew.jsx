@@ -10,7 +10,9 @@ import {
     Animated,
     Dimensions,
     PanResponder,
-    Pressable
+    Pressable,
+    RefreshControl,
+    ActivityIndicator
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -69,6 +71,7 @@ const CustomerProfileNew = (route) => {
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [showSuccessMessage, setShowSuccessMessage] = useState("");
     const [showModalType, setShowModalType] = useState("")
+    const [refreshing, setRefreshing] = useState(false)
 
     const SCREEN_HEIGHT = Dimensions.get("window").height;
 
@@ -98,8 +101,7 @@ const CustomerProfileNew = (route) => {
         return () => backHandler.remove();
     }, [navigation, penditnActionBottomSheet])
 
-
-    useEffect(() => {
+    const fetchCustomerDetail = () => {
         customerDetails(loginContext.getToken).then(r => {
             console.log(r.data)
             context.updateCustomer(r.data)
@@ -112,7 +114,23 @@ const CustomerProfileNew = (route) => {
         }).catch(error => {
             console.log(error)
         })
+    }
+
+
+    useEffect(() => {
+        fetchCustomerDetail();
     }, [context.getHostelDetail, loginContext.getToken])
+
+    const onRefresh = async () => {
+        setRefreshing(true);
+        fetchCustomerDetail();
+        setTimeout(() => {
+            setRefreshing(false);
+        }, 1000);
+
+
+    };
+
 
     const openSheet = () => {
         Animated.timing(translateY, {
@@ -283,7 +301,25 @@ const CustomerProfileNew = (route) => {
         }
     }
 
-
+    if (refreshing) {
+        return <View style={{ flex: 1, backgroundColor: '#fff' }} >
+            <LinearGradient
+                colors={["#c0e3ff", "#FFFFFF"]}
+                start={{ x: 0.5, y: 0 }}
+                end={{ x: 0.5, y: 1 }}
+                style={{ width: "100%", height: "25%" }}
+            >
+                <View
+                    style={{
+                        flex: 1,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}>
+                    <ActivityIndicator size="large" color="#1E45E1" />
+                </View>
+            </LinearGradient>
+        </View>;
+    }
     return (
 
         <View style={styles.container}>
@@ -292,7 +328,12 @@ const CustomerProfileNew = (route) => {
                 onClose={() => setShowSuccessModal(false)}
                 message={showSuccessMessage}
                 type={showModalType} />
-            <ScrollView contentContainerStyle={styles.scrollContainer} >
+
+            <ScrollView contentContainerStyle={styles.scrollContainer}
+                refreshControl={<RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh} />}>
+
                 <View>
                     <LinearGradient
                         colors={["#c0e3ff", "#FFFFFF"]}

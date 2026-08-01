@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Image, Text, TouchableOpacity } from "react-native";
+import { Image, ScrollView, Text, TouchableOpacity } from "react-native";
 import { StyleSheet, View } from "react-native";
 import LeftArrow from "../../assets/Images/LeftArrow.png"
 import { TextInput } from "react-native";
@@ -123,6 +123,7 @@ const EditBasicDetail = ({ }) => {
                 visible={showSuccesModal}
                 message={showSuccessMessage}
                 type={modalType} />
+            <ScrollView showsVerticalScrollIndicator={false}>
             <View>
                 <View style={styles.mainHeader}>
                     <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -196,11 +197,12 @@ const EditBasicDetail = ({ }) => {
                 }}>
                     <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#1E45E1' }}>Mobile No not editable</Text>
                 </View>
-            </View>
+            </View>   
+            </ScrollView>
 
 
 
-            <TouchableOpacity onPress={handleSave}
+            <TouchableOpacity  onPress={handleSave}
                 style={styles.saveBtn}>
                 <Text style={styles.saveTxt}>Save Changes</Text>
             </TouchableOpacity>
@@ -233,8 +235,8 @@ const styles = StyleSheet.create({
         fontSize: 14, fontFamily: "Gilroy-Medium", color: '#4B4B4B'
     },
     saveBtn: {
-        backgroundColor: '#1E45E1', borderRadius: 10,
-        paddingVertical: 14, alignItems: 'center', marginBottom: 40
+        backgroundColor: '#1E45E1', borderRadius: 10,position:'relative',
+        paddingVertical: 14, alignItems: 'center', marginBottom: 40,marginTop:8
     },
     saveTxt: {
         fontSize: 16, fontFamily: 'Gilroy-Semibold', color: '#ffffff'

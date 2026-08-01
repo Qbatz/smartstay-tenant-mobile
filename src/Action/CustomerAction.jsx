@@ -297,6 +297,40 @@ export const addJobDetails=async(token,payload)=>{
         return res;
     }catch(error){
         console.log(res)
-        return{status: error.response.status, message: error.response.data}
+        return{status: error.response.status, message: error.response.data || error.response}
+    }
+}
+
+export const CancelRequest=async(hostelId,requestId,token)=>{
+    try{
+        const axios=getAxios();
+        const res=await axios.delete("/v2/tenant/hostels/requests/" + hostelId + "/" + requestId, { 
+            headers: {
+                Authorization: "Bearer " + token
+            
+        }
+        })
+        console.log(res)
+        return res;
+    }catch(error){
+        console.log(error)
+        return{status: error.response.status, message: error.response.data || error.response}
+    }
+}
+
+export const CancelAmenitiesRequest=async(hostelId,requestId,token)=>{
+    try{
+        const axios=getAxios();
+        const res=await axios.delete("/v2/amenities/request/" + hostelId + "/" + requestId, { 
+            headers: {
+                Authorization: "Bearer " + token
+            
+        }
+        })
+        console.log(res)
+        return res;
+    }catch(error){
+        console.log(error)
+        return{status: error.response.status, message: error.response.data || error.response}
     }
 }

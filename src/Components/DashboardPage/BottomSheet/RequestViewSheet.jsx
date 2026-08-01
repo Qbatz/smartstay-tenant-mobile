@@ -27,6 +27,8 @@ import { LoginContexts } from "../../../Context/LoginContext";
 import AppLoader from "../../ToastFile/LoaderPage";
 import CallIcon from "../../../assets/Images/call.png"
 import DeleteIcon from "../../../assets/Images/deleteIcon.png"
+import { CancelRequest, getRequestRaised } from "../../../Action/CustomerAction";
+import SuccessModal from "../../ToastFile/TostFilePage";
 
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
@@ -42,8 +44,12 @@ export default function RequestViewSheet({
 
 
     const { CommonModule } = NativeModules;
-    const context = useContext(UsersContext)
-    const loginContext = useContext(LoginContexts)
+    const {getHostelDetail,updateRequestRaised} = useContext(UsersContext)
+    const {getToken} = useContext(LoginContexts)
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+      const [toastMessage, setToastMessage] = useState()
+      const [modelType, setModelType] = useState()
+      const [loading,setLoading]=useState(false)
     console.log(requestDetail)
 
     // useEffect(() => {
@@ -103,6 +109,42 @@ export default function RequestViewSheet({
     });
   };
 
+  const ClickCancelReq=async(requestId)=>{
+    setLoading(true)
+    try{
+        const res=await CancelRequest(getHostelDetail?.hostelId,requestId,getToken)
+        console.log(res)
+        if(res.status ==200){
+            setShowSuccessModal(true)
+            setToastMessage(res?.data)
+            setModelType('success')
+            getRequestRaised(getHostelDetail.hostelId, getToken).then(res => {
+                        console.log(res)
+                        if(res?.status ===200){
+                        updateRequestRaised(res.data)
+                        }else{
+                          console.log(res)
+                        }
+                      })
+                      setTimeout(() => {
+                        setLoading(false)
+                         onClose()
+                      }, 1000);
+        }else{
+            setShowSuccessModal(true)
+            setToastMessage(res?.message)
+            setModelType('error')
+             setTimeout(() => {
+                        setLoading(false)
+                         onClose()
+                      }, 1000);
+        }
+        }catch(error){
+            console.log(error)
+            setLoading(false)
+        }
+  }
+
 
 
 
@@ -111,7 +153,12 @@ export default function RequestViewSheet({
 
     return (
         <View style={style.overlay}>
-            {/* <AppLoader visible={paymentContext.getLoading}/> */}
+            <AppLoader visible={loading}/>
+            <SuccessModal
+                visible={showSuccessModal}
+                onClose={()=>setShowSuccessModal(false)}
+                message={toastMessage}
+                type={modelType}/>
             <TouchableWithoutFeedback onPress={onClose}>
                 <View style={StyleSheet.absoluteFillObject} />
             </TouchableWithoutFeedback>
@@ -150,7 +197,8 @@ export default function RequestViewSheet({
                                         {/* <View style={{height: 1, backgroundColor: "#eee", marginTop: 10}} /> */}
 
                                         <View >
-                                            <TouchableOpacity style={{
+                                            <TouchableOpacity onPress={()=>ClickCancelReq(requestDetail?.requestId)}
+                                            style={{
                                                 borderWidth: 1, borderColor: '#eee', paddingTop: 9, paddingBottom: 14, paddingHorizontal: 15,
                                                 borderRadius: 5, flexDirection: 'row', justifyContent: 'center',alignItems:'center'
                                             }}>
@@ -206,7 +254,8 @@ export default function RequestViewSheet({
                                         {/* <View style={{height: 1, backgroundColor: "#eee", marginTop: 10}} /> */}
 
                                         <View >
-                                            <TouchableOpacity style={{
+                                            <TouchableOpacity onPress={()=>ClickCancelReq(requestDetail?.requestId)}
+                                            style={{
                                                 borderWidth: 1, borderColor: '#eee', paddingTop: 9, paddingBottom: 14, paddingHorizontal: 15,
                                                 borderRadius: 5, flexDirection: 'row', justifyContent: 'center',alignItems:'center'
                                             }}>

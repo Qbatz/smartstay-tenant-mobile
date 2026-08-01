@@ -17,6 +17,7 @@ const CreateMpin = (props) => {
     const [enterPinError, setEnterPinError] = useState()
 
     console.log(createMpin)
+    console.log(props)
 
     const handlePinChange = async (text, index) => {
         const newPin = [...createMpin];
@@ -61,7 +62,7 @@ const CreateMpin = (props) => {
         navigation.navigate('ConfirmMPin',{mPinNumber:mPinNo})
     }
 
-    return <View style={{ paddingHorizontal: 20,flex:1}}>
+    return <View style={{ paddingHorizontal: 20,flex:1,backgroundColor:'#ffffff'}}>
         <View>
              <Image source={Sm_logo} style={style.logo} />
 
@@ -101,19 +102,24 @@ const CreateMpin = (props) => {
 
 const style = StyleSheet.create({
     logo: { width: 151, height: 28.22, marginTop: 70, },
-    createText: { fontSize: 27, fontWeight: 600, color: '#222222', marginTop: 20 },
-    subtitle: { fontSize: 14, fontWeight: 400, color: '#4B4B4B', marginTop: 15 },
-    pinContainer: { flexDirection: 'row',justifyContent:'space-between',paddingTop:20,paddingLeft:10,paddingRight:10,marginBottom:5 },
-    pinBox: {
-        width: 60, height: 60, borderWidth: 1, borderColor: "#ccc", borderRadius: 8, textAlign: "center",
-        fontSize: 20, color: "#000"
+    createText: { fontSize: 28,fontFamily:'Gilroy-Semibold', color: '#222222', marginTop: 20 },
+    subtitle: { fontSize: 14,fontFamily:'Gilroy-Medium', color: '#4B4B4B', marginTop: 15 },
+    // pinContainer: { flexDirection: 'row',justifyContent:'space-between',paddingTop:20,paddingLeft:10,
+    //                 paddingRight:10,marginBottom:5,height:60},
+    pinContainer: {
+        flexDirection: 'row', justifyContent: 'space-between', paddingLeft: 10,
+        paddingRight: 10, marginBottom: 5, marginTop: 30, height: 60
     },
-    nextButton:{backgroundColor: "#1A73E8",
+    pinBox: {
+        width: 60, height: 60, borderWidth: 1, borderColor: "#ccc", borderRadius: 12, textAlign: "center",
+       color: "#000",fontFamily:'Gilroy-Medium',fontSize:24
+    },
+    nextButton:{backgroundColor: "#1E45E1",
         borderRadius: 10,
         paddingVertical: 14,
         marginTop: 250,
         alignItems: "center",},
-    nextText:{color:'#ffffff',fontSize:16,fontWeight:600},
+    nextText:{color:'#ffffff',fontSize:16,fontFamily:'Gilroy-Semibold'},
     disabledButton: {
         backgroundColor: "#A8C1FF",
     },

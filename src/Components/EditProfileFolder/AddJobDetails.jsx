@@ -16,6 +16,7 @@ import { UsersContext } from "../../Context/UserContext";
 import TimerIcon from "../../assets/Images/timer.png"
 import DatePicker from "react-native-date-picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import ErrorMessage from "../ToastFile/ErrorMessage";
 
 
 const AddJobDetails = ({ route }) => {
@@ -46,30 +47,32 @@ const AddJobDetails = ({ route }) => {
     const [shiftTo, setShiftTo] = useState(null)
     const [openTimeBox, setOpenTimeBox] = useState(false);
     const [pickerType, setPickerType] = useState(null);
+    const [errors, setErrors] = useState({})
 
     const { CommonModule } = NativeModules
 
     console.log(route)
-    console.log("shiftFrom",shiftFrom)
+    console.log("shiftFrom", shiftFrom)
     console.log(typeof shiftFrom); // string
-console.log(shiftFrom instanceof Date); // false
+    console.log(shiftFrom instanceof Date); // false
+    console.log("errormsg", errors)
 
-const convertTimeToDate = (time) => {
-    if (!time) return new Date();
+    const convertTimeToDate = (time) => {
+        if (!time) return new Date();
 
-    const cleanedTime = time.replace(/\u202F/g, " ").trim(); // Handles narrow no-break space
+        const cleanedTime = time.replace(/\u202F/g, " ").trim(); // Handles narrow no-break space
 
-    const [timePart, period] = cleanedTime.split(" ");
-    let [hours, minutes] = timePart.split(":").map(Number);
+        const [timePart, period] = cleanedTime.split(" ");
+        let [hours, minutes] = timePart.split(":").map(Number);
 
-    if (period.toUpperCase() === "PM" && hours !== 12) hours += 12;
-    if (period.toUpperCase() === "AM" && hours === 12) hours = 0;
+        if (period.toUpperCase() === "PM" && hours !== 12) hours += 12;
+        if (period.toUpperCase() === "AM" && hours === 12) hours = 0;
 
-    const date = new Date();
-    date.setHours(hours, minutes, 0, 0);
+        const date = new Date();
+        date.setHours(hours, minutes, 0, 0);
 
-    return date;
-};
+        return date;
+    };
 
     useEffect(() => {
         const selectedJobDetails = route?.params?.selectedJobDetails
@@ -82,7 +85,7 @@ const convertTimeToDate = (time) => {
             // setShiftFrom(selectedJobDetails?.shiftFrom)
             // setShiftTo(selectedJobDetails?.shiftTo)
             setShiftFrom(convertTimeToDate(selectedJobDetails.shiftFrom));
-        setShiftTo(convertTimeToDate(selectedJobDetails.shiftTo));
+            setShiftTo(convertTimeToDate(selectedJobDetails.shiftTo));
         }
 
     }, [])
@@ -171,7 +174,36 @@ const convertTimeToDate = (time) => {
     //     setOpen(false);
     // };
 
+    const validateForm = () => {
+
+        let newErrors = {};
+
+        if (!companyName && !companyName.trim()) {
+            newErrors.company = "Please Enter Companyname"
+        }
+
+        if (!location) {
+            newErrors.location = "Please Enter Location "
+        }
+
+        if (!(formatTime(shiftFrom)) && !formatTime(shiftTo)) {
+            newErrors.shiftTime = "Please Select Time"
+        }
+
+        // if (!guardianMobileNo && !guardianMobileNo.trim()) {
+        //     newErrors.guardianNumber = "Please Enter Number"
+        // }
+
+
+
+        setErrors(newErrors)
+        // return;
+        return Object.keys(newErrors).length === 0;
+    }
+
     const saveChanges = async () => {
+
+        if (!validateForm()) return;
 
 
 
@@ -186,6 +218,8 @@ const convertTimeToDate = (time) => {
                     shiftFrom: formatTime(shiftFrom),
                     shiftTo: formatTime(shiftTo),
                 }]
+
+            console.log("payload", payload)
             setLoading(true)
             try {
                 const res = await addJobDetails(getToken, payload)
@@ -272,7 +306,7 @@ const convertTimeToDate = (time) => {
                 <Text style={styles.mainheader}>{mode === "edit" ? "Edit" : "Add"} Job Details</Text>
             </View>
 
-            <ScrollView contentContainerStyle={{ justifyContent: 'space-between', flexGrow: 1 }}>
+            <ScrollView contentContainerStyle={{ justifyContent: 'space-between', flexGrow: 1 }} showsVerticalScrollIndicator={false}>
                 <View>
                     <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, marginTop: 20 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
@@ -303,7 +337,9 @@ const convertTimeToDate = (time) => {
                             <Text style={{ fontSize: 15, fontFamily: 'Gilroy-Medium', marginLeft: 10 }}>Working Professional</Text>
                         </View>
                     </View>
-                    <Text style={styles.labelTxt}>{employmentStatus === "Student" ? "College Name" : "Company Name"}</Text>
+                    <Text style={styles.labelTxt}>{employmentStatus === "Student" ? "College Name" : "Company Name"}
+                        <Text style={{ color: 'red' }}> *</Text>
+                    </Text>
 
                     <View>
                         <TextInput
@@ -315,6 +351,8 @@ const convertTimeToDate = (time) => {
                                 setCompanyName(onlyLetters)
                             }} />
                     </View>
+
+                    {errors.company && (<ErrorMessage message={errors.company} type="error" />)}
 
 
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
@@ -370,7 +408,7 @@ const convertTimeToDate = (time) => {
 
                     {employmentStatus !== "Student" && (
                         <>
-                            <Text style={styles.labelTxt}>Shift Type</Text>
+                            <Text style={styles.labelTxt}>Shift Type </Text>
 
                             <TouchableOpacity onPress={() => setOpenShiftList(!openShiftList)}
                                 style={styles.inputBox}>
@@ -398,7 +436,9 @@ const convertTimeToDate = (time) => {
                     )}
 
 
-                    <Text style={styles.labelTxt}>{employmentStatus === "Student" ? "College/Institute Location" : "Work Location"}</Text>
+                    <Text style={styles.labelTxt}>{employmentStatus === "Student" ? "College/Institute Location" : "Work Location"}
+                        <Text style={{ color: 'red' }}> *</Text>
+                    </Text>
 
                     <View>
                         <TextInput
@@ -411,7 +451,11 @@ const convertTimeToDate = (time) => {
                             }} />
                     </View>
 
-                    <Text style={styles.labelTxt}>{employmentStatus === "Student" ? "College Timing" : "Shift Timing"}</Text>
+                    {errors.location && (<ErrorMessage message={errors.location} type="error" />)}
+
+                    <Text style={styles.labelTxt}>{employmentStatus === "Student" ? "College Timing" : "Shift Timing"}
+                        <Text style={{ color: 'red' }}> *</Text>
+                    </Text>
 
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                         <TouchableOpacity onPress={() => openTimePicker('from')}
@@ -422,22 +466,29 @@ const convertTimeToDate = (time) => {
 
                         <TouchableOpacity onPress={() => openTimePicker('to')}
                             style={[styles.shiftInputBox, { marginRight: 6 }]}>
-                            <Text>  {shiftTo ?  formatTime(shiftTo) : "To"}</Text>
+                            <Text>  {shiftTo ? formatTime(shiftTo) : "To"}</Text>
                             <Image source={TimerIcon} style={{ width: 22.5, height: 22.5 }} />
                         </TouchableOpacity>
                     </View>
+
+                    {errors.shiftTime && (<ErrorMessage message={errors.shiftTime} type="error" />)}
                 </View>
 
+            </ScrollView>
 
+            <View style={{
+                backgroundColor: '#ffffff', width: '100%', position: 'absolute',
+                alignSelf: "center", bottom: 0
+            }}>
 
                 <TouchableOpacity onPress={saveChanges}
                     style={{
                         backgroundColor: "#1E45E1", borderRadius: 8, justifyContent: 'center',
-                        alignItems: 'center', paddingVertical: 15, marginBottom: 40, marginTop: 12
+                        alignItems: 'center', paddingVertical: 15, marginBottom: 40, marginTop: 10
                     }}>
                     <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold', color: '#FFFFFF' }}>Save Changes</Text>
                 </TouchableOpacity>
-            </ScrollView>
+            </View>
 
             {openCalendar && (
                 <View style={styles.dateOverlay}>
