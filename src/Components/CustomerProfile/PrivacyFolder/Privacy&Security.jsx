@@ -20,7 +20,8 @@ const PrivacySecurity = ({ }) => {
             <Text style={styles.headerTxt}>Privacy & Security</Text>
         </View>
 
-        <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginTop: 30, justifyContent: 'space-between' }}>
+        <TouchableOpacity onPress={()=>navigation.navigate("EditMpin")}
+        style={{ flexDirection: 'row', alignItems: 'center', marginTop: 30, justifyContent: 'space-between' }}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Image source={KeyIcon} style={{ width: 20, height: 20 }} />
                 <Text style={styles.chngePinTxt}>Change mPin</Text>

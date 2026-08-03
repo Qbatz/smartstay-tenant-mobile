@@ -715,7 +715,7 @@ const BackgroundDetails = (route) => {
                                         <Text style={{fontSize:13,fontFamily:'Girloy-Regular',color:'#475569',marginTop:10}}>
                                             {i?.shiftFrom} - {i?.shiftTo}</Text>
 
-                                        <Text style={{fontSize:13,fontFamily:'Girloy-Regular',color:'#475569',marginTop:10}}>April 2025 - present</Text>
+                                        {/* <Text style={{fontSize:13,fontFamily:'Girloy-Regular',color:'#475569',marginTop:10}}>April 2025 - present</Text> */}
                                     </View>
                                 </View>
                             </>

@@ -328,7 +328,7 @@ const style = StyleSheet.create({
     },
     pinBox: {
         width: 60, heiht: 60, borderWidth: 1, borderColor: "#ccc", borderRadius: 12, textAlign: "center",
-        fontSize: 20, color: "#000", fontFamily: 'Gilroy-Medium'
+        fontSize: 24, color: "#000", fontFamily: 'Gilroy-Medium'
     },
     nextButton: { backgroundColor: '#1A73E8', borderRadius: 8, paddingVertical: 20, alignItems: 'center' },
     nextText: { color: '#ffffff', fontSize: 16, fontWeight: 600 },

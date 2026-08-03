@@ -57,11 +57,12 @@ const ProfileHostels = () => {
   const [previousStay, setPreviousStay] = useState([])
   const [docsViewerIndex,setDocsViewerIndex]=useState("")
   const [docsViewer,setDocsViewer]=useState(false)
+  
 
   console.log(selectedHostel?.rentalDetails)
   console.log(userContext)
   console.log(showMoreDetail)
-  console.log(hostelList)
+  console.log("activeHostelList",hostelList)
   console.log("otherHostel", otherHostel)
   console.log("selectedSwitchHostel", selectedSwitchHostel)
   console.log("loginContxt", loginContext)
@@ -154,7 +155,7 @@ const ProfileHostels = () => {
 
   const switchHostel = (hostelId) => {
     console.log(hostelId)
-    const res = getHostelList.filter((i) => i.hostelId != hostelId)
+    const res = hostelList.filter((i) => i.hostelId != hostelId)
     console.log("deselecthos", res)
     setOtherHostels(res)
     if (res) {
@@ -178,11 +179,12 @@ const ProfileHostels = () => {
           loginContext.updateToken(r.data)
           storeData(ACCESS_TOKEN, r.data)
           CommonModule.storeCredentials(r.data)
-          updateHostelDetail(hostel)
+          const updateHostel=getHostelList.find(item=>item?.hostelId == hostel?.hostelId)
+          updateHostelDetail(updateHostel)
         }
       })
       const res = hostelList.find((item) => item.hostelId === hostel.hostelId)
-      console.log(res)
+      console.log("changedHostel",res)
       setSelectedHostel(res);
 
     }
@@ -400,9 +402,10 @@ const ProfileHostels = () => {
 
         {
           selectedHostel?.currentStatus != "BOOKED" && (
-            <TouchableOpacity style={{
+            <TouchableOpacity disabled
+            style={{
               paddingVertical: 16, backgroundColor: '#D41515', borderRadius: 8, justifyContent: "center",
-              alignItems: "center", flexDirection: 'row', paddingHorizontal: 12, marginTop: 20
+              alignItems: "center", flexDirection: 'row', paddingHorizontal: 12, marginTop: 20,opacity:0.3
             }}>
               <Image source={AlertIcon} style={{ width: 15, height: 15, marginRight: 5 }} />
               <Text style={{ color: '#FFFFFF', fontSize: 16, fontFamily: 'Gilroy-Medium' }}>Request Notice Period</Text>
@@ -438,7 +441,7 @@ const ProfileHostels = () => {
 
         {previousStay.length>0 && (
         <Text style={{ paddingVertical: 3, paddingHorizontal: 5, fontSize: 12, fontFamily: 'Gilroy-Medium', color: '#1E45E1', backgroundColor: "#F3F5FF" }}>
-          {previousHostelCount} hostel</Text>
+          {previousStay?.length} hostel</Text>
           )}
       </View>
 
@@ -658,7 +661,7 @@ const ProfileHostels = () => {
             <View style={styles.dragindictor} />
           </View>
 
-          <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}>
+          <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
             <Text style={{ fontSize: 20, fontFamily: 'Gilroy-Semibold', marginTop: 14, marginBottom: 16 }}>Switch to</Text>
 
             {otherHostel.length > 0 && (

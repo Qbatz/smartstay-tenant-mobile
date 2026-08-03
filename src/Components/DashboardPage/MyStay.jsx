@@ -204,13 +204,13 @@ function MyStay(props) {
                         borderRadius: 5, paddingRight: 25, paddingLeft: 14, marginTop: 20
                     }}>
                         <Image source={ExclamationCircle} style={{ width: 14, height: 14, resizeMode: 'contain' }} />
-                        <Text style={{ fontSize: 12, fontFamily:'Gilroy-Medium', color: '#1E45E1', marginLeft: 7, lineHeight: 20 }}>
+                        <Text style={{ fontSize: 12,fontFamily:'Gilroy-Medium', color: '#1E45E1', marginLeft: 7, lineHeight: 20 }}>
                             Tenants have beed must follow the PG Rules and checkin on date properly</Text>
                     </View>
 
                     <TouchableOpacity style={{
                         backgroundColor: '#1E45E1', borderRadius: 8, justifyContent: 'center', alignItems: 'center',
-                        marginTop: 25, flexDirection: 'row', paddingVertical: 14, paddingHorizontal: 40,marginHorizontal:10
+                        marginTop: 25, flexDirection: 'row', paddingVertical: 20, paddingHorizontal: 40,marginHorizontal:10
                     }}>
                         <Image source={callIcon} style={{ width: 20, height: 20, tintColor: '#ffffff' }} />
                         <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium', marginLeft: 8, color: '#ffffff',marginLeft:10 }}>

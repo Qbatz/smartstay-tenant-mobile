@@ -41,6 +41,8 @@ import PrivacySecurity from "./Components/CustomerProfile/PrivacyFolder/Privacy&
 import EditBasicDetail from "./Components/EditProfileFolder/EditBasicDetail"
 import EditAddressDetail from "./Components/EditProfileFolder/EditAddressDetail";
 import AddJobDetails from "./Components/EditProfileFolder/AddJobDetails"
+import EditMpin from "./Components/CustomerProfile/PrivacyFolder/EditMpin";
+import VerifyMpinOtp from "./Components/CustomerProfile/PrivacyFolder/VerifyMpinOtp";
 
 const SuccessFlow = ({props, MpinVerified}) => {
   console.log(props)
@@ -104,10 +106,12 @@ const SuccessFlow = ({props, MpinVerified}) => {
           <Navigation.Screen name="AccountDetails" component={AccountDetails}/>
           <Navigation.Screen name="PersonalDetails" component={PersonalDetails}/>
           <Navigation.Screen name="EditBasicDetail" component={EditBasicDetail}/>
+          <Navigation.Screen name="VerifyMpinOtp" component={VerifyMpinOtp}/>
           <Navigation.Screen name="EditAddressDetail" component={EditAddressDetail}/>
           <Navigation.Screen name="BackgroundDetails" component={BackgroundDetails}/>
           <Navigation.Screen name="AddJobDetails" component={AddJobDetails}/>
           <Navigation.Screen name="Privacy&Security" component={PrivacySecurity}/>
+          <Navigation.Screen name="EditMpin" component={EditMpin}/>
           <Navigation.Screen name="AddGuardianDetails" component={AddGuardianDetails}/>
           <Navigation.Screen name="DocumentUpload" component={DocumentsUpload}/>
           <Navigation.Screen name="ComingSoonPage" component={ComingSoon}/>
