@@ -65,8 +65,8 @@ const SuccessFlow = ({props, MpinVerified}) => {
   }
 
   useEffect(()=>{
-    const hasHostelDetail =
-  getHostelDetail && Object.keys(getHostelDetail).length > 0;
+    const hasHostelDetail = getHostelDetail && Object.keys(getHostelDetail).length > 0 &&
+                             getHostelDetail?.currentStatus !== "INACTIVE" ;
      const initialRouteName= getHostelList?.length == 1 && hasHostelDetail ? "Dashboard" : "HostelList"
      setInitialRoute(initialRouteName)
   },[getHostelDetail,getHostelList])
@@ -75,6 +75,7 @@ const SuccessFlow = ({props, MpinVerified}) => {
 
   console.log("hostelDetails",getHostelDetail)
   console.log(intialRoute)
+  console.log("imediatehostellist",getHostelList)
   
 
   console.log(isMpinVerified)

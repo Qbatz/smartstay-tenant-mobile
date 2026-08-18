@@ -1,12 +1,12 @@
 import React, { useContext, useRef, useState, useEffect } from "react";
-import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity, Animated } from "react-native";
+import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity, Animated, NativeModules, Platform } from "react-native";
 import Sm_logo from '../../assets/Images/Sm_logo.png'
 import { useNavigation } from "@react-navigation/native";
 import { UsersContext } from "../../Context/UserContext";
-import { verifyMPin } from "../../Action/LoginAction";
+import { getToken, updateFCMToken, verifyMPin } from "../../Action/LoginAction";
 import SuccessModal from "../ToastFile/TostFilePage";
 import { retriveData, storeData } from "../../Utils/Storage";
-import { ACCESS_TOKEN, CUSTOMERDETAIL, HOSTELLIST, LOGGEDIN } from "../../Utils/Constant";
+import { ACCESS_TOKEN, CUSTOMERDETAIL, HOSTELDETAIL, HOSTELLIST, LOGGEDIN } from "../../Utils/Constant";
 import { LoginContexts } from "../../Context/LoginContext";
 import WaveIcon from '../../assets/Images/HiIcon.png';
 import ErrorMessage from "../ToastFile/ErrorMessage";
@@ -16,6 +16,7 @@ import AppLogo from "../../assets/Images/AppLogo.png"
 const EnterMPin = (props) => {
     console.log(props)
 
+    const { NotificationModule, CommonModule } = NativeModules;
     const context = useContext(UsersContext)
     const loginContext = useContext(LoginContexts)
     const navigation = useNavigation()
@@ -29,6 +30,7 @@ const EnterMPin = (props) => {
     const [enterPinError, setEnterPinError] = useState()
 
     const [customerName, setCustomerName] = useState();
+    const [fcmToken, setFcmToken] = useState();
 
     const rotation = useRef(new Animated.Value(0)).current;
 
@@ -55,7 +57,7 @@ const EnterMPin = (props) => {
 
     useEffect(() => {
         retriveData(CUSTOMERDETAIL).then(r => {
-            const customerDetail= r ? JSON.parse(r) : null
+            const customerDetail = r ? JSON.parse(r) : null
             setCustomerName(customerDetail?.firstName)
         })
     }, [])
@@ -64,6 +66,32 @@ const EnterMPin = (props) => {
         inputRange: [-1, 1],
         outputRange: ["0deg", "10deg"], // waving angle
     });
+
+    const fetchFcmTokenAsync = () => {
+        NotificationModule.fetchFcmToken().then(r => {
+            console.log(r)
+            setFcmToken(r)
+        })
+            .catch(error => {
+                console.log(error);
+                setFcmToken(null)
+            })
+
+    }
+
+    useEffect(() => {
+        if (Platform.OS == 'android') {
+            fetchFcmTokenAsync();
+        }
+
+    }, [])
+
+    const fetchFCMToken = async (authToken) => {
+        if (fcmToken != null) {
+            await updateFCMToken(loginContext.getUserId, fcmToken, authToken);
+        }
+
+    }
 
 
     const handlePinChange = async (text, index) => {
@@ -87,36 +115,64 @@ const EnterMPin = (props) => {
                 mPin: pinNumber,
             }
 
-            verifyMPin(data).then(r => {
-                console.log(r)
-                if (r.status == 200) {
-                    console.log(r.data)
-                    setHostelList(r.data)
+            verifyMPin(data).then(res => {
+                console.log(res)
+                if (res.status == 200) {
+                    console.log("hostelList", res.data)
+                    setHostelList(res.data)
+                    console.log("manuallyselecthostel", res.data?.[0])
 
 
                     setShowSuccessModal(true)
                     setShowModelMessage("Login Successfully")
                     setModelType('success')
+                    context.updateHostelList(res.data)
+                    storeData(HOSTELLIST, JSON.stringify(res.data))
 
                     setTimeout(() => {
                         setShowSuccessModal(false);
                         storeData(LOGGEDIN, "true")
                         loginContext.loggedin('true')
-                        context.updateHostelList(r.data)
-                        storeData(HOSTELLIST, JSON.stringify(r.data))
+
                         // navigation.navigate('HostelList')
-                        props.callbackMpin()
+                    
+                        if (res.data.length == 1 && res.data?.[0].currentStatus !== "INACTIVE") {
+                            const data = {
+                                xuid: loginContext.getUserId,
+                                hostelId: res.data?.[0].hostelId,
+                            }
+                            console.log(data)
+
+                            getToken(data).then(r => {
+                                console.log("token", r)
+                                if (r?.status == 200) {
+                                    fetchFCMToken(r.data);
+                                    loginContext.updateToken(r.data)
+                                    storeData(ACCESS_TOKEN, r.data)
+                                    storeData(HOSTELDETAIL, JSON.stringify(res.data?.[0]))
+                                    context.updateHostelDetail(res.data?.[0])
+                                    // navigation.navigate("Dashboard");
+                                    CommonModule.storeCredentials(r.data)
+                                    setTimeout(() => {
+                                          props.callbackMpin()
+                                    }, 200);
+
+                                }
+                            })
+                        }else{
+                             props.callbackMpin()
+                        }
                     }, 2000);
                 }
-                else if (r.status == 400) {
+                else if (res.status == 400) {
                     setShowSuccessModal(true)
                     setShowModelMessage("Incorrect MPIN")
                     setModelType('error')
-                    setCreateMpin(["","","",""])
+                    setCreateMpin(["", "", "", ""])
 
                     setTimeout(() => {
                         setShowSuccessModal(false);
-                         inputs.current[0].focus();
+                        inputs.current[0].focus();
                     }, 2000);
                 }
             })
@@ -267,7 +323,7 @@ const EnterMPin = (props) => {
                     {loginContext?.getPhoneNo &&
                         <Text
                             style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold', color: '#222222' }}>
-                           {""} +91 {loginContext?.getPhoneNo}
+                            {""} +91 {loginContext?.getPhoneNo}
                         </Text>}
                 </Text>
 

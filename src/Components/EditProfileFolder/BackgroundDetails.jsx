@@ -687,9 +687,8 @@ const BackgroundDetails = (route) => {
 
                 {getCustomerDetail?.customerJobDetails.length > 0 ? (
                     <View style={{marginTop:12}}>
-                        {getCustomerDetail?.customerJobDetails.map((i, index) => (
-                            <>
-                                <View style={{ flexDirection: 'row',flex:1,marginTop:14 }} key={index}>
+                        {getCustomerDetail?.customerJobDetails.map((i, index) => (                         
+                                <View style={{ flexDirection: 'row',flex:1,marginTop:14 }} key={i?.jobId}>
                                     <View style={{
                                         backgroundColor: "#EFF0F1", borderRadius: 50, width: 45, height: 45, padding: 10,
                                         alignItems: 'center', justifyContent: 'center',marginTop:2
@@ -715,10 +714,13 @@ const BackgroundDetails = (route) => {
                                         <Text style={{fontSize:13,fontFamily:'Girloy-Regular',color:'#475569',marginTop:10}}>
                                             {i?.shiftFrom} - {i?.shiftTo}</Text>
 
-                                        {/* <Text style={{fontSize:13,fontFamily:'Girloy-Regular',color:'#475569',marginTop:10}}>April 2025 - present</Text> */}
+                                        {i?.workStartDate && (
+                                        <Text style={{fontSize:13,fontFamily:'Girloy-Regular',color:'#475569',marginTop:10}}>
+                                            {i?.workStartDate} - {i?.workEndDate || "Present"}</Text>
+                                        )}
                                     </View>
                                 </View>
-                            </>
+                            
                         ))}
 
                         <TouchableOpacity onPress={() => navigation.navigate("AddJobDetails", { mode: "add" })}

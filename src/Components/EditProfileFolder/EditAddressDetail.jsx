@@ -245,7 +245,7 @@ const EditAddressDetail = ({ route }) => {
                         style={styles.input}
                         placeholder="Enter City"
                         onChangeText={(text) => {
-                            const onlyLetters = text.replace(/[^0-9\s]/g, "")
+                            const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
                             setCity(onlyLetters)
 
                         }} />

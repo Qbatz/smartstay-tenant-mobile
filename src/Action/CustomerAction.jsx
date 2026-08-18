@@ -334,3 +334,18 @@ export const CancelAmenitiesRequest=async(hostelId,requestId,token)=>{
         return{status: error.response.status, message: error.response.data || error.response}
     }
 }
+
+export const raiseNoticePeriodRequest=async(hostelId,token,payload)=>{
+    try{
+        const axios =getAxios();
+        const res=await axios.post("/v2/customer/raise-notice/" + hostelId, payload, {
+            headers: {
+                Authorization: "Bearer " + token
+            }
+        })
+        return res;
+    }catch(error){
+        return{status: error.response.status, message: error.response.data || error.response}
+    }
+
+}

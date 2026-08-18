@@ -65,6 +65,18 @@ const OtpDesign = ({ route }) => {
 
         setTimeout(() => {
           setShowSuccessModal(false);
+          setOtp(["", "", "", "", "", ""])
+            inputs.current[0].focus();
+        }, 2000);
+      }else{
+         setShowSuccessModal(true)
+        setShowModelMessage(data?.message)
+        setModelType('error')
+
+        setTimeout(() => {
+          setShowSuccessModal(false);
+          setOtp(["", "", "", "", "", ""])
+           inputs.current[0].focus();
         }, 2000);
       }
     }
