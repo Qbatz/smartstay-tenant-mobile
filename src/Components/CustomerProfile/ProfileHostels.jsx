@@ -29,6 +29,7 @@ import Buildings from "../../assets/Images/buildings.png"
 import EyeIcon from "../../assets/Images/view.png";
 import DownloadIcon from "../../assets/Images/downloadDark.png"
 import DocumentViewer from "../DocumentsView/DocumentViewer";
+import NoticePeriodRequestRise from "../../Components/CustomerProfile/NoticePeriodRequestRise"
 
 
 
@@ -57,6 +58,7 @@ const ProfileHostels = () => {
   const [previousStay, setPreviousStay] = useState([])
   const [docsViewerIndex,setDocsViewerIndex]=useState("")
   const [docsViewer,setDocsViewer]=useState(false)
+  const [showRequestNoticeSheet,setShowRequestNoticeSheet]=useState(false)
   
 
   console.log(selectedHostel?.rentalDetails)
@@ -66,6 +68,7 @@ const ProfileHostels = () => {
   console.log("otherHostel", otherHostel)
   console.log("selectedSwitchHostel", selectedSwitchHostel)
   console.log("loginContxt", loginContext)
+  console.log("previous",previousStay)
 
 
   const hostels = [
@@ -229,7 +232,7 @@ const ProfileHostels = () => {
 
   const handleBack = () => navigation.goBack();
 
-  const previousHostelCount= previousStay.length + 1;
+  const previousHostelCount= previousStay.length ;
   return <View style={styles.container}>
     <AppLoader visible={loading} />
     <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -402,10 +405,10 @@ const ProfileHostels = () => {
 
         {
           selectedHostel?.currentStatus != "BOOKED" && (
-            <TouchableOpacity disabled
+            <TouchableOpacity onPress={()=>setShowRequestNoticeSheet(true)}
             style={{
               paddingVertical: 16, backgroundColor: '#D41515', borderRadius: 8, justifyContent: "center",
-              alignItems: "center", flexDirection: 'row', paddingHorizontal: 12, marginTop: 20,opacity:0.3
+              alignItems: "center", flexDirection: 'row', paddingHorizontal: 12, marginTop: 20,
             }}>
               <Image source={AlertIcon} style={{ width: 15, height: 15, marginRight: 5 }} />
               <Text style={{ color: '#FFFFFF', fontSize: 16, fontFamily: 'Gilroy-Medium' }}>Request Notice Period</Text>
@@ -737,6 +740,10 @@ const ProfileHostels = () => {
                 initialIndex={docsViewerIndex}
                 onClose={() => setDocsViewer(false)}
             />
+
+      <NoticePeriodRequestRise
+        visible={showRequestNoticeSheet}
+        onClose={()=>{setShowRequestNoticeSheet(false)}}/>
     
 
   </View>
@@ -932,8 +939,8 @@ const styles = StyleSheet.create({
   hstlDtlValueTxt: { fontSize: 15, fontFamily: 'Gilroy-Medium', color: "#222222", marginTop: 8 },
   prvsHostelList: {
     padding: 12,
-    borderWidth: 1,
-    borderColor: "#eee", marginVertical: 8, borderRadius: 10
+    borderWidth: 1,backgroundColor:'#FFFFFF',
+    borderColor: "#eee", marginVertical: 8, borderRadius: 12,elevation:2
   },
   styInfoField: {
     flexDirection: 'row',

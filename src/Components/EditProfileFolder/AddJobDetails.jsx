@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Alert, Image, NativeModules, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { Alert, Image, KeyboardAvoidingView, NativeModules, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import LeftArrow from "../../assets/Images/LeftArrow.png"
 import { useNavigation } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -214,6 +214,8 @@ const AddJobDetails = ({ route }) => {
                     organizationName: companyName,
                     role: jobRole,
                     workLocation: location,
+                    workStartDate:startDate ? dayjs(startDate).format("DD-MM-YYYY") : "",
+                    workEndDate:endDate ? dayjs(endDate).format("DD-MM-YYYY") : "" ,
                     shiftType: shiftType,
                     shiftFrom: formatTime(shiftFrom),
                     shiftTo: formatTime(shiftTo),
@@ -254,6 +256,8 @@ const AddJobDetails = ({ route }) => {
                     organizationName: companyName,
                     role: jobRole,
                     workLocation: location,
+                    workStartDate:startDate ? dayjs(startDate).format("DD-MM-YYYY") : "",
+                    workEndDate:endDate ? dayjs(endDate).format("DD-MM-YYYY") : "Select start Date",
                     shiftType: shiftType,
                     shiftFrom: formatTime(shiftFrom),
                     shiftTo: formatTime(shiftTo),
@@ -306,7 +310,13 @@ const AddJobDetails = ({ route }) => {
                 <Text style={styles.mainheader}>{mode === "edit" ? "Edit" : "Add"} Job Details</Text>
             </View>
 
-            <ScrollView contentContainerStyle={{ justifyContent: 'space-between', flexGrow: 1 }} showsVerticalScrollIndicator={false}>
+             <KeyboardAvoidingView
+                    style={{ flex: 1, backgroundColor: "#fff" }}
+                    behavior={Platform.OS === "ios" ? "padding" : "height"}  
+                    keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
+                >
+            <ScrollView contentContainerStyle={{ justifyContent: 'space-between', flexGrow: 1,paddingBottom:150 }} 
+            showsVerticalScrollIndicator={false}>
                 <View>
                     <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, marginTop: 20 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
@@ -373,7 +383,7 @@ const AddJobDetails = ({ route }) => {
 
                     <TouchableOpacity onPress={openStartCalendar}
                         style={styles.inputBox}>
-                        <Text style={styles.valueTxt}>{startDate ? dayjs(startDate).format("DD/MM/YYYY") : "Select start Date"}</Text>
+                        <Text style={styles.valueTxt}>{startDate ? dayjs(startDate).format("DD-MM-YYYY") : "Select start Date"}</Text>
                     </TouchableOpacity>
 
                     {!isTickIcon && (
@@ -382,7 +392,7 @@ const AddJobDetails = ({ route }) => {
 
                             <TouchableOpacity onPress={openEndCalendar}
                                 style={styles.inputBox}>
-                                <Text style={styles.valueTxt}>{endDate ? dayjs(endDate).format("DD/MM/YYYY") : "Select end Date"}</Text>
+                                <Text style={styles.valueTxt}>{endDate ? dayjs(endDate).format("DD-MM-YYYY") : "Select end Date"}</Text>
                             </TouchableOpacity>
                         </>
                     )}
@@ -475,6 +485,7 @@ const AddJobDetails = ({ route }) => {
                 </View>
 
             </ScrollView>
+            </KeyboardAvoidingView>
 
             <View style={{
                 backgroundColor: '#ffffff', width: '100%', position: 'absolute',
