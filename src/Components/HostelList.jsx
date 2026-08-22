@@ -14,9 +14,11 @@ import { hostelList } from "../Action/HostelAction";
 import { UsersContext } from "../Context/UserContext";
 import { LoginContexts } from "../Context/LoginContext";
 import { generateToken, getToken, updateFCMToken } from "../Action/LoginAction";
-import { retriveData, storeData } from "../Utils/Storage";
-import { ACCESS_TOKEN, FCM_TOKEN, SHOULD_TOKEN_UPDATE } from "../Utils/Constant";
+import { remoteData, retriveData, storeData } from "../Utils/Storage";
+import { ACCESS_TOKEN, CUSTOMERDETAIL, CUSTOMERINITIALS, CUSTOMERPROFILEPIC, FCM_TOKEN, HOSTELDETAIL, HOSTELLIST, LOGGEDIN, LOGGEDOUT, LOGIN_ANOTHER_NUMBER, PHONE_NO, SHOULD_TOKEN_UPDATE } from "../Utils/Constant";
 import { useNavigation } from "@react-navigation/native";
+import gobackIcon from "../assets/Images/logout.png"
+
 
 
 const HostelList = (route) => {
@@ -30,7 +32,7 @@ const HostelList = (route) => {
   const [fcmToken, setFcmToken] = useState();
   const { NotificationModule,CommonModule } = NativeModules;
 
-  console.log(context?.getHostelList[0].hostelId)
+  console.log(context?.getHostelList[0]?.hostelId)
     console.log(context?.getHostelList)
     console.log(selectedHostel)
 
@@ -39,6 +41,7 @@ const HostelList = (route) => {
     setSelectedHostel(context.getHostelList[0]);
   }
 }, [context?.getHostelList]);
+
 
 
   const fetchFcmTokenAsync = () => {
@@ -80,6 +83,8 @@ const HostelList = (route) => {
       if (r?.status == 200) {
         fetchFCMToken(r.data);
         loginContext.updateToken(r.data)
+        storeData(ACCESS_TOKEN, r.data)
+        storeData(HOSTELDETAIL, JSON.stringify(selectedHostel))
         context.updateHostelDetail(selectedHostel)
         navigation.navigate("Dashboard");
         CommonModule.storeCredentials(r.data)
@@ -97,6 +102,28 @@ const HostelList = (route) => {
    
   }
 
+  const handleLoginWithAnotherNo = () => {
+          // loginContext.logout("false")
+          storeData(LOGGEDIN, "false")
+          remoteData(PHONE_NO)
+          remoteData(CUSTOMERPROFILEPIC)
+          storeData(LOGGEDOUT, "false")
+          remoteData(CUSTOMERINITIALS)
+          remoteData(HOSTELDETAIL)
+          remoteData(HOSTELLIST)
+          remoteData(ACCESS_TOKEN)
+          remoteData(CUSTOMERDETAIL)
+           loginContext.updateToken(null)
+           storeData(LOGIN_ANOTHER_NUMBER, "true")
+  
+          loginContext.logout("temp");
+          setTimeout(() => {
+              loginContext.logout("false");
+          }, 0);
+      }
+  
+  
+
   
 
   const renderHostel = ({ item }) => {
@@ -109,14 +136,14 @@ const HostelList = (route) => {
     >
       <View style={styles.cardLeft}>
 
-        {item.hostelPic ? (
+        {item?.hostelPic ? (
           <Image
             source={{ uri: item.hostelPic }}
             style={styles.hostelImage}/>
         ) : (
           <View style={[styles.hostelImage, styles.initialContainer]}>
             <Text style={styles.initialText}>
-              {item.hostelInitial?.charAt(0).toUpperCase()}
+              {item?.hostelInitial?.charAt(0).toUpperCase()}
             </Text>
           </View>
         )}
@@ -142,15 +169,15 @@ const HostelList = (route) => {
 
   return (
     <View style={styles.container}>
-      <View style={{ flex:1 }}>
+      <View style={{  }}>
         <Text style={styles.title}>Select Hostel</Text>
         <Text style={styles.subtitle}>Select Your Current Staying Hostel</Text>
 
         <FlatList
-          data={context.getHostelList} showsVerticalScrollIndicator={false}
+          data={context?.getHostelList} showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item.hostelId}
           renderItem={renderHostel}
-          style={{ marginTop: 20 }}
+          style={{ marginTop: 20,height:'75%'}}
         />
       </View>
 
@@ -161,6 +188,16 @@ const HostelList = (route) => {
         >
           <Text style={styles.goButtonText}>Go</Text>
         </TouchableOpacity>
+
+        {context?.getHostelList?.length ===1 && context?.getHostelList?.[0]?.currentStatus === "INACTIVE" && (
+        <TouchableOpacity
+          style={styles.goWithAnotherNo}
+          onPress={handleLoginWithAnotherNo}
+        >
+          <Image source={gobackIcon} style={{ width: 18, height: 18, tintColor: '#4B4B4B',marginRight:6 }} />
+          <Text style={styles.goAnotherNoTxt}>Login With Another Number</Text>
+        </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -169,7 +206,7 @@ const HostelList = (route) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#ffffff",
     padding: 25,
     paddingTop: 50,
     justifyContent: "space-between",
@@ -243,8 +280,8 @@ initialContainer: {
   },
   goButtonContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: "flex-end",
+    alignItems: "center",marginBottom:40
   },
   goButton: {
     width: "100%",
@@ -252,10 +289,24 @@ initialContainer: {
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#0057FF",
+    backgroundColor: "#1e45e2",
+  },
+  goWithAnotherNo: {
+    width: "100%",
+    paddingVertical: 15,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#FFFFFF",flexDirection:'row',
+    borderWidth:1,borderColor:"#ddd",marginTop:16
   },
   goButtonText: {
     color: "#fff",
+    fontSize: 16,
+    fontFamily:'Gilroy-Semibold',
+  },
+   goAnotherNoTxt: {
+    color:'#4B4B4B',
     fontSize: 16,
     fontFamily:'Gilroy-Semibold',
   },

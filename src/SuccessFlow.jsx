@@ -35,6 +35,14 @@ import PersonalDetails from "./Components/EditProfileFolder/PersonalDetails";
 import BackgroundDetails from "./Components/EditProfileFolder/BackgroundDetails";
 import DocumentsUpload from "./Components/EditProfileFolder/DocumentUpload";
 import AddGuardianDetails from "./Components/EditProfileFolder/AddGuardianDetails";
+import { UsersContext } from "./Context/UserContext";
+import PrivacySecurity from "./Components/CustomerProfile/PrivacyFolder/Privacy&Security";
+// import EditBasicDetail from "./Components/EditProfileFolder/EditBasicDetail";
+import EditBasicDetail from "./Components/EditProfileFolder/EditBasicDetail"
+import EditAddressDetail from "./Components/EditProfileFolder/EditAddressDetail";
+import AddJobDetails from "./Components/EditProfileFolder/AddJobDetails"
+import EditMpin from "./Components/CustomerProfile/PrivacyFolder/EditMpin";
+import VerifyMpinOtp from "./Components/CustomerProfile/PrivacyFolder/VerifyMpinOtp";
 
 const SuccessFlow = ({props, MpinVerified}) => {
   console.log(props)
@@ -43,6 +51,8 @@ const SuccessFlow = ({props, MpinVerified}) => {
   const loginContext = useContext(LoginContexts)
   const Navigation = createStackNavigator();
   const [isMpinVerified, setMpinVerified] = useState(false)
+  const {getHostelDetail,getHostelList}=useContext(UsersContext);
+  const [intialRoute,setInitialRoute]=useState("HostelList")
 
   useEffect(()=>{
     if(MpinVerified === true){
@@ -54,25 +64,55 @@ const SuccessFlow = ({props, MpinVerified}) => {
     setMpinVerified(true)
   }
 
+  useEffect(()=>{
+    const hasHostelDetail = getHostelDetail && Object.keys(getHostelDetail).length > 0 &&
+                             getHostelDetail?.currentStatus !== "INACTIVE" ;
+     const initialRouteName= getHostelList?.length == 1 && hasHostelDetail ? "Dashboard" : "HostelList"
+     setInitialRoute(initialRouteName)
+  },[getHostelDetail,getHostelList])
+
+ 
+
+  console.log("hostelDetails",getHostelDetail)
+  console.log(intialRoute)
+  console.log("imediatehostellist",getHostelList)
+  
+
   console.log(isMpinVerified)
 
   return <View style={{ flex: 1 }}>
-
     {loginContext.getRoute === 'confirmMPin' || isMpinVerified ?
       <NavigationContainer>
-        <Navigation.Navigator screenOptions={{ headerShown: false }} initialRouteName='HostelList'>
-          <Navigation.Screen name='HostelList' component={HostelList} />
+        <Navigation.Navigator screenOptions={{ headerShown: false }} initialRouteName= {"HostelList"}>
+          {intialRoute === "HostelList" ? (
+    <>
+      <Navigation.Screen name="HostelList" component={HostelList} />
+      <Navigation.Screen name="Dashboard" component={Dashboard} />
+    </>
+  ) : (
+    <>
+      <Navigation.Screen name="Dashboard" component={Dashboard} />
+      <Navigation.Screen name="HostelList" component={HostelList} />
+    </>
+  )}
+          {/* <Navigation.Screen name='HostelList' component={HostelList} /> */}
           <Navigation.Screen name="KYCUpload" component={KYCUpload} />
           <Navigation.Screen name='VerifyKYC' component={VerifyKYC} />
           <Navigation.Screen name="KycSuccess" component={KycSuccessDesign} />
-          <Navigation.Screen name='Dashboard' component={Dashboard} />
+          {/* <Navigation.Screen name='Dashboard' component={Dashboard} /> */}
           <Navigation.Screen name="CustomerProfile" component={CustomerProfile} />
           <Navigation.Screen name="CustomerProfileNew" component={CustomerProfileNew}/>
           <Navigation.Screen name='ProfileHostels' component={ProfileHostels} />
           <Navigation.Screen name='RentalAgreement' component={RentalAgreement} />
           <Navigation.Screen name="AccountDetails" component={AccountDetails}/>
           <Navigation.Screen name="PersonalDetails" component={PersonalDetails}/>
+          <Navigation.Screen name="EditBasicDetail" component={EditBasicDetail}/>
+          <Navigation.Screen name="VerifyMpinOtp" component={VerifyMpinOtp}/>
+          <Navigation.Screen name="EditAddressDetail" component={EditAddressDetail}/>
           <Navigation.Screen name="BackgroundDetails" component={BackgroundDetails}/>
+          <Navigation.Screen name="AddJobDetails" component={AddJobDetails}/>
+          <Navigation.Screen name="Privacy&Security" component={PrivacySecurity}/>
+          <Navigation.Screen name="EditMpin" component={EditMpin}/>
           <Navigation.Screen name="AddGuardianDetails" component={AddGuardianDetails}/>
           <Navigation.Screen name="DocumentUpload" component={DocumentsUpload}/>
           <Navigation.Screen name="ComingSoonPage" component={ComingSoon}/>

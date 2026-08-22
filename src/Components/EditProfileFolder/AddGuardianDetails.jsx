@@ -10,6 +10,7 @@ import SuccessModal from "../ToastFile/TostFilePage";
 import { LoginContexts } from "../../Context/LoginContext";
 import DeleteIcon from "../../assets/Images/trash.png";
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import ErrorMessage from "../ToastFile/ErrorMessage";
 
 
 
@@ -56,7 +57,8 @@ const AddGuardianDetails = ({ route }) => {
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [toastMessage, setToastMessage] = useState()
     const [modelType, setModelType] = useState();
-    const [selectedContactId, setSelectedContactId]=useState(items.map(item=>item.contactId))
+    const [selectedContactId, setSelectedContactId] = useState(items.map(item => item.contactId))
+    const [errors, setErrors] = useState([])
 
     console.log(items)
     const handleChange = (index, key, value) => {
@@ -66,14 +68,18 @@ const AddGuardianDetails = ({ route }) => {
 
         updated[index][key] = value;
         setItems(updated);
+        setErrors(prev => ({
+            ...prev,[index]: {...prev[index],[key]: "",
+            },
+        }));
     }
 
-    const toggleCount=(contactId)=>{
-        setSelectedContactId(prev=>{
-            if(prev.includes(contactId)){
-                return prev.filter(id=>id !=contactId)
-            }else{
-                return [...prev,contactId]
+    const toggleCount = (contactId) => {
+        setSelectedContactId(prev => {
+            if (prev.includes(contactId)) {
+                return prev.filter(id => id != contactId)
+            } else {
+                return [...prev, contactId]
             }
         })
     }
@@ -120,53 +126,62 @@ const AddGuardianDetails = ({ route }) => {
             <View style={{ borderWidth: 1, borderRadius: 10, padding: 16, borderColor: '#E7E7E7', marginVertical: 10 }}
                 key={index}>
 
-                <TouchableOpacity onPress={()=>toggleCount(item.contactId)}
-                style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                <TouchableOpacity onPress={() => toggleCount(item.contactId)}
+                    style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold', marginTop: 6 }}>Contact - {count}</Text>
-                    <Ionicons  name={selectedContactId.includes(item.contactId) ? "chevron-up" : "chevron-down" } size={17} />
+                    <Ionicons name={selectedContactId.includes(item.contactId) ? "chevron-up" : "chevron-down"} size={17} />
                 </TouchableOpacity>
 
-                
+
                 {selectedContactId.includes(item.contactId) && (<>
 
-                <View style={[styles.fieldContainer, { marginTop: 15 }]}>
-                    <Text style={styles.label}>Guardian Full Name</Text>
-
-                    <TextInput
-                        value={item.guardianName}
-                        placeholder="Enter fullName"
-                        style={styles.input}
-                        onChangeText={(text) => {
-                            const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
-                            handleChange(index, "guardianName", onlyLetters)
-                            // setGuardianFullName(onlyLetters)
-                            // setErrorMsg((prev) => ({ ...prev, fullName: "" }))
-                        }}
-                    />
-                </View>
-
-                {/* {errorMsg.fullName && (<ErrorMessage message={errorMsg.fullName} type="error" />)} */}
-
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <View style={[styles.rltnOccptField, { marginRight: 3 }]}>
-                        <Text style={styles.label}>Relationship</Text>
+                    <View style={[styles.fieldContainer, { marginTop: 15 }]}>
+                        <Text style={styles.label}>Guardian Full Name <Text style={{ color: "red", }}>*</Text></Text>
 
                         <TextInput
-                            value={item?.guardianRelation}
-                            placeholder="Enter Relation"
+                            value={item.guardianName}
+                            placeholder="Enter fullName"
                             style={styles.input}
                             onChangeText={(text) => {
                                 const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
-                                // setOccupation(onlyLetters)
-                                handleChange(index, "guardianRelation", onlyLetters)
-                                // setErrorMsg((prev) => ({ ...prev, occupation: "" }))
+                                handleChange(index, "guardianName", onlyLetters)
+                                // setGuardianFullName(onlyLetters)
+                                // setErrorMsg((prev) => ({ ...prev, fullName: "" }))
                             }}
                         />
 
+                        {errors[index]?.guardianName && (
+                            <ErrorMessage message={errors[index].guardianName} type="error" />
+                        )}
+                    </View>
 
+                    {/* {errorMsg.fullName && (<ErrorMessage message={errorMsg.fullName} type="error" />)} */}
+
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <View style={[styles.rltnOccptField, { marginRight: 3 }]}>
+                            <Text style={styles.label}>Relationship <Text style={{ color: "red", }}>*</Text></Text>
+
+                            <TextInput
+                                value={item?.guardianRelation}
+                                placeholder="Enter Relation"
+                                style={styles.input}
+                                onChangeText={(text) => {
+                                    const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
+                                    // setOccupation(onlyLetters)
+                                    handleChange(index, "guardianRelation", onlyLetters)
+                                    // setErrorMsg((prev) => ({ ...prev, occupation: "" }))
+                                }}
+                            />
+
+                            {errors[index]?.guardianRelation && (
+                                <ErrorMessage message={errors[index].guardianRelation} type="error" />
+                            )}
+
+                        </View>
+                        {/* {errorMsg.relationType && (<Error message={errorMsg.relationType} type="error" />)} */}
 
                     </View>
-                    {/* {errorMsg.relationType && (<Error message={errorMsg.relationType} type="error" />)} */}
+                    {/* {errorMsg.occupation && (<ErrorMessage message={errorMsg.occupation} type="error" />)} */}
 
                     <View style={[styles.rltnOccptField, { marginLeft: 3 }]}>
                         <Text style={styles.label}>Guardian Occupation</Text>
@@ -185,34 +200,43 @@ const AddGuardianDetails = ({ route }) => {
 
 
                     </View>
-                </View>
-                {/* {errorMsg.occupation && (<ErrorMessage message={errorMsg.occupation} type="error" />)} */}
 
-                <View style={styles.fieldContainer}>
-                    <Text style={styles.label}>Mobile No</Text>
+                    <View style={styles.fieldContainer}>
+                        <Text style={styles.label}>Mobile No <Text style={{ color: "red", }}>*</Text></Text>
 
-                    <TextInput
-                        value={item?.guardianMobile}
-                        placeholder="Enter mobileNo"
-                        style={styles.input}
-                        maxLength={10}
-                        onChangeText={(text) => {
-                            const onlyNum = text.replace(/[^0-9]/g, "")
-                            // setGuardianMobileNo(onlyNum)
-                            handleChange(index, "guardianMobile", onlyNum)
-                            // setErrorMsg((prev) => ({ ...prev, guardianMobileNo: "" }))
-                        }}
-                    />
-                </View>
+                        <View style={{
+                            flexDirection: 'row', alignItems: 'center', paddingVertical: 5, paddingHorizontal: 10,
+                            marginTop: 10, borderWidth: 1, borderColor: '#EEEEEE', borderRadius: 8,
+                        }}>
+                            <Text style={{ fontFamily: 'Gilroy-Regular', fontSize: 15, color: '#111827', }}>+91</Text>
+                            <Ionicons name="chevron-down" size={16} style={{ marginLeft: 3 }} />
 
-                {mode === "edit" && (
-                    <TouchableOpacity onPress={() => handleDeleteContact(item?.contactId)}
-                        style={{ flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-end', marginTop: 8 }}>
-                        <Image source={DeleteIcon} style={{ width: 16, height: 16, tintColor: '#222222' }} />
-                        <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#222222', marginLeft: 5 }}>
-                            Remove</Text>
-                    </TouchableOpacity>
-                )}
+                            <TextInput
+                                value={item?.guardianMobile}
+                                placeholder="Enter mobileNo"
+                                style={{ fontFamily: 'Gilroy-Regular', fontSize: 15, color: '#111827', marginLeft: 4 }}
+                                maxLength={10}
+                                onChangeText={(text) => {
+                                    const onlyNum = text.replace(/[^0-9]/g, "")
+                                    // setGuardianMobileNo(onlyNum)
+                                    handleChange(index, "guardianMobile", onlyNum)
+                                    // setErrorMsg((prev) => ({ ...prev, guardianMobileNo: "" }))
+                                }}
+                            />
+                        </View>
+                        {errors[index]?.guardianMobile && (
+                            <ErrorMessage message={errors[index].guardianMobile} type="error" />
+                        )}
+                    </View>
+
+                    {mode === "edit" && (
+                        <TouchableOpacity onPress={() => handleDeleteContact(item?.contactId)}
+                            style={{ flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-end', marginTop: 8 }}>
+                            <Image source={DeleteIcon} style={{ width: 16, height: 16, tintColor: '#FF0000' }} />
+                            <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#222222', marginLeft: 5 }}>
+                                Remove</Text>
+                        </TouchableOpacity>
+                    )}
 
                 </>)}
 
@@ -221,10 +245,48 @@ const AddGuardianDetails = ({ route }) => {
 
     }
 
-    const handleEdit = () => {
-        console.log("binthu")
+    const validateForm = () => {
+        const errors = {};
 
-        // if (!validateForm()) return;
+        items.forEach((item, index) => {
+            const itemErrors = {};
+
+            if (!item?.guardianName?.trim()) {
+                itemErrors.guardianName = "Guardian name is required";
+            }
+
+            if (!item?.guardianRelation) {
+                itemErrors.guardianRelation = "Relationship is required";
+            }
+
+            if (!item?.guardianMobile) {
+                itemErrors.guardianMobile = "Mobile number is required";
+            }
+             if (item?.guardianMobile.length < 10) {
+                itemErrors.guardianMobile = "Mobile should not below 10 number";
+            }
+             if (item?.guardianMobile?.trim() === "0000000000") {
+                itemErrors.guardianMobile = "Mobile should not be 0";
+            }
+
+            if (Object.keys(itemErrors).length > 0) {
+                errors[index] = itemErrors;
+            }
+        });
+
+        // if (Object.keys(errors).length > 0) {
+        //     setErrors(errors);
+        //     return;
+        // }
+        setErrors(errors);
+       return Object.keys(errors).length === 0;
+
+    }
+
+    console.log(errors)
+    const handleEdit = () => {
+
+        if (!validateForm()) return;
 
 
 
@@ -278,7 +340,6 @@ const AddGuardianDetails = ({ route }) => {
 
                     setTimeout(() => {
                         customerDetails(getToken).then(r => {
-                            console.log("geetha", r.data)
                             updateCustomer(r.data)
                         })
                         navigation.goBack();
@@ -293,6 +354,14 @@ const AddGuardianDetails = ({ route }) => {
 
     const handleSave = () => {
 
+        // if (!validateForm()) return;
+         const isValid = validateForm();
+    console.log("isValid:", isValid);
+
+    if (!isValid) return;
+
+
+
         const payload = items.map(item =>
         ({
             name: item?.guardianName,
@@ -304,17 +373,6 @@ const AddGuardianDetails = ({ route }) => {
 
 
         console.log(payload)
-
-        // const formData = new FormData();
-
-        // const jsonBase64 = btoa(JSON.stringify(payload))
-
-
-        // formData.append("payloads", {
-        //     uri: "data:application/json;base64," + jsonBase64,
-        //     type: "application/json",
-        //     name: "payload.json",
-        // })
 
         addGuardian(getToken, payload).then(r => {
             console.log(r)

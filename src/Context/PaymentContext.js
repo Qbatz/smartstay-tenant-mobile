@@ -10,7 +10,6 @@ const PaymentContext=(props)=> {
     const [loading, setLoading]=useState(false)
 
     console.log(invoiceDetail)
-    console.log(loading,"sinnu")
 
    useEffect(() => {
   if (invoiceDetail) {
@@ -25,7 +24,6 @@ const PaymentContext=(props)=> {
     }
 
     const loadingFn=(value)=>{
-        console.log(value,"binthu")
         setLoading(value)
     }
 

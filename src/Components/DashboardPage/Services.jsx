@@ -24,7 +24,6 @@ function Services(props) {
     const amenitiesContext = useContext(amenitiesContexts)
 
     console.log(commonContext.Complaint)
-    console.log(props)
     const [complaintsList, setComplaintsList] = useState([])
     const [selectedfield, setselectfield] = useState(0);
     const [modulevisible, setModalVisible] = useState(false)
@@ -82,14 +81,14 @@ function Services(props) {
             .catch(err => console.log("Error:", err));
 
         getAmenitiesList(commonContext.getHostelDetail.hostelId, loginContext.getToken).then(r => {
-            amenitiesContext.updateAssignedAmenities(r.data.assignedAmenities)
-            amenitiesContext.updateUnassginedAmenites(r.data.unassignedAmenities)
+            amenitiesContext.updateAssignedAmenities(r?.data?.assignedAmenities)
+            amenitiesContext.updateUnassginedAmenites(r?.data?.unassignedAmenities)
         })
     };
 
     useEffect(() => {
         fetchServiceData();
-    }, [])
+    }, [commonContext.getHostelDetail.hostelId, loginContext.getToken])
     // useFocusEffect(
     //     useCallback(() => {
     //         fetchServiceData();
@@ -187,6 +186,7 @@ function Services(props) {
                         style={{ marginTop: 10, position: 'relative', marginBottom: 10 }}
                         keyExtractor={(item) => item.complaintId}
                         data={complaintContext.getComplaintList}
+                        onScroll={props.onScroll}
                         renderItem={({ item }) => {
                             const { backgroundColor, textColor } = getStatusColor(item.status);
                             return <View key={item.complaintId}>
@@ -293,6 +293,7 @@ function Services(props) {
                     style={{ marginTop: 10 }}
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={{ paddingBottom: 80 }}
+                    onScroll={props.onScroll}
                 >
                     {/* MY AMENITIES */}
                     {amenitiesContext.getAssignedAmenities?.length > 0 && (

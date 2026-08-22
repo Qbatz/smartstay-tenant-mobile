@@ -10,7 +10,9 @@ import {
     Animated,
     Dimensions,
     PanResponder,
-    Pressable
+    Pressable,
+    RefreshControl,
+    ActivityIndicator
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -53,6 +55,7 @@ import BedIconNew from "../../assets/Images/bedIconNew.png";
 import RoomIconNew from "../../assets/Images/roomIconNew.png"
 import RightArrow from "../../assets/Images/arrow-right.png"
 import SuccessModal from "../ToastFile/TostFilePage";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 
 
@@ -66,9 +69,10 @@ const CustomerProfileNew = (route) => {
     const [customer, setCustomers] = useState()
     const { NotificationModule, CommonModule } = NativeModules;
     const [penditnActionBottomSheet, setPendingActionSheet] = useState(false);
-    const [showSuccessModal, setShowSuccessModal]=useState(false);
-    const [showSuccessMessage, setShowSuccessMessage]=useState("");
-    const [showModalType, setShowModalType]=useState("")
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [showSuccessMessage, setShowSuccessMessage] = useState("");
+    const [showModalType, setShowModalType] = useState("")
+    const [refreshing, setRefreshing] = useState(false)
 
     const SCREEN_HEIGHT = Dimensions.get("window").height;
 
@@ -98,12 +102,11 @@ const CustomerProfileNew = (route) => {
         return () => backHandler.remove();
     }, [navigation, penditnActionBottomSheet])
 
-
-    useEffect(() => {
+    const fetchCustomerDetail = () => {
         customerDetails(loginContext.getToken).then(r => {
             console.log(r.data)
             context.updateCustomer(r.data)
-            storeData(CUSTOMERDETAIL, r.data.firstName)
+            storeData(CUSTOMERDETAIL, JSON.stringify(r.data))
 
             storeData(CUSTOMERINITIALS, r.data.initials)
             if (r.data.profilePic != null) {
@@ -112,7 +115,23 @@ const CustomerProfileNew = (route) => {
         }).catch(error => {
             console.log(error)
         })
-    }, [])
+    }
+
+
+    useEffect(() => {
+        fetchCustomerDetail();
+    }, [context.getHostelDetail, loginContext.getToken])
+
+    const onRefresh = async () => {
+        setRefreshing(true);
+        fetchCustomerDetail();
+        setTimeout(() => {
+            setRefreshing(false);
+        }, 1000);
+
+
+    };
+
 
     const openSheet = () => {
         Animated.timing(translateY, {
@@ -237,10 +256,10 @@ const CustomerProfileNew = (route) => {
         })
         storeData(LOGGEDOUT, "true")
         loginContext.logout('false')
-        remoteData(ACCESS_TOKEN)
+        // remoteData(ACCESS_TOKEN)
         // remoteData(PHONE_NO) 
         storeData(LOGGEDIN, "false")
-        loginContext.updateToken(null)
+        // loginContext.updateToken(null)
         NotificationModule.logout();
 
 
@@ -269,7 +288,6 @@ const CustomerProfileNew = (route) => {
         console.log(entityId)
         console.log(tenantMobileNo)
 
-        console.log("Thata", res)
         if (res?.status === 200) {
             CommonModule.verifyKyc(tenantMobileNo, entityId, accessTokenId)
         } else {
@@ -284,197 +302,237 @@ const CustomerProfileNew = (route) => {
         }
     }
 
-
+    if (refreshing) {
+        return <View style={{ flex: 1, backgroundColor: '#fff' }} >
+            <LinearGradient
+                colors={["#c0e3ff", "#FFFFFF"]}
+                start={{ x: 0.5, y: 0 }}
+                end={{ x: 0.5, y: 1 }}
+                style={{ width: "100%", height: "25%" }}
+            >
+                <View
+                    style={{
+                        flex: 1,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}>
+                    <ActivityIndicator size="large" color="#1E45E1" />
+                </View>
+            </LinearGradient>
+        </View>;
+    }
     return (
-      
-        <View style={styles.container}>
-              <SuccessModal
-              visible={showSuccessModal}
-              onClose={()=>setShowSuccessModal(false)}
-              message={showSuccessMessage}
-              type={showModalType}/>
-            <ScrollView contentContainerStyle={styles.scrollContainer} >
-                <View>
-                    <LinearGradient
-                        colors={["#c0e3ff", "#FFFFFF"]}
-                        start={{ x: 0.5, y: 0 }}
-                        end={{ x: 0.5, y: 1 }}
-                        style={{ width: "100%", }}
-                    >
-                        <View style={{ paddingHorizontal: 20, paddingTop: 10, }}>
+        <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+            <View style={styles.container}>
+                <SuccessModal
+                    visible={showSuccessModal}
+                    onClose={() => setShowSuccessModal(false)}
+                    message={showSuccessMessage}
+                    type={showModalType} />
 
-                            {/* Header */}
-                            <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-                                    <Image source={LeftArrow} style={{ height: 25, width: 25 }} />
-                                </TouchableOpacity>
-                            </View>
+                <ScrollView contentContainerStyle={styles.scrollContainer}
+                    refreshControl={<RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh} />}>
 
-                            {/* Profile */}
-                            <View style={{ alignItems: 'center', marginTop: 10 }}>
-                                {context.getCustomerDetail?.profilePic ? (
-                                    <Image
-                                        source={{ uri: context.getCustomerDetail?.profilePic }}
-                                        style={styles.profileImage}
-                                    />
-                                ) : (
-                                    <View style={[styles.profileImage, styles.initialContainer]}>
-                                        <Text style={styles.initialText}>
-                                            {context.getCustomerDetail?.initials}
+                    <View>
+                        <LinearGradient
+                            colors={["#c0e3ff", "#FFFFFF"]}
+                            start={{ x: 0.5, y: 0 }}
+                            end={{ x: 0.5, y: 1 }}
+                            style={{ width: "100%", }}
+                        >
+                            <View style={{ paddingHorizontal: 20, paddingTop: 10, }}>
+
+                                {/* Header */}
+                                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                    <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+                                        <Image source={LeftArrow} style={{ height: 25, width: 25 }} />
+                                    </TouchableOpacity>
+                                </View>
+
+                                {/* Profile */}
+                                <View style={{ alignItems: 'center', marginTop: 10 }}>
+                                    {context.getCustomerDetail?.profilePic ? (
+                                        <Image
+                                            source={{ uri: context.getCustomerDetail?.profilePic }}
+                                            style={styles.profileImage}
+                                        />
+                                    ) : (
+                                        <View style={[styles.profileImage, styles.initialContainer]}>
+                                            <Text style={styles.initialText}>
+                                                {context.getCustomerDetail?.initials}
+                                            </Text>
+                                        </View>
+                                    )}
+                                </View>
+
+                                {/* Name */}
+                                <View style={{ alignItems: 'center', marginTop: 20, paddingHorizontal: 30 }}>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                        <Text style={styles.profileName} numberOfLines={1}>
+                                            {context.getCustomerDetail?.firstName}{" "}
+                                            {context.getCustomerDetail?.lastName}
                                         </Text>
-                                    </View>
-                                )}
-                            </View>
-
-                            {/* Name */}
-                            <View style={{ alignItems: 'center', marginTop: 20, paddingHorizontal: 30 }}>
-                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    <Text style={styles.profileName} numberOfLines={1}>
-                                        {context.getCustomerDetail?.firstName}{" "}
-                                        {context.getCustomerDetail?.lastName}
-                                    </Text>
-                                    <Image source={VerifyIcon} style={{ marginLeft: 4, height: 20, width: 20, tintColor: '#1E45E1' }} />
-                                </View>
-
-                                {/* Info */}
-
-                                <View style={styles.infoRow}>
-                                    <View style={styles.FloorBadgePending}>
-                                        <Image
-                                            source={Building}
-                                            style={{ height: 18, width: 18, marginRight: 2 }}
-                                            resizeMode="contain"
-                                        />
-                                        <Text numberOfLines={1} ellipsizeMode="clip"
-                                            style={{ fontSize: 14, color: 'black', textAlign: 'center', fontFamily: 'Gilroy-Medium', flexShrink: 1 }}>
-                                            {context.getCustomerDetail?.bookingDetails?.floorName}</Text>
+                                        <Image source={VerifyIcon} style={{ marginLeft: 4, height: 20, width: 20, tintColor: '#1E45E1' }} />
                                     </View>
 
-                                    <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-                                        <Image
-                                            source={RoomIconNew}
-                                            style={{ height: 18.5, width: 18.5, marginRight: 4 }}
-                                            resizeMode="contain"
-                                        />
-                                        <Text style={{ flexShrink: 1, fontFamily: 'Gilroy-Medium' }}
-                                            numberOfLines={2}
-                                            ellipsizeMode="tail">{context.getCustomerDetail?.bookingDetails?.roomName}</Text>
-                                    </View>
+                                    {/* Info */}
 
-                                    <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-                                        <Image
-                                            source={BedIconNew}
-                                            style={{ height: 19, width: 19, marginRight: 4 }}
-                                            resizeMode="contain"
-                                        />
-                                        <Text style={{ flexShrink: 1, fontFamily: 'Gilroy-Medium' }}
-                                            numberOfLines={2}
-                                            ellipsizeMode="tail">{context.getCustomerDetail?.bookingDetails?.bedName}</Text>
-                                    </View>
+                                    <View style={styles.infoRow}>
+                                        <View style={styles.FloorBadgePending}>
+                                            <Image
+                                                source={Building}
+                                                style={{ height: 18, width: 18, marginRight: 2 }}
+                                                resizeMode="contain"
+                                            />
+                                            <Text numberOfLines={1} ellipsizeMode="clip"
+                                                style={{ fontSize: 14, color: 'black', textAlign: 'center', fontFamily: 'Gilroy-Medium', flexShrink: 1 }}>
+                                                {context.getCustomerDetail?.bookingDetails?.floorName}</Text>
+                                        </View>
 
+                                        <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                                            <Image
+                                                source={RoomIconNew}
+                                                style={{ height: 18.5, width: 18.5, marginRight: 4 }}
+                                                resizeMode="contain"
+                                            />
+                                            <Text style={{ flexShrink: 1, fontFamily: 'Gilroy-Medium' }}
+                                                numberOfLines={2}
+                                                ellipsizeMode="tail">{context.getCustomerDetail?.bookingDetails?.roomName}</Text>
+                                        </View>
+
+                                        <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                                            <Image
+                                                source={BedIconNew}
+                                                style={{ height: 19, width: 19, marginRight: 4 }}
+                                                resizeMode="contain"
+                                            />
+                                            <Text style={{ flexShrink: 1, fontFamily: 'Gilroy-Medium' }}
+                                                numberOfLines={2}
+                                                ellipsizeMode="tail">{context.getCustomerDetail?.bookingDetails?.bedName}</Text>
+                                        </View>
+
+
+                                    </View>
 
                                 </View>
 
                             </View>
-
-                        </View>
-                    </LinearGradient>
+                        </LinearGradient>
 
 
-                    <View style={{ paddingTop: 20, paddingHorizontal: 20 }}>
+                        <View style={{ paddingTop: 20, paddingHorizontal: 20 }}>
 
-                        {context.getCustomerDetail?.kyc?.currentStatus != "VERIFIED" && (
+                            {context.getCustomerDetail?.kyc?.currentStatus != "VERIFIED" && (
 
-                            <View style={{ borderRadius: 12, borderWidth: 1, borderColor: "#eee", padding: 20, marginTop: 12 }}>
-                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    <View style={{ flex: 1 }}>
-                                        <Text style={{ fontSize: 15, fontFamily: 'Gilroy-Medium', color: '#000000', flexShrink: 1 }}>
-                                            Complete your KYC Verification</Text>
-
-                                        <Text style={{ fontSize: 11, fontFamily: 'Gilroy-Regular', color: '#4B4B4B', flexShrink: 1, marginTop: 8, lineHeight: 16 }}>
-                                            Enter your Aadhar/PAN Documents and Complete the status</Text>
-
-                                    </View>
+                                <View style={{
+                                    borderRadius: 12, borderWidth: 1, borderColor: "#DCDCDC", padding: 20, marginTop: 12, elevation: 2,
+                                    shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
+                                    shadowOpacity: 0.08, shadowRadius: 4, backgroundColor: '#ffffff'
+                                }}>
 
                                     <Image source={MessageDocIcon} style={{ width: 92, height: 51 }} />
+                                    <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 11 }}>
+                                        <View style={{ flex: 1 }}>
+                                            <Text style={{ fontSize: 15, fontFamily: 'Gilroy-Medium', color: '#000000', flexShrink: 1 }}>
+                                                Complete your KYC Verification</Text>
+
+                                            <Text style={{ fontSize: 11, fontFamily: 'Gilroy-Regular', color: '#4B4B4B', flexShrink: 1, marginTop: 8, lineHeight: 16 }}>
+                                                Enter your Aadhar/PAN Documents and Complete the status</Text>
+
+                                        </View>
 
 
-                                </View>
 
-                                <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 12, alignItems: 'center' }}>
-                                    {/* <View style={{backgroundColor:'#E5FFE0',paddingHorizontal:2.5,paddingVertical:2,borderRadius:5}}>
+
+                                    </View>
+
+                                    <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 12, alignItems: 'center' }}>
+                                        {/* <View style={{backgroundColor:'#E5FFE0',paddingHorizontal:2.5,paddingVertical:2,borderRadius:5}}>
                                     <Text style={{fontSize:12,fontFamily:'Gilroy-Regular',color:'#00A32E'}}>
                                        ↑  50 %</Text>
                                 </View> */}
 
-                                    <TouchableOpacity onPress={handleKyc}
-                                        style={{
-                                            backgroundColor: '#1E45E1', paddingHorizontal: 20, paddingVertical: 16,
-                                            borderRadius: 8, flexDirection: 'row', alignItems: 'center'
-                                        }}>
-                                        <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Semibold', color: '#ffffff' }}>Verify now</Text>
-                                        <Image source={RightArrow} style={{ width: 14.06, height: 14.06, marginLeft: 5 }} />
-                                    </TouchableOpacity>
+                                        <TouchableOpacity onPress={handleKyc}
+                                            style={{
+                                                backgroundColor: '#1E45E1', paddingHorizontal: 22, paddingVertical: 10,
+                                                borderRadius: 8, flexDirection: 'row', alignItems: 'center'
+                                            }}>
+                                            <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Semibold', color: '#ffffff' }}>Verify now</Text>
+                                            <Image source={RightArrow} style={{ width: 14.06, height: 14.06, marginLeft: 5 }} />
+                                        </TouchableOpacity>
+                                    </View>
+
                                 </View>
+                            )}
+
+
+
+
+
+                            <View style={styles.cards}>
+
+                                <TouchableOpacity onPress={HostelClick} style={styles.row}>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                        <Image source={buildings} style={{ width: 25, height: 25 }} />
+                                        <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium', marginLeft: 5 }}>
+                                            Hostels</Text>
+                                    </View>
+
+                                    <Image source={sideframe} style={{ width: 23, height: 23 }} />
+                                </TouchableOpacity>
+
+                                {/* <View style={styles.divider} /> */}
+
+                                <TouchableOpacity onPress={() => navigation.navigate("AccountDetails", { customer: context.getCustomerDetail })}
+                                    style={[styles.row, { marginTop: 30 }]}>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                        <Image source={UserAccountDetails} style={{ width: 25, height: 25 }} />
+                                        <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium', marginLeft: 5 }}>
+                                            Account Details</Text>
+                                    </View>
+
+                                    <Image source={sideframe} style={{ width: 23, height: 23 }} />
+                                </TouchableOpacity>
+
+                                {
+                                    context.getCustomerDetail?.bookingDetails?.currentStatus != "BOOKED" && (
+                                        <>
+                                            {/* <View style={styles.divider} /> */}
+
+                                            <TouchableOpacity onPress={() => navigation.navigate('ComingSoonPage')} style={[styles.row, { marginTop: 30 }]}>
+                                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                                    <Image source={paperclip} style={{ width: 25, height: 25 }} />
+                                                    <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium', marginLeft: 5 }}>Rental Agreement</Text>
+                                                </View>
+
+                                                <Image source={sideframe} style={{ width: 23, height: 23 }} />
+                                            </TouchableOpacity>
+                                        </>
+
+                                    )
+                                }
+
+                                <TouchableOpacity onPress={() => navigation.navigate("Privacy&Security")}
+                                    style={[styles.row, { marginTop: 30 }]}>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                        <Image source={UserAccountDetails} style={{ width: 25, height: 25 }} />
+                                        <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium', marginLeft: 5 }}>
+                                            Privacy & Security</Text>
+                                    </View>
+
+                                    <Image source={sideframe} style={{ width: 23, height: 23 }} />
+                                </TouchableOpacity>
 
                             </View>
-                        )}
-
-
-
-
-
-                        <View style={styles.cards}>
-
-                            <TouchableOpacity onPress={HostelClick} style={styles.row}>
-                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    <Image source={buildings} style={{ width: 25, height: 25 }} />
-                                    <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium', marginLeft: 5 }}>
-                                        Hostels</Text>
-                                </View>
-
-                                <Image source={sideframe} style={{ width: 23, height: 23 }} />
-                            </TouchableOpacity>
-
-                            <View style={styles.divider} />
-
-                            <TouchableOpacity onPress={() => navigation.navigate("AccountDetails", { customer: context.getCustomerDetail })}
-                                style={styles.row}>
-                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    <Image source={UserAccountDetails} style={{ width: 25, height: 25 }} />
-                                    <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium', marginLeft: 5 }}>
-                                        Account Details</Text>
-                                </View>
-
-                                <Image source={sideframe} style={{ width: 23, height: 23 }} />
-                            </TouchableOpacity>
-
-                            {
-                                context.getCustomerDetail?.bookingDetails?.currentStatus != "BOOKED" && (
-                                    <>
-                                        <View style={styles.divider} />
-
-                                        <TouchableOpacity onPress={() => navigation.navigate('ComingSoonPage')} style={styles.row}>
-                                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                <Image source={paperclip} style={{ width: 25, height: 25 }} />
-                                                <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium', marginLeft: 5 }}>Rental Agreement</Text>
-                                            </View>
-
-                                            <Image source={sideframe} style={{ width: 23, height: 23 }} />
-                                        </TouchableOpacity>
-                                    </>
-
-                                )
-                            }
-
                         </View>
                     </View>
-                </View>
 
 
 
 
-                {/* <View style={styles.card}>
+                    {/* <View style={styles.card}>
           <Text style={styles.sectionTitle}>Rental Agreement</Text>
           <Text style={styles.warningText}>
             Complete your Rental Agreement E-Sign to fully activate your account.
@@ -484,7 +542,7 @@ const CustomerProfileNew = (route) => {
           </TouchableOpacity>
         </View> */}
 
-                {/* <View style={styles.card}>
+                    {/* <View style={styles.card}>
           <Text style={styles.sectionTitle}>Rental Agreement</Text>
           <Text style={styles.subtitle}>
             View your Rental Agreement Details as PDF
@@ -498,101 +556,104 @@ const CustomerProfileNew = (route) => {
               <Text style={styles.primaryButtonText}>Download</Text>
                  <Image  source={DownloadIcon} resizeMode="contain" style={{ width: 20, height: 20 , marginLeft:8 }}/>
             </TouchableOpacity> */}
-                {/* <TouchableOpacity style={styles.primaryButtonSmall} onPress={handleDownload}>
+                    {/* <TouchableOpacity style={styles.primaryButtonSmall} onPress={handleDownload}>
               <Text style={styles.primaryButtonText}>Download</Text>
               <Image source={DownloadIcon} resizeMode="contain" style={{ width: 20, height: 20, marginLeft: 8 }} />
             </TouchableOpacity> */}
 
 
-                {/* </View> */}
-                {/* </View> */}
-                <View style={{ justifyContent: 'flex-end', paddingHorizontal: 20 }}>
-                    <View style={styles.helpRow}>
-                        <Image source={InfoIcon} resizeMode="contain" style={{ width: 20, height: 20 }} />
-                        <Text style={styles.helpText}>Help & Information</Text>
+                    {/* </View> */}
+                    {/* </View> */}
+                    <View style={styles.divider} />
+                    <View style={{ paddingHorizontal: 20, marginLeft: 5 }}>
+                        <View style={styles.helpRow}>
+                            <Image source={InfoIcon} resizeMode="contain" style={{ width: 20, height: 20 }} />
+                            <Text style={styles.helpText}>Help & Information</Text>
+                        </View>
+
+                        <View style={{ marginTop: 20, }}>
+                            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+                                <Image source={LogoutIcon} resizeMode="contain" style={{ width: 25, height: 25, transform: [{ rotate: '180deg' }] }} />
+                                <Text style={styles.logoutText}>Logout</Text>
+                            </TouchableOpacity>
+                        </View>
+
                     </View>
 
-                    <View style={{ marginTop: 20, }}>
-                        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-                            <Image source={LogoutIcon} resizeMode="contain" style={{ width: 20, height: 20 }} />
-                            <Text style={styles.logoutText}>Logout</Text>
-                        </TouchableOpacity>
-                    </View>
-
-                </View>
-
-            </ScrollView>
-
-            {
-                penditnActionBottomSheet && (
-                    <View style={styles.overlay}>
-                        <Pressable
-                            style={StyleSheet.absoluteFillObject}
-                            onPress={closeSheet}
-                        />
-
-                        <Animated.View
-                            {...panResponder.panHandlers}
-                            style={[styles.sheet,
-                            {
-                                transform: [{ translateY }]
-                            }]}>
+                </ScrollView>
 
 
-                            <View style={styles.dragindictor} />
+                {
+                    penditnActionBottomSheet && (
+                        <View style={styles.overlay}>
+                            <Pressable
+                                style={StyleSheet.absoluteFillObject}
+                                onPress={closeSheet}
+                            />
 
-                            <View style={{ marginTop: 5, marginBottom: 20 }}>
+                            <Animated.View
+                                {...panResponder.panHandlers}
+                                style={[styles.sheet,
+                                {
+                                    transform: [{ translateY }]
+                                }]}>
 
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Text style={{ fontSize: 20, fontFamily: 'Gilroy-Semibold' }}>Pending Action</Text>
 
-                                    <TouchableOpacity onPress={closeSheet}>
-                                        <Image source={CloseIcon} style={{ width: 22, height: 22 }} />
+                                <View style={styles.dragindictor} />
+
+                                <View style={{ marginTop: 5, marginBottom: 20 }}>
+
+                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <Text style={{ fontSize: 20, fontFamily: 'Gilroy-Semibold' }}>Pending Action</Text>
+
+                                        <TouchableOpacity onPress={closeSheet}>
+                                            <Image source={CloseIcon} style={{ width: 22, height: 22 }} />
+                                        </TouchableOpacity>
+                                    </View>
+
+                                    <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 18, justifyContent: 'space-between' }}>
+                                        <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>Profile completed</Text>
+                                        <Text style={{
+                                            fontSize: 12, fontFamily: 'Gilroy-Medium', paddingVertical: 3, backgroundColor: '#FFF4DD',
+                                            paddingHorizontal: 10, color: '#FF9900', borderRadius: 14.5
+                                        }}>
+                                            {percent}%</Text>
+                                    </View>
+
+                                    <View style={styles.progressContainer}>
+                                        <View style={[styles.progressFill, { width: `${percent}%` }]} />
+                                    </View>
+
+                                    <View style={{ width: '100%', borderWidth: 0.8, borderColor: '#E5E7EB', marginTop: 20, marginBottom: 10 }} />
+
+                                    <TouchableOpacity onPress={handleEditProfile}
+                                        style={styles.touchableAction}>
+                                        <Text style={styles.actionText}>Update profile</Text>
+                                        <Image source={GreenAddIcon} style={{ width: 24, height: 24 }} />
                                     </TouchableOpacity>
+
+                                    <TouchableOpacity onPress={() => navigation.navigate("ComingSoonPage")}
+                                        style={styles.touchableAction}>
+                                        <Text style={styles.actionText}>Kyc Verification</Text>
+                                        <Image source={GreenAddIcon} style={{ width: 24, height: 24 }} />
+                                    </TouchableOpacity>
+
+                                    <TouchableOpacity onPress={() => navigation.navigate('ComingSoonPage')}
+                                        style={styles.touchableAction}>
+                                        <Text style={styles.actionText}>Rental Aggrement</Text>
+                                        <Image source={GreenAddIcon} style={{ width: 24, height: 24 }} />
+                                    </TouchableOpacity>
+
                                 </View>
 
-                                <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 18, justifyContent: 'space-between' }}>
-                                    <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>Profile completed</Text>
-                                    <Text style={{
-                                        fontSize: 12, fontFamily: 'Gilroy-Medium', paddingVertical: 3, backgroundColor: '#FFF4DD',
-                                        paddingHorizontal: 10, color: '#FF9900', borderRadius: 14.5
-                                    }}>
-                                        {percent}%</Text>
-                                </View>
+                            </Animated.View>
 
-                                <View style={styles.progressContainer}>
-                                    <View style={[styles.progressFill, { width: `${percent}%` }]} />
-                                </View>
+                        </View>
+                    )
+                }
 
-                                <View style={{ width: '100%', borderWidth: 0.8, borderColor: '#E5E7EB', marginTop: 20, marginBottom: 10 }} />
-
-                                <TouchableOpacity onPress={handleEditProfile}
-                                    style={styles.touchableAction}>
-                                    <Text style={styles.actionText}>Update profile</Text>
-                                    <Image source={GreenAddIcon} style={{ width: 24, height: 24 }} />
-                                </TouchableOpacity>
-
-                                <TouchableOpacity onPress={() => navigation.navigate("ComingSoonPage")}
-                                    style={styles.touchableAction}>
-                                    <Text style={styles.actionText}>Kyc Verification</Text>
-                                    <Image source={GreenAddIcon} style={{ width: 24, height: 24 }} />
-                                </TouchableOpacity>
-
-                                <TouchableOpacity onPress={() => navigation.navigate('ComingSoonPage')}
-                                    style={styles.touchableAction}>
-                                    <Text style={styles.actionText}>Rental Aggrement</Text>
-                                    <Image source={GreenAddIcon} style={{ width: 24, height: 24 }} />
-                                </TouchableOpacity>
-
-                            </View>
-
-                        </Animated.View>
-
-                    </View>
-                )
-            }
-
-        </View>
+            </View>
+        </SafeAreaView>
     );
 };
 
@@ -602,13 +663,13 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#fff",
-        paddingTop: 20,
+        // paddingTop: 20,
     },
     scrollContainer: {
         // padding: 20,
         paddingBottom: 50,
         flexGrow: 1,
-        justifyContent: "space-between"
+        // justifyContent: "space-between"
     },
     backButton: {
         flexDirection: "row",
@@ -765,7 +826,7 @@ const styles = StyleSheet.create({
     divider: {
         height: 1,
         backgroundColor: "#eee",
-        marginVertical: 20
+        marginVertical: 12, marginHorizontal: 14,
 
     },
     sectionTitle: {
@@ -866,29 +927,30 @@ const styles = StyleSheet.create({
     },
     helpRow: {
         flexDirection: "row",
-        alignItems: "left",
+        alignItems: "center",
         justifyContent: "left",
         marginTop: 20,
         gap: 5,
     },
     helpText: {
-        color: "#555",
-        fontFamily: 'Gilroy-Medium'
+        color: "#4B4B4B", fontSize: 16,
+        fontFamily: 'Gilroy-Medium', marginLeft: 7
     },
     logoutButton: {
         width: "100%",
         flexDirection: "row",
         paddingVertical: 15,
-        borderTopWidth: 1,
-        borderColor: "#eee",
-        backgroundColor: "#FFF0F0",
-        paddingLeft: 5,
+        alignItems: 'center',
+        // borderTopWidth: 1,
+        // borderColor: "#eee",
+        // backgroundColor: "#FFF0F0",
+        // paddingLeft: 5,
         borderRadius: 7
     },
     logoutText: {
-        color: "#ff3b30",
+        // color: "#ff3b30",
         fontFamily: 'Gilroy-Medium', fontSize: 16,
-        marginLeft: 6,
+        marginLeft: 7,
     },
     row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
     overlay: {

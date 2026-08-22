@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useContext, useCallback } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, FlatList, Image, TouchableWithoutFeedback, Animated, ScrollView } from "react-native";
+import React, { useState, useEffect, useContext, useCallback, useRef } from "react";
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, FlatList, Image, TouchableWithoutFeedback, Animated, ScrollView, Modal, Dimensions } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import SuccessModal from "../../ToastFile/TostFilePage";
@@ -49,6 +49,15 @@ const EditComplaintSheet = ({
     const [selectedIndex, setSelectedIndex] = useState(null);
     const [deleteVisible, setDeleteVisible] = useState(false);
 
+    const SCREEN_WIDTH = Dimensions.get("window").width;
+    const SCREEN_HEIGHT = Dimensions.get("window").height;
+
+    const flatListRef = useRef(null);
+    const [viewerVisible, setViewerVisible] = useState(false);
+    const [selectedViewIndex, setSelectedViewIndex] = useState(0);
+
+    console.log("mediaimg", mediaimage)
+    console.log(imageuri)
 
     useEffect(() => {
         if (visible && selectedComplaint) {
@@ -323,6 +332,48 @@ const EditComplaintSheet = ({
 
     }
 
+    const openViewer = (index) => {
+        setSelectedViewIndex(index);
+        setViewerVisible(true);
+    }
+
+    const deleteSpecificImage = () => {
+        const deletedImage = mediaimage[selectedViewIndex];
+
+        console.log("Delete Image Id:", deletedImage.imageId);
+
+        if (deletedImage?.imageId) {
+            deleteImage(deletedImage.imageId, complaintContext.getComplaintDetail.complaintId, loginContext.getToken, context.getHostelDetail.hostelId
+            ).then(r => {
+                console.log("Deleted from server", r);
+
+                getComplaints(context.getHostelDetail.hostelId, complaintContext.getComplaintDetail.complaintId, loginContext.getToken)
+                    .then(r => {
+                        console.log(r)
+                        complaintContext.updateComplaint(r.data)
+                        complaintContext.updateComments(r.data?.comments)
+                    })
+
+            });
+        }
+
+        const updatedImages = mediaimage.filter(
+            (_, index) => index !== selectedViewIndex
+        );
+
+        setMediaimage(updatedImages);
+        setImageuri(updatedImages)
+
+        if (updatedImages.length === 0) {
+            setViewerVisible(false);
+            return;
+        }
+
+        if (selectedViewIndex >= updatedImages.length) {
+            setSelectedViewIndex(updatedImages.length - 1);
+        }
+    };
+
     useEffect(() => {
         if (!visible) {
             setSelectedComplaintTypeId(selectedComplaint?.complaintTypeId || null);
@@ -370,10 +421,10 @@ const EditComplaintSheet = ({
                         <View style={{ padding: 20, justifyContent: 'space-between', flex: 1 }}>
 
                             <View>
-                                <Text style={{ fontSize: 20, fontWeight: 600 }}>Edit complaint</Text>
+                                <Text style={{ fontSize: 20, fontFamily: "Gilroy-Semibold" }}>Edit complaint</Text>
 
                                 <View style={{ paddingTop: 20 }}>
-                                    <Text>Complaint type
+                                    <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>Complaint type
                                         <Text style={{ color: 'red' }}> *</Text>
                                     </Text>
 
@@ -383,6 +434,8 @@ const EditComplaintSheet = ({
                                         onBlur={() => setIsFocus(false)}
                                         data={complaintType}
                                         containerStyle={{ borderRadius: 10, paddingLeft: 0 }}
+                                        placeholderStyle={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}
+                                        selectedTextStyle={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}
                                         placeholder="Select a type"
                                         labelField="complaintTypeName"
                                         valueField="complaintTypeId"
@@ -393,6 +446,27 @@ const EditComplaintSheet = ({
                                                 setComplaintTypeError("")
                                             }
                                         }}
+                                        renderItem={(item) => (
+                                            <View
+                                                style={{
+                                                    padding: 15,
+                                                    borderRadius: 15,
+                                                    backgroundColor:
+                                                        item.complaintTypeId === selectedComplaintTypeId
+                                                            ? "#E8F0FE"
+                                                            : "#FFF",
+                                                }}
+                                            >
+                                                <Text
+                                                    style={{
+                                                        fontSize: 16,
+                                                        fontFamily: "Gilroy-Medium",
+                                                    }}
+                                                >
+                                                    {item.complaintTypeName}
+                                                </Text>
+                                            </View>
+                                        )}
                                         renderRightIcon={() => (
                                             <Ionicons
                                                 name={isFocus ? "chevron-up" : "chevron-down"}
@@ -406,58 +480,58 @@ const EditComplaintSheet = ({
                                 {compliantTypeError && <ErrorMessage message={compliantTypeError} type="error" />}
 
                                 <View style={{ paddingTop: 16 }}>
-                                    <Text>Complaint message
+                                    <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>Complaint message
                                         <Text style={{ color: 'red' }}> *</Text>
                                     </Text>
                                     <View style={styles.textInputBox}>
-                                        <TextInput value={description} placeholder="Enter message" onChangeText={(value) => {
-                                            setDespriction(value)
-                                            if (commentError) {
-                                                setCommentError("")
-                                            }
-                                            if (commentNoChanges) { setCommentNoChanges("") }
-                                        }}
+                                        <TextInput value={description}
+                                            placeholder="Enter message"
+                                            onChangeText={(value) => {
+                                                setDespriction(value)
+                                                if (commentError) {
+                                                    setCommentError("")
+                                                }
+                                                if (commentNoChanges) { setCommentNoChanges("") }
+                                            }}
                                             multiline={true}
                                             numberOfLines={4}
-                                            style={{ textAlignVertical: "top" }} />
+                                            style={{ textAlignVertical: "top", fontSize: 14, fontFamily: "Gilroy-Medium", }} />
                                     </View>
                                     {commentError && <ErrorMessage message={commentError} type="error" />}
                                     {commentNoChanges && <ErrorMessage message={commentNoChanges} type="error" />}
                                 </View>
 
                                 <View style={{ paddingTop: 16 }}>
-                                    <Text>Add Proof</Text>
+                                    <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>Add Proof</Text>
                                     <TouchableOpacity onPress={uploadimage} style={styles.uploadBox}>
                                         <Image source={CameraPic} style={{ width: 32, height: 32 }} />
                                         <View style={{ paddingLeft: 22 }}>
-                                            <Text style={{ color: '#1E45E1' }}>Choose file</Text>
-                                            <Text style={{ fontSize: 11 }}>Must be PNG, JPG</Text>
+                                            <Text style={{ color: '#1E45E1', fontSize: 13, fontFamily: 'Gilroy-Medium' }}>Choose file</Text>
+                                            <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular' }}>Must be PNG, JPG</Text>
                                         </View>
                                     </TouchableOpacity>
 
                                     {mediaimage?.length > 0 && (
                                         <FlatList
                                             horizontal
-                                            style={{ paddingTop: 20 }}
                                             data={mediaimage}
+                                            keyExtractor={(item, index) => index.toString()}
+                                            showsHorizontalScrollIndicator={false}
+                                            contentContainerStyle={{ paddingTop: 20 }}
                                             renderItem={({ item, index }) => (
-
-                                                <TouchableOpacity onPress={() => imageClick(index)}>
-                                                    {console.log(item)}
+                                                <TouchableOpacity onPress={() => openViewer(index)}
+                                                    style={styles.imageContainer}>
                                                     <Image
                                                         source={{ uri: item?.imageUrl || item }}
-                                                        style={{ width: 80, height: 70, marginRight: 8, borderRadius: 5 }}
+                                                        style={styles.image}
                                                     />
-                                                    {selectedIndex === index && deleteVisible && (
-                                                        <TouchableOpacity onPress={() => removeImage(index, item?.imageId)}
-                                                            style={{
-                                                                position: 'absolute', top: 0, bottom: 0, left: 0,
-                                                                right: 0, alignItems: 'center', justifyContent: 'center',
-                                                            }}>
-                                                            <Image source={Trash} style={{ width: 17.72, height: 17.72 }} />
 
-                                                        </TouchableOpacity>
-                                                    )}
+                                                    <TouchableOpacity
+                                                        onPress={() => removeImage(index, item?.imageId)}
+                                                        style={styles.deleteBtn}
+                                                    >
+                                                        <Image source={Trash} style={styles.deleteIcon} />
+                                                    </TouchableOpacity>
                                                 </TouchableOpacity>
                                             )}
                                         />
@@ -472,6 +546,103 @@ const EditComplaintSheet = ({
                         </View>
                     </ScrollView>
                 </View>
+
+                <Modal
+                    visible={viewerVisible}
+                    transparent={false}
+                    animationType="fade"
+                    onShow={() => {
+                        flatListRef.current?.scrollToIndex({
+                            index: selectedIndex,
+                            animated: false,
+                        });
+                    }}
+                >
+
+                    <View
+                        style={{
+                            marginTop: 50,
+                            paddingHorizontal: 20,
+                            flexDirection: "row",
+                            justifyContent: "space-between"
+                        }}
+                    >
+
+                        <TouchableOpacity
+                            onPress={() => setViewerVisible(false)}
+                        >
+                            <Text>←</Text>
+                        </TouchableOpacity>
+
+                        <Text>
+                            {selectedViewIndex + 1} / {mediaimage.length}
+                        </Text>
+
+                    </View>
+
+                    <FlatList
+                        ref={flatListRef}
+                        data={mediaimage}
+                        horizontal
+                        pagingEnabled
+                        showsHorizontalScrollIndicator={false}
+
+                        renderItem={({ item }) => (
+
+                            <Image
+                                source={{
+                                    uri: item.imageUrl || item
+                                }}
+                                resizeMode="contain"
+                                style={{
+                                    width: SCREEN_WIDTH,
+                                    height: SCREEN_HEIGHT - 150
+                                }}
+                            />
+
+                        )}
+
+                        keyExtractor={(item, index) => index.toString()}
+
+                        onMomentumScrollEnd={(e) => {
+
+                            const index = Math.round(
+                                e.nativeEvent.contentOffset.x /
+                                SCREEN_WIDTH
+                            );
+
+                            setSelectedViewIndex(index);
+
+                        }}
+                    />
+
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            justifyContent: 'space-around',
+                            marginBottom: 50, marginHorizontal: 20
+                        }}
+                    >
+
+                        <TouchableOpacity onPress={deleteSpecificImage}
+                            style={{
+                                borderWidth: 1, borderRadius: 10, paddingVertical: 14, flex: 1, alignItems: 'center',
+                                justifyContent: 'center', marginRight: 4
+                            }}>
+                            <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>Delete</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={{
+                                backgroundColor: "#0565FF", borderRadius: 10, paddingVertical: 14, flex: 1,
+                                alignItems: 'center', justifyContent: 'center', marginLeft: 4
+                            }}>
+                            <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#ffffff' }}>
+                                Replace</Text>
+                        </TouchableOpacity>
+
+                    </View>
+                </Modal>
             </Animated.View>
         </View>
     );
@@ -532,4 +703,43 @@ const styles = StyleSheet.create({
         justifyContent: "flex-end",
 
     },
+    imageContainer: {
+        width: 120,
+        height: 120,
+        marginRight: 12,
+        position: "relative",
+    },
+
+    image: {
+        width: "100%",
+        height: "100%",
+        borderRadius: 8,
+    },
+
+    deleteBtn: {
+        position: "absolute",
+        bottom: 8,
+        right: 8,
+        width: 34,
+        height: 34,
+        backgroundColor: "#FFFFFF",
+        borderRadius: 8,
+        justifyContent: "center",
+        alignItems: "center",
+
+        elevation: 4, // Android
+
+        shadowColor: "#000", // iOS
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 3,
+    },
+
+    deleteIcon: {
+        width: 18,
+        height: 18,
+        resizeMode: "contain",
+        tintColor: '#FF0000'
+    },
+
 });

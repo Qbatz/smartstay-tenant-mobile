@@ -285,3 +285,67 @@ export const deleteContact=async(token,payload)=>{
         return{status: error.response.status, message: error.response.data}
     }
 }
+
+export const addJobDetails=async(token,payload)=>{
+    try{
+        const axios=getAxios();
+        const res=await axios.post("/v2/customer-job-details", payload, {
+            headers: {
+                Authorization: "Bearer " + token
+            }
+        })
+        return res;
+    }catch(error){
+        console.log(res)
+        return{status: error.response.status, message: error.response.data || error.response}
+    }
+}
+
+export const CancelRequest=async(hostelId,requestId,token)=>{
+    try{
+        const axios=getAxios();
+        const res=await axios.delete("/v2/tenant/hostels/requests/" + hostelId + "/" + requestId, { 
+            headers: {
+                Authorization: "Bearer " + token
+            
+        }
+        })
+        console.log(res)
+        return res;
+    }catch(error){
+        console.log(error)
+        return{status: error.response.status, message: error.response.data || error.response}
+    }
+}
+
+export const CancelAmenitiesRequest=async(hostelId,requestId,token)=>{
+    try{
+        const axios=getAxios();
+        const res=await axios.delete("/v2/amenities/request/" + hostelId + "/" + requestId, { 
+            headers: {
+                Authorization: "Bearer " + token
+            
+        }
+        })
+        console.log(res)
+        return res;
+    }catch(error){
+        console.log(error)
+        return{status: error.response.status, message: error.response.data || error.response}
+    }
+}
+
+export const raiseNoticePeriodRequest=async(hostelId,token,payload)=>{
+    try{
+        const axios =getAxios();
+        const res=await axios.post("/v2/customer/raise-notice/" + hostelId, payload, {
+            headers: {
+                Authorization: "Bearer " + token
+            }
+        })
+        return res;
+    }catch(error){
+        return{status: error.response.status, message: error.response.data || error.response}
+    }
+
+}

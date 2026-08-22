@@ -41,18 +41,19 @@ export default function PaymentBottomSheet({
 }) {
     const translateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
     const paymentContext = useContext(paymentContexts)
-    const [showVisible, setShowVisible] = useState(false);
-    const [rentAmountVisible, setRentAmountVisible] = useState(false)
+    const [showVisible, setShowVisible] = useState(true);
+    const [rentAmountVisible, setRentAmountVisible] = useState(true)
     const [showNonrefundable, setNonrefundable] = useState(false)
     const navigation = useNavigation();
     const [selected, setSelected] = useState("invoice");
+    const [showUnpaidInv, setShowUnpaidInv] = useState(true)
 
 
     const { CommonModule } = NativeModules;
     const context = useContext(UsersContext)
     const loginContext = useContext(LoginContexts)
-    const [showRedeemTo,setShowRedeemTo]=useState(false);
-    const [showRedeemFrom,setShowRedeemFrom]=useState(true)
+    const [showRedeemTo, setShowRedeemTo] = useState(false);
+    const [showRedeemFrom, setShowRedeemFrom] = useState(true)
 
     // useEffect(() => {
     //     if (visible && selectedComplaintSend) {
@@ -162,12 +163,18 @@ export default function PaymentBottomSheet({
     }
 
 
+    const totalUnpaidInvoice = paymentContext?.getInvoiceDetail?.unpaidInvoices?.reduce(
+        (sum, item) => sum + Number(item.totalAmount || 0),
+        0
+    );
 
+
+    console.log(totalUnpaidInvoice)
     if (!visible) return null;
 
     return (
         <View style={style.overlay}>
-            <AppLoader visible={paymentContext.getLoading}/>
+            <AppLoader visible={paymentContext.getLoading} />
             <TouchableWithoutFeedback onPress={onClose}>
                 <View style={StyleSheet.absoluteFillObject} />
             </TouchableWithoutFeedback>
@@ -331,6 +338,26 @@ export default function PaymentBottomSheet({
                                         )
                                     )}
 
+                                    {paymentContext?.getInvoiceDetail?.deductions.length > 0 && (
+                                        <View style={{ paddingTop: 10,marginBottom:10 }}>
+                                            <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium' }}>Deductions</Text>
+
+                                            {paymentContext?.getInvoiceDetail?.deductions.map((i, index) => {
+
+                                                return <View key={index}
+                                                    style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 8, alignItems: 'center' }}>
+                                                    <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Regular' }}>{i.type}</Text>
+
+                                                    <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Regular' }}>₹ {i.amount}</Text>
+                                                </View>
+                                            }
+                                            )}
+
+                                        </View>
+                                    )}
+
+
+
 
 
                                     {paymentContext.getInvoiceDetail.status === "Partial Payment" && (
@@ -347,69 +374,69 @@ export default function PaymentBottomSheet({
                                     }
                                 </View>
 
-                                {showRedeemedTo && paymentContext.getInvoiceDetail.redeemedTo.length>0 && (
+                                {showRedeemedTo && paymentContext.getInvoiceDetail.redeemedTo.length > 0 && (
                                     <>
-                                        <TouchableOpacity onPress={()=>setShowRedeemTo(!showRedeemTo)}
-                                         style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
+                                        <TouchableOpacity onPress={() => setShowRedeemTo(!showRedeemTo)}
+                                            style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                                             <Text style={style.appldTo}>Applied to</Text>
                                             <Ionicons
                                                 name={showRedeemTo ? "chevron-up" : "chevron-down"}
                                                 size={20}
-                                                style={{ marginRight:5}}
+                                                style={{ marginRight: 5 }}
                                             />
                                         </TouchableOpacity>
 
 
                                         {showRedeemTo && (
-                                         paymentContext?.getInvoiceDetail?.redeemedTo.map((i,index)=>(
-                                            <View style={style.shwRedeem} key={index}>
-                                                <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
-                                                    <Text style={style.redeemIncNo}>{i?.invoiceNumber}</Text>
-                                                    <Text style={style.redeemAmntTxt}>₹ {i?.redemptionAmount}</Text>
-                                                </View>
+                                            paymentContext?.getInvoiceDetail?.redeemedTo.map((i, index) => (
+                                                <View style={style.shwRedeem} key={index}>
+                                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                        <Text style={style.redeemIncNo}>{i?.invoiceNumber}</Text>
+                                                        <Text style={style.redeemAmntTxt}>₹ {i?.redemptionAmount}</Text>
+                                                    </View>
 
-                                                <View style={{marginVertical:9,borderWidth:1,borderColor:'#F2F2F2'}}/>
+                                                    <View style={{ marginVertical: 9, borderWidth: 1, borderColor: '#F2F2F2' }} />
 
-                                                <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
-                                                    <Text style={ style.redeemDateTxt}>Date</Text>
-                                                    <Text style={style.redeemDate}>{i?.redeemedAtDate}</Text>
+                                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                        <Text style={style.redeemDateTxt}>Date</Text>
+                                                        <Text style={style.redeemDate}>{i?.redeemedAtDate}</Text>
+                                                    </View>
                                                 </View>
-                                            </View>
-                                         ))
+                                            ))
                                         )}
                                     </>
 
                                 )}
 
-                                {showRedeemedFrom && paymentContext.getInvoiceDetail.redeemedFrom.length>0 && (
+                                {showRedeemedFrom && paymentContext.getInvoiceDetail.redeemedFrom.length > 0 && (
                                     <>
-                                        <TouchableOpacity onPress={()=>setShowRedeemFrom(!showRedeemFrom)}
-                                         style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between',marginTop:10,marginBottom:8}}>
+                                        <TouchableOpacity onPress={() => setShowRedeemFrom(!showRedeemFrom)}
+                                            style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10, marginBottom: 8 }}>
                                             <Text style={style.appldTo}>Adjusted From</Text>
                                             <Ionicons
                                                 name={showRedeemFrom ? "chevron-up" : "chevron-down"}
                                                 size={20}
-                                                style={{ marginRight:5}}
+                                                style={{ marginRight: 5 }}
                                             />
                                         </TouchableOpacity>
 
 
                                         {showRedeemFrom && (
-                                         paymentContext?.getInvoiceDetail?.redeemedFrom.map((i,index)=>(
-                                            <View style={style.shwRedeem} key={index}>
-                                                <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
-                                                    <Text style={style.redeemIncNo}>{i?.invoiceNumber}</Text>
-                                                    <Text style={style.redeemAmntTxt}>₹ {i?.redemptionAmount}</Text>
-                                                </View>
+                                            paymentContext?.getInvoiceDetail?.redeemedFrom.map((i, index) => (
+                                                <View style={style.shwRedeem} key={index}>
+                                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                        <Text style={style.redeemIncNo}>{i?.invoiceNumber}</Text>
+                                                        <Text style={style.redeemAmntTxt}>₹ {i?.redemptionAmount}</Text>
+                                                    </View>
 
-                                                <View style={{marginVertical:9,borderWidth:1,borderColor:'#F2F2F2'}}/>
+                                                    <View style={{ marginVertical: 9, borderWidth: 1, borderColor: '#F2F2F2' }} />
 
-                                                <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
-                                                    <Text style={ style.redeemDateTxt}>Date</Text>
-                                                    <Text style={style.redeemDate}>{i?.redeemedAtDate}</Text>
+                                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                        <Text style={style.redeemDateTxt}>Date</Text>
+                                                        <Text style={style.redeemDate}>{i?.redeemedAtDate}</Text>
+                                                    </View>
                                                 </View>
-                                            </View>
-                                         ))
+                                            ))
                                         )}
                                     </>
 
@@ -517,7 +544,7 @@ export default function PaymentBottomSheet({
                                                 />
                                             </TouchableOpacity>
 
-                                            <TouchableOpacity style={style.downloadBtn}>
+                                            <TouchableOpacity disabled style={[style.downloadBtn,{opacity:0.3}]}>
                                                 <Text style={style.downloadText}>Pay Now</Text>
                                                 <Image
                                                     source={ArrowRightIcon}
@@ -624,12 +651,12 @@ export default function PaymentBottomSheet({
                                 </View>
 
                                 {paymentContext?.getInvoiceDetail?.status === "Partially Paid" && (
-                                <View style={[style.row, { paddingTop: 3}]}>
-                                    <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium' }}>Balance Amount</Text>
+                                    <View style={[style.row, { paddingTop: 3 }]}>
+                                        <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium' }}>Balance Amount</Text>
 
-                                    <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold' }}>
-                                        ₹ {paymentContext?.getInvoiceDetail?.dueAmount || "N/A"}</Text>
-                                </View>
+                                        <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold' }}>
+                                            ₹ {paymentContext?.getInvoiceDetail?.dueAmount || "N/A"}</Text>
+                                    </View>
                                 )}
 
                                 <View style={style.row}>
@@ -663,7 +690,7 @@ export default function PaymentBottomSheet({
 
                                         <View style={style.row}>
                                             <TouchableOpacity onPress={() => setRentAmountVisible(!rentAmountVisible)}>
-                                                <View style={{ flexDirection: 'row' }}>
+                                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                                     <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Regular', color: '#2F2F2F' }}>
                                                         Actual Stay days ({paymentContext?.getInvoiceDetail?.currentMonthInfo?.noOfDaysStayed} days)
                                                     </Text>
@@ -687,7 +714,7 @@ export default function PaymentBottomSheet({
                                             <>
                                                 <View style={{ marginBottom: 10 }}>
                                                     {paymentContext?.getInvoiceDetail?.currentMonthInfo?.bedHistories.map((r, index) => {
-                                                        return <View key={index} style={{ paddingTop: 5, flexDirection: 'row', alignItems: 'center' }}>
+                                                        return <View key={index} style={{ paddingTop: 8, flexDirection: 'row', alignItems: 'center' }}>
 
                                                             <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#1e45e2' }}>
                                                                 {r?.floorName}{"  "}{r?.roomName}{"  "}{r?.bedName}</Text>
@@ -715,18 +742,20 @@ export default function PaymentBottomSheet({
 
                                 )}
 
-                                <View style={{ flexDirection: 'row', paddingTop: 10 }}>
-                                    <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium' }}>Non Refundable Rent</Text>
-                                    <TouchableOpacity onPress={() => setNonrefundable(!showNonrefundable)}
-                                        style={{ padding: 2, backgroundColor: 'green', marginLeft: 6, borderRadius: 5, backgroundColor: '#EFF6FF', }}>
-                                        <Ionicons
-                                            name={showNonrefundable ? "chevron-up" : "chevron-down"}
-                                            size={20}
-                                            color="#007FFF"
-                                        />
-                                    </TouchableOpacity>
+                                {paymentContext?.getInvoiceDetail?.advanceInfo?.deductions.length > 0 && (
+                                    <View style={{ flexDirection: 'row', paddingTop: 10 }}>
+                                        <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium' }}>Non Refundable Rent</Text>
+                                        <TouchableOpacity onPress={() => setNonrefundable(!showNonrefundable)}
+                                            style={{ padding: 2, backgroundColor: 'green', marginLeft: 6, borderRadius: 5, backgroundColor: '#EFF6FF', }}>
+                                            <Ionicons
+                                                name={showNonrefundable ? "chevron-up" : "chevron-down"}
+                                                size={20}
+                                                color="#007FFF"
+                                            />
+                                        </TouchableOpacity>
 
-                                </View>
+                                    </View>
+                                )}
 
                                 {showNonrefundable && (
                                     <>
@@ -748,6 +777,45 @@ export default function PaymentBottomSheet({
                                 )}
 
 
+                                <View style={style.row}>
+
+                                    <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }}
+                                        onPress={() => setShowUnpaidInv(!showUnpaidInv)}>
+
+                                        <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium' }}>Unpaid Invoices</Text>
+                                        <Ionicons
+                                            name={showUnpaidInv ? "chevron-up" : "chevron-down"}
+                                            size={20}
+                                            color="#007FFF"
+                                            style={{ marginLeft: 6, padding: 2, borderRadius: 5, backgroundColor: '#EFF6FF', }}
+                                        />
+                                    </TouchableOpacity>
+
+                                    <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold' }}> ₹ {totalUnpaidInvoice}</Text>
+                                </View>
+
+                                {showUnpaidInv && (
+                                    <View>
+                                        {paymentContext.getInvoiceDetail?.unpaidInvoices.length > 0 && (
+                                            paymentContext.getInvoiceDetail?.unpaidInvoices.map((i, index) => (
+                                                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 7, paddingHorizontal: 2 }}
+                                                    key={index}>
+                                                    <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                                        <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#1E45E1' }}>
+                                                            {i?.invoiceNo}</Text>
+                                                        <Image source={ReceiptPic} style={{ width: 16, height: 16, marginLeft: 12 }} />
+                                                    </TouchableOpacity>
+
+                                                    <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#2F2F2F' }}>
+                                                        ₹ {i?.balanceAmount}</Text>
+                                                </View>
+                                            ))
+                                        )}
+                                    </View>
+                                )}
+
+
+
 
 
 
@@ -762,26 +830,26 @@ export default function PaymentBottomSheet({
 
                                 {["Partially Paid", "Paid"].includes(paymentContext?.getInvoiceDetail?.status) && (
 
-                                <View style={style.Billbottom}>
-                                    <Text style={style.paiddetailLabel}>
-                                        Paid Date
-                                    </Text>
-                                    <Text style={style.paiddetailValue}>
-                                        {paymentContext?.getInvoiceDetail?.lastPaidDate ? paymentContext?.getInvoiceDetail?.lastPaidDate : "N/A"}
-                                    </Text>
-                                </View>
+                                    <View style={style.Billbottom}>
+                                        <Text style={style.paiddetailLabel}>
+                                            Paid Date
+                                        </Text>
+                                        <Text style={style.paiddetailValue}>
+                                            {paymentContext?.getInvoiceDetail?.lastPaidDate ? paymentContext?.getInvoiceDetail?.lastPaidDate : "N/A"}
+                                        </Text>
+                                    </View>
                                 )}
 
-                                 {paymentContext?.getInvoiceDetail?.status === "Pending" && (
+                                {paymentContext?.getInvoiceDetail?.status === "Pending" && (
 
-                                <View style={style.Billbottom}>
-                                    <Text style={style.paiddetailLabel}>
-                                        Due Date
-                                    </Text>
-                                    <Text style={style.paiddetailValue}>
-                                        {paymentContext?.getInvoiceDetail?.dueDate || "N/A"}
-                                    </Text>
-                                </View>
+                                    <View style={style.Billbottom}>
+                                        <Text style={style.paiddetailLabel}>
+                                            Due Date
+                                        </Text>
+                                        <Text style={style.paiddetailValue}>
+                                            {paymentContext?.getInvoiceDetail?.dueDate || "N/A"}
+                                        </Text>
+                                    </View>
                                 )}
 
 
@@ -933,13 +1001,13 @@ const style = StyleSheet.create({
         justifyContent: 'center'
     },
     downloadText: { color: '#FFFFFF', fontSize: 16, fontFamily: 'Gilroy-Semibold' },
-    appldTo:{fontSize:16,fontFamily:'Gilroy-Semibold'},
-    shwRedeem:{
-        borderWidth:1,borderColor:"#E7E7E7",borderRadius:8,marginTop:8,
-        paddingVertical:12,paddingHorizontal:16
+    appldTo: { fontSize: 16, fontFamily: 'Gilroy-Semibold' },
+    shwRedeem: {
+        borderWidth: 1, borderColor: "#E7E7E7", borderRadius: 8, marginTop: 8,
+        paddingVertical: 12, paddingHorizontal: 16
     },
-    redeemIncNo:{fontSize:15,fontFamily:'Gilroy-Semibold'},
-    redeemAmntTxt:{fontSize:18,fontFamily:'Gilroy-Semibold'},
-    redeemDateTxt:{fontSize:14,fontFamily:'Gilroy-Regular',color:'#3C3C4399'},
-    redeemDate:{fontSize:14,fontFamily:'Gilroy-Semibold'}
+    redeemIncNo: { fontSize: 15, fontFamily: 'Gilroy-Semibold' },
+    redeemAmntTxt: { fontSize: 18, fontFamily: 'Gilroy-Semibold' },
+    redeemDateTxt: { fontSize: 14, fontFamily: 'Gilroy-Regular', color: '#3C3C4399' },
+    redeemDate: { fontSize: 14, fontFamily: 'Gilroy-Semibold' }
 });

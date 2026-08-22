@@ -53,12 +53,13 @@ function MyStay(props) {
         }, 500);
     },[])
     const fetchMystayData = () => {
+        console.log("sooru",context.getHostelDetail)
         hostelDetails(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
             console.log(r.data)
             setComplaints(r.data?.complaints)
             setRentBill(r.data.currentMonthBills)
-            context.updateCurrentMonthBills(r.data.currentMonthBills)
-            context.updatePreviousMonth(r.data.previousMonthBills)
+            context.updateCurrentMonthBills(r?.data?.currentMonthBills)
+            context.updatePreviousMonth(r?.data?.previousMonthBills)
         })
 
         getRequestRaised(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
@@ -68,7 +69,7 @@ function MyStay(props) {
     }
     useEffect(() => {
         fetchMystayData();
-    }, [])
+    }, [context.getHostelDetail])
 
     // useFocusEffect(
     //     useCallback(()=>{
@@ -119,7 +120,7 @@ function MyStay(props) {
         <>
      <SkeletonLoader loading={isLoading}>
             {context.getCustomerDetail?.bookingDetails?.currentStatus === "BOOKED" && (
-                <ScrollView style={{ backgroundColor: '#ffffff', flex: 1, width: '100%' }}>
+                <ScrollView style={{ backgroundColor: '#ffffff', flex: 1, width: '100%' }} onScroll={props.onScroll}>
 
                     <View style={{ height: 130, marginTop: 15, marginRight: width * 0.10, overflow: 'hidden', width: width * 0.97 }}>
                         <View style={{ marginRight: 10, flex: 1 }}>
@@ -131,14 +132,14 @@ function MyStay(props) {
                                 <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} colors={['#10267B', '#0227B5']}
                                     style={{ width: width * 0.9, height: '65%', borderRadius: 10, paddingHorizontal: 20, paddingTop: 10 }} >
                                     <View style={{flexDirection:'row',alignItems:'center'}}>
-                                         <Text style={{ color: '#ffffff', fontSize: 17, lineHeight: 24 }}>
+                                         <Text style={{ color: '#ffffff', fontSize: 18,fontFamily:'Gilroy-Semibold',lineHeight: 24 }}>
                                         Hi, {context.getCustomerDetail?.firstName} {context.getCustomerDetail?.lastName}
                                     </Text>
                                     <Image source={WaveIcon} style={{width:18.13,height:18.13,marginLeft:8}}/>
                                     </View>
                                    
 
-                                    <Text style={{ color: '#ffffff', fontSize: 14, fontWeight: 400, lineHeight: 24, marginTop: 10 }}>
+                                    <Text style={{ color: '#ffffff', fontSize: 13,fontFamily:'Gilroy-Regular', lineHeight: 24, marginTop: 10 }}>
                                         Your Bed have been reserved
                                     </Text>
                                 </LinearGradient>
@@ -148,51 +149,51 @@ function MyStay(props) {
 
                     <View>
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <Text style={{ fontSize: 14, fontWeight: 400, color: '#3C3C4399' }}>
+                            <Text style={{ fontSize: 14, fontFamily:'Gilroy-Medium', color: '#3C3C4399' }}>
                                 Room No/ Bed No
                             </Text>
 
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 <Image source={RoomIcon} style={{ width: 17, height: 17, resizeMode: 'contain' }} />
-                                <Text style={{ fontSize: 14, fontWeight: 400, marginRight: 4, marginLeft: 3 }}>
+                                <Text style={{ fontSize: 14, fontFamily:'Gilroy-Medium', marginRight: 4, marginLeft: 3 }}>
                                     {context.getCustomerDetail?.bookingDetails?.roomName}</Text>
 
                                 <Image source={BedIcon} style={{ width: 17, height: 17, resizeMode: 'contain', marginLeft: 4 }} />
-                                <Text style={{ fontSize: 14, fontWeight: 400, marginLeft: 3 }}>
+                                <Text style={{ fontSize: 14, fontFamily:'Gilroy-Medium', marginLeft: 3 }}>
                                     {context.getCustomerDetail?.bookingDetails?.bedName}
                                 </Text>
                             </View>
                         </View>
 
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 15 }}>
-                            <Text style={{ fontSize: 14, fontWeight: 400, color: '#3C3C4399' }}>
+                            <Text style={{ fontSize: 14, fontFamily:'Gilroy-Medium', color: '#3C3C4399' }}>
                                 Check in date
                             </Text>
 
 
-                            <Text style={{ fontSize: 14, fontWeight: 600 }}>
+                            <Text style={{ fontSize: 14, fontFamily:'Gilroy-Medium' }}>
                                 {context.getCustomerDetail?.expJoiningDate}
                             </Text>
                         </View>
 
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 15 }}>
-                            <Text style={{ fontSize: 14, fontWeight: 400, color: '#3C3C4399' }}>
+                            <Text style={{ fontSize: 14, fontFamily:'Gilroy-Medium', color: '#3C3C4399' }}>
                                 Room Type
                             </Text>
 
 
-                            <Text style={{ fontSize: 14, fontWeight: 600 }}>
+                            <Text style={{ fontSize: 14, fontFamily:'Gilroy-Medium'}}>
                                 {context.getCustomerDetail?.bookingDetails?.roomSharingType ||  "N/A"}
                             </Text>
                         </View>
 
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 15 }}>
-                            <Text style={{ fontSize: 14, fontWeight: 400, color: '#3C3C4399' }}>
+                            <Text style={{ fontSize: 14, fontFamily:'Gilroy-Medium', color: '#3C3C4399' }}>
                                 PG Contact Number
                             </Text>
 
 
-                            <Text style={{ fontSize: 14, fontWeight: 600 }}>
+                            <Text style={{ fontSize: 14, fontFamily:'Gilroy-Medium' }}>
                                 {context.getCustomerDetail?.hostel?.mobile ? `+91 ${context.getCustomerDetail?.hostel?.mobile}` : "N/A"}
                             </Text>
                         </View>
@@ -203,7 +204,7 @@ function MyStay(props) {
                         borderRadius: 5, paddingRight: 25, paddingLeft: 14, marginTop: 20
                     }}>
                         <Image source={ExclamationCircle} style={{ width: 14, height: 14, resizeMode: 'contain' }} />
-                        <Text style={{ fontSize: 12, fontWeight: 400, color: '#1E45E1', marginLeft: 7, lineHeight: 20 }}>
+                        <Text style={{ fontSize: 12,fontFamily:'Gilroy-Medium', color: '#1E45E1', marginLeft: 7, lineHeight: 20 }}>
                             Tenants have beed must follow the PG Rules and checkin on date properly</Text>
                     </View>
 
@@ -221,7 +222,7 @@ function MyStay(props) {
             {context.getCustomerDetail?.bookingDetails?.currentStatus != "BOOKED" && (
                 <ScrollView style={{ backgroundColor: '#ffffff', flex: 1, width: '100%' }}
                     showsVerticalScrollIndicator={false}
-                    contentContainerStyle={{ paddingBottom: 20 }}>
+                    contentContainerStyle={{ paddingBottom: 20 }} onScroll={props.onScroll}>
 
                     {/* <View style={{height:130, marginTop: 15,marginRight:width*0.10,overflow: 'hidden', width: width*0.97  }}>
             <View style={{marginRight:10,flex:1}}> 
@@ -489,7 +490,8 @@ function MyStay(props) {
                         {context.getRequestRaised && context.getRequestRaised.length > 0 ?
 
                             context.getRequestRaised.map(i => {
-                                return <View key={i?.requestId}
+                                return <TouchableOpacity onPress={()=>props.onHandleViewRequest(i)}
+                                 key={i?.requestId}
                                     style={{
                                         borderWidth: 1, borderRadius: 10, flexDirection: 'row', paddingVertical: 15,
                                         borderColor: '#EFF2FF', justifyContent: 'space-between', marginTop: 10
@@ -520,7 +522,7 @@ function MyStay(props) {
                                             {i.status}
                                         </Text>
                                     </View>
-                                </View>
+                                </TouchableOpacity>
                             })
                             :
                             <View style={{

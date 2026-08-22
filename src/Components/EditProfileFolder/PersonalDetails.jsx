@@ -15,6 +15,10 @@ import CloseIcon from "../../assets/Images/close.png";
 import sideframe from '../../assets/Images/sideframe.png';
 import RemoveIcon from "../../assets/Images/removeIcon.png";
 import EditSmallIcon from "../../assets/Images/editSmallIcon.png"
+import NoResultPic from "../../assets/Images/NoResultPic.png"
+import Ionicons from "react-native-vector-icons/Ionicons";
+
+
 
 
 
@@ -22,6 +26,7 @@ const PersonalDetails = (route) => {
 
     const navigation = useNavigation();
     const context = useContext(UsersContext)
+    const { getCustomerDetail } = useContext(UsersContext)
     const loginContext = useContext(LoginContexts)
 
     const [firstname, setfirstName] = useState(route.route?.params?.customer?.firstName);
@@ -32,7 +37,7 @@ const PersonalDetails = (route) => {
     const [streetName, setStreetName] = useState(route.route?.params?.customer?.street || "");
     const [landmark, setLandmark] = useState(route.route?.params?.customer?.landmark || "");
     const [city, setCity] = useState(route.route?.params?.customer?.city || "");
-    const [pincode, setPincode] = useState(route.route?.params?.customer?.pincode || "");
+    const [pincode, setPincode] = useState("");
     const [state, setState] = useState(route.route?.params?.customer?.state || "")
     const [initials, setInitials] = useState(route.route?.params?.customer?.initials)
     const [profileImage, setProfileImage] = useState(null);
@@ -57,12 +62,12 @@ const PersonalDetails = (route) => {
             });
         });
     };
-    const houseNoRef=useRef(null);
-    const streetRef=useRef(null);
-    const landmarkRef=useRef(null);
-    const cityRef=useRef(null);
+    const houseNoRef = useRef(null);
+    const streetRef = useRef(null);
+    const landmarkRef = useRef(null);
+    const cityRef = useRef(null);
     const PincodeRef = useRef(null);
-    const stateRef=useRef(null);
+    const stateRef = useRef(null);
 
     const scrollToField = (ref) => {
         if (!ref?.current || !scrollRef.current) return;
@@ -78,6 +83,20 @@ const PersonalDetails = (route) => {
             () => { }
         );
     };
+
+    useEffect(() => {
+        if (getCustomerDetail) {
+            setfirstName(getCustomerDetail?.firstName)
+            setLastName(getCustomerDetail?.lastName)
+            setMailId(getCustomerDetail?.emailId)
+            setHouseNo(getCustomerDetail?.houseNo)
+            setStreetName(getCustomerDetail?.street)
+            setLandmark(getCustomerDetail?.landmark)
+            setCity(getCustomerDetail?.city)
+            setPincode(String(getCustomerDetail?.pincode))
+            setState(getCustomerDetail?.state)
+        }
+    }, [getCustomerDetail])
 
 
 
@@ -122,6 +141,16 @@ const PersonalDetails = (route) => {
             }
         })
     ).current;
+
+    const isAddressEmpty =
+  !houseNo?.trim() &&
+  !streetName?.trim() &&
+  !landmark?.trim() &&
+  !city?.trim() &&
+  pincode?.trim() ==="0" &&
+  !state?.trim();
+
+  console.log(houseNo,streetName,landmark,city,pincode,state)
 
 
     const handleImagePick = async () => {
@@ -268,18 +297,18 @@ const PersonalDetails = (route) => {
         />
 
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 30 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 12 }}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
                     <Image source={LeftArrow} style={{ height: 25, width: 25 }} />
                 </TouchableOpacity>
                 <Text style={{ fontSize: 20, fontFamily: 'Gilroy-Semibold', marginLeft: 8 }}>Personal Details</Text>
             </View>
 
-            <TouchableOpacity onPress={handleEdit}
+            {/* <TouchableOpacity onPress={handleEdit}
                 style={{ backgroundColor: '#E7F1FF', paddingVertical: 5, paddingHorizontal: 10, borderRadius: 5, flexDirection: 'row' }}>
                 <Image source={EditSmallIcon} style={{ width: 16, height: 16 }} />
                 <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#1E45E1', marginLeft: 6 }}>Edit</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
         </View>
         <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -323,14 +352,21 @@ const PersonalDetails = (route) => {
                     </TouchableOpacity>
                 </View>
 
-
-                <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold', marginTop: 15 }}>Basic Info</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: "space-between", marginTop: 15 }}>
+                    <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold', }}>Basic Info</Text>
+                    <TouchableOpacity onPress={() => navigation.navigate("EditBasicDetail")}
+                        style={{ backgroundColor: '#E7F1FF', paddingVertical: 5, paddingHorizontal: 10, borderRadius: 8, flexDirection: 'row' }}>
+                        <Image source={EditSmallIcon} style={{ width: 16, height: 16 }} />
+                        <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#1E45E1', marginLeft: 6 }}>Edit</Text>
+                    </TouchableOpacity>
+                </View>
 
                 <View style={[styles.fieldContainer, { marginTop: 15 }]}>
                     <Text style={styles.label}>First name</Text>
 
                     <TextInput
                         value={firstname}
+                        editable={false}
                         placeholder="Enter first name"
                         style={styles.input}
                         onChangeText={(text) => {
@@ -345,6 +381,7 @@ const PersonalDetails = (route) => {
 
                     <TextInput
                         value={lastName}
+                        editable={false}
                         placeholder="Enter last name"
                         style={styles.input}
                         onChangeText={(text) => {
@@ -360,6 +397,7 @@ const PersonalDetails = (route) => {
                     <TextInput
                         value={mailId}
                         placeholder="Enter mailId"
+                        editable={false}
                         style={styles.input}
                         onChangeText={(text) => {
                             const noEmojis = text.replace(
@@ -371,128 +409,102 @@ const PersonalDetails = (route) => {
 
                 <View style={styles.fieldContainer}>
                     <Text style={styles.label}>Mobile No</Text>
-
+                    
+                    <View style={{flexDirection:'row',alignItems:'center'}}>
+                    <Text  style={styles.input}>+91</Text>
+                    <Ionicons name="chevron-down" size={16}/>
                     <TextInput
                         value={mobile}
                         placeholder="Enter first name"
-                        style={styles.input}
+                        style={[styles.input,{marginLeft:5}]}
                         disableFullscreenUI
                     />
+                    </View>
                 </View>
                 <View style={{ paddingHorizontal: 10, paddingVertical: 5, backgroundColor: "#F5F9FF", alignSelf: "flex-start", borderRadius: 8 }}>
                     <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#1E45E1' }}>Mobile No not editable</Text>
                 </View>
 
-                <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold', marginTop: 15 }}>Address Details</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: "space-between", marginTop: 15 }}>
+                    <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold' }}>Address Details</Text>
 
-                <View ref={houseNoRef} style={[styles.fieldContainer, { marginTop: 15 }]}>
-                    <Text style={styles.label}>House No / Apartment</Text>
-
-                    <TextInput
-                        value={houseNo}
-                        placeholder="Enter house No"
-                        style={styles.input}
-                        onFocus={() => {
-                            setTimeout(() => {
-                                scrollToField(houseNoRef);
-                            }, 200);
-                        }}
-                        onChangeText={(text) => {
-                            const noEmojis = text.replace(
-                                /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, "");
-                            setHouseNo(noEmojis)
-                        }}
-                    />
+                   {(houseNo || streetName || landmark || city || pincode !=0 || state) && (
+                    <TouchableOpacity onPress={() => navigation.navigate("EditAddressDetail", {mode:"edit"})}
+                        style={{ backgroundColor: '#E7F1FF', paddingVertical: 5, paddingHorizontal: 10, borderRadius: 8, flexDirection: 'row' }}>
+                        <Image source={EditSmallIcon} style={{ width: 16, height: 16 }} />
+                        <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#1E45E1', marginLeft: 6 }}>Edit</Text>
+                    </TouchableOpacity>
+                    )}
                 </View>
 
-                <View  ref={streetRef} style={styles.fieldContainer}>
-                    <Text style={styles.label}>Street / Area</Text>
+                {isAddressEmpty ? (
+                    <View style={{ borderWidth: 1, borderRadius: 10, padding: 16, borderColor: '#E7E7E7', alignItems: 'center', marginTop: 20 }}>
+                        <Image source={NoResultPic} style={{ width: 100, height: 100 }} />
+                        <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', textAlign: 'center', lineHeight: 20, marginTop: 12 }}>
+                            Your Address Details are missing 
+                        </Text>
 
-                    <TextInput
-                        value={streetName}
-                        placeholder="Enter street name"
-                        style={styles.input}
-                        onFocus={() => {
-                            setTimeout(() => {
-                                scrollToField(streetRef);
-                            }, 200);
-                        }}
-                        onChangeText={(text) => {
-                            const noEmojis = text.replace(/[^A-Za-z\s]/g, "");
-                            setStreetName(noEmojis)
-                        }}
-                    />
-                </View>
+                        <TouchableOpacity onPress={() => navigation.navigate("EditAddressDetail", {mode:"add"})}
+                            style={{
+                                backgroundColor: "#1E45E1", borderRadius: 10, width: '100%', paddingVertical: 10,
+                                marginHorizontal: 14, marginTop: 16, alignItems: 'center'
+                            }}>
+                            <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Semibold', color: '#FFFFFF' }}>
+                                Add Address Details</Text>
+                        </TouchableOpacity>
+                    </View>
+                ) : (
+                    <>
 
-                <View ref={landmarkRef} style={styles.fieldContainer}>
-                    <Text style={styles.label}>Landmark</Text>
+                        <View style={[styles.fieldContainer, { marginTop: 15 }]}>
+                            <Text style={styles.label}>House No / Apartment</Text>
 
-                    <TextInput
+                            <Text style={[styles.input, { marginLeft: 4 }]}>{houseNo || "--"}</Text>
+                        </View>
+
+                        <View style={styles.fieldContainer}>
+                            <Text style={styles.label}>Street / Area</Text>
+
+                            <Text style={[styles.input, { marginLeft: 4 }]}>{streetName || "--"}</Text>
+                        </View>
+
+                        <View ref={landmarkRef} style={styles.fieldContainer}>
+                            <Text style={styles.label}>Landmark</Text>
+
+                            <Text style={[styles.input, { marginLeft: 4 }]}>{landmark || "--"}</Text>
+
+                            {/* <TextInput
                         value={landmark}
                         placeholder="Enter landmark"
                         style={styles.input}
+                        editable={false}
                         onFocus={() => {
                             setTimeout(() => {
                                 scrollToField(landmarkRef);
                             }, 200);
                         }}
-                    />
-                </View>
+                    /> */}
+                        </View>
 
-                <View ref={cityRef} style={styles.fieldContainer}>
-                    <Text style={styles.label}>City</Text>
+                        <View style={styles.fieldContainer}>
+                            <Text style={styles.label}>City</Text>
 
-                    <TextInput
-                        value={city}
-                        placeholder="Enter city name"
-                        style={styles.input}
-                        onFocus={() => {
-                            setTimeout(() => {
-                                scrollToField(cityRef);
-                            }, 200);
-                        }}
-                        onChangeText={(text) => {
-                            const noEmojis = text.replace(/[^A-Za-z\s]/g, "");
-                            setCity(noEmojis)
-                        }}
+                            <Text style={[styles.input, { marginLeft: 4 }]}>{city || "--"}</Text>
+                        </View>
 
-                    />
-                </View>
+                        <View style={styles.fieldContainer} >
+                            <Text style={styles.label}>Pincode</Text>
 
-                <View ref={PincodeRef} style={styles.fieldContainer} >
-                    <Text style={styles.label}>Pincode</Text>
+                            <Text style={[styles.input, { marginLeft: 4 }]}>{pincode == 0 ? "--" : pincode}</Text>
+                        </View>
 
-                    <TextInput
-                        value={pincode}
-                        placeholder="Enter pincode"
-                        style={styles.input}
-                        maxLength={6}             
-                        onFocus={() => {
-                            setTimeout(() => {
-                                scrollToField(PincodeRef);
-                            }, 200);
-                        }}
-                        keyboardType="numeric"
-                        onChangeText={(text) => {
-                            const onlyNum = text.replace(/[^0-9]/g, "")
-                            setPincode(onlyNum)
-                        }}
-                    />
-                </View>
+                        <View style={styles.fieldContainer}>
+                            <Text style={styles.label}>State</Text>
 
-                <View style={styles.fieldContainer}>
-                    <Text style={styles.label}>State</Text>
-
-                    <TextInput
-                        value={state}
-                        placeholder="Enter state"
-                        style={styles.input}
-                        onChangeText={(text) => {
-                            const noEmojis = text.replace(/[^A-Za-z\s]/g, "");
-                            setState(noEmojis)
-                        }}
-                    />
-                </View>
+                            <Text style={[styles.input, { marginLeft: 4 }]}>{state || "--"}</Text>
+                        </View>
+                    </>
+                )}
             </ScrollView>
         </KeyboardAvoidingView>
 

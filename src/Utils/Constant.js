@@ -8,6 +8,9 @@ export const LOGGEDOUT="loggedout"
 export const CUSTOMERDETAIL="customerDetail"
 export const CUSTOMERPROFILEPIC= "customerProfilePic"
 export const CUSTOMERINITIALS= "customerinitials"
+export const HOSTELLIST= "hostelList"
+export const HOSTELDETAIL ="hostelDetail"
+export const LOGIN_ANOTHER_NUMBER ="login-With-AnotherNumber"
 
 
 let _BASE_URL;         

@@ -150,10 +150,10 @@ const Notification = (props) => {
                           style={{ width: 324, height: 221, resizeMode: 'contain', marginBottom: 20, }}
                       />
                       <Text style={{ fontSize: 22,fontFamily:'Gilroy-Semibold', color: '#000', marginBottom: 8, }}>
-                          No Results Found!
+                          No Notification Available!
                       </Text>
                       <Text style={{ fontSize: 15, color: '#555', textAlign: 'center', width: 260, lineHeight: 18,fontFamily:'Gilroy-Medium' }}>
-                          Try adjusting your search or filters to see more options.
+                          There is no records relevant to this field.
                       </Text>
                   </View>
               </View> }
