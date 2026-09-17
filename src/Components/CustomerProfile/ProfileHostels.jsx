@@ -77,8 +77,8 @@ const ProfileHostels = () => {
     { id: 3, name: "ComfortNest", location: "Thoraipakkam", floor: "G1", room: "R3", bed: "B3", checkin: "11/05/2024", checkout: "95/44/4545", duration: "5month", monthlyRent: "6000", advancePaid: "30000", advancerefunded: "20000", checkoutreson: 'Changed to another place' },
   ];
 
-  useEffect(() => {
-    setLoading(true)
+  const fetchDetails=()=>{
+     setLoading(true)
     try {
       getHostelRentalDetails(loginContext.getUserId, loginContext.getToken).then(r => {
         setHostelList(r.data.activeStays)
@@ -95,14 +95,12 @@ const ProfileHostels = () => {
       console.log(error)
       setLoading(false)
     }
+  }
 
 
-    // getRentalDetials(userContext?.getHostelDetail?.hostelId, loginContext.getToken)
-    // .then(res => {
-    //   setRentalDetails(res.data);
-    //   console.log(res)
-    // })
-
+  useEffect(() => {
+   
+    fetchDetails()
 
   }, [])
 
@@ -354,11 +352,13 @@ const ProfileHostels = () => {
         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 18 }}>
           <View style={styles.hostelDetailBox}>
             <Text style={styles.hstlDtlHeaderTxt}>Room</Text>
-            <Text style={styles.hstlDtlValueTxt}>{selectedHostel?.rentalDetails?.roomName}</Text>
+            <Text style={styles.hstlDtlValueTxt}numberOfLines={1}
+            >{selectedHostel?.rentalDetails?.roomName}</Text>
           </View>
           <View style={styles.hostelDetailBox}>
             <Text style={styles.hstlDtlHeaderTxt}>Bed</Text>
-            <Text style={styles.hstlDtlValueTxt}>{selectedHostel?.rentalDetails?.bedName}</Text>
+            <Text style={styles.hstlDtlValueTxt} numberOfLines={1}
+            >{selectedHostel?.rentalDetails?.bedName}</Text>
           </View>
           <View style={styles.hostelDetailBox}>
             <Text style={styles.hstlDtlHeaderTxt}>Joined</Text>
@@ -406,10 +406,12 @@ const ProfileHostels = () => {
         {
           selectedHostel?.currentStatus != "BOOKED" && (
             <TouchableOpacity onPress={()=>setShowRequestNoticeSheet(true)}
-            style={{
+            disabled={!selectedHostel?.canRaiseNotice}
+            style={[{
               paddingVertical: 16, backgroundColor: '#D41515', borderRadius: 8, justifyContent: "center",
               alignItems: "center", flexDirection: 'row', paddingHorizontal: 12, marginTop: 20,
-            }}>
+            }, !selectedHostel?.canRaiseNotice && {opacity:0.6} ]}>
+             
               <Image source={AlertIcon} style={{ width: 15, height: 15, marginRight: 5 }} />
               <Text style={{ color: '#FFFFFF', fontSize: 16, fontFamily: 'Gilroy-Medium' }}>Request Notice Period</Text>
             </TouchableOpacity>
@@ -572,7 +574,7 @@ const ProfileHostels = () => {
                 {item?.customerHostelDocs?.length > 0 ? (
                    item?.customerHostelDocs.map((docs,index) => (
                       <>
-                        <View key={index}
+                        <View key={(item)=>item?.documentId}
                           style={{
                             borderWidth: 1, paddingVertical: 20, borderColor: '#eaeaec', borderRadius: 10, paddingHorizontal: 10,
                             backgroundColor: "#f9fafc", flexDirection: "row", alignItems: "center", marginBottom: 5,
@@ -707,7 +709,10 @@ const ProfileHostels = () => {
               ))
             )}
 
-            <View style={{ flexDirection: 'row', alignItems: "center", flex: 1, marginTop: 25 }}>
+            
+
+          </ScrollView>
+          <View style={{ flexDirection: 'row', alignItems: "center",paddingTop:10,backgroundColor:'#ffffff',bottom:15 }}>
               <TouchableOpacity onPress={() => {
                 setShowSwithToSheet(false)
                 setSelectedSwithcHostel("")
@@ -728,8 +733,6 @@ const ProfileHostels = () => {
               </TouchableOpacity>
             </View>
 
-          </ScrollView>
-
 
         </Animated.View>
       </View>
@@ -743,7 +746,12 @@ const ProfileHostels = () => {
 
       <NoticePeriodRequestRise
         visible={showRequestNoticeSheet}
-        onClose={()=>{setShowRequestNoticeSheet(false)}}/>
+        onClose={()=>{
+          fetchDetails();
+          setTimeout(() => {
+            setShowRequestNoticeSheet(false)
+          }, 200);
+          }}/>
     
 
   </View>

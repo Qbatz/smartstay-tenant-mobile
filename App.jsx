@@ -6,7 +6,7 @@
  */
 
 import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View, Text, Image, TouchableOpacity, Dimensions, Platform, NativeModules } from 'react-native';
+import { StatusBar, StyleSheet, useColorScheme, View, Text, Image, TouchableOpacity, Dimensions, Platform, NativeModules, NativeEventEmitter } from 'react-native';
 import {
   SafeAreaProvider,
 } from 'react-native-safe-area-context';
@@ -151,8 +151,27 @@ function AppContent(props) {
   const [isAfterLogout, setIsAfterLogout] = useState()
   const [isMpinVerified, setMpinVerified] = useState()
   const [isLoginWith, setIsLoginWith] = useState()
+   const emitter = new NativeEventEmitter(CommonModule);
 
 
+   useEffect(() => {
+    if (Platform.OS === "android") {
+      if (emitter !== null) {
+
+
+        const subscription = emitter.addListener("networkStatus", (status) => {
+       
+          loginContext.internet(status)
+          console.log(status)
+
+        });
+        return () => subscription.remove();
+      }
+
+
+    }
+
+  }, []);
 
   useEffect(() => {
 

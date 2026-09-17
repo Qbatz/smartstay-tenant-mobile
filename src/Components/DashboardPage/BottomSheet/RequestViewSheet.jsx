@@ -44,7 +44,7 @@ export default function RequestViewSheet({
 
 
     const { CommonModule } = NativeModules;
-    const {getHostelDetail,updateRequestRaised} = useContext(UsersContext)
+    const {getHostelDetail,updateRequestRaised,getCustomerDetail} = useContext(UsersContext)
     const {getToken} = useContext(LoginContexts)
     const [showSuccessModal, setShowSuccessModal] = useState(false);
       const [toastMessage, setToastMessage] = useState()
@@ -128,6 +128,7 @@ export default function RequestViewSheet({
                       })
                       setTimeout(() => {
                         setLoading(false)
+                         setShowSuccessModal(false)
                          onClose()
                       }, 1000);
         }else{
@@ -136,6 +137,7 @@ export default function RequestViewSheet({
             setModelType('error')
              setTimeout(() => {
                         setLoading(false)
+                         setShowSuccessModal(false)
                          onClose()
                       }, 1000);
         }
@@ -198,10 +200,11 @@ export default function RequestViewSheet({
 
                                         <View >
                                             <TouchableOpacity onPress={()=>ClickCancelReq(requestDetail?.requestId)}
-                                            style={{
+                                            style={[{
                                                 borderWidth: 1, borderColor: '#eee', paddingTop: 9, paddingBottom: 14, paddingHorizontal: 15,
                                                 borderRadius: 5, flexDirection: 'row', justifyContent: 'center',alignItems:'center'
-                                            }}>
+                                            }, getCustomerDetail?.currentStatus === "VACATED" && {opacity:0.4}]}
+                                             disabled={getCustomerDetail?.currentStatus === "VACATED"}>
                                                 <Image source={DeleteIcon} style={{ width: 16, height: 18,tintColor:'#EB6617' }} />
                                                 <Text style={{ marginLeft: 5, fontSize: 14, fontFamily: 'Gilroy-Medium' }}>Cancel Request</Text>
                                             </TouchableOpacity>
@@ -255,10 +258,11 @@ export default function RequestViewSheet({
 
                                         <View >
                                             <TouchableOpacity onPress={()=>ClickCancelReq(requestDetail?.requestId)}
-                                            style={{
+                                            style={[{
                                                 borderWidth: 1, borderColor: '#eee', paddingTop: 9, paddingBottom: 14, paddingHorizontal: 15,
                                                 borderRadius: 5, flexDirection: 'row', justifyContent: 'center',alignItems:'center'
-                                            }}>
+                                            }, getCustomerDetail?.currentStatus === "VACATED" && {opacity:0.4}]}
+                                            disabled={getCustomerDetail?.currentStatus === "VACATED"}>
                                                 <Image source={DeleteIcon} style={{ width: 16, height: 18,tintColor:"#EB6617" }} />
                                                 <Text style={{ marginLeft: 5, fontSize: 14, fontFamily: 'Gilroy-Medium' }}>Cancel Request</Text>
                                             </TouchableOpacity>

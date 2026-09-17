@@ -10,6 +10,7 @@ import {
   Pressable,
   TouchableWithoutFeedback, Linking, Alert, Animated,
   PanResponder,
+  RefreshControl,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import SideArrow from "../assets/Images/arrow-up.png";
@@ -41,6 +42,7 @@ const Payment = (props) => {
   const context = useContext(UsersContext)
   const loginContext = useContext(LoginContexts)
   const paymentContext = useContext(paymentContexts)
+  const [refreshing, setRefreshing] = useState(false)
 
 
 
@@ -146,6 +148,33 @@ const Payment = (props) => {
     navigation.navigate("ReceiptPdfView");
   };
 
+   const formatDate = (joiningDate) => {
+
+    if (!joiningDate) return "";
+
+    const normalized = joiningDate.replace(/-/g, "/");
+
+    const [day, month, year] = normalized.split("/");
+
+    const date = new Date(`${year}-${month}-${day}`);
+
+    const options = { month: "long"};
+
+    return date.toLocaleDateString("en-GB", options);
+
+  }
+
+   const onRefresh = async () => {
+        console.log("REFRESH CALLED");
+
+        setRefreshing(true);
+        fetchPaymentData();
+        setTimeout(() => {
+            setRefreshing(false);
+        }, 1000);
+
+
+    };
 
 
 
@@ -153,7 +182,10 @@ const Payment = (props) => {
     <>
       {paymentContext.getInvoiceList?.invoices?.length > 0 ? 
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false} contentContainerStyle={{paddingBottom:110}}
-       onScroll={props.onScroll} nestedScrollEnabled={true}>
+       onScroll={props.onScroll} nestedScrollEnabled={true}
+       refreshControl={<RefreshControl
+                                   refreshing={refreshing}
+                                   onRefresh={onRefresh} />}>
         {paymentContext.getInvoiceList?.invoices?.map((item, index) => (
           <React.Fragment key={index}>
             <TouchableOpacity onPress={() => props.onPayment(item)} style={styles.card}>
@@ -176,7 +208,8 @@ const Payment = (props) => {
 
                 <View style={styles.infoContainer}>
                   <View style={{ flex: 1 }}>
-                    <Text style={styles.title}>{item.invoiceType}</Text>
+                    <Text style={styles.title}>
+                      {item?.invoiceType === "RENT" && formatDate(item?.invoiceStartDate)} {item.invoiceType}</Text>
 
                     {item.status === "Cancelled" || item.status === "Pending Refund" ? (
                       <Text style={styles.date}>Inv date: {item.invoiceStartDate}</Text>
@@ -198,6 +231,8 @@ const Payment = (props) => {
                                   <Text style={styles.amount}>₹{item.amount}</Text>
                                     :
                                   <Text style={styles.amount}>{item.paidAmount}</Text>} */}
+                   {!["Advance_holding", "Eb_holding", "Amount_holding", "AMOUNT_HOLDING","EB_HOLDING", "ADVANCE_HOLDING"].
+                   includes(item?.invoiceType) && (
                     <View
                       style={[
                         styles.statusBadge,
@@ -241,6 +276,51 @@ const Payment = (props) => {
 
                       </View>
                     </View>
+                    )}
+
+                    {["Advance_holding", "Eb_holding", "Amount_holding", "AMOUNT_HOLDING","EB_HOLDING", "ADVANCE_HOLDING"].includes(item?.invoiceType) && (
+                    <View
+                      style={[
+                        styles.statusBadge,
+                        {
+                          backgroundColor:  item?.adjustmentStatus === "Not adjusted" ? "#A5FF9624"  :
+                            item?.adjustmentStatus === "Partially adjusted" ? "#FFF8EA"  : "#FFD5D5" 
+                        },
+                      ]}
+                    >
+                      <View style={{ flexDirection: "row", alignItems: 'center' }}>
+                        <Text
+                          style={[styles.statusText,
+                          {
+                            color: item?.adjustmentStatus === "Not adjusted" ? "#09882C"   :
+                              item?.adjustmentStatus === "Partially adjusted" ? "#EC9B29" : "#FF3B30"
+                          }]}
+                        >
+                          {item?.adjustmentStatus === "Not adjusted" ? "Available" :
+                            item?.adjustmentStatus === "Partially adjusted" ? "Partially adjusted" : "Adjusted"
+                                                                }
+                        </Text>
+                        {paymentContext?.getInvoiceList?.hostelUrl != null ?
+                          (<Image
+                            source={{ uri: paymentContext.getInvoiceList?.hostelUrl }}
+                            style={{ width: 16, height: 16, borderRadius: 8, marginLeft: 6 }}
+                            resizeMode="contain"
+                          />)
+                          : (<View style={{
+                            width: 18, height: 18, borderRadius: 9, backgroundColor: '#788fed', marginLeft: 5,
+                            alignItems: 'center', justifyContent: 'center'
+                          }}>
+                            <Text style={{ fontSize: 9, fontWeight: 600 }}>
+                              {paymentContext.getInvoiceList.initials}
+                            </Text>
+                          </View>)
+                        }
+
+
+
+                      </View>
+                    </View>
+                    )}
                   </View>
                 </View>
               </View>

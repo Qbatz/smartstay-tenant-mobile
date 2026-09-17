@@ -32,6 +32,9 @@ const EditBasicDetail = ({ }) => {
     const [showSuccessMessage, setShowSuccessMessage] = useState("")
     const [modalType, setModalType] = useState("")
     const [loading, setLoading] = useState(false)
+    const [emailError, setEmailError] = useState("");
+
+      const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
 
     console.log(getCustomerDetail)
 
@@ -52,6 +55,15 @@ const EditBasicDetail = ({ }) => {
             isValid = false;
         }
 
+        if (!mailId?.trim()) {
+            setEmailError("Please Enter Email ID");
+            isValid = false;
+
+        } else if (!emailRegex.test(mailId)) {
+            setEmailError("Please Enter Valid Email ID");
+            isValid = false
+        }
+
         if ((firstName ?? "").trim() === (initialFirstName ?? "").trim() &&
             (lastName ?? "").trim() === (initialLastName ?? "").trim() && (mailId ?? "").trim() === (initialMailid ?? "").trim()) {
             setShowSuccessModal(true)
@@ -69,6 +81,8 @@ const EditBasicDetail = ({ }) => {
         if (!validateForm()) return;
 
         console.log("sona")
+
+        
 
         const payload = {
             firstName: firstName,
@@ -108,6 +122,13 @@ const EditBasicDetail = ({ }) => {
                         setShowSuccessModal(false)
                         navigation.goBack();
                     }, 2000);
+                } else {
+                    setShowSuccessModal(true)
+                    setShowSuccessMessage(r?.message || 'Failed to add')
+                    setModalType('error')
+                    setTimeout(() => {
+                        setShowSuccessModal(false)
+                    }, 800);
                 }
             }, 2000);
 
@@ -124,85 +145,88 @@ const EditBasicDetail = ({ }) => {
                 message={showSuccessMessage}
                 type={modalType} />
             <ScrollView showsVerticalScrollIndicator={false}>
-            <View>
-                <View style={styles.mainHeader}>
-                    <TouchableOpacity onPress={() => navigation.goBack()}>
-                        <Image source={LeftArrow} style={{ height: 23.5, width: 23.5 }} />
-                    </TouchableOpacity>
-                    <Text style={styles.headerTxt}>Edit Basic Details</Text>
-                </View>
+                <View>
+                    <View style={styles.mainHeader}>
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Image source={LeftArrow} style={{ height: 23.5, width: 23.5 }} />
+                        </TouchableOpacity>
+                        <Text style={styles.headerTxt}>Edit Basic Details</Text>
+                    </View>
 
 
-                <Text style={[styles.labelTxt, { marginTop: 18 }]}>First Name
-                    <Text style={{ color: 'red' }}> *</Text>
-                </Text>
-                <TextInput
-                    value={firstName}
-                    style={styles.input}
-                    placeholder="Enter firstname"
-                    onChangeText={(text) => {
-                        const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
-                        setFirstName(onlyLetters)
-                        setFirstNameError("")
-
-                    }} />
-                {firstNameError && <ErrorMessage message={firstNameError} type="error" />}
-
-                <Text style={[styles.labelTxt, { marginTop: 12 }]}>Last Name</Text>
-                <TextInput
-                    value={lastName}
-                    style={styles.input}
-                    placeholder="Enter lastname"
-                    onChangeText={(text) => {
-                        const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
-                        setLastName(onlyLetters)
-
-                    }} />
-
-                <Text style={[styles.labelTxt, { marginTop: 12 }]}>Mail ID</Text>
-                <TextInput
-                    value={mailId}
-                    style={styles.input}
-                    placeholder="Enter mailId"
-                    onChangeText={(text) => {
-                        const noEmojis = text.replace(
-                            /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, "");
-                        setMailId(noEmojis)
-
-                    }} />
-
-                <Text style={[styles.labelTxt, { marginTop: 12 }]}>Mobile No</Text>
-                <View style={{
-                    flexDirection: 'row', alignItems: 'center',
-                    paddingVertical: 5, paddingHorizontal: 10, marginTop: 10, fontFamily: 'Gilroy-Regular',
-                    borderWidth: 1, borderColor: '#EEEEEE', borderRadius: 8,
-                }}>
-                    <Text style={{ fontSize: 15, color: '#111827', fontFamily: 'Gilroy-Regular', }}>+91</Text>
-                    <Ionicons name="chevron-down" size={16} />
+                    <Text style={[styles.labelTxt, { marginTop: 18 }]}>First Name
+                        <Text style={{ color: 'red' }}> *</Text>
+                    </Text>
                     <TextInput
-                        value={mobileNo}
-                        style={{ fontSize: 15, color: '#111827', fontFamily: 'Gilroy-Regular',marginLeft:6 }}
-                        editable={false}
-                        placeholder="Enter mobileNo"
-                    // onChangeText={(text) => {
-                    //                 const onlyLetters = text.replace(/[^0-9\s]/g, "")
-                    //                 setMobileNo(onlyLetters)
+                        value={firstName}
+                        style={styles.input}
+                        placeholder="Enter firstname"
+                        onChangeText={(text) => {
+                            const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
+                            setFirstName(onlyLetters)
+                            setFirstNameError("")
 
-                    //             }}
-                    />
+                        }} />
+                    {firstNameError && <ErrorMessage message={firstNameError} type="error" />}
+
+                    <Text style={[styles.labelTxt, { marginTop: 12 }]}>Last Name</Text>
+                    <TextInput
+                        value={lastName}
+                        style={styles.input}
+                        placeholder="Enter lastname"
+                        onChangeText={(text) => {
+                            const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
+                            setLastName(onlyLetters)
+
+                        }} />
+
+                    <Text style={[styles.labelTxt, { marginTop: 12 }]}>Mail ID</Text>
+                    <TextInput
+                        value={mailId}
+                        style={styles.input}
+                        placeholder="Enter mailId"
+                        onChangeText={(text) => {
+                            const noEmojis = text.replace(
+                                /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, "");
+                            setMailId(noEmojis)
+                            setEmailError("")
+
+                        }} />
+
+                    {emailError && <ErrorMessage message={emailError} type="error"/>}
+
+                    <Text style={[styles.labelTxt, { marginTop: 12 }]}>Mobile No</Text>
+                    <View style={{
+                        flexDirection: 'row', alignItems: 'center',
+                        paddingVertical: 5, paddingHorizontal: 10, marginTop: 10, fontFamily: 'Gilroy-Regular',
+                        borderWidth: 1, borderColor: '#EEEEEE', borderRadius: 8,
+                    }}>
+                        <Text style={{ fontSize: 15, color: '#111827', fontFamily: 'Gilroy-Regular', }}>+91</Text>
+                        <Ionicons name="chevron-down" size={16} />
+                        <TextInput
+                            value={mobileNo}
+                            style={{ fontSize: 15, color: '#111827', fontFamily: 'Gilroy-Regular', marginLeft: 6 }}
+                            editable={false}
+                            placeholder="Enter mobileNo"
+                        // onChangeText={(text) => {
+                        //                 const onlyLetters = text.replace(/[^0-9\s]/g, "")
+                        //                 setMobileNo(onlyLetters)
+
+                        //             }}
+                        />
+                    </View>
+                    <View style={{
+                        paddingHorizontal: 10, paddingVertical: 5, backgroundColor: "#F5F9FF",
+                        alignSelf: "flex-start", borderRadius: 8, marginTop: 5
+                    }}>
+                        <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#1E45E1' }}>Mobile No not editable</Text>
+                    </View>
                 </View>
-                <View style={{
-                    paddingHorizontal: 10, paddingVertical: 5, backgroundColor: "#F5F9FF",
-                    alignSelf: "flex-start", borderRadius: 8, marginTop: 5
-                }}>
-                    <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#1E45E1' }}>Mobile No not editable</Text>
-                </View>
-            </View>   
             </ScrollView>
 
 
 
-            <TouchableOpacity  onPress={handleSave}
+            <TouchableOpacity onPress={handleSave}
                 style={styles.saveBtn}>
                 <Text style={styles.saveTxt}>Save Changes</Text>
             </TouchableOpacity>
@@ -235,8 +259,8 @@ const styles = StyleSheet.create({
         fontSize: 14, fontFamily: "Gilroy-Medium", color: '#4B4B4B'
     },
     saveBtn: {
-        backgroundColor: '#1E45E1', borderRadius: 10,position:'relative',
-        paddingVertical: 14, alignItems: 'center', marginBottom: 40,marginTop:8
+        backgroundColor: '#1E45E1', borderRadius: 10, position: 'relative',
+        paddingVertical: 14, alignItems: 'center', marginBottom: 40, marginTop: 8
     },
     saveTxt: {
         fontSize: 16, fontFamily: 'Gilroy-Semibold', color: '#ffffff'

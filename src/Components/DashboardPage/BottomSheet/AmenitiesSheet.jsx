@@ -7,10 +7,11 @@ import Dot from '../../../assets/Images/dot.png';
 import calenderTick from '../../../assets/Images/calendar-tick.png'
 import { UsersContext } from "../../../Context/UserContext";
 import { LoginContexts } from "../../../Context/LoginContext";
-import { postRquestAmenties } from "../../../Action/HostelAction";
+import { getAmenitiesList, postRquestAmenties } from "../../../Action/HostelAction";
 import { paymentContexts } from "../../../Context/PaymentContext";
-import { CancelAmenitiesRequest, CancelRequest, getRequestRaised } from "../../../Action/CustomerAction";
+import { CancelAmenitiesRequest, CancelRequest, deactivateAmenity, getRequestRaised } from "../../../Action/CustomerAction";
 import DeleteIcon from "../../../assets/Images/deleteIcon.png"
+import { amenitiesContexts } from "../../../Context/AmenitiesContext";
 
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
@@ -28,6 +29,7 @@ const AmenitiesBottomSheet = ({
   const context = useContext(UsersContext)
   const loginContext = useContext(LoginContexts)
   const { getLoading } = useContext(paymentContexts)
+  const amenitiesContext = useContext(amenitiesContexts)
 
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [toastMessage, setToastMessage] = useState()
@@ -143,45 +145,86 @@ const AmenitiesBottomSheet = ({
     })
   }
 
-   const ClickCancelReq=async(requestId)=>{
+  const ClickCancelReq = async (requestId) => {
     console.log(requestId)
-      setLoading(true)
-      try{
-          const res=await CancelAmenitiesRequest(context?.getHostelDetail?.hostelId,requestId,loginContext?.getToken)
+    setLoading(true)
+    try {
+      const res = await CancelAmenitiesRequest(context?.getHostelDetail?.hostelId, requestId, loginContext?.getToken)
+      console.log(res)
+      if (res.status == 200) {
+        setShowSuccessModal(true)
+        setToastMessage(res?.data)
+        setModelType('success')
+        getRequestRaised(context?.getHostelDetail.hostelId, loginContext?.getToken).then(res => {
           console.log(res)
-          if(res.status ==200){
-              setShowSuccessModal(true)
-              setToastMessage(res?.data)
-              setModelType('success')
-              getRequestRaised(context?.getHostelDetail.hostelId,loginContext?.getToken).then(res => {
-                          console.log(res)
-                          if(res?.status ===200){
-                           context.updateRequestRaised(res.data)
-                          }else{
-                            console.log(res)
-                          }
-                        })
-                        setTimeout(() => {
-                          setLoading(false)
-                           setShowSuccessModal(false)
-                           onClose()
-                        }, 1000);
-          }else{
-              setShowSuccessModal(true)
-              setToastMessage(res?.message)
-              setModelType('error')
-               setTimeout(() => {
-                   setShowSuccessModal(false)
-                          setLoading(false)
-                           onClose()
-                        }, 1000);
+          if (res?.status === 200) {
+            context.updateRequestRaised(res.data)
+          } else {
+            console.log(res)
           }
-          }catch(error){
-              console.log(error)
-              setLoading(false)
-          }
+        })
+        setTimeout(() => {
+          setLoading(false)
+          setShowSuccessModal(false)
+          onClose()
+        }, 1000);
+      } else {
+        setShowSuccessModal(true)
+        setToastMessage(res?.message)
+        setModelType('error')
+        setTimeout(() => {
+          setShowSuccessModal(false)
+          setLoading(false)
+          onClose()
+        }, 1000);
+      }
+    } catch (error) {
+      console.log(error)
+      setLoading(false)
     }
-  
+  }
+
+  const fetchServiceData = () => {
+
+    getAmenitiesList(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
+      amenitiesContext.updateAssignedAmenities(r?.data?.assignedAmenities || [])
+      amenitiesContext.updateUnassginedAmenites(r?.data?.unassignedAmenities || [])
+    })
+  };
+
+  const handleDeactiveAmenity = async (amenityId) => {
+
+    setLoading(true)
+
+    try {
+      const res = await deactivateAmenity(context?.getHostelDetail.hostelId, loginContext?.getToken, amenityId)
+      console.log(res)
+      if (res?.status == 200) {
+        fetchServiceData()
+        setShowSuccessModal(true)
+        setToastMessage(res?.data)
+        setModelType('success')
+        setTimeout(() => {
+          setShowSuccessModal(false)
+          setLoading(false)
+          onClose()
+        }, 1200);
+      } else {
+        setShowSuccessModal(true)
+        setToastMessage(res?.message)
+        setModelType('error')
+        setTimeout(() => {
+          setShowSuccessModal(false)
+          setLoading(false)
+          onClose()
+        }, 1000);
+      }
+    } catch (error) {
+      console.log(error?.message)
+      setLoading(false)
+    }
+  }
+
 
 
   if (!visible) return null;
@@ -231,10 +274,11 @@ const AmenitiesBottomSheet = ({
                       {/* <View style={{height: 1, backgroundColor: "#eee", marginTop: 10}} /> */}
 
                       <View >
-                        <TouchableOpacity style={{
-                          borderWidth: 1, borderColor: '#eee', paddingTop: 9, paddingBottom: 14, paddingHorizontal: 15,
-                          borderRadius: 5, flexDirection: 'row', justifyContent: 'center'
-                        }}>
+                        <TouchableOpacity onPress={() => handleDeactiveAmenity(myAmenitis?.amenityId)}
+                          style={{
+                            borderWidth: 1, borderColor: '#eee', paddingTop: 9, paddingBottom: 14, paddingHorizontal: 15,
+                            borderRadius: 5, flexDirection: 'row', justifyContent: 'center'
+                          }}>
                           <Image source={calenderTick} style={{ width: 16, height: 16, marginTop: 3 }} />
                           <Text style={{ marginLeft: 5, fontSize: 14, fontFamily: 'Gilroy-Medium' }}>Make Deactive</Text>
                         </TouchableOpacity>
@@ -343,16 +387,19 @@ const AmenitiesBottomSheet = ({
                     </View>
                     <View >
                       {available?.isRequestRaised ? (
-                        <TouchableOpacity style={{ paddingVertical: 13, borderWidth: 1, borderRadius: 10, alignItems: 'center',
-                                                   backgroundColor: '#FFFDF5', borderColor: '#E27625', marginTop: 30 }}>
+                        <TouchableOpacity style={{
+                          paddingVertical: 13, borderWidth: 1, borderRadius: 10, alignItems: 'center',
+                          backgroundColor: '#FFFDF5', borderColor: '#E27625', marginTop: 30
+                        }}>
                           <Text style={{ fontSize: 14.11, fontFamily: 'Gilroy-Semibold', color: '#EB6617' }}>Request Raised</Text>
                         </TouchableOpacity>
                       ) : (
                         <TouchableOpacity onPress={() => onRequestAmenities(available.amenityId)}
-                          style={{
+                          style={[{
                             backgroundColor: '#1d41d5', paddingVertical: 12, alignItems: 'center', borderRadius: 10,
                             marginTop: 35
-                          }}>
+                          }, context?.getCustomerDetail?.currentStatus === "VACATED" && {opacity:0.4}] }
+                          disabled={context?.getCustomerDetail?.currentStatus === "VACATED"}>
                           <Text style={{ fontSize: 14.11, fontFamily: 'Gilroy-Semibold', color: '#ffffff' }}>Request Amenity</Text>
                         </TouchableOpacity>
                       )}

@@ -1,5 +1,5 @@
 import React, { useRef, useContext, useEffect, useState, useMemo, useCallback } from "react";
-import { View, Text, Image, FlatList, TouchableOpacity, ScrollView, StyleSheet, Button, BackHandler, Platform, Dimensions, PanResponder, Animated } from "react-native";
+import { View, Text, Image, FlatList, TouchableOpacity, ScrollView, StyleSheet, Button, BackHandler, Platform, Dimensions, PanResponder, Animated, RefreshControl, NativeModules } from "react-native";
 import Swiper from "react-native-swiper";
 import LinearGradient from "react-native-linear-gradient";
 import Electricity from '../../assets/Images/electricity.png';
@@ -30,15 +30,18 @@ function MyStay(props) {
     const context = useContext(UsersContext);
     const loginContext = useContext(LoginContexts)
     const { width } = Dimensions.get('window');
+    const { CommonModule } = NativeModules;
 
 
     const [complaints, setComplaints] = useState([])
     const [rentBill, setRentBill] = useState([])
     const [request, setRequest] = useState([])
 
-    const [isLoading,setIsLoading]=useState(false)
+    const [isLoading, setIsLoading] = useState(false)
+      const [refreshing, setRefreshing] = useState(false)
+    
 
-    console.log(context.getRequestRaised)
+    console.log("Kolla",context)
 
     const announcements = [
         { id: 1, text: 'Hello water maintenance on 5th June' },
@@ -46,15 +49,15 @@ function MyStay(props) {
         { id: 3, text: 'field3' }
     ];
 
-    useEffect(()=>{
+    useEffect(() => {
         setIsLoading(true)
         setTimeout(() => {
             setIsLoading(false)
         }, 500);
-    },[])
+    }, [])
     const fetchMystayData = () => {
-        console.log("sooru",context.getHostelDetail)
-        hostelDetails(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
+        console.log("sooru", context?.getHostelDetail)
+        hostelDetails(context?.getHostelDetail.hostelId, loginContext?.getToken).then(r => {
             console.log(r.data)
             setComplaints(r.data?.complaints)
             setRentBill(r.data.currentMonthBills)
@@ -62,7 +65,7 @@ function MyStay(props) {
             context.updatePreviousMonth(r?.data?.previousMonthBills)
         })
 
-        getRequestRaised(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
+        getRequestRaised(context?.getHostelDetail?.hostelId, loginContext?.getToken).then(r => {
             console.log(r)
             context.updateRequestRaised(r.data)
         })
@@ -108,7 +111,6 @@ function MyStay(props) {
     function viewallclick() {
         props.jumpTo('services')
         context.jumpComplain('complaint')
-
     }
 
     function complaintsClick() {
@@ -116,115 +118,150 @@ function MyStay(props) {
         context.jumpComplain('complaint')
     }
 
+    const pending = ["PENDING", "PARTIAL PAID", "PARTIALLY PAID","PARTIAL_PAYMENT"].includes(context?.getPreviousMonthBills?.paymentStatus)
+    const currentPending= ["PENDING", "PARTIAL PAID", "PARTIALLY PAID","PARTIAL_PAYMENT"].includes(context?.getCurrentMonthBills?.paymentStatus)
+
+      const onRefresh = async () => {
+        console.log("REFRESH CALLED");
+
+        setRefreshing(true);
+        fetchMystayData();
+        setTimeout(() => {
+            setRefreshing(false);
+        }, 1000);
+
+
+    };
+
+    const handlePhoneCall=(mobile)=>{
+        
+        if(mobile){
+            CommonModule.makeCall(mobile)
+        }
+    }
+    
+
+
     return (
         <>
-     <SkeletonLoader loading={isLoading}>
-            {context.getCustomerDetail?.bookingDetails?.currentStatus === "BOOKED" && (
-                <ScrollView style={{ backgroundColor: '#ffffff', flex: 1, width: '100%' }} onScroll={props.onScroll}>
+            <SkeletonLoader loading={isLoading}>
+                {context.getCustomerDetail?.bookingDetails?.currentStatus === "BOOKED" && (
+                    <ScrollView style={{ backgroundColor: '#ffffff', flex: 1, width: '100%' }}
+                    contentContainerStyle={{paddingBottom:30}} showsVerticalScrollIndicator={false}
+                    scrollEventThrottle={16} onScroll={props.onScroll}
+                    refreshControl={<RefreshControl
+                                            refreshing={refreshing}
+                                            onRefresh={onRefresh} />}>
 
-                    <View style={{ height: 130, marginTop: 15, marginRight: width * 0.10, overflow: 'hidden', width: width * 0.97 }}>
-                        <View style={{ marginRight: 10, flex: 1 }}>
-                            <Swiper loop showsPagination
-                                index={0} paginationStyle={{ width: "100%", paddingRight: 22 }}
-                                style={{ borderRadius: 10 }} >
+                        <View style={{ height: 130, marginTop: 15, marginRight: width * 0.10, overflow: 'hidden', width: width * 0.97 }}>
+                            <View style={{ marginRight: 10, flex: 1 }}>
+                                <Swiper loop showsPagination
+                                    index={0} paginationStyle={{ width: "100%", paddingRight: 22 }}
+                                    style={{ borderRadius: 10 }} >
 
 
-                                <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} colors={['#10267B', '#0227B5']}
-                                    style={{ width: width * 0.9, height: '65%', borderRadius: 10, paddingHorizontal: 20, paddingTop: 10 }} >
-                                    <View style={{flexDirection:'row',alignItems:'center'}}>
-                                         <Text style={{ color: '#ffffff', fontSize: 18,fontFamily:'Gilroy-Semibold',lineHeight: 24 }}>
-                                        Hi, {context.getCustomerDetail?.firstName} {context.getCustomerDetail?.lastName}
-                                    </Text>
-                                    <Image source={WaveIcon} style={{width:18.13,height:18.13,marginLeft:8}}/>
-                                    </View>
-                                   
+                                    <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} colors={['#10267B', '#0227B5']}
+                                        style={{ width: width * 0.9, height: '65%', borderRadius: 10, paddingHorizontal: 20, paddingTop: 10 }} >
+                                        <View style={{ flexDirection: 'row', alignItems: 'center',marginTop:3}}>
+                                            <Text  style={{ color: '#ffffff', fontSize: 18, fontFamily: 'Gilroy-Semibold',
+                                                    lineHeight: 24,flexShrink:1}}
+                                                    numberOfLines={1}>
+                                                Hi, {context.getCustomerDetail?.firstName} {context.getCustomerDetail?.lastName}
+                                            </Text>
+                                            <Image source={WaveIcon} style={{ width: 18.13, height: 18.13, marginLeft: 8 }} />
+                                        </View>
 
-                                    <Text style={{ color: '#ffffff', fontSize: 13,fontFamily:'Gilroy-Regular', lineHeight: 24, marginTop: 10 }}>
-                                        Your Bed have been reserved
-                                    </Text>
-                                </LinearGradient>
-                            </Swiper>
+
+                                        <Text style={{ color: '#ffffff', fontSize: 13, fontFamily: 'Gilroy-Regular', lineHeight: 24, marginTop: 10 }}>
+                                            Your Bed have been reserved
+                                        </Text>
+                                    </LinearGradient>
+                                </Swiper>
+                            </View>
                         </View>
-                    </View>
 
-                    <View>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <Text style={{ fontSize: 14, fontFamily:'Gilroy-Medium', color: '#3C3C4399' }}>
-                                Room No/ Bed No
-                            </Text>
+                        <View>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                                <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#3C3C4399' }}>
+                                    Room No/ Bed No
+                                </Text>
 
-                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                <Image source={RoomIcon} style={{ width: 17, height: 17, resizeMode: 'contain' }} />
-                                <Text style={{ fontSize: 14, fontFamily:'Gilroy-Medium', marginRight: 4, marginLeft: 3 }}>
-                                    {context.getCustomerDetail?.bookingDetails?.roomName}</Text>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <Image source={RoomIcon} style={{ width: 17, height: 17, resizeMode: 'contain' }} />
+                                    <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', marginRight: 4, marginLeft: 3 }}>
+                                        {context.getCustomerDetail?.bookingDetails?.roomName}</Text>
 
-                                <Image source={BedIcon} style={{ width: 17, height: 17, resizeMode: 'contain', marginLeft: 4 }} />
-                                <Text style={{ fontSize: 14, fontFamily:'Gilroy-Medium', marginLeft: 3 }}>
-                                    {context.getCustomerDetail?.bookingDetails?.bedName}
+                                    <Image source={BedIcon} style={{ width: 17, height: 17, resizeMode: 'contain', marginLeft: 4 }} />
+                                    <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', marginLeft: 3 }}>
+                                        {context.getCustomerDetail?.bookingDetails?.bedName}
+                                    </Text>
+                                </View>
+                            </View>
+
+                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 15 }}>
+                                <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#3C3C4399' }}>
+                                    Check in date
+                                </Text>
+
+
+                                <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>
+                                    {context.getCustomerDetail?.expJoiningDate}
+                                </Text>
+                            </View>
+
+                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 15 }}>
+                                <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#3C3C4399' }}>
+                                    Room Type
+                                </Text>
+
+
+                                <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>
+                                    {context.getCustomerDetail?.bookingDetails?.roomSharingType || "N/A"} Sharing
+                                </Text>
+                            </View>
+
+                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 15 }}>
+                                <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#3C3C4399' }}>
+                                    PG Contact Number
+                                </Text>
+
+
+                                <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>
+                                    {context.getCustomerDetail?.hostel?.mobile ? `+91 ${context.getCustomerDetail?.hostel?.mobile}` : "N/A"}
                                 </Text>
                             </View>
                         </View>
 
-                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 15 }}>
-                            <Text style={{ fontSize: 14, fontFamily:'Gilroy-Medium', color: '#3C3C4399' }}>
-                                Check in date
-                            </Text>
-
-
-                            <Text style={{ fontSize: 14, fontFamily:'Gilroy-Medium' }}>
-                                {context.getCustomerDetail?.expJoiningDate}
-                            </Text>
+                        <View style={{
+                            backgroundColor: '#F5F9FF', paddingVertical: 15, flexDirection: 'row', alignItems: 'center',
+                            borderRadius: 5, paddingRight: 25, paddingLeft: 14, marginTop: 20
+                        }}>
+                            <Image source={ExclamationCircle} style={{ width: 14, height: 14, resizeMode: 'contain' }} />
+                            <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Medium', color: '#1E45E1', marginLeft: 7, lineHeight: 20 }}>
+                                Tenants have beed must follow the PG Rules and checkin on date properly</Text>
                         </View>
 
-                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 15 }}>
-                            <Text style={{ fontSize: 14, fontFamily:'Gilroy-Medium', color: '#3C3C4399' }}>
-                                Room Type
-                            </Text>
+                        <TouchableOpacity onPress={()=>handlePhoneCall(context?.getCustomerDetail?.hostel?.mobile)}
+                        style={{
+                            backgroundColor: '#1E45E1', borderRadius: 8, justifyContent: 'center', alignItems: 'center',
+                            marginTop: 25, flexDirection: 'row', paddingVertical: 16, paddingHorizontal: 40, marginHorizontal: 10
+                        }}>
+                            <Image source={callIcon} style={{ width: 20, height: 20, tintColor: '#ffffff' }} />
+                            <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium', marginLeft: 8, color: '#ffffff', marginLeft: 10 }}>
+                                Contact Hostel Admin</Text>
+                        </TouchableOpacity>
+                    </ScrollView>
+                )}
 
+                {context.getCustomerDetail?.bookingDetails?.currentStatus != "BOOKED" && (
+                    <ScrollView style={{ backgroundColor: '#ffffff', flex: 1, width: '100%' }}
+                        showsVerticalScrollIndicator={false}
+                        contentContainerStyle={{ paddingBottom: 20 }} onScroll={props.onScroll}
+                        refreshControl={<RefreshControl
+                                                refreshing={refreshing}
+                                                onRefresh={onRefresh} />}>
 
-                            <Text style={{ fontSize: 14, fontFamily:'Gilroy-Medium'}}>
-                                {context.getCustomerDetail?.bookingDetails?.roomSharingType ||  "N/A"}
-                            </Text>
-                        </View>
-
-                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 15 }}>
-                            <Text style={{ fontSize: 14, fontFamily:'Gilroy-Medium', color: '#3C3C4399' }}>
-                                PG Contact Number
-                            </Text>
-
-
-                            <Text style={{ fontSize: 14, fontFamily:'Gilroy-Medium' }}>
-                                {context.getCustomerDetail?.hostel?.mobile ? `+91 ${context.getCustomerDetail?.hostel?.mobile}` : "N/A"}
-                            </Text>
-                        </View>
-                    </View>
-
-                    <View style={{
-                        backgroundColor: '#F5F9FF', paddingVertical: 15, flexDirection: 'row', alignItems: 'center',
-                        borderRadius: 5, paddingRight: 25, paddingLeft: 14, marginTop: 20
-                    }}>
-                        <Image source={ExclamationCircle} style={{ width: 14, height: 14, resizeMode: 'contain' }} />
-                        <Text style={{ fontSize: 12,fontFamily:'Gilroy-Medium', color: '#1E45E1', marginLeft: 7, lineHeight: 20 }}>
-                            Tenants have beed must follow the PG Rules and checkin on date properly</Text>
-                    </View>
-
-                    <TouchableOpacity style={{
-                        backgroundColor: '#1E45E1', borderRadius: 8, justifyContent: 'center', alignItems: 'center',
-                        marginTop: 25, flexDirection: 'row', paddingVertical: 20, paddingHorizontal: 40,marginHorizontal:10
-                    }}>
-                        <Image source={callIcon} style={{ width: 20, height: 20, tintColor: '#ffffff' }} />
-                        <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium', marginLeft: 8, color: '#ffffff',marginLeft:10 }}>
-                            Contact Hostel Admin</Text>
-                    </TouchableOpacity>
-                </ScrollView>
-            )}
-
-            {context.getCustomerDetail?.bookingDetails?.currentStatus != "BOOKED" && (
-                <ScrollView style={{ backgroundColor: '#ffffff', flex: 1, width: '100%' }}
-                    showsVerticalScrollIndicator={false}
-                    contentContainerStyle={{ paddingBottom: 20 }} onScroll={props.onScroll}>
-
-                    {/* <View style={{height:130, marginTop: 15,marginRight:width*0.10,overflow: 'hidden', width: width*0.97  }}>
+                        {/* <View style={{height:130, marginTop: 15,marginRight:width*0.10,overflow: 'hidden', width: width*0.97  }}>
             <View style={{marginRight:10,flex:1}}> 
             <Swiper loop showsPagination
                 index={0} paginationStyle={{ bottom: 10,width: "100%",paddingRight:22}}
@@ -244,111 +281,114 @@ function MyStay(props) {
             </Swiper>
             </View>
         </View> */}
-                    {console.log(context?.getCustomerDetail)}
+                        {console.log(context?.getCustomerDetail)}
 
-                    {context?.getCustomerDetail?.bookingDetails?.currentStatus === "BOOKED" && (
-                        <View style={{ flex: 1 }}>
-                            <Text>hfhf</Text>
+                        {context?.getCustomerDetail?.bookingDetails?.currentStatus === "BOOKED" && (
+                            <View style={{ flex: 1 }}>
+                                <Text>hfhf</Text>
+                            </View>
+                        )}
+
+                        <View style={style.wrapper}>
+                            <View style={style.row}>
+
+                                <View style={style.cardboc}>
+                                    <View style={style.content}>
+                                        <Text style={style.amount} numberOfLines={1}>
+                                            ₹ {context.getPreviousMonthBills?.eb ?? 'N/A'}
+                                        </Text>
+
+                                        <Text style={style.subText}>
+                                            Last Month EB Bill
+                                        </Text>
+
+                                        <View style={style.inlineRow}>
+                                            <Text style={style.label}>{pending ? "Invc On :" : "Paid On :"}</Text>
+                                            <Text style={style.value} numberOfLines={1}>
+                                                {pending ? context.getPreviousMonthBills?.invoiceGeneratedDate : context.getPreviousMonthBills?.paymentDate ?? 'N/A'}
+                                            </Text>
+                                        </View>
+                                    </View>
+
+                                    <Image source={Electricity} style={style.icon} />
+                                </View>
+
+                                <View style={style.cardboc}>
+                                    <View style={style.content}>
+                                        <Text style={style.amount} numberOfLines={1}>
+                                            ₹ {context.getPreviousMonthBills?.rent ?? 'N/A'}
+                                        </Text>
+
+                                        <Text style={style.subText}>
+                                            Last Month Rent
+                                        </Text>
+
+                                        <View style={style.inlineRow}>
+                                            <Text style={style.label}>{pending ? "Invc On :" : "Paid On :"}</Text>
+                                            <Text style={style.value} numberOfLines={1}>
+                                                {pending ? context.getPreviousMonthBills?.invoiceGeneratedDate : context.getPreviousMonthBills?.paymentDate ?? 'N/A'}
+                                            </Text>
+                                        </View>
+                                    </View>
+
+                                    <Image source={Frame} style={style.icon} />
+                                </View>
+
+                            </View>
+
+                            <View style={style.row}>
+
+                                <View style={style.cardboc}>
+                                    <View style={style.content}>
+                                        <Text style={style.amount} numberOfLines={1}>
+                                            ₹ {context.getCurrentMonthBills?.eb ?? 'N/A'}
+                                        </Text>
+
+                                        <Text style={style.highlightText}>
+                                            New Bill Generated
+                                        </Text>
+                                        
+                                        <View style={style.inlineRow}>
+                                            <Text style={style.label}>
+                                                {context.getCurrentMonthBills?.eb === 0 ? "Inv on :" : currentPending ? "Due On :" : "Paid On :"}</Text>
+                                            <Text style={style.value} numberOfLines={1}>
+                                                {context.getCurrentMonthBills?.eb === 0 ?
+                                                context.getCurrentMonthBills?.currentInvoiceStartDate : currentPending ? 
+                                                context.getCurrentMonthBills?.invoiceDueDate : context.getCurrentMonthBills?.paymentDate ?? 'N/A' }
+                                            </Text>
+                                        </View>
+                                    </View>
+
+                                    <Image source={Electricity} style={style.icon} />
+                                </View>
+
+                                <View style={style.cardboc}>
+                                    <View style={style.content}>
+                                        <Text style={style.amount} numberOfLines={1}>
+                                            ₹ {context.getCurrentMonthBills?.rent ?? 'N/A'}
+                                        </Text>
+
+                                        <Text style={style.highlightText}>
+                                            New Bill Generated
+                                        </Text>
+
+                                        <View style={style.inlineRow}>
+                                            <Text style={style.label}>{currentPending ? "Due On :" : "Paid On"}</Text>
+                                            <Text style={style.value} numberOfLines={1}>
+                                                 { currentPending ? context.getCurrentMonthBills?.invoiceDueDate : context.getCurrentMonthBills?.paymentDate ?? 'N/A'}
+                                            </Text>
+                                        </View>
+                                    </View>
+
+                                    <Image source={Frame} style={style.icon} />
+                                </View>
+
+                            </View>
                         </View>
-                    )}
-
-                    <View style={style.wrapper}>
-                        <View style={style.row}>
-
-                            <View style={style.cardboc}>
-                                <View style={style.content}>
-                                    <Text style={style.amount} numberOfLines={1}>
-                                        ₹ {context.getPreviousMonthBills?.eb ?? 'N/A'}
-                                    </Text>
-
-                                    <Text style={style.subText}>
-                                        Last Month EB Bill
-                                    </Text>
-
-                                    <View style={style.inlineRow}>
-                                        <Text style={style.label}>Paid On:</Text>
-                                        <Text style={style.value} numberOfLines={1}>
-                                            {context.getPreviousMonthBills?.invoiceGeneratedDate ?? 'N/A'}
-                                        </Text>
-                                    </View>
-                                </View>
-
-                                <Image source={Electricity} style={style.icon} />
-                            </View>
-
-                            <View style={style.cardboc}>
-                                <View style={style.content}>
-                                    <Text style={style.amount} numberOfLines={1}>
-                                        ₹ {context.getPreviousMonthBills?.rent ?? 'N/A'}
-                                    </Text>
-
-                                    <Text style={style.subText}>
-                                        Last Month Rent
-                                    </Text>
-
-                                    <View style={style.inlineRow}>
-                                        <Text style={style.label}>Paid On:</Text>
-                                        <Text style={style.value} numberOfLines={1}>
-                                            {context.getPreviousMonthBills?.invoiceGeneratedDate ?? 'N/A'}
-                                        </Text>
-                                    </View>
-                                </View>
-
-                                <Image source={Frame} style={style.icon} />
-                            </View>
-
-                        </View>
-
-                        <View style={style.row}>
-
-                            <View style={style.cardboc}>
-                                <View style={style.content}>
-                                    <Text style={style.amount} numberOfLines={1}>
-                                        ₹ {context.getCurrentMonthBills?.eb ?? 'N/A'}
-                                    </Text>
-
-                                    <Text style={style.highlightText}>
-                                        New Bill Generated
-                                    </Text>
-
-                                    <View style={style.inlineRow}>
-                                        <Text style={style.label}>Due date:</Text>
-                                        <Text style={style.value} numberOfLines={1}>
-                                            {context.getCurrentMonthBills?.invoiceDueDate ?? 'N/A'}
-                                        </Text>
-                                    </View>
-                                </View>
-
-                                <Image source={Electricity} style={style.icon} />
-                            </View>
-
-                            <View style={style.cardboc}>
-                                <View style={style.content}>
-                                    <Text style={style.amount} numberOfLines={1}>
-                                        ₹ {context.getCurrentMonthBills?.rent ?? 'N/A'}
-                                    </Text>
-
-                                    <Text style={style.highlightText}>
-                                        New Bill Generated
-                                    </Text>
-
-                                    <View style={style.inlineRow}>
-                                        <Text style={style.label}>Due date:</Text>
-                                        <Text style={style.value} numberOfLines={1}>
-                                            {context.getCurrentMonthBills?.invoiceDueDate ?? 'N/A'}
-                                        </Text>
-                                    </View>
-                                </View>
-
-                                <Image source={Frame} style={style.icon} />
-                            </View>
-
-                        </View>
-                    </View>
 
 
 
-                    {/* <View style={{marginTop:30}}>
+                        {/* <View style={{marginTop:30}}>
             <View style={{ flexDirection: 'row',flex:1}}>
 
                 <View style={style.EbContainer}>
@@ -450,188 +490,195 @@ function MyStay(props) {
 
 
 
-                    <View>
-                        <View style={{ marginTop: 20 }}>
-                            <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Semibold' }}>Quick Links</Text>
-                        </View>
-                        <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'space-between' }}>
-                            <TouchableOpacity onPress={() => props.onSheet()}
-                                style={{
-                                    borderWidth: 1, borderRadius: 10, flex: 1, justifyContent: 'center',
-                                    alignItems: 'center', marginRight: 10, padding: 10, borderColor: '#EFF2FF',
-                                }}>
-                                <View style={{ marginBottom: 10 }}>
-                                    <Image source={Receipt} style={{ width: 26, height: 26 }} />
-                                </View>
-                                <Text style={{ fontSize: 10, marginTop: 5, fontFamily: 'Gilroy-Medium' }}>Complaint</Text>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity onPress={() => props.onRequestBedChange()}
-                                style={{
-                                    borderWidth: 1, borderRadius: 10, flex: 1, justifyContent: 'center', alignItems: 'center',
-                                    marginLeft: 5, padding: 10, borderColor: '#EFF2FF'
-                                }}>
-                                <View>
-                                    <Image source={FrameAdd} style={{ width: 24, height: 24 }} />
-                                </View>
-                                <View style={{ justifyContent: 'center', alignItems: 'center', paddingTop: 5 }}>
-                                    <Text style={{ fontSize: 10, fontFamily: 'Gilroy-Regular' }}>Request</Text>
-                                    <Text style={{ fontSize: 10, fontFamily: 'Gilroy-Regular' }}>Bed change</Text>
-                                </View>
-                            </TouchableOpacity>
-                        </View>
-
-                    </View>
-
-                    <View style={{ paddingTop: 15 }}>
-                        <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold' }}>Request</Text>
-
-
-                        {context.getRequestRaised && context.getRequestRaised.length > 0 ?
-
-                            context.getRequestRaised.map(i => {
-                                return <TouchableOpacity onPress={()=>props.onHandleViewRequest(i)}
-                                 key={i?.requestId}
+                        <View>
+                            <View style={{ marginTop: 20 }}>
+                                <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Semibold' }}>Quick Links</Text>
+                            </View>
+                            <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'space-between' }}>
+                                <TouchableOpacity onPress={() => props.onSheet()}
+                                disabled={context?.getCustomerDetail?.currentStatus === "VACATED" }
                                     style={{
-                                        borderWidth: 1, borderRadius: 10, flexDirection: 'row', paddingVertical: 15,
-                                        borderColor: '#EFF2FF', justifyContent: 'space-between', marginTop: 10
+                                        borderWidth: 1, borderRadius: 10, flex: 1, justifyContent: 'center',
+                                        alignItems: 'center', marginRight: 10, padding: 10, borderColor: '#EFF2FF',
                                     }}>
-                                    <View style={{ paddingLeft: 12, paddingRight: 10,flex:1 }}>
-                                        <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold', marginBottom: 5 }}>
-                                            {i.type}
-                                        </Text>
-
-                                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
-                                            <Image source={Clippath} style={{ width: 20, height: 20 }} />
-
-                                            <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', marginLeft: 10 }}>
-                                                {i.reason || "N/A"}</Text>
-                                        </View>
-
+                                    <View style={{ marginBottom: 10 }}>
+                                        <Image source={Receipt} style={[{ width: 26, height: 26 },
+                                            context?.getCustomerDetail?.currentStatus === "VACATED" && {opacity:0.4}]} />
                                     </View>
+                                    <Text style={{ fontSize: 10, marginTop: 5, fontFamily: 'Gilroy-Medium' }}>Complaint</Text>
+                                </TouchableOpacity>
 
-                                    <View style={{ paddingRight: 10 }}>
-                                        <Text style={{ color: '#9C9C9C', fontSize: 11, fontFamily: 'Gilroy-Medium', marginBottom: 5 }}>
-                                            {i.requestedDateDisplay}
-                                        </Text>
-
-                                        <Text style={{
-                                            fontSize: 12, fontFamily: 'Gilroy-Medium', paddingHorizontal: 8, paddingVertical: 4, backgroundColor: '#FFF8EC',
-                                            color: '#FF9500', borderRadius: 28, textAlign: 'center', textAlignVertical: 'center', marginTop: 8
-                                        }}>
-                                            {i.status}
-                                        </Text>
+                                <TouchableOpacity onPress={() => props.onRequestBedChange()}
+                                disabled={context?.getCustomerDetail?.currentStatus === "VACATED" }
+                                    style={{
+                                        borderWidth: 1, borderRadius: 10, flex: 1, justifyContent: 'center', alignItems: 'center',
+                                        marginLeft: 5, padding: 10, borderColor: '#EFF2FF'
+                                    }}>
+                                    <View>
+                                        <Image source={FrameAdd} style={[{ width: 24, height: 24 },
+                                            context?.getCustomerDetail?.currentStatus === "VACATED" && {opacity:0.4}]} />
+                                    </View>
+                                    <View style={{ justifyContent: 'center', alignItems: 'center', paddingTop: 5 }}>
+                                        <Text style={{ fontSize: 10, fontFamily: 'Gilroy-Regular' }}>Request</Text>
+                                        <Text style={{ fontSize: 10, fontFamily: 'Gilroy-Regular' }}>Bed change</Text>
                                     </View>
                                 </TouchableOpacity>
-                            })
-                            :
-                            <View style={{
+                            </View>
+
+                        </View>
+
+                        <View style={{ paddingTop: 15 }}>
+                            <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold' }}>Request</Text>
+
+
+                            {context.getRequestRaised && context.getRequestRaised.length > 0 ?
+
+                                context.getRequestRaised.map(i => {
+                                    return <TouchableOpacity onPress={() => props.onHandleViewRequest(i)}
+                                        key={i?.requestId}
+                                        style={{
+                                            borderWidth: 1, borderRadius: 10, flexDirection: 'row', paddingVertical: 15,
+                                            borderColor: '#EFF2FF', justifyContent: 'space-between', marginTop: 10
+                                        }}>
+                                        <View style={{ paddingLeft: 12, paddingRight: 10, flex: 1 }}>
+                                            <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold', marginBottom: 5 }}>
+                                                {i.type}
+                                            </Text>
+
+                                            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
+                                                <Image source={Clippath} style={{ width: 20, height: 20 }} />
+
+                                                <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', marginLeft: 10 }}>
+                                                    {i.reason || "N/A"}</Text>
+                                            </View>
+
+                                        </View>
+
+                                        <View style={{ paddingRight: 10 }}>
+                                            <Text style={{ color: '#9C9C9C', fontSize: 11, fontFamily: 'Gilroy-Medium', marginBottom: 5 }}>
+                                                {i.requestedDateDisplay}
+                                            </Text>
+
+                                            <Text style={{
+                                                fontSize: 12, fontFamily: 'Gilroy-Medium', paddingHorizontal: 8, paddingVertical: 4, backgroundColor: '#FFF8EC',
+                                                color: '#FF9500', borderRadius: 28, textAlign: 'center', textAlignVertical: 'center', marginTop: 8
+                                            }}>
+                                                {i.status}
+                                            </Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                })
+                                :
+                                <>
+                                <View style={{
+                                    borderWidth: 1, borderRadius: 10, flexDirection: 'row', paddingVertical: 15, borderColor: '#EFF2FF',
+                                    justifyContent: 'space-between', marginTop: 10
+                                }}>
+                                    <View style={{ paddingLeft: 12, paddingRight: 10 }}>
+                                        <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold', marginBottom: 5 }}>
+                                            No Request yet
+                                        </Text>
+                                        <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#4B4B4B', marginTop: 5 }}>
+                                            You have'nt raised any request</Text>
+                                    </View>
+
+                                    <Image source={requestProfile} style={{ width: 44, height: 44, marginRight: 12, marginTop: 5 }} />
+                                </View>                            
+                                </>
+                                }
+
+                        </View>
+
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 12 }}>
+                            <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold' }}>Complaints</Text>
+                            <TouchableOpacity onPress={viewallclick}>
+                                <Text style={{ color: '#1E45E1', marginRight: 2, fontSize: 14, fontFamily: 'Gilroy-Semibold' }}>view all</Text>
+                            </TouchableOpacity>
+
+                        </View>
+
+                        {complaints && complaints?.length > 0 ?
+                            complaints?.map(i => {
+                                const { backgroundColor, textColor } = getStatusColor(i.status)
+
+                                return (
+                                    <View key={i.complaintId}>
+
+                                        <TouchableOpacity onPress={() => props.onViewComplaint(i.complaintId)}
+                                            style={{
+                                                borderWidth: 1, borderRadius: 12, marginTop: 12, flexDirection: 'row', justifyContent: 'space-between',
+                                                borderColor: '#EFF2FF', backgroundColor: '#FFFFFF',
+                                            }}>
+
+                                            {/* LEFT SECTION */}
+                                            <View style={{
+                                                paddingLeft: 20, paddingTop: 18, paddingBottom: 20, flex: 1
+                                            }}>
+                                                <Text
+                                                    numberOfLines={1}
+                                                    ellipsizeMode="tail"
+                                                    style={{
+                                                        fontSize: 17, fontFamily: 'Gilroy-Semibold', color: '#1C1C1E', maxWidth: '90%'
+                                                    }}
+                                                >
+                                                    {i.description}
+                                                </Text>
+
+                                                <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 10 }}>
+                                                    <Image
+                                                        source={require('../../assets/Images/bill.png')}
+                                                        style={{ width: 18, height: 18 }}
+                                                    />
+                                                    <Text style={{
+                                                        marginLeft: 8, fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#6C6C70'
+                                                    }}>
+                                                        {i.complaintTypeName}
+                                                    </Text>
+                                                </View>
+                                            </View>
+
+                                            {/* RIGHT SECTION */}
+                                            <View style={{
+                                                justifyContent: 'center', alignItems: 'flex-end', paddingRight: 18, paddingTop: 18, paddingBottom: 20
+                                            }}>
+                                                <Text style={{
+                                                    color: '#9C9C9C', fontSize: 12, fontFamily: 'Gilroy-Medium', marginBottom: 18
+                                                }}>
+                                                    {i?.complaintDateDisplay}
+                                                </Text>
+
+                                                <View style={{
+                                                    borderRadius: 20, paddingHorizontal: 12, paddingVertical: 4, backgroundColor: backgroundColor
+                                                }}>
+                                                    <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Medium', color: textColor }}>
+                                                        {i.status}
+                                                    </Text>
+                                                </View>
+                                            </View>
+
+                                        </TouchableOpacity>
+
+                                    </View>
+                                )
+                            }) : <View style={{
                                 borderWidth: 1, borderRadius: 10, flexDirection: 'row', paddingVertical: 15, borderColor: '#EFF2FF',
                                 justifyContent: 'space-between', marginTop: 10
                             }}>
                                 <View style={{ paddingLeft: 12, paddingRight: 10 }}>
                                     <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold', marginBottom: 5 }}>
-                                        No Request yet
+                                        No Complaints yet
                                     </Text>
                                     <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#4B4B4B', marginTop: 5 }}>
-                                        You have'nt raised any request</Text>
+                                        You have'nt raised any Complaints</Text>
                                 </View>
 
                                 <Image source={requestProfile} style={{ width: 44, height: 44, marginRight: 12, marginTop: 5 }} />
-                            </View>}
-
-                    </View>
-
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 12 }}>
-                        <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold' }}>Complaints</Text>
-                        <TouchableOpacity onPress={viewallclick}>
-                            <Text style={{ color: '#1E45E1', marginRight: 2, fontSize: 14, fontFamily: 'Gilroy-Semibold' }}>view all</Text>
-                        </TouchableOpacity>
-
-                    </View>
-
-                    {complaints && complaints?.length > 0 ?
-                        complaints?.map(i => {
-                            const { backgroundColor, textColor } = getStatusColor(i.status)
-
-                            return (
-                                <View key={i.complaintId}>
-
-                                    <TouchableOpacity onPress={() => props.onViewComplaint(i.complaintId)}
-                                        style={{
-                                            borderWidth: 1, borderRadius: 12, marginTop: 12, flexDirection: 'row', justifyContent: 'space-between',
-                                            borderColor: '#EFF2FF', backgroundColor: '#FFFFFF',
-                                        }}>
-
-                                        {/* LEFT SECTION */}
-                                        <View style={{
-                                            paddingLeft: 20, paddingTop: 18, paddingBottom: 20, flex: 1
-                                        }}>
-                                            <Text
-                                                numberOfLines={1}
-                                                ellipsizeMode="tail"
-                                                style={{
-                                                    fontSize: 17, fontFamily: 'Gilroy-Semibold', color: '#1C1C1E', maxWidth: '90%'
-                                                }}
-                                            >
-                                                {i.description}
-                                            </Text>
-
-                                            <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 10 }}>
-                                                <Image
-                                                    source={require('../../assets/Images/bill.png')}
-                                                    style={{ width: 18, height: 18 }}
-                                                />
-                                                <Text style={{
-                                                    marginLeft: 8, fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#6C6C70'
-                                                }}>
-                                                    {i.complaintTypeName}
-                                                </Text>
-                                            </View>
-                                        </View>
-
-                                        {/* RIGHT SECTION */}
-                                        <View style={{
-                                            justifyContent: 'center', alignItems: 'flex-end', paddingRight: 18, paddingTop: 18, paddingBottom: 20
-                                        }}>
-                                            <Text style={{
-                                                color: '#9C9C9C', fontSize: 12, fontFamily: 'Gilroy-Medium', marginBottom: 18
-                                            }}>
-                                                {i?.complaintDateDisplay}
-                                            </Text>
-
-                                            <View style={{
-                                                borderRadius: 20, paddingHorizontal: 12, paddingVertical: 4, backgroundColor: backgroundColor
-                                            }}>
-                                                <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Medium', color: textColor }}>
-                                                    {i.status}
-                                                </Text>
-                                            </View>
-                                        </View>
-
-                                    </TouchableOpacity>
-
-                                </View>
-                            )
-                        }) : <View style={{
-                            borderWidth: 1, borderRadius: 10, flexDirection: 'row', paddingVertical: 15, borderColor: '#EFF2FF',
-                            justifyContent: 'space-between', marginTop: 10
-                        }}>
-                            <View style={{ paddingLeft: 12, paddingRight: 10 }}>
-                                <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold', marginBottom: 5 }}>
-                                    No Complaints yet
-                                </Text>
-                                <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#4B4B4B', marginTop: 5 }}>
-                                    You have'nt raised any Complaints</Text>
                             </View>
 
-                            <Image source={requestProfile} style={{ width: 44, height: 44, marginRight: 12, marginTop: 5 }} />
-                        </View>
+                        }
 
-                    }
-
-                </ScrollView>
-            )}
+                    </ScrollView>
+                )}
             </SkeletonLoader>
         </>
     )

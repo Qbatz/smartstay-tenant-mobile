@@ -28,6 +28,7 @@ const CreateAccount = ({ navigation }) => {
   const [phoneNoError, setPhoneNoError] = useState()
   const [showDropdown, setShowDropdown] = useState(false)
   const [isFocus, setIsFocus] = useState(false)
+  const [isSubmitClicked, setIsSubmitClicked] = useState(false)
 
   const countries = [
     { name: "India", code: "IN", dial_code: "+91" },
@@ -63,49 +64,64 @@ const CreateAccount = ({ navigation }) => {
   const handleGetOtp = async () => {
     if (!validateForm()) return;
 
+    if (isSubmitClicked) return;
+
     if (phoneNumber.length === 10) {
 
-      const dat = await verifyPhoneNo(phoneNumber)
-      console.log(dat)
+      try {
+        setIsSubmitClicked(true)
+        const dat = await verifyPhoneNo(phoneNumber)
+        console.log(dat)
 
 
 
-      if (dat.status == 200) {
-        loginContext.userId(dat.data.xuid)
+        if (dat.status == 200) {
+          loginContext.userId(dat.data.xuid)
 
 
-        if (dat?.data?.otp) {
-          setOtp(dat.data.otp)
-          setModelType('success')
-          setShowSuccessModal(true)
-          setTimeout(() => {
-            setShowSuccessModal(false);
+          if (dat?.data?.otp) {
+            setOtp(dat.data.otp)
+            setModelType('success')
+            setShowSuccessModal(true)
+            setTimeout(() => {
+              setShowSuccessModal(false);
+              navigation.navigate("OtpDesign", { phone: phoneNumber });
+              setTimeout(() => {
+                setIsSubmitClicked(false)
+              }, 200);
+            }, 4000);
+          }
+          else {
             navigation.navigate("OtpDesign", { phone: phoneNumber });
+            setTimeout(() => {
+              setIsSubmitClicked(false)
+            }, 100);
+          }
 
-          }, 4000);
         }
-        else {
-          navigation.navigate("OtpDesign", { phone: phoneNumber });
+        else if (dat.status == 400) {
+          setShowSuccessModal(true)
+          setOtp(dat.message || "You are not belongs to any hostels")
+          setModelType('error')
+
+          setTimeout(() => {
+            setShowSuccessModal(false)
+            setIsSubmitClicked(false)
+          }, 2000);
         }
+        else if (dat.status == dat.status) {
+          setShowSuccessModal(true)
+          setOtp(dat.message || "Something Went Wrong")
+          setModelType('error')
 
-      }
-      else if (dat.status == 400) {
-        setShowSuccessModal(true)
-        setOtp(dat.message || "You are not belongs to any hostels")
-        setModelType('error')
-
-        setTimeout(() => {
-          setShowSuccessModal(false)
-        }, 2000);
-      }
-      else if (dat.status == dat.status) {
-        setShowSuccessModal(true)
-        setOtp(dat.message || "Something Went Wrong")
-        setModelType('error')
-
-        setTimeout(() => {
-          setShowSuccessModal(false)
-        }, 2000);
+          setTimeout(() => {
+            setShowSuccessModal(false)
+            setIsSubmitClicked(false)
+          }, 2000);
+        }
+      } catch (error) {
+        console.log(error)
+        setIsSubmitClicked(false)
       }
     }
     else {
@@ -114,6 +130,7 @@ const CreateAccount = ({ navigation }) => {
       setModelType('error')
       setTimeout(() => {
         setShowSuccessModal(false)
+        setIsSubmitClicked(false)
       }, 1500);
     }
   };
@@ -203,9 +220,9 @@ const CreateAccount = ({ navigation }) => {
         <TouchableOpacity
           style={[
             styles.button,
-            isButtonDisabled ? styles.buttonDisabled : styles.buttonEnabled,
+            isButtonDisabled || isSubmitClicked ? styles.buttonDisabled : styles.buttonEnabled,
           ]}
-          // disabled={isButtonDisabled}
+          disabled={isSubmitClicked}
           onPress={handleGetOtp}
         >
           <Text style={styles.buttonText}>Get OTP →</Text>
