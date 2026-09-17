@@ -75,7 +75,7 @@ function Dashboard(props) {
   const { width } = Dimensions.get('window');
 
   const navigation = useNavigation();
-  const [index, setindex] = useState(0);
+  // const [index, setindex] = useState(0);
   const [selectedComplaint, setSelectComplaint] = useState(null);
   const [comment, setComment] = useState(false)
   const [imageid, setimageid] = useState();
@@ -132,10 +132,44 @@ function Dashboard(props) {
 
   const { CommonModule } = NativeModules;
 
+  const initialTab = props?.route?.params?.initialTab;
+
+  const [index, setindex] = useState(() => {
+    if (initialTab === "payment") return 2;
+    if (initialTab === "services") return 1;
+    return 0;
+  });
+
 
 
   const sheetY = useRef(new Animated.Value(500)).current;
   const keyboardY = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+  if (props?.route?.params?.initialTab === "payment") {
+     paymentContext.updateInvoice(null)
+
+    try {
+      paymentContext.updateLoading(true)
+      getInvoices(context?.getHostelDetail?.hostelId, props?.route?.params?.sourceId, loginContext.getToken).then(r => {
+        console.log(r)
+
+        if (r.status === 200) {
+          paymentContext.updateInvoice(r.data);
+          setTimeout(() => {
+            paymentContext.updateLoading(false)
+          }, 1000);
+        }
+
+      })
+      setModalVisible(true);
+
+    } catch (error) {
+      console.log(error)
+    }
+    setindex(2);
+  }
+}, [props?.route?.params?.initialTab]);
 
 
 
@@ -283,6 +317,7 @@ function Dashboard(props) {
       console.log(error)
     })
   }, [context.getHostelDetail, loginContext.getToken])
+  console.log("brithta",context)
 
   //   const handleScroll = (event) => {
   //   const currentY = event.nativeEvent.contentOffset.y;
@@ -364,36 +399,178 @@ function Dashboard(props) {
 
   //   lastScrollY.current = currentY;
   // };
-  const lastOffset = useRef(0);
-  const scrollDirection = useRef(null);
 
-  const handleScroll = (event) => {
-    const currentY = event.nativeEvent.contentOffset.y;
+  // {} 
+  // const lastOffset = useRef(0);
+  // const scrollDirection = useRef(null);
 
-    // Ignore top area
-    if (currentY < 0) return;
+  // const handleScroll = (event) => {
+  //   const currentY = event.nativeEvent.contentOffset.y;
+
+  //   // Ignore top area
+  //   if (currentY < 0) return;
+
+  //   const diff = currentY - lastScrollY.current;
+
+  //   // Ignore tiny movements
+  //   if (Math.abs(diff) < 15) return;
+
+  //   if (diff > 0) {
+  //     // Scrolling DOWN
+  //     if (scrollDirection.current !== "down") {
+  //       scrollDirection.current = "down";
+  //       setShowTopNavigationBar(false);
+  //       return;
+  //     }
+  //   } else {
+  //     // Scrolling UP
+  //     if (scrollDirection.current !== "up") {
+  //       scrollDirection.current = "up";
+  //       setShowTopNavigationBar(true);
+  //       return;
+  //     }
+  //   }
+
+  //   lastScrollY.current = currentY;
+  // };
+  // const lastScrollY = useRef(0);
+  // const lastScrollY = useRef(0);
+  // const isHidden = useRef(false);
+
+
+
+  // const handleScroll = useCallback((event) => {
+  //   if (!event?.nativeEvent) return;
+
+  //   const {
+  //     contentOffset,
+  //     contentSize,
+  //     layoutMeasurement,
+  //   } = event.nativeEvent;
+
+  //   const currentY = contentOffset.y;
+
+  //   // Ignore bounce at top
+  //   if (currentY <= 0) {
+  //     lastScrollY.current = 0;
+  //     return;
+  //   }
+
+  //   const diff = currentY - lastScrollY.current;
+
+  //   // Detect bottom
+  //   const isAtBottom =
+  //     currentY >=
+  //     contentSize.height -
+  //       layoutMeasurement.height -
+  //       5;
+
+  //   // IMPORTANT:
+  //   // At bottom, don't allow direction detection to show the bar
+  //   if (isAtBottom) {
+  //     lastScrollY.current = currentY;
+  //     return;
+  //   }
+
+  //   // Update position before threshold check
+  //   lastScrollY.current = currentY;
+
+  //   // Ignore tiny movements
+  //   if (Math.abs(diff) < 15) {
+  //     return;
+  //   }
+
+  //   // DOWN → HIDE
+  //   if (
+  //     diff > 0 &&
+  //     currentY > 80 &&
+  //     !isHidden.current
+  //   ) {
+  //     isHidden.current = true;
+
+  //     setShowTopNavigationBar(false);
+  //   }
+
+  //   // UP → SHOW
+  //   else if (
+  //     diff < 0 &&
+  //     isHidden.current
+  //   ) {
+  //     isHidden.current = false;
+
+  //     setShowTopNavigationBar(true);
+  //   }
+  // }, []);
+
+  // const lastScrollY = useRef(0);
+  const accumulatedScroll = useRef(0);
+  // const isHidden = useRef(false);
+
+  const handleScroll = useCallback((event) => {
+    if (!event?.nativeEvent) return;
+
+    const {
+      contentOffset,
+      contentSize,
+      layoutMeasurement,
+    } = event.nativeEvent;
+
+    const currentY = contentOffset.y;
+
+    // Ignore top bounce
+    if (currentY <= 0) {
+      lastScrollY.current = 0;
+      accumulatedScroll.current = 0;
+      return;
+    }
 
     const diff = currentY - lastScrollY.current;
 
-    // Ignore tiny movements
-    if (Math.abs(diff) < 15) return;
+    // Detect bottom
+    const isAtBottom =
+      currentY >=
+      contentSize.height -
+      layoutMeasurement.height -
+      5;
 
-    if (diff > 0) {
-      // Scrolling DOWN
-      if (scrollDirection.current !== "down") {
-        scrollDirection.current = "down";
-        setShowTopNavigationBar(false);
-      }
-    } else {
-      // Scrolling UP
-      if (scrollDirection.current !== "up") {
-        scrollDirection.current = "up";
-        setShowTopNavigationBar(true);
-      }
+    // Don't show bar just because of bottom bounce
+    if (isAtBottom) {
+      lastScrollY.current = currentY;
+      accumulatedScroll.current = 0;
+      return;
     }
 
     lastScrollY.current = currentY;
-  };
+
+    // Ignore extremely tiny movement
+    if (Math.abs(diff) < 8) return;
+
+    // Accumulate movement in the current direction
+    accumulatedScroll.current += diff;
+
+    // DOWN → HIDE
+    if (
+      accumulatedScroll.current >= 15 &&
+      currentY > 80 &&
+      !isHidden.current
+    ) {
+      isHidden.current = true;
+      accumulatedScroll.current = 0;
+
+      setShowTopNavigationBar(false);
+    }
+
+    // UP → SHOW
+    else if (
+      accumulatedScroll.current <= -15 &&
+      isHidden.current
+    ) {
+      isHidden.current = false;
+      accumulatedScroll.current = 0;
+
+      setShowTopNavigationBar(true);
+    }
+  }, []);
 
   const formatDate = (inputDate) => {
     if (!inputDate) return "";
@@ -669,6 +846,13 @@ function Dashboard(props) {
 
   }
 
+  const handlePhoneCall=(mobile)=>{
+        console.log(mobile)
+        if(mobile){
+            CommonModule.makeCall(mobile)
+        }
+    }
+
   const downloadOption = (invoiceId) => {
     console.log(invoiceId)
     setShowOption(true)
@@ -720,6 +904,8 @@ function Dashboard(props) {
   // );
 
   const renderScene = ({ route, jumpTo }) => {
+    console.log(route)
+    console.log(jumpTo)
     switch (route.key) {
       case 'mystay':
         return <MyStay onRequestBedChange={bedfn} onSheet={addComplaint} hostel={props?.route?.params?.hostel} jumpTo={jumpTo}
@@ -792,7 +978,7 @@ function Dashboard(props) {
             </TouchableOpacity>
             <TouchableOpacity onPress={handleProfile}
               style={{ opacity: context?.getCustomerDetail?.currentStatus === "INACTIVE" ? 0.4 : 1 }}
-            // disabled={context?.getCustomerDetail?.currentStatus === "INACTIVE"}
+              disabled={["INACTIVE", "CANCELLED_BOOKING"].includes(context?.getCustomerDetail?.currentStatus)}
             >
               {context.getCustomerDetail?.profilePic ? (
                 <Image
@@ -842,7 +1028,8 @@ function Dashboard(props) {
 
 
         <View style={{ marginTop: 15, width: '100%', marginBottom: 10 }}>
-          <TouchableOpacity style={{
+          <TouchableOpacity onPress={()=>handlePhoneCall(context?.getCustomerDetail?.hostel?.mobile)}
+           style={{
             backgroundColor: '#1E45E1', borderRadius: 8, justifyContent: 'center', alignItems: 'center',
             marginTop: 20, flexDirection: 'row', paddingVertical: 20, paddingHorizontal: 40
           }}>
@@ -883,7 +1070,7 @@ function Dashboard(props) {
             renderScene={renderScene}
             onIndexChange={setindex}
             initialLayout={{ width: Dimensions.get('window').width }}
-            style={{ flex: 1, justifyContent: 'center' }} />
+            style={{ flex: 1, }} />
 
         </View>
       )

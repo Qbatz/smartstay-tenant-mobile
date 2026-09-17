@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { View, Image, TouchableOpacity, ScrollView, Text, StyleSheet, TextInput } from "react-native";
+import { View, Image, TouchableOpacity, ScrollView, Text, StyleSheet, TextInput, Platform, KeyboardAvoidingView } from "react-native";
 import { UsersContext } from "../../Context/UserContext";
 import { FlatList } from "react-native-gesture-handler";
 import LeftArrow from "../../assets/Images/LeftArrow.png"
@@ -69,7 +69,8 @@ const AddGuardianDetails = ({ route }) => {
         updated[index][key] = value;
         setItems(updated);
         setErrors(prev => ({
-            ...prev,[index]: {...prev[index],[key]: "",
+            ...prev, [index]: {
+                ...prev[index], [key]: "",
             },
         }));
     }
@@ -136,7 +137,7 @@ const AddGuardianDetails = ({ route }) => {
                 {selectedContactId.includes(item.contactId) && (<>
 
                     <View style={[styles.fieldContainer, { marginTop: 15 }]}>
-                        <Text style={styles.label}>Guardian Full Name <Text style={{ color: "red", }}>*</Text></Text>
+                        <Text style={styles.label}>Guardian Full Name </Text>
 
                         <TextInput
                             value={item.guardianName}
@@ -262,10 +263,10 @@ const AddGuardianDetails = ({ route }) => {
             if (!item?.guardianMobile) {
                 itemErrors.guardianMobile = "Mobile number is required";
             }
-             if (item?.guardianMobile.length < 10) {
+            if (item?.guardianMobile.length < 10) {
                 itemErrors.guardianMobile = "Mobile should not below 10 number";
             }
-             if (item?.guardianMobile?.trim() === "0000000000") {
+            if (item?.guardianMobile?.trim() === "0000000000") {
                 itemErrors.guardianMobile = "Mobile should not be 0";
             }
 
@@ -279,7 +280,7 @@ const AddGuardianDetails = ({ route }) => {
         //     return;
         // }
         setErrors(errors);
-       return Object.keys(errors).length === 0;
+        return Object.keys(errors).length === 0;
 
     }
 
@@ -355,10 +356,10 @@ const AddGuardianDetails = ({ route }) => {
     const handleSave = () => {
 
         // if (!validateForm()) return;
-         const isValid = validateForm();
-    console.log("isValid:", isValid);
+        const isValid = validateForm();
+        console.log("isValid:", isValid);
 
-    if (!isValid) return;
+        if (!isValid) return;
 
 
 
@@ -417,13 +418,19 @@ const AddGuardianDetails = ({ route }) => {
             </TouchableOpacity>
             <Text style={styles.mainheader}>{mode === "edit" ? "Edit" : "Add"} Parent/Guardian Details</Text>
         </View>
-
-        <FlatList
-            data={items}
-            contentContainerStyle={{ flexGrow: 1 }}
-            showsVerticalScrollIndicator={false}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item, index }) => renderContactCard(item, index)} />
+        <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={{ flex: 1 }}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 100}
+        >
+            <FlatList
+                data={items}
+                contentContainerStyle={{ paddingBottom: 150 }}
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item, index }) => renderContactCard(item, index)} />
+        </KeyboardAvoidingView>
 
         <TouchableOpacity onPress={mode === "edit" ? handleEdit : handleSave}
             style={styles.saveChngs}>

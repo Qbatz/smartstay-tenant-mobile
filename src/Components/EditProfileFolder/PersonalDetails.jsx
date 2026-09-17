@@ -26,7 +26,7 @@ const PersonalDetails = (route) => {
 
     const navigation = useNavigation();
     const context = useContext(UsersContext)
-    const { getCustomerDetail } = useContext(UsersContext)
+    const { getCustomerDetail, updateCustomer} = useContext(UsersContext)
     const loginContext = useContext(LoginContexts)
 
     const [firstname, setfirstName] = useState(route.route?.params?.customer?.firstName);
@@ -143,14 +143,14 @@ const PersonalDetails = (route) => {
     ).current;
 
     const isAddressEmpty =
-  !houseNo?.trim() &&
-  !streetName?.trim() &&
-  !landmark?.trim() &&
-  !city?.trim() &&
-  pincode?.trim() ==="0" &&
-  !state?.trim();
+        !houseNo?.trim() &&
+        !streetName?.trim() &&
+        !landmark?.trim() &&
+        !city?.trim() &&
+        pincode?.trim() === "0" &&
+        !state?.trim();
 
-  console.log(houseNo,streetName,landmark,city,pincode,state)
+    console.log(houseNo, streetName, landmark, city, pincode, state)
 
 
     const handleImagePick = async () => {
@@ -202,7 +202,66 @@ const PersonalDetails = (route) => {
         } else {
             console.log("Gallery Image:", result.assets);
             setProfileImage(result?.assets[0])
-            // 👉 use result.assets[0]
+
+            const profileImage = result?.assets[0]
+
+            const formData = new FormData();
+            // formData.append("payloads", JSON.stringify({}));
+            const payload = {
+
+            }
+
+
+            const jsonBase64 = btoa(JSON.stringify(payload))
+
+            formData.append("payloads", {
+                uri: "data:application/json;base64," + jsonBase64,
+                type: "application/json",
+                name: "payload.json",
+            })
+
+            if (profileImage) {
+                console.log(profileImage)
+
+                formData.append("profilePic", {
+                    uri: profileImage.uri,
+                    type: profileImage.type || "image/jpeg",
+                    name: profileImage.fileName,
+                })
+
+            }
+
+            editProfile(loginContext?.getToken, formData).then(r => {
+                console.log(r)
+                setLoading(true)
+
+                setTimeout(() => {
+                    setLoading(false)
+
+                    if (r.status == 200) {
+                        // setShowSuccessModal(true)
+                        // setToastMessage('Updated Successfully')
+                        // setModelType('success')
+                        setTimeout(() => {
+                            customerDetails(loginContext?.getToken).then(r => {
+                                console.log(r.data)
+                                updateCustomer(r.data)
+
+                            })
+                            // setShowSuccessModal(false)  
+                            setSelectPicUpload(false)
+                        }, 800);
+                    } else {
+                        setShowSuccessModal(true)
+                        setToastMessage(r?.message || 'Failed to add')
+                        setModelType('error')
+                        setTimeout(() => {
+                            setShowSuccessModal(false)
+                        }, 800);
+                    }
+                }, 2000);
+
+            })
         }
     };
 
@@ -355,7 +414,9 @@ const PersonalDetails = (route) => {
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: "space-between", marginTop: 15 }}>
                     <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold', }}>Basic Info</Text>
                     <TouchableOpacity onPress={() => navigation.navigate("EditBasicDetail")}
-                        style={{ backgroundColor: '#E7F1FF', paddingVertical: 5, paddingHorizontal: 10, borderRadius: 8, flexDirection: 'row' }}>
+                        style={[{ backgroundColor: '#E7F1FF', paddingVertical: 5, paddingHorizontal: 10,
+                                 borderRadius: 8, flexDirection: 'row' }, getCustomerDetail?.currentStatus === "VACATED" && {opacity:0.4}]}
+                        disabled={getCustomerDetail?.currentStatus === "VACATED"}>
                         <Image source={EditSmallIcon} style={{ width: 16, height: 16 }} />
                         <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#1E45E1', marginLeft: 6 }}>Edit</Text>
                     </TouchableOpacity>
@@ -409,16 +470,16 @@ const PersonalDetails = (route) => {
 
                 <View style={styles.fieldContainer}>
                     <Text style={styles.label}>Mobile No</Text>
-                    
-                    <View style={{flexDirection:'row',alignItems:'center'}}>
-                    <Text  style={styles.input}>+91</Text>
-                    <Ionicons name="chevron-down" size={16}/>
-                    <TextInput
-                        value={mobile}
-                        placeholder="Enter first name"
-                        style={[styles.input,{marginLeft:5}]}
-                        disableFullscreenUI
-                    />
+
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <Text style={styles.input}>+91</Text>
+                        <Ionicons name="chevron-down" size={16} />
+                        <TextInput
+                            value={mobile}
+                            placeholder="Enter first name"
+                            style={[styles.input, { marginLeft: 5 }]}
+                            disableFullscreenUI
+                        />
                     </View>
                 </View>
                 <View style={{ paddingHorizontal: 10, paddingVertical: 5, backgroundColor: "#F5F9FF", alignSelf: "flex-start", borderRadius: 8 }}>
@@ -428,12 +489,14 @@ const PersonalDetails = (route) => {
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: "space-between", marginTop: 15 }}>
                     <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold' }}>Address Details</Text>
 
-                   {(houseNo || streetName || landmark || city || pincode !=0 || state) && (
-                    <TouchableOpacity onPress={() => navigation.navigate("EditAddressDetail", {mode:"edit"})}
-                        style={{ backgroundColor: '#E7F1FF', paddingVertical: 5, paddingHorizontal: 10, borderRadius: 8, flexDirection: 'row' }}>
-                        <Image source={EditSmallIcon} style={{ width: 16, height: 16 }} />
-                        <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#1E45E1', marginLeft: 6 }}>Edit</Text>
-                    </TouchableOpacity>
+                    {(houseNo || streetName || landmark || city || pincode != 0 || state) && (
+                        <TouchableOpacity onPress={() => navigation.navigate("EditAddressDetail", { mode: "edit" })}
+                            style={[{ backgroundColor: '#E7F1FF', paddingVertical: 5, paddingHorizontal: 10, 
+                            borderRadius: 8, flexDirection: 'row' }, getCustomerDetail?.currentStatus === "VACATED" && {opacity:0.4}]}
+                            disabled={getCustomerDetail?.currentStatus === "VACATED"}>
+                            <Image source={EditSmallIcon} style={{ width: 16, height: 16 }} />
+                            <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#1E45E1', marginLeft: 6 }}>Edit</Text>
+                        </TouchableOpacity>
                     )}
                 </View>
 
@@ -441,14 +504,15 @@ const PersonalDetails = (route) => {
                     <View style={{ borderWidth: 1, borderRadius: 10, padding: 16, borderColor: '#E7E7E7', alignItems: 'center', marginTop: 20 }}>
                         <Image source={NoResultPic} style={{ width: 100, height: 100 }} />
                         <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', textAlign: 'center', lineHeight: 20, marginTop: 12 }}>
-                            Your Address Details are missing 
+                            Your Address Details are missing
                         </Text>
 
-                        <TouchableOpacity onPress={() => navigation.navigate("EditAddressDetail", {mode:"add"})}
-                            style={{
+                        <TouchableOpacity onPress={() => navigation.navigate("EditAddressDetail", { mode: "add" })}
+                            style={[{
                                 backgroundColor: "#1E45E1", borderRadius: 10, width: '100%', paddingVertical: 10,
                                 marginHorizontal: 14, marginTop: 16, alignItems: 'center'
-                            }}>
+                            }, getCustomerDetail?.currentStatus === "VACATED" && {opacity:0.4}]}
+                            disabled={getCustomerDetail?.currentStatus === "VACATED"}>
                             <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Semibold', color: '#FFFFFF' }}>
                                 Add Address Details</Text>
                         </TouchableOpacity>

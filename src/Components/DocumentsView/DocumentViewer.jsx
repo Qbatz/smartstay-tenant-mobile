@@ -47,6 +47,8 @@ export default function DocumentViewer({
 
 const imageDocs = documents.filter(doc => doc.documentFileType || doc?.docFileType === "IMAGE");
 
+console.log(imageDocs)
+
 
   return (
     <Modal  visible={visible}

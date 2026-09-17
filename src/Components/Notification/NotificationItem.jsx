@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity, NativeModules } from "react-native";
 import { notificationContexts } from "../../Context/NotificationContext";
 import { LoginContexts } from "../../Context/LoginContext";
+import { useNavigation } from "@react-navigation/native";
 const NotificationItem = ({ item }) => {
   const iconMap = {
     alert: require("../../assets/Images/money-check.png"),
@@ -12,35 +13,55 @@ const NotificationItem = ({ item }) => {
     resolved: require("../../assets/Images/money-check.png"),
   };
 
-  const notificatioContext=useContext(notificationContexts)
-  const loginContext=useContext(LoginContexts)
-  const {CommonModule}=NativeModules;
+  const notificatioContext = useContext(notificationContexts)
+  const loginContext = useContext(LoginContexts)
+  const { CommonModule } = NativeModules;
+  const navigation = useNavigation();
   console.log(CommonModule)
   console.log(loginContext.getToken)
 
-  const handleKycRequest=(entityId,mobileNo,tokenId)=>{
-    console.log(entityId,mobileNo,tokenId)
+  const handleKycRequest = (entityId, mobileNo, tokenId) => {
+    console.log(entityId, mobileNo, tokenId)
 
-    CommonModule.verifyKyc(mobileNo,entityId,tokenId)
+    CommonModule.verifyKyc(mobileNo, entityId, tokenId)
+  }
 
-
+  const handleViewDetails = (sourceId, type) => {
+    console.log("billana")
+    console.log(sourceId, type)
+    if (type === "INVOICE_GENERATION") {
+      // navigation.navigate("Dashboard")
+      navigation.navigate("Dashboard", {
+        initialTab: "payment",
+        sourceId: sourceId,
+      });
+    }
   }
 
   return (
-    <TouchableOpacity 
-    onPress={()=> item?.fullNotificationType == "KYC_REQUEST" && 
-      (handleKycRequest(item?.kycInfo?.entityId, item?.kycInfo?.tenantMobile,item?.kycInfo?.accessTokenId))}
-    style={styles.card}>
+    <TouchableOpacity
+      onPress={() => {
+        if (item?.fullNotificationType == "KYC_REQUEST") {
+          (handleKycRequest(item?.kycInfo?.entityId, item?.kycInfo?.tenantMobile, item?.kycInfo?.accessTokenId))
+        } else {
+          handleViewDetails(item?.sourceId, item?.fullNotificationType)
+        }
+      }
+
+      }
+
+
+      style={styles.card}>
       <View style={styles.iconContainer}>
         {/* <Image source={iconMap[item.notificationType]} style={styles.iconImage} /> */}
         {notificatioContext?.getNotificationList?.hostelLogoUrl != null ?
-        <Image source={{uri:notificatioContext?.getNotificationList?.hostelLogoUrl}} style={styles.hostelImage} /> 
-        :
-        <View style={[styles.hostelImage, styles.initialContainer]}>
-                        <Text style={styles.initialText}>
-                          {notificatioContext?.getNotificationList?.hostelInitials}
-                        </Text>
-                      </View> }
+          <Image source={{ uri: notificatioContext?.getNotificationList?.hostelLogoUrl }} style={styles.hostelImage} />
+          :
+          <View style={[styles.hostelImage, styles.initialContainer]}>
+            <Text style={styles.initialText}>
+              {notificatioContext?.getNotificationList?.hostelInitials}
+            </Text>
+          </View>}
       </View>
 
       <View style={styles.contentContainer}>
@@ -85,24 +106,24 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontFamily:'Gilroy-Semibold',
+    fontFamily: 'Gilroy-Semibold',
     fontSize: 15,
     color: "#111827",
   },
   description: {
     color: "#6B7280",
     fontSize: 13,
-    fontFamily:'Gilroy-Regular',
+    fontFamily: 'Gilroy-Regular',
     marginTop: 3,
   },
   time: {
     color: "#9CA3AF",
     fontSize: 12,
-    fontFamily:'Gilroy-Regular',
+    fontFamily: 'Gilroy-Regular',
     marginTop: 5,
     alignSelf: "flex-end",
   },
-   hostelImage: {
+  hostelImage: {
     width: 50,
     height: 50,
     borderRadius: 25,

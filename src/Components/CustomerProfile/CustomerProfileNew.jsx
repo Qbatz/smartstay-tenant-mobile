@@ -276,6 +276,8 @@ const CustomerProfileNew = (route) => {
 
     const handleBack = () => navigation.goBack();
 
+    const restrictVerify= ["VACATED","BOOKED"].includes(context.getCustomerDetail?.currentStatus)
+
     const handleKyc = async () => {
 
         const res = await verifyNowKyc(loginContext.getToken)
@@ -455,10 +457,11 @@ const CustomerProfileNew = (route) => {
                                 </View> */}
 
                                         <TouchableOpacity onPress={handleKyc}
-                                            style={{
+                                        disabled={restrictVerify}
+                                            style={[{
                                                 backgroundColor: '#1E45E1', paddingHorizontal: 22, paddingVertical: 10,
-                                                borderRadius: 8, flexDirection: 'row', alignItems: 'center'
-                                            }}>
+                                                borderRadius: 8, flexDirection: 'row', alignItems: 'center',
+                                            }, restrictVerify && {opacity:0.4}]}>
                                             <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Semibold', color: '#ffffff' }}>Verify now</Text>
                                             <Image source={RightArrow} style={{ width: 14.06, height: 14.06, marginLeft: 5 }} />
                                         </TouchableOpacity>
@@ -473,7 +476,8 @@ const CustomerProfileNew = (route) => {
 
                             <View style={styles.cards}>
 
-                                <TouchableOpacity onPress={HostelClick} style={styles.row}>
+                                <TouchableOpacity onPress={HostelClick} style={[styles.row,context.getCustomerDetail?.currentStatus ==="VACATED" && {opacity:0.4}]}
+                                disabled={["VACATED"].includes(context.getCustomerDetail?.currentStatus)}>
                                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                         <Image source={buildings} style={{ width: 25, height: 25 }} />
                                         <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium', marginLeft: 5 }}>

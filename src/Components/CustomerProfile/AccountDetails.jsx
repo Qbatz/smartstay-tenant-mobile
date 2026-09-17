@@ -51,7 +51,8 @@ const AccountDetails = (route) => {
             <View style={styles.divider} />
 
             <TouchableOpacity onPress={handleBackgroundDetailsEdit}
-            style={styles.row}>
+            disabled={route.route?.params?.customer?.currentStatus === "BOOKED" ? true : false}
+            style={[styles.row,{opacity: route.route?.params?.customer?.currentStatus === "BOOKED" ? 0.5 : 1}]}>
                 <View style={{ flexDirection: 'row',alignItems:'center' }}>
                     <Image source={buildings} style={{ width: 25, height: 25 }} />
                     <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium', marginLeft: 5 }}>

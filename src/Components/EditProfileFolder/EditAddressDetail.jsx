@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Image, Keyboard, ScrollView, Text, TouchableOpacity, TouchableWithoutFeedback } from "react-native";
+import { Image, Keyboard, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, TouchableWithoutFeedback } from "react-native";
 import { StyleSheet, View } from "react-native";
 import LeftArrow from "../../assets/Images/LeftArrow.png"
 import { TextInput } from "react-native";
@@ -11,6 +11,7 @@ import { customerDetails, editProfile } from "../../Action/CustomerAction";
 import { LoginContexts } from "../../Context/LoginContext";
 import AppLoader from "../ToastFile/LoaderPage";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 
 
@@ -187,13 +188,14 @@ const EditAddressDetail = ({ route }) => {
 
 
     return (
+        <SafeAreaView style={{flex:1}} edges={["bottom","top"]}>
         <View style={styles.mainContainer}>
             <AppLoader visible={loading} />
             <SuccessModal
                 visible={showSuccesModal}
                 message={showSuccessMessage}
                 type={modalType} />
-
+        
             <View>
                 <View style={styles.mainHeader}>
                     <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -202,177 +204,186 @@ const EditAddressDetail = ({ route }) => {
                     <Text style={styles.headerTxt}>{mode === "edit" ? "Edit" : "Add"} Address Details</Text>
                 </View>
 
-                <ScrollView showsVerticalScrollIndicator={false}>
+                <KeyboardAvoidingView
+                    behavior={Platform.OS === "ios" ? "padding" : "height"}
+                    // style={{ flex: 1 }}
+                    keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 100}
+                >
+                    <ScrollView showsVerticalScrollIndicator={false}
+                        contentContainerStyle={{ paddingBottom: 180,flexGrow:1 }}                       
+                        keyboardShouldPersistTaps="handled">
 
-                    <Text style={[styles.labelTxt, { marginTop: 18 }]}>HouseNo/Apartment
-                        <Text style={{ color: 'red' }}> *</Text>
-                    </Text>
-                    <TextInput
-                        value={houseNo}
-                        style={styles.input}
-                        placeholder="Enter HouseNo"
-                        onChangeText={(text) => {
-                            const onlyLetters = text.replace(/[^A-Za-z0-9"/,-\s]/g, "")
-                            setHouseNo(onlyLetters)
-
-                        }} />
-
-                    <Text style={[styles.labelTxt, { marginTop: 12 }]}>Street / Area</Text>
-                    <TextInput
-                        value={street}
-                        style={styles.input}
-                        placeholder="Enter Street Name"
-                        onChangeText={(text) => {
-                            const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
-                            setStreet(onlyLetters)
-
-                        }} />
-
-                    <Text style={[styles.labelTxt, { marginTop: 12 }]}>Landmark</Text>
-                    <TextInput
-                        value={landmark}
-                        style={styles.input}
-                        placeholder="Enter landmark"
-                        onChangeText={(text) => {
-                            const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
-                            setLandmark(onlyLetters)
-
-                        }} />
-
-                    <Text style={[styles.labelTxt, { marginTop: 12 }]}>City</Text>
-                    <TextInput
-                        value={city}
-                        style={styles.input}
-                        placeholder="Enter City"
-                        onChangeText={(text) => {
-                            const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
-                            setCity(onlyLetters)
-
-                        }} />
-
-                    <Text style={[styles.labelTxt, { marginTop: 12 }]}>Pincode</Text>
-                    <TextInput
-                        value={pincode}
-                        maxLength={6}
-                        style={styles.input}
-                        placeholder="Enter Pincode"
-                        keyboardType="number-pad"
-                        onChangeText={(text) => {
-                            const onlyLetters = text.replace(/[^0-9\s]/g, "")
-                            setPincode(onlyLetters)
-                        }} />
-                    {pincodeError && <ErrorMessage message={pincodeError} type="error" />}
-
-                    <Text style={[styles.labelTxt, { marginTop: 12 }]}>State</Text>
-
-                    <View style={{ position: "relative", marginTop: 10 }}>
+                        <Text style={[styles.labelTxt, { marginTop: 18 }]}>HouseNo/Apartment
+                            {/* <Text style={{ color: 'red' }}> *</Text> */}
+                        </Text>
                         <TextInput
-                            style={styles.select}
-                            placeholder="Select state"
-                            placeholderTextColor="#9CA3AF"
-                            value={stateOpen ? stateQuery : selectedState}
+                            value={houseNo}
+                            style={styles.input}
+                            placeholder="Enter HouseNo"
+                            onChangeText={(text) => {
+                                const onlyLetters = text.replace(/[^A-Za-z0-9"/,-\s]/g, "")
+                                setHouseNo(onlyLetters)
 
-                            onFocus={() => {
-                                setStateOpen(true);
-                                setStateQuery("");   // 🔥 cursor focus panna fresh search
-                            }}
-                            onChangeText={(t) => {
-                                const sanitized = t.replace(/[^a-zA-Z\s]/g, "");
-                                setStateQuery(sanitized);    // 🔥 typing always search
-                                setStateOpen(true);
-                            }}
-                        />
+                            }} />
+
+                        <Text style={[styles.labelTxt, { marginTop: 12 }]}>Street / Area</Text>
+                        <TextInput
+                            value={street}
+                            style={styles.input}
+                            placeholder="Enter Street Name"
+                            onChangeText={(text) => {
+                                const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
+                                setStreet(onlyLetters)
+
+                            }} />
+
+                        <Text style={[styles.labelTxt, { marginTop: 12 }]}>Landmark</Text>
+                        <TextInput
+                            value={landmark}
+                            style={styles.input}
+                            placeholder="Enter landmark"
+                            onChangeText={(text) => {
+                                const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
+                                setLandmark(onlyLetters)
+
+                            }} />
+
+                        <Text style={[styles.labelTxt, { marginTop: 12 }]}>City</Text>
+                        <TextInput
+                            value={city}
+                            style={styles.input}
+                            placeholder="Enter City"
+                            onChangeText={(text) => {
+                                const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
+                                setCity(onlyLetters)
+
+                            }} />
+
+                        <Text style={[styles.labelTxt, { marginTop: 12 }]}>Pincode</Text>
+                        <TextInput
+                            value={pincode}
+                            maxLength={6}
+                            style={styles.input}
+                            placeholder="Enter Pincode"
+                            keyboardType="number-pad"
+                            onChangeText={(text) => {
+                                const onlyLetters = text.replace(/[^0-9\s]/g, "")
+                                setPincode(onlyLetters)
+                                setPincodeError("")
+                            }} />
+                        {pincodeError && <ErrorMessage message={pincodeError} type="error" />}
+
+                        <Text style={[styles.labelTxt, { marginTop: 12 }]}>State</Text>
+
+                        <View style={{ position: "relative", marginTop: 10 }}>
+                            <TextInput
+                                style={styles.select}
+                                placeholder="Select state"
+                                placeholderTextColor="#9CA3AF"
+                                value={stateOpen ? stateQuery : selectedState}
+
+                                onFocus={() => {
+                                    setStateOpen(true);
+                                    setStateQuery("");   // 🔥 cursor focus panna fresh search
+                                }}
+                                onChangeText={(t) => {
+                                    const sanitized = t.replace(/[^a-zA-Z\s]/g, "");
+                                    setStateQuery(sanitized);    // 🔥 typing always search
+                                    setStateOpen(true);
+                                }}
+                            />
 
 
-                        <TouchableOpacity
-                            style={styles.arrowTouch}
-                            activeOpacity={0.7}
-                            onPress={() => {
-                                Keyboard.dismiss();  // ✅ keyboard hide
-                                setStateOpen((prev) => !prev);
+                            <TouchableOpacity
+                                style={styles.arrowTouch}
+                                activeOpacity={0.7}
+                                onPress={() => {
+                                    Keyboard.dismiss();  // ✅ keyboard hide
+                                    setStateOpen((prev) => !prev);
 
-                                // ✅ close pannumbothu query reset
-                                if (stateOpen) setStateQuery("");
-                            }}
-                        >
-                            <Ionicons name="chevron-up" size={16} />
-                        </TouchableOpacity>
+                                    // ✅ close pannumbothu query reset
+                                    if (stateOpen) setStateQuery("");
+                                }}
+                            >
+                                <Ionicons name="chevron-up" size={16} />
+                            </TouchableOpacity>
 
-                        {stateOpen && (
-                            <>
-                                <TouchableWithoutFeedback
-                                    onPress={() => {
-                                        setStateOpen(false);
-                                        setStateQuery("");
-                                    }}
-                                >
-                                    <View style={{
-                                        position: "absolute",
-                                        top: -1000,
-                                        left: -1000,
-                                        right: -1000,
-                                        bottom: -1000,
-                                        backgroundColor: "transparent",
-                                        zIndex: 999,
-                                    }} />
-                                </TouchableWithoutFeedback>
-
-                                <View style={{
-                                    borderWidth: 1,
-                                    borderColor: "#ddd",
-                                    borderRadius: 12,
-                                    zIndex: 1000,
-                                    marginTop: 6,
-                                    maxHeight: 180,
-                                    backgroundColor: "#fff",
-                                }}>
-                                    <ScrollView
-                                        keyboardShouldPersistTaps="always"
-                                        nestedScrollEnabled={true}
-                                        showsVerticalScrollIndicator={true}
+                            {stateOpen && (
+                                <>
+                                    <TouchableWithoutFeedback
+                                        onPress={() => {
+                                            setStateOpen(false);
+                                            setStateQuery("");
+                                        }}
                                     >
-                                        {filteredStateList.length > 0 ? (
-                                            filteredStateList.map((v, index) => (
+                                        <View style={{
+                                            position: "absolute",
+                                            top: -1000,
+                                            left: -1000,
+                                            right: -1000,
+                                            bottom: -1000,
+                                            backgroundColor: "transparent",
+                                            zIndex: 999,
+                                        }} />
+                                    </TouchableWithoutFeedback>
+
+                                    <View style={{
+                                        borderWidth: 1,
+                                        borderColor: "#ddd",
+                                        borderRadius: 12,
+                                        zIndex: 1000,
+                                        marginTop: 6,
+                                        maxHeight: 180,
+                                        backgroundColor: "#fff",
+                                    }}>
+                                        <ScrollView
+                                            keyboardShouldPersistTaps="always"
+                                            nestedScrollEnabled={true}
+                                            showsVerticalScrollIndicator={true}
+                                        >
+                                            {filteredStateList.length > 0 ? (
+                                                filteredStateList.map((v, index) => (
+                                                    <TouchableOpacity
+                                                        key={index}
+                                                        style={[styles.option, selectedState === v.label
+                                                            && { backgroundColor: "#E6F0FF" }]}
+                                                        onPress={() => {
+                                                            setSelectedState(v.label);
+                                                            setStateQuery("");
+                                                            setStateOpen(false);
+                                                        }}
+                                                    >
+                                                        {console.log(v)}
+                                                        <Text style={styles.optionText}>{v.label}</Text>
+                                                    </TouchableOpacity>
+                                                ))
+                                            ) : (
+                                                <Text style={styles.noResult}>No state found</Text>
+                                            )}
+
+                                            {/* 🔴 CLEAR OPTION */}
+                                            {selectedState && (
                                                 <TouchableOpacity
-                                                    key={index}
-                                                    style={[styles.option, selectedState === v.label
-                                                        && { backgroundColor: "#E6F0FF" }]}
+                                                    style={{ padding: 12, alignItems: "center" }}
                                                     onPress={() => {
-                                                        setSelectedState(v.label);
+                                                        setSelectedState("");
                                                         setStateQuery("");
                                                         setStateOpen(false);
                                                     }}
                                                 >
-                                                    {console.log(v)}
-                                                    <Text style={styles.optionText}>{v.label}</Text>
+                                                    <Text style={{ color: "red", fontFamily: "Gilroy-Semibold" }}>
+                                                        Clear selection
+                                                    </Text>
                                                 </TouchableOpacity>
-                                            ))
-                                        ) : (
-                                            <Text style={styles.noResult}>No state found</Text>
-                                        )}
+                                            )}
+                                        </ScrollView>
+                                    </View>
+                                </>
+                            )}
+                        </View>
 
-                                        {/* 🔴 CLEAR OPTION */}
-                                        {selectedState && (
-                                            <TouchableOpacity
-                                                style={{ padding: 12, alignItems: "center" }}
-                                                onPress={() => {
-                                                    setSelectedState("");
-                                                    setStateQuery("");
-                                                    setStateOpen(false);
-                                                }}
-                                            >
-                                                <Text style={{ color: "red", fontFamily: "Gilroy-Semibold" }}>
-                                                    Clear selection
-                                                </Text>
-                                            </TouchableOpacity>
-                                        )}
-                                    </ScrollView>
-                                </View>
-                            </>
-                        )}
-                    </View>
-
-                </ScrollView>
+                    </ScrollView>
+                </KeyboardAvoidingView>
 
             </View>
 
@@ -393,7 +404,7 @@ const EditAddressDetail = ({ route }) => {
             </View>
 
         </View>
-
+    </SafeAreaView>
 
     )
 

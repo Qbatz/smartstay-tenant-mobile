@@ -349,3 +349,50 @@ export const raiseNoticePeriodRequest=async(hostelId,token,payload)=>{
     }
 
 }
+
+export const deactivateAmenity=async(hostelId,token,amenityId)=>{
+    console.log(hostelId,token)
+    console.log(amenityId)
+    try{
+        const axios=getAxios()
+        const res= axios.post("/v2/amenities/deactivate/" + hostelId + "/" + amenityId, null, {
+            headers: {
+                Authorization: "Bearer " + token
+            }
+        })
+        return res;
+    }catch(error){     
+         return{status: error.response.status, message: error.response.data || error.response}
+    }
+}
+
+export const getNoticeReason=async(token)=>{
+    try{
+        const axios=getAxios()
+        const res = await axios.get("/v2/customer/notice-reason",{
+            headers: {
+                Authorization: "Bearer " + token
+            }
+        })
+        console.log("simla",res)
+        return res;
+    }catch(error){
+         console.log("sillu",error)
+         return{status: error.response.status, message: error.response.data || error.response}
+    }
+
+}
+
+export const bedChangeUrgencyReason=async(token)=>{
+    try{
+        const axios=getAxios();
+        const res= await axios.get("/v2/bed/bed-change-urgency",{
+            headers: {
+                Authorization: "Bearer " + token
+            }
+        })
+        return res;
+    }catch(error){
+        return{status: error.response.status, message: error.response.data || error.response}
+    }
+}

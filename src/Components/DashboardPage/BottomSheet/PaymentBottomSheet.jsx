@@ -168,6 +168,17 @@ export default function PaymentBottomSheet({
         0
     );
 
+    const totalRedeemedFrom = paymentContext?.getInvoiceDetail?.redeemedFrom?.reduce(
+        (sum, item) => sum + Number(item.redemptionAmount || 0), 0
+    );
+
+    const balanceRedeemedFrom = paymentContext?.getInvoiceDetail?.totalAmount - totalRedeemedFrom;
+
+    const totalRedeemedTo = paymentContext?.getInvoiceDetail?.redeemedTo?.reduce(
+        (sum, item) => sum + Number(item.redemptionAmount || 0), 0
+    );
+
+    const balanceRedeemedTo = paymentContext?.getInvoiceDetail?.totalAmount - totalRedeemedTo;
 
     console.log(totalUnpaidInvoice)
     if (!visible) return null;
@@ -186,8 +197,11 @@ export default function PaymentBottomSheet({
                     { transform: [{ translateY }] },
                 ]}
             >
+                {/* <View style={{flex:1}}> */}
 
-                <SafeAreaView edges={["bottom"]}  >
+                <SafeAreaView edges={["bottom","top"]} 
+                // style={{flex:1}} 
+                >
 
                     {/* ================= YOUR CONTENT HERE ================= */}
 
@@ -195,11 +209,14 @@ export default function PaymentBottomSheet({
                         <View style={style.dragindictor} />
                     </View>
 
-                    <ScrollView showsVerticalScrollIndicator={false}>
-                        {paymentContext.getInvoiceDetail && ["Rent", "Advance", "Booking", "Reassign_rent"].includes(
-                            paymentContext.getInvoiceDetail.invoiceType
-                        ) ? (
+                   
+                        {paymentContext.getInvoiceDetail &&
+                            ["Rent", "Advance", "Booking", "Reassign_rent", "Advance_holding", "Eb_holding", "Amount_holding","Other"].
+                            includes(
+                                paymentContext.getInvoiceDetail.invoiceType
+                            ) ? (
                             <>
+                             <ScrollView contentContainerStyle={{paddingBottom:50}}  >
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                     <Text style={style.modalTitle}>{paymentContext.getInvoiceDetail?.invoiceType}</Text>
 
@@ -231,37 +248,84 @@ export default function PaymentBottomSheet({
                                             )}
                                         </Text>
 
-                                        {paymentContext.getInvoiceDetail?.status === "Pending" && (
-                                            <View
-                                                style={[
-                                                    style.statusBadge,
-                                                    { backgroundColor: "rgba(254,243,198,1)" },
-                                                ]}
-                                            >
-                                                <Text
-                                                    style={[
-                                                        style.statusText,
-                                                        { color: "rgba(187,77,0,1)" },
-                                                    ]}
-                                                >
-                                                    Pending
-                                                </Text>
-                                            </View>
-                                        )}
+                                        {!["Advance_holding", "Eb_holding", "Amount_holding"].includes(
+                                            paymentContext.getInvoiceDetail.invoiceType) && (
+                                                <>
+                                                    {["Pending", "Cancelled"].includes(paymentContext.getInvoiceDetail?.status) && (
+                                                        <View
+                                                            style={[
+                                                                style.statusBadge,
+                                                                { backgroundColor: paymentContext.getInvoiceDetail?.status === "Pending" ? "rgba(254,243,198,1)" : "#FFD5D5" },
+                                                            ]}
+                                                        >
+                                                            <Text
+                                                                style={[
+                                                                    style.statusText,
+                                                                    { color: paymentContext.getInvoiceDetail?.status === "Pending" ? "rgba(187,77,0,1)" : "#FF3B30" },
+                                                                ]}
+                                                            >
+                                                                {paymentContext.getInvoiceDetail?.status === "Pending" ? "Pending" : "Cancelled"}
+                                                            </Text>
+                                                        </View>
+                                                    )}
 
-                                        {(paymentContext.getInvoiceDetail?.status === "Partial Payment" ||
-                                            paymentContext.getInvoiceDetail?.status === "Paid") && (
-                                                <View style={{ flexDirection: "row", marginTop: 6 }}>
-                                                    <Image
-                                                        source={PaidIcon}
-                                                        style={{ width: 20, height: 20 }}
-                                                    />
-                                                    <Text style={{ fontSize: 14, marginLeft: 6, fontFamily: 'Gilroy-Medium' }}>
-                                                        {paymentContext.getInvoiceDetail.status === "Paid"
-                                                            ? "Full Paid"
-                                                            : "Partial Payment"}
-                                                    </Text>
-                                                </View>
+                                                    {(paymentContext.getInvoiceDetail?.status === "Partial Payment" ||
+                                                        paymentContext.getInvoiceDetail?.status === "Paid") && (
+                                                            <View style={{ flexDirection: "row", marginTop: 6 }}>
+                                                                <Image
+                                                                    source={PaidIcon}
+                                                                    style={{ width: 20, height: 20 }}
+                                                                />
+                                                                <Text style={{ fontSize: 14, marginLeft: 6, fontFamily: 'Gilroy-Medium' }}>
+                                                                    {paymentContext.getInvoiceDetail.status === "Paid"
+                                                                        ? "Full Paid"
+                                                                        : "Partial Payment"}
+                                                                </Text>
+                                                            </View>
+                                                        )}
+                                                </>
+                                            )}
+
+                                        {["Advance_holding", "Eb_holding", "Amount_holding"].includes(
+                                            paymentContext.getInvoiceDetail.invoiceType) && (
+                                                <>
+                                                   
+                                                        <View
+                                                            style={[
+                                                                style.statusBadge,
+                                                                { backgroundColor: paymentContext.getInvoiceDetail?.adjustmentStatus === "Not adjusted" ? "#A5FF9624" : 
+                                                                     paymentContext.getInvoiceDetail?.adjustmentStatus === "Partially adjusted" ? "#FFF8EA" : "#FFD5D5" },
+                                                            ]}
+                                                        >
+                                                            <Text
+                                                                style={[
+                                                                    style.retainerStatusText,
+                                                                    { color: paymentContext.getInvoiceDetail?.adjustmentStatus === "Not adjusted" ? "#09882C" :
+                                                                         paymentContext.getInvoiceDetail?.adjustmentStatus === "Partially adjusted" ? "#EC9B29" : "#FF3B30" },
+                                                                ]}
+                                                            >
+                                                                {paymentContext.getInvoiceDetail?.adjustmentStatus === "Not adjusted" ? "Available" :
+                                                                    paymentContext.getInvoiceDetail?.adjustmentStatus === "Partially adjusted" ? "Partially adjusted" : "Adjusted"
+                                                                }
+                                                            </Text>
+                                                        </View>
+                                                   
+
+                                                    {/* {(paymentContext.getInvoiceDetail?.status === "Partial Payment" ||
+                                                        paymentContext.getInvoiceDetail?.status === "Paid") && (
+                                                            <View style={{ flexDirection: "row", marginTop: 6 }}>
+                                                                <Image
+                                                                    source={PaidIcon}
+                                                                    style={{ width: 20, height: 20 }}
+                                                                />
+                                                                <Text style={{ fontSize: 14, marginLeft: 6, fontFamily: 'Gilroy-Medium' }}>
+                                                                    {paymentContext.getInvoiceDetail.status === "Paid"
+                                                                        ? "Full Paid"
+                                                                        : "Partial Payment"}
+                                                                </Text>
+                                                            </View>
+                                                        )} */}
+                                                </>
                                             )}
                                     </View>
                                 </View>
@@ -269,26 +333,31 @@ export default function PaymentBottomSheet({
 
 
                                 {/* Details */}
+
                                 <View style={style.detailsSection}>
-                                    {(paymentContext.getInvoiceDetail?.status === "Partial Payment" ||
-                                        paymentContext.getInvoiceDetail?.status === "Paid" || paymentContext.getInvoiceDetail?.status == "Pending") && (
-                                            paymentContext.getInvoiceDetail?.invoiceItems.map((i, index) => {
-                                                return (
-                                                    <View style={style.row} key={index}>
-                                                        {/* <TouchableOpacity > */}
-                                                        <Text style={style.detailLabel}>{i.invoiceItem}</Text>
-                                                        {/* </TouchableOpacity> */}
-                                                        <Text style={style.detailValue}>₹{new Intl.NumberFormat('en-IN').format(i.amount)}</Text>
-                                                    </View>
-                                                )
-                                            })
-                                        )}
+                                    {!["Advance_holding", "Eb_holding", "Amount_holding"].includes(
+                                        paymentContext.getInvoiceDetail.invoiceType) && (
+
+                                            (paymentContext.getInvoiceDetail?.status === "Partial Payment" ||
+                                                paymentContext.getInvoiceDetail?.status === "Paid" || paymentContext.getInvoiceDetail?.status == "Pending") && (
+                                                paymentContext.getInvoiceDetail?.invoiceItems.map((i, index) => {
+                                                    return (
+                                                        <View style={style.row} key={index}>
+
+                                                            <Text style={style.detailLabel}>
+                                                                {i?.invoiceItem != 'OTHERS' ? i?.invoiceItem : i?.otherItem ?? "Others"}</Text>
+
+                                                            <Text style={style.detailValue}>₹{new Intl.NumberFormat('en-IN').format(i.amount)}</Text>
+                                                        </View>
+                                                    )
+                                                })
+                                            ))}
 
                                     {paymentContext.getInvoiceDetail?.discountAmount !== 0 && (
                                         <View style={{ backgroundColor: '#F8F8F8', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 10 }}>
                                             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                                                 <Text style={style.detailLabel}>Actual Amount</Text>
-                                                <Text style={style.detailValue}> ₹ {paymentContext.getInvoiceDetail?.discountAmount}</Text>
+                                                <Text style={style.detailValue}> ₹ {paymentContext.getInvoiceDetail?.dueAmount}</Text>
                                             </View>
                                             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }}>
                                                 <Text style={style.detailLabel}>Discount</Text>
@@ -301,6 +370,23 @@ export default function PaymentBottomSheet({
                                             }}>
                                                 <Text style={{ fontSize: 13, fontFamily: 'Gilroy-Medium', color: '#FFFFFF' }}>
                                                     Discount Applied</Text>
+                                            </View>
+                                        </View>
+                                    )}
+
+                                    {["Advance_holding", "Eb_holding", "Amount_holding"].includes(paymentContext.getInvoiceDetail?.invoiceType) && (
+                                        <View style={{ backgroundColor: '#F8F8F8', borderRadius: 6, paddingHorizontal: 12, paddingVertical: 14 }}>
+                                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                <Text style={style.detailLabel}>Balance Amount</Text>
+                                                <Text style={style.detailValue}> ₹ {paymentContext.getInvoiceDetail?.balanceAmount}</Text>
+                                            </View>
+                                        </View>
+                                    )}
+                                    {["Booking"].includes(paymentContext.getInvoiceDetail?.invoiceType) && (
+                                        <View style={{ backgroundColor: '#F8F8F8', borderRadius: 6, paddingHorizontal: 12, paddingVertical: 14 }}>
+                                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                <Text style={style.detailLabel}>Balance Amount</Text>
+                                                <Text style={style.detailValue}> ₹ {paymentContext.getInvoiceDetail?.balanceAmount}</Text>
                                             </View>
                                         </View>
                                     )}
@@ -339,7 +425,7 @@ export default function PaymentBottomSheet({
                                     )}
 
                                     {paymentContext?.getInvoiceDetail?.deductions.length > 0 && (
-                                        <View style={{ paddingTop: 10,marginBottom:10 }}>
+                                        <View style={{ paddingTop: 10, marginBottom: 10 }}>
                                             <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium' }}>Deductions</Text>
 
                                             {paymentContext?.getInvoiceDetail?.deductions.map((i, index) => {
@@ -378,7 +464,7 @@ export default function PaymentBottomSheet({
                                     <>
                                         <TouchableOpacity onPress={() => setShowRedeemTo(!showRedeemTo)}
                                             style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                                            <Text style={style.appldTo}>Applied to</Text>
+                                            <Text style={style.appldTo}>Adjusted to</Text>
                                             <Ionicons
                                                 name={showRedeemTo ? "chevron-up" : "chevron-down"}
                                                 size={20}
@@ -395,7 +481,7 @@ export default function PaymentBottomSheet({
                                                         <Text style={style.redeemAmntTxt}>₹ {i?.redemptionAmount}</Text>
                                                     </View>
 
-                                                    <View style={{ marginVertical: 9, borderWidth: 1, borderColor: '#F2F2F2' }} />
+                                                    <View style={{ marginVertical: 9, borderWidth: 0.8, borderColor: '#F2F2F2' }} />
 
                                                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                                                         <Text style={style.redeemDateTxt}>Date</Text>
@@ -476,7 +562,8 @@ export default function PaymentBottomSheet({
 
 
                                 {/* Notes */}
-                                {paymentContext.getInvoiceDetail.status === "Pending" && (
+                                {paymentContext.getInvoiceDetail.status === "Pending"  &&
+                                 paymentContext?.getInvoiceDetail?.invoiceType != "Advance" && (
                                     <View style={{ marginTop: 10 }}>
                                         <Text style={{ fontSize: 14, color: "rgba(60,60,67,0.6)", fontFamily: 'Gilroy-Medium' }}>
                                             Notes & Instructions
@@ -527,10 +614,27 @@ export default function PaymentBottomSheet({
                                     </View>
                                 )}
 
+                                {["Advance_holding", "Eb_holding", "Amount_holding"].includes(paymentContext.getInvoiceDetail?.invoiceType) && (
+                                     <View style={[style.Billbottom, { paddingTop: 10 }]}>
+                                            <Text style={style.paiddetailLabel}>Last Adjusted Date</Text>
+                                            <Text style={style.paiddetailValue}>
+                                                {paymentContext?.getInvoiceDetail?.lastAdjustedDate ? paymentContext?.getInvoiceDetail?.lastAdjustedDate : "N/A"}
+                                            </Text>
+                                            {/* {paymentContext.getInvoiceDetail.receipts.map(i => {
+                                                return (
+                                                  <Text key={i.transactionId} style={style.paiddetailValue}>{i.referenceNumber}</Text>
+                                                )
+                        
+                                              })} */}
+                                        </View>
+                                )}
+                                </ScrollView>
+
                                 {/* Buttons */}
                                 <View style={style.buttonRow}>
                                     {paymentContext.getInvoiceDetail.status === "Pending" ? (
                                         <>
+                                        <View style={{flexDirection:'row',flex:1}}>
                                             <TouchableOpacity
                                                 style={style.shareBtn}
                                                 onPress={() => handleDownload(paymentContext.getInvoiceDetail.invoiceId)}
@@ -544,16 +648,18 @@ export default function PaymentBottomSheet({
                                                 />
                                             </TouchableOpacity>
 
-                                            <TouchableOpacity disabled style={[style.downloadBtn,{opacity:0.3}]}>
+                                            <TouchableOpacity disabled style={[style.downloadBtn, { opacity: 0.3 }]}>
                                                 <Text style={style.downloadText}>Pay Now</Text>
                                                 <Image
                                                     source={ArrowRightIcon}
                                                     style={{ width: 20, height: 20, marginLeft: 8 }}
                                                 />
                                             </TouchableOpacity>
+                                        </View>
                                         </>
                                     ) : (
                                         <>
+                                        <View style={{flexDirection:'row',flex:1,alignItems:'center'}}>
                                             <TouchableOpacity style={style.shareBtn} onPress={() => sharePdf(paymentContext.getInvoiceDetail.invoiceId)}>
                                                 <Text style={style.shareText}>Share</Text>
                                                 <Image
@@ -573,12 +679,15 @@ export default function PaymentBottomSheet({
                                                     style={{ width: 20, height: 20, marginLeft: 8 }}
                                                 />
                                             </TouchableOpacity>
+                                        </View>
                                         </>
                                     )}
                                 </View>
                             </>
                         ) :
                             <>
+                            <ScrollView contentContainerStyle={{flexGrow:1,paddingBottom:50}}
+                            showsVerticalScrollIndicator={false}>
                                 <View style={style.row}>
                                     <Text style={style.modalTitle}>{paymentContext?.getInvoiceDetail?.invoiceType}</Text>
 
@@ -650,7 +759,7 @@ export default function PaymentBottomSheet({
                                         ₹ {paymentContext?.getInvoiceDetail?.advanceInfo?.totalAdvancePaid}</Text>
                                 </View>
 
-                                {paymentContext?.getInvoiceDetail?.status === "Partially Paid" && (
+                                {["Partially Paid", "Partial Payment"].includes(paymentContext?.getInvoiceDetail?.status) && (
                                     <View style={[style.row, { paddingTop: 3 }]}>
                                         <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium' }}>Balance Amount</Text>
 
@@ -875,6 +984,7 @@ export default function PaymentBottomSheet({
                                             })} */}
                                     </View>
                                 </View>
+                                </ScrollView>
 
                                 {/* {---------Button--} */}
 
@@ -903,11 +1013,11 @@ export default function PaymentBottomSheet({
 
                             </>
                         }
-                    </ScrollView>
+                    
 
 
                 </SafeAreaView>
-
+                {/* </View> */}
             </Animated.View>
         </View>
 
@@ -960,6 +1070,12 @@ const style = StyleSheet.create({
     label: { fontSize: 20, color: "rgba(31, 38, 51, 1)", fontFamily: 'Gilroy-Semibold' },
     totalAmount: { fontSize: 18, fontFamily: 'Gilroy-Bold', color: "#000" },
     statusBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, marginTop: 6 },
+    statusText: {
+        fontSize: 14, fontFamily: 'Gilroy-Medium'
+    },
+    retainerStatusText: {
+        fontSize: 13, fontFamily: 'Gilroy-Medium'
+    },
     detailsSection: { marginVertical: 10 },
     row: {
         flexDirection: "row",
@@ -976,7 +1092,12 @@ const style = StyleSheet.create({
     buttonRow: {
         flexDirection: "row",
         justifyContent: "space-between",
-        marginTop: 20,
+        // marginTop: 20,
+        // flex:1,
+        backgroundColor:'#ffffff',
+        paddingTop:10,
+        // position:"relative",
+        bottom:6
     },
     shareBtn: {
         flex: 1,
@@ -1003,8 +1124,8 @@ const style = StyleSheet.create({
     downloadText: { color: '#FFFFFF', fontSize: 16, fontFamily: 'Gilroy-Semibold' },
     appldTo: { fontSize: 16, fontFamily: 'Gilroy-Semibold' },
     shwRedeem: {
-        borderWidth: 1, borderColor: "#E7E7E7", borderRadius: 8, marginTop: 8,
-        paddingVertical: 12, paddingHorizontal: 16
+        borderWidth: 1, borderColor: "#E7E7E7", borderRadius: 10, marginTop: 8,
+        paddingVertical: 12, paddingHorizontal: 16, elevation: 2, backgroundColor: '#ffffff'
     },
     redeemIncNo: { fontSize: 15, fontFamily: 'Gilroy-Semibold' },
     redeemAmntTxt: { fontSize: 18, fontFamily: 'Gilroy-Semibold' },

@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Alert, Image, KeyboardAvoidingView, NativeModules, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { Alert, Image, Keyboard, KeyboardAvoidingView, NativeModules, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import LeftArrow from "../../assets/Images/LeftArrow.png"
 import { useNavigation } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -48,6 +48,9 @@ const AddJobDetails = ({ route }) => {
     const [openTimeBox, setOpenTimeBox] = useState(false);
     const [pickerType, setPickerType] = useState(null);
     const [errors, setErrors] = useState({})
+    const [showEmploymentList, setShowEmploymentList] = useState(false)
+    const [selectedEmployment, setSelectedEmployment] = useState("")
+    const [stateQuery, setStateQuery] = useState("")
 
     const { CommonModule } = NativeModules
 
@@ -57,6 +60,9 @@ const AddJobDetails = ({ route }) => {
     console.log(shiftFrom instanceof Date); // false
     console.log("errormsg", errors)
 
+    const employmentType = [{ id: 1, type: "Employed" }, { id: 2, type: "Self-Employed" }, { id: 3, type: "Student" },
+    { id: 4, type: "Business Owner" }, { id: 5, type: "Freelancer" }, { id: 6, type: "Govt Employee" }, { id: 7, type: "Pvt Employee" },
+    { id: 8, type: "Intern" }, { id: 9, type: "Unemployed" }, { id: 10, type: "Other" }]
     const convertTimeToDate = (time) => {
         if (!time) return new Date();
 
@@ -74,11 +80,23 @@ const AddJobDetails = ({ route }) => {
         return date;
     };
 
+    const parseDate = (dateString) => {
+        if (!dateString) return null;
+
+        const [day, month, year] = dateString.split("/");
+
+        return new Date(
+            Number(year),
+            Number(month) - 1,
+            Number(day)
+        );
+    };
     useEffect(() => {
         const selectedJobDetails = route?.params?.selectedJobDetails
         if (selectedJobDetails) {
             setJobId(selectedJobDetails?.jobId)
             setCompanyName(selectedJobDetails?.organizationName)
+            setSelectedEmployment(selectedJobDetails?.employmentStatus)
             setJobRole(selectedJobDetails?.role)
             setLocation(selectedJobDetails?.workLocation)
             setShiftType(selectedJobDetails?.shiftType)
@@ -86,6 +104,11 @@ const AddJobDetails = ({ route }) => {
             // setShiftTo(selectedJobDetails?.shiftTo)
             setShiftFrom(convertTimeToDate(selectedJobDetails.shiftFrom));
             setShiftTo(convertTimeToDate(selectedJobDetails.shiftTo));
+            setStartDate(parseDate(selectedJobDetails?.workStartDate));
+            setEndDate(parseDate(selectedJobDetails?.workEndDate))
+            if (selectedJobDetails?.workEndDate) {
+                setIsTickIcon(false)
+            }
         }
 
     }, [])
@@ -213,9 +236,10 @@ const AddJobDetails = ({ route }) => {
                 {
                     organizationName: companyName,
                     role: jobRole,
+                    employmentStatus:selectedEmployment,
                     workLocation: location,
-                    workStartDate:startDate ? dayjs(startDate).format("DD-MM-YYYY") : "",
-                    workEndDate:endDate ? dayjs(endDate).format("DD-MM-YYYY") : "" ,
+                    workStartDate: startDate ? dayjs(startDate).format("DD-MM-YYYY") : "",
+                    workEndDate: endDate ? dayjs(endDate).format("DD-MM-YYYY") : "",
                     shiftType: shiftType,
                     shiftFrom: formatTime(shiftFrom),
                     shiftTo: formatTime(shiftTo),
@@ -252,12 +276,12 @@ const AddJobDetails = ({ route }) => {
             const payload = [
                 {
                     jobId: jobId,
-                    employmentStatus: employmentStatus,
+                    employmentStatus: selectedEmployment,
                     organizationName: companyName,
                     role: jobRole,
                     workLocation: location,
-                    workStartDate:startDate ? dayjs(startDate).format("DD-MM-YYYY") : "",
-                    workEndDate:endDate ? dayjs(endDate).format("DD-MM-YYYY") : "Select start Date",
+                    workStartDate: startDate ? dayjs(startDate).format("DD-MM-YYYY") : "",
+                    workEndDate: endDate ? dayjs(endDate).format("DD-MM-YYYY") : "Select start Date",
                     shiftType: shiftType,
                     shiftFrom: formatTime(shiftFrom),
                     shiftTo: formatTime(shiftTo),
@@ -293,6 +317,8 @@ const AddJobDetails = ({ route }) => {
 
     }
 
+    console.log("nathja", dayjs(startDate))
+
     return (
         <View style={styles.mainContainer}>
             <AppLoader visible={loading} />
@@ -310,15 +336,15 @@ const AddJobDetails = ({ route }) => {
                 <Text style={styles.mainheader}>{mode === "edit" ? "Edit" : "Add"} Job Details</Text>
             </View>
 
-             <KeyboardAvoidingView
-                    style={{ flex: 1, backgroundColor: "#fff" }}
-                    behavior={Platform.OS === "ios" ? "padding" : "height"}  
-                    keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
-                >
-            <ScrollView contentContainerStyle={{ justifyContent: 'space-between', flexGrow: 1,paddingBottom:150 }} 
-            showsVerticalScrollIndicator={false}>
-                <View>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, marginTop: 20 }}>
+            <KeyboardAvoidingView
+                style={{ flex: 1, backgroundColor: "#fff" }}
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+                keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
+            >
+                <ScrollView contentContainerStyle={{ justifyContent: 'space-between', flexGrow: 1, paddingBottom: 150 }}
+                    showsVerticalScrollIndicator={false}>
+                    <View>
+                        {/* <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, marginTop: 20 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
                             <TouchableOpacity onPress={() => setEmploymentStatus("Student")}
                                 style={[{
@@ -346,59 +372,194 @@ const AddJobDetails = ({ route }) => {
 
                             <Text style={{ fontSize: 15, fontFamily: 'Gilroy-Medium', marginLeft: 10 }}>Working Professional</Text>
                         </View>
-                    </View>
-                    <Text style={styles.labelTxt}>{employmentStatus === "Student" ? "College Name" : "Company Name"}
-                        <Text style={{ color: 'red' }}> *</Text>
-                    </Text>
+                    </View> */}
 
-                    <View>
-                        <TextInput
-                            style={styles.inputBox}
-                            value={companyName}
-                            placeholder="Enter Name"
-                            onChangeText={(text) => {
-                                const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
-                                setCompanyName(onlyLetters)
-                            }} />
-                    </View>
+                        <Text style={styles.labelTxt}>Employment Status </Text>
 
-                    {errors.company && (<ErrorMessage message={errors.company} type="error" />)}
+                        {/* <TouchableOpacity onPress={() => setShowEmploymentList(!showEmploymentList)}
+                            style={styles.inputBox}>
+                            <Text style={styles.valueTxt}>{selectedEmployment ? selectedEmployment : "Select Shift Type"}</Text>
+                            <Ionicons name={showEmploymentList ? "chevron-up" : "chevron-down"} size={18} />
+                        </TouchableOpacity> */}
+
+                        <View style={{ position: "relative", marginTop: 12 }}>
+                            <TextInput
+                                style={styles.select}
+                                placeholder="Select employment status"
+                                placeholderTextColor="#9CA3AF"
+                                value={showEmploymentList ? stateQuery : selectedEmployment}
+
+                                onFocus={() => {
+                                    setShowEmploymentList(true);
+                                    setStateQuery("");   // 🔥 cursor focus panna fresh search
+                                }}
+                                onChangeText={(t) => {
+                                    const sanitized = t.replace(/[^a-zA-Z\s]/g, "");
+                                    setSelectedEmployment(sanitized);    // 🔥 typing always search
+                                    setShowEmploymentList(true);
+                                }}
+                            />
 
 
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
-                        <TouchableOpacity onPress={() => setIsTickIcon(!isTickIcon)}
-                            style={{
-                                borderWidth: 1, borderColor: "#D9D9D9", width: 15, height: 15, borderRadius: 4,
-                                alignItems: 'center', justifyContent: 'center'
+                            <TouchableOpacity
+                                style={styles.arrowTouch}
+                                activeOpacity={0.7}
+                                onPress={() => {
+                                    Keyboard.dismiss();  // ✅ keyboard hide
+                                    setShowEmploymentList((prev) => !prev);
+
+                                    // ✅ close pannumbothu query reset
+                                    if (showEmploymentList) setStateQuery("");
+                                }}
+                            >
+                                <Ionicons name="chevron-up" size={16} />
+                            </TouchableOpacity>
+
+                            {showEmploymentList && (
+                                <>
+                                    <TouchableWithoutFeedback
+                                        onPress={() => {
+                                            setShowEmploymentList(false);
+                                            setStateQuery("");
+                                        }}
+                                    >
+                                        <View style={{
+                                            position: "absolute",
+                                            top: -1000,
+                                            left: -1000,
+                                            right: -1000,
+                                            bottom: -1000,
+                                            backgroundColor: "transparent",
+                                            zIndex: 999,
+                                        }} />
+                                    </TouchableWithoutFeedback>
+
+                                    <View style={{
+                                        borderWidth: 1,
+                                        borderColor: "#ddd",
+                                        borderRadius: 12,
+                                        zIndex: 1000,
+                                        marginTop: 6,
+                                        maxHeight: 180,
+                                        backgroundColor: "#fff",
+                                    }}>
+                                        <ScrollView
+                                            keyboardShouldPersistTaps="always"
+                                            nestedScrollEnabled={true}
+                                            showsVerticalScrollIndicator={true}
+                                        >
+                                            {employmentType.length > 0 ? (
+                                                employmentType.map((v, index) => (
+                                                    <TouchableOpacity
+                                                        key={index}
+                                                        style={[styles.option, selectedEmployment === v.type
+                                                            && { backgroundColor: "#E6F0FF" }]}
+                                                        onPress={() => {
+                                                            setSelectedEmployment(v.type);
+                                                            setStateQuery("");
+                                                            setShowEmploymentList(false);
+                                                        }}
+                                                    >
+                                                        {console.log(v)}
+                                                        <Text style={styles.optionText}>{v.type}</Text>
+                                                    </TouchableOpacity>
+                                                ))
+                                            ) : (
+                                                <Text style={styles.noResult}>No state found</Text>
+                                            )}
+
+                                            {/* 🔴 CLEAR OPTION */}
+                                            {selectedEmployment && (
+                                                <TouchableOpacity
+                                                    style={{ padding: 12, alignItems: "center" }}
+                                                    onPress={() => {
+                                                        setSelectedEmployment("");
+                                                        setStateQuery("");
+                                                        setShowEmploymentList(false);
+                                                    }}
+                                                >
+                                                    <Text style={{ color: "red", fontFamily: "Gilroy-Semibold" }}>
+                                                        Clear selection
+                                                    </Text>
+                                                </TouchableOpacity>
+                                            )}
+                                        </ScrollView>
+                                    </View>
+                                </>
+                            )}
+                        </View>
+
+
+
+
+                        {/* {showEmploymentList && (
+                            <ScrollView contentContainerStyle={{
+                                borderWidth: 1, borderRadius: 10, marginTop: 8, borderColor: '#D9D9D9', elevation: 1,
+                                backgroundColor: '#ffffff', paddingVertical: 4, paddingHorizontal: 18,height:100,flex:1
                             }}>
-                            {isTickIcon ? <Image source={CheckBox} style={{ width: 30, height: 30, borderRadius: 4 }} /> : null}
+                                {employmentType.map((i, index) => (
+                                    <TouchableOpacity key={index} onPress={() => {
+                                        setSelectedEmployment(i?.type)
+                                        setShowEmploymentList(false)
+                                    }}
+                                        style={{ marginVertical: 10 }}>
+                                        <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>{i.type}</Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </ScrollView>
+                        )} */}
+                        <Text style={styles.labelTxt}>{employmentStatus === "Student" ? "College Name" : "Company Name"}
+                            <Text style={{ color: 'red' }}> *</Text>
+                        </Text>
+
+                        <View>
+                            <TextInput
+                                style={styles.inputBox}
+                                value={companyName}
+                                placeholder="Enter Name"
+                                onChangeText={(text) => {
+                                    const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
+                                    setCompanyName(onlyLetters)
+                                }} />
+                        </View>
+
+                        {errors.company && (<ErrorMessage message={errors.company} type="error" />)}
+
+
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
+                            <TouchableOpacity onPress={() => setIsTickIcon(!isTickIcon)}
+                                style={{
+                                    borderWidth: 1, borderColor: "#D9D9D9", width: 15, height: 15, borderRadius: 4,
+                                    alignItems: 'center', justifyContent: 'center'
+                                }}>
+                                {isTickIcon ? <Image source={CheckBox} style={{ width: 30, height: 30, borderRadius: 4 }} /> : null}
+                            </TouchableOpacity>
+
+                            <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', marginLeft: 8 }}>
+                                {employmentStatus === "Student" ? "I'm Currently Studying on this college" : "I'm currently working on this role"}</Text>
+                        </View>
+
+
+                        <Text style={styles.labelTxt}>Start Date</Text>
+
+                        <TouchableOpacity onPress={openStartCalendar}
+                            style={styles.inputBox}>
+                            <Text style={styles.valueTxt}>{startDate ? dayjs(startDate).format("DD-MM-YYYY") : "Select start Date"}</Text>
                         </TouchableOpacity>
 
-                        <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', marginLeft: 8 }}>
-                            {employmentStatus === "Student" ? "I'm Currently Studying on this college" : "I'm currently working on this role"}</Text>
-                    </View>
+                        {!isTickIcon && (
+                            <>
+                                <Text style={styles.labelTxt}>End Date</Text>
+
+                                <TouchableOpacity onPress={openEndCalendar}
+                                    style={styles.inputBox}>
+                                    <Text style={styles.valueTxt}>{endDate ? dayjs(endDate).format("DD-MM-YYYY") : "Select end Date"}</Text>
+                                </TouchableOpacity>
+                            </>
+                        )}
 
 
-                    <Text style={styles.labelTxt}>Start Date</Text>
-
-                    <TouchableOpacity onPress={openStartCalendar}
-                        style={styles.inputBox}>
-                        <Text style={styles.valueTxt}>{startDate ? dayjs(startDate).format("DD-MM-YYYY") : "Select start Date"}</Text>
-                    </TouchableOpacity>
-
-                    {!isTickIcon && (
-                        <>
-                            <Text style={styles.labelTxt}>End Date</Text>
-
-                            <TouchableOpacity onPress={openEndCalendar}
-                                style={styles.inputBox}>
-                                <Text style={styles.valueTxt}>{endDate ? dayjs(endDate).format("DD-MM-YYYY") : "Select end Date"}</Text>
-                            </TouchableOpacity>
-                        </>
-                    )}
-
-
-                    {employmentStatus !== "Student" && (
+                        {/* {employmentStatus !== "Student" && ( */}
                         <>
                             <Text style={styles.labelTxt}>Job Role</Text>
 
@@ -413,10 +574,10 @@ const AddJobDetails = ({ route }) => {
                                     }} />
                             </View>
                         </>
-                    )}
+                        {/* )} */}
 
 
-                    {employmentStatus !== "Student" && (
+                        {/* {employmentStatus !== "Student" && ( */}
                         <>
                             <Text style={styles.labelTxt}>Shift Type </Text>
 
@@ -426,65 +587,65 @@ const AddJobDetails = ({ route }) => {
                                 <Ionicons name={openShiftList ? "chevron-up" : "chevron-down"} size={18} />
                             </TouchableOpacity>
                         </>
-                    )}
+                        {/* )} */}
 
-                    {openShiftList && (
-                        <View style={{
-                            borderWidth: 1, borderRadius: 10, marginTop: 8, borderColor: '#D9D9D9', elevation: 1,
-                            backgroundColor: '#ffffff', paddingVertical: 4, paddingHorizontal: 18
-                        }}>
-                            {shiftTypeList.map((i, index) => (
-                                <TouchableOpacity key={index} onPress={() => {
-                                    setShiftType(i?.type)
-                                    setOpenShiftList(false)
-                                }}
-                                    style={{ marginVertical: 10 }}>
-                                    <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>{i.type}</Text>
-                                </TouchableOpacity>
-                            ))}
+                        {openShiftList && (
+                            <View style={{
+                                borderWidth: 1, borderRadius: 10, marginTop: 8, borderColor: '#D9D9D9', elevation: 1,
+                                backgroundColor: '#ffffff', paddingVertical: 4, paddingHorizontal: 18
+                            }}>
+                                {shiftTypeList.map((i, index) => (
+                                    <TouchableOpacity key={index} onPress={() => {
+                                        setShiftType(i?.type)
+                                        setOpenShiftList(false)
+                                    }}
+                                        style={{ marginVertical: 10 }}>
+                                        <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>{i.type}</Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
+                        )}
+
+
+                        <Text style={styles.labelTxt}>{employmentStatus === "Student" ? "College/Institute Location" : "Work Location"}
+                            <Text style={{ color: 'red' }}> *</Text>
+                        </Text>
+
+                        <View>
+                            <TextInput
+                                style={styles.inputBox}
+                                value={location}
+                                placeholder="Enter Location"
+                                onChangeText={(text) => {
+                                    const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
+                                    setLocation(onlyLetters)
+                                }} />
                         </View>
-                    )}
 
+                        {errors.location && (<ErrorMessage message={errors.location} type="error" />)}
 
-                    <Text style={styles.labelTxt}>{employmentStatus === "Student" ? "College/Institute Location" : "Work Location"}
-                        <Text style={{ color: 'red' }}> *</Text>
-                    </Text>
+                        <Text style={styles.labelTxt}>{employmentStatus === "Student" ? "College Timing" : "Shift Timing"}
+                            <Text style={{ color: 'red' }}> *</Text>
+                        </Text>
 
-                    <View>
-                        <TextInput
-                            style={styles.inputBox}
-                            value={location}
-                            placeholder="Enter Location"
-                            onChangeText={(text) => {
-                                const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
-                                setLocation(onlyLetters)
-                            }} />
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <TouchableOpacity onPress={() => openTimePicker('from')}
+                                style={[styles.shiftInputBox, { marginRight: 6 }]}>
+                                <Text> {shiftFrom ? formatTime(shiftFrom) : "From"}</Text>
+                                <Image source={TimerIcon} style={{ width: 22.5, height: 22.5 }} />
+                            </TouchableOpacity>
+
+                            <TouchableOpacity onPress={() => openTimePicker('to')}
+                                style={[styles.shiftInputBox, { marginRight: 6 }]}>
+                                <Text>  {shiftTo ? formatTime(shiftTo) : "To"}</Text>
+                                <Image source={TimerIcon} style={{ width: 22.5, height: 22.5 }} />
+                            </TouchableOpacity>
+                        </View>
+
+                        {errors.shiftTime && (<ErrorMessage message={errors.shiftTime} type="error" />)}
                     </View>
 
-                    {errors.location && (<ErrorMessage message={errors.location} type="error" />)}
-
-                    <Text style={styles.labelTxt}>{employmentStatus === "Student" ? "College Timing" : "Shift Timing"}
-                        <Text style={{ color: 'red' }}> *</Text>
-                    </Text>
-
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <TouchableOpacity onPress={() => openTimePicker('from')}
-                            style={[styles.shiftInputBox, { marginRight: 6 }]}>
-                            <Text> {shiftFrom ? formatTime(shiftFrom) : "From"}</Text>
-                            <Image source={TimerIcon} style={{ width: 22.5, height: 22.5 }} />
-                        </TouchableOpacity>
-
-                        <TouchableOpacity onPress={() => openTimePicker('to')}
-                            style={[styles.shiftInputBox, { marginRight: 6 }]}>
-                            <Text>  {shiftTo ? formatTime(shiftTo) : "To"}</Text>
-                            <Image source={TimerIcon} style={{ width: 22.5, height: 22.5 }} />
-                        </TouchableOpacity>
-                    </View>
-
-                    {errors.shiftTime && (<ErrorMessage message={errors.shiftTime} type="error" />)}
-                </View>
-
-            </ScrollView>
+                </ScrollView>
             </KeyboardAvoidingView>
 
             <View style={{
@@ -590,14 +751,26 @@ const styles = StyleSheet.create({
     valueTxt: {
         fontSize: 15, fontFamily: "Gilroy-Medium", color: '#222222'
     },
+    select: {
+        height: 51,
+        // paddingVertical:16,
+        borderWidth: 1,
+        borderColor: "#EEEEEE",
+        borderRadius: 8,
+        paddingHorizontal: 14,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center", fontSize: 15,
+        color: '#111827', fontFamily: 'Gilroy-Medium',
+    },
     inputBox: {
-        borderWidth: 1, borderRadius: 8, borderColor: '#D9D9D9', paddingVertical: 16,
+        borderWidth: 1, borderRadius: 8, borderColor: '#EEEEEE', paddingVertical: 16,
         paddingHorizontal: 14, marginTop: 12, flexDirection: 'row',
         justifyContent: 'space-between', fontSize: 15,
         fontFamily: "Gilroy-Medium",
     },
     shiftInputBox: {
-        borderWidth: 1, borderRadius: 8, borderColor: '#D9D9D9', paddingVertical: 16,
+        borderWidth: 1, borderRadius: 8, borderColor: '#EEEEEE', paddingVertical: 16,
         paddingHorizontal: 14, marginTop: 12, flexDirection: 'row',
         justifyContent: 'space-between', flex: 1
 
@@ -624,6 +797,26 @@ const styles = StyleSheet.create({
         padding: 10,
         width: "85%",
         elevation: 10,
+    },
+    arrowTouch: {
+        position: "absolute",
+        right: 12,
+        top: 12,
+        width: 30,
+        height: 30,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    option: {
+        paddingVertical: 12,
+        paddingHorizontal: 14,
+    },
+
+    selectText: { color: "#555" },
+    optionText: {
+        fontSize: 15,
+        color: "#000",
+        fontFamily: "Gilroy-Regular",
     },
 })
 
