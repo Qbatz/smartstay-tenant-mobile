@@ -14,6 +14,7 @@
 		0C80B921A6F3F58F76C31292 /* libPods-smartstayTenant.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DCACB8F33CDC322A6C60F78 /* libPods-smartstayTenant.a */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		1B84C0CEDF84BB4E63DB8D5A /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
+		2212B02BDAF0C1745D7DFD6C /* KYCVerification.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4D778E336895CFEE343D8FB /* KYCVerification.swift */; };
 		44B37EB50AA1489AA3DB6AD6 /* Gilroy-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5EF44D594FD54E86B4A2E66F /* Gilroy-Bold.ttf */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		7CA2A77B8480431D875BB2F5 /* Gilroy-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 55B22AC2E248426FA4D9D24A /* Gilroy-Medium.ttf */; };
@@ -41,6 +42,7 @@
 		84592258999748FB82F0908E /* Gilroy-Semibold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Gilroy-Semibold.ttf"; path = "../src/assets/fonts/Gilroy-Semibold.ttf"; sourceTree = "<group>"; };
 		CAB7EA0BD99F953B91DACB21 /* NativeModules.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = NativeModules.m; path = smartstayTenant/NativeModules.m; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		F4D778E336895CFEE343D8FB /* KYCVerification.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = KYCVerification.swift; path = smartstayTenant/KYCVerification.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +69,7 @@
 				562436FAEABE558DAF966930 /* CommonModule.swift */,
 				76AB9AD7865718E50E736DB2 /* NotificationModule.swift */,
 				CAB7EA0BD99F953B91DACB21 /* NativeModules.m */,
+				F4D778E336895CFEE343D8FB /* KYCVerification.swift */,
 			);
 			name = smartstayTenant;
 			sourceTree = "<group>";
@@ -288,6 +291,7 @@
 				0A721B207DEFCA5E03DF3C36 /* CommonModule.swift in Sources */,
 				D45488B978CB4AFBD249656F /* NotificationModule.swift in Sources */,
 				01839436019C1D83CFAD3348 /* NativeModules.m in Sources */,
+				2212B02BDAF0C1745D7DFD6C /* KYCVerification.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -4,7 +4,6 @@ import React
 import UIKit
 
 // iOS counterpart of android/app/src/main/java/com/qbatz/smartstay/tenant/CommonModule.java.
-// verifyKyc (Digio) is not ported yet.
 @objc(CommonModule)
 class CommonModule: RCTEventEmitter {
   private static let networkStatusEvent = "networkStatus"
@@ -13,6 +12,8 @@ class CommonModule: RCTEventEmitter {
   private var hasListeners = false
   // Same store name as the Android SharedPreferences file.
   private let credentials = UserDefaults(suiteName: "user_credentials") ?? .standard
+  // The KYC attempt in progress, if any. Main queue only.
+  private var kycVerification: KYCVerification?
 
   override init() {
     super.init()
@@ -101,6 +102,25 @@ class CommonModule: RCTEventEmitter {
   func logout(_ customerId: String) {
     credentials.removeObject(forKey: "customerId")
     credentials.removeObject(forKey: "token")
+  }
+
+  @objc(verifyKyc:documentId:token:)
+  func verifyKyc(_ mobile: String?, documentId: String?, token: String?) {
+    let accessToken = credentials.string(forKey: "token") ?? ""
+    DispatchQueue.main.async { [weak self] in
+      // One attempt at a time: a second tap while Digio is opening is ignored.
+      guard let self = self, self.kycVerification == nil else { return }
+      let verification = KYCVerification(
+        documentId: documentId ?? "",
+        identifier: mobile ?? "",
+        tokenId: token,
+        accessToken: accessToken
+      ) { [weak self] in
+        self?.kycVerification = nil
+      }
+      self.kycVerification = verification
+      verification.start()
+    }
   }
 
   @objc(makeCall:)

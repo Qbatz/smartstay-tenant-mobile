@@ -23,6 +23,10 @@ target 'smartstayTenant' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
+  # Digio KYC, launched from CommonModule.verifyKyc. DigioCaptureKit adds the selfie step.
+  pod 'DigiokycSDK', '~> 2.0'
+  pod 'DigioCaptureKit', '~> 2.0'
+
   post_install do |installer|
     react_native_post_install(
       installer,

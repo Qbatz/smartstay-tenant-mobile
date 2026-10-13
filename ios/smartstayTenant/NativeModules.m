@@ -13,6 +13,7 @@ RCT_EXTERN_METHOD(sharePDF:(NSString *)url title:(NSString *)title)
 RCT_EXTERN_METHOD(storeCredentials:(NSString *)token)
 RCT_EXTERN_METHOD(updateCustomerId:(NSString *)customerId)
 RCT_EXTERN_METHOD(logout:(NSString *)customerId)
+RCT_EXTERN_METHOD(verifyKyc:(NSString *)mobile documentId:(NSString *)documentId token:(NSString *)token)
 RCT_EXTERN_METHOD(makeCall:(NSString *)phoneNumber)
 
 @end
