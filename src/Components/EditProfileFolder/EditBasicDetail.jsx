@@ -198,14 +198,14 @@ const EditBasicDetail = ({ }) => {
                     <Text style={[styles.labelTxt, { marginTop: 12 }]}>Mobile No</Text>
                     <View style={{
                         flexDirection: 'row', alignItems: 'center',
-                        paddingVertical: 5, paddingHorizontal: 10, marginTop: 10, fontFamily: 'Gilroy-Regular',
+                        paddingHorizontal: 10, marginTop: 10, fontFamily: 'Gilroy-Regular',
                         borderWidth: 1, borderColor: '#EEEEEE', borderRadius: 8,
                     }}>
                         <Text style={{ fontSize: 15, color: '#111827', fontFamily: 'Gilroy-Regular', }}>+91</Text>
                         <Ionicons name="chevron-down" size={16} />
                         <TextInput
                             value={mobileNo}
-                            style={{ fontSize: 15, color: '#111827', fontFamily: 'Gilroy-Regular', marginLeft: 6 }}
+                            style={{ flex: 1, paddingVertical: 14, fontSize: 15, color: '#111827', fontFamily: 'Gilroy-Regular', marginLeft: 6 }}
                             editable={false}
                             placeholder="Enter mobileNo"
                         // onChangeText={(text) => {

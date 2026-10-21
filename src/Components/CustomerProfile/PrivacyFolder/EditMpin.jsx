@@ -55,7 +55,7 @@ const EditMpin = () => {
 
 
                     setShowSuccessModal(true)
-                    setShowModelMessage(r.data)
+                    setShowModelMessage("OTP Sent")
                     setModelType('success')
 
                     setTimeout(() => {

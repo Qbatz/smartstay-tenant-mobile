@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>smartstayTenant</string>
+	<string>Tenant</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -34,15 +34,15 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>$(PRODUCT_NAME) uses the camera to capture your photo and documents for KYC verification.</string>
+	<string>Tenant uses the camera to capture your photo and documents for KYC verification.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>$(PRODUCT_NAME) uses your location to geo-tag your KYC verification.</string>
+	<string>Tenant uses your location to geo-tag your KYC verification.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>$(PRODUCT_NAME) uses your location to geo-tag your KYC verification.</string>
+	<string>Tenant uses your location to geo-tag your KYC verification.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>$(PRODUCT_NAME) uses the microphone to record video during KYC verification.</string>
+	<string>Tenant uses the microphone to record video during KYC verification.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>$(PRODUCT_NAME) accesses your photos so you can upload documents for KYC verification.</string>
+	<string>Tenant accesses your photos so you can upload documents for KYC verification.</string>
 	<key>RCTNewArchEnabled</key>
 	<true/>
 	<key>UIAppFonts</key>
@@ -51,6 +51,7 @@
 		<string>Gilroy-Medium.ttf</string>
 		<string>Gilroy-Regular.ttf</string>
 		<string>Gilroy-Semibold.ttf</string>
+		<string>Ionicons.ttf</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
