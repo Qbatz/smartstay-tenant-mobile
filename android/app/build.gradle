@@ -1,9 +1,8 @@
 apply plugin: "com.android.application"
-apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
 apply plugin: "com.google.gms.google-services"
-apply plugin: "kotlin-kapt"
-apply plugin: 'org.jetbrains.kotlin.plugin.compose'
+apply plugin: "org.jetbrains.kotlin.plugin.compose"
+apply plugin: 'org.jetbrains.kotlin.android'
 
 /**
  * This is the configuration block to customize your React Native Android app.
@@ -43,7 +42,7 @@ react {
     // entryFile = file("../js/MyApplication.android.js")
     //
     //   A list of extra flags to pass to the 'bundle' commands.
-    //   See https://github.com/react-native-community/cli/blob/main/docs/commands.md#bundle
+    //   See https://github.com
     // extraPackagerArgs = []
 
     /* Hermes Commands */
@@ -80,16 +79,21 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
     buildFeatures {
         dataBinding = true
-        compose true
+        compose = true
+        buildConfig = true
+        resValues = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.15" // Match your Compose version
-    }
-    kotlinOptions {
-        jvmTarget = '17' // Or '11', '17' depending on your setup
-    }
+
+//    kotlinOptions {
+//        jvmTarget = '17' // Or '11', '17' depending on your setup
+//    }
 
     namespace "com.qbatz.smartstay.tenant"
     defaultConfig {
@@ -113,10 +117,10 @@ android {
         }
         release {
             // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
+            // see https://reactnative.dev.
             signingConfig signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
         }
     }
 
@@ -137,15 +141,21 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
 
 }
 
 dependencies {
+    implementation 'androidx.core:core-ktx:1.15.0'
+
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
+    implementation jscFlavor
     implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
     implementation 'com.google.firebase:firebase-messaging'
-    implementation "androidx.core:core:1.17.0"
+    implementation "androidx.core:core:1.15.0"
     implementation "androidx.core:core-role:1.1.0"
     implementation "androidx.core:core-animation:1.0.0"
     implementation 'androidx.appcompat:appcompat:1.7.1'
@@ -153,7 +163,6 @@ dependencies {
     implementation 'androidx.activity:activity:1.11.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
     androidTestImplementation "androidx.core:core-animation-testing:1.0.0"
-    implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("androidx.activity:activity-compose:1.8.2")
     implementation(platform("androidx.compose:compose-bom:2023.08.00"))
@@ -161,8 +170,6 @@ dependencies {
     implementation("com.github.digio-tech:gateway:v4.0.22")
     implementation("com.github.digio-tech:gateway_kyc:v4.0.24")
 
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.6")
@@ -177,31 +184,12 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:1.2.2")
     implementation("androidx.camera:camera-view:1.2.2")
 
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.11.0")
-    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
-
-
-    implementation("androidx.activity:activity-compose")
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.ui:ui-tooling-preview")
 
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
     implementation("com.squareup.retrofit2:converter-scalars:2.11.0")
-
-    debugImplementation("androidx.compose.ui:ui-tooling")
-
-    if (hermesEnabled.toBoolean()) {
-        implementation("com.facebook.react:hermes-android")
-    } else {
-        implementation jscFlavor
-    }
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 }
-
-
-
-apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
-
