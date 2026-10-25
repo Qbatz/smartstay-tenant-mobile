@@ -8,8 +8,6 @@ require Pod::Executable.execute_command('node', ['-p',
 platform :ios, min_ios_version_supported
 prepare_react_native_project!
 
-# The Dev and Prod schemes each build a Debug and a Release configuration. CocoaPods needs to know
-# which is which; the env file each one reads is its ENVFILE build setting in the Xcode project.
 project 'smartstayTenant',
   'DevDebug' => :debug,
   'DevRelease' => :release,
@@ -43,9 +41,6 @@ target 'smartstayTenant' do
       # :ccache_enabled => true
     )
 
-    # Xcode 27 fails the build for deployment targets below iOS 15.0.
-    # react_native_post_install only raises each pod's main target, so
-    # resource bundle targets keep the older value from their podspec.
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |build_config|
         deployment_target = build_config.build_settings['IPHONEOS_DEPLOYMENT_TARGET']
@@ -53,17 +48,13 @@ target 'smartstayTenant' do
           build_config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = min_ios_version_supported
         end
 
-        # fmt 11.0.2 enables consteval format-string checks under C++20, which
-        # the clang shipped with Xcode 27 fails to compile. Building fmt itself
-        # as C++17 turns those checks off.
+
         if target.name == 'fmt'
           build_config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++17'
         end
       end
     end
 
-    # react-native-config reads the env file from its own pod target, which cannot see the app's
-    # build settings, so give it each configuration's ENVFILE from the Xcode project.
     envfiles = installer.aggregate_targets.first.user_project.build_configurations.to_h do |c|
       [c.name, c.build_settings['ENVFILE']]
     end
@@ -72,7 +63,6 @@ target 'smartstayTenant' do
     envfiles.each do |name, envfile|
       raise "ENVFILE is not set for #{name} in smartstayTenant.xcodeproj" unless envfile
     end
-    # The Pods project also keeps its own Debug/Release configurations, which the app never builds.
     config_target.build_configurations.each do |build_config|
       envfile = envfiles[build_config.name]
       build_config.build_settings['ENVFILE'] = envfile if envfile
