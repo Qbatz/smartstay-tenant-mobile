@@ -8,6 +8,14 @@ require Pod::Executable.execute_command('node', ['-p',
 platform :ios, min_ios_version_supported
 prepare_react_native_project!
 
+# The Dev and Prod schemes each build a Debug and a Release configuration. CocoaPods needs to know
+# which is which; the env file each one reads is its ENVFILE build setting in the Xcode project.
+project 'smartstayTenant',
+  'DevDebug' => :debug,
+  'DevRelease' => :release,
+  'ProdDebug' => :debug,
+  'ProdRelease' => :release
+
 linkage = ENV['USE_FRAMEWORKS']
 if linkage != nil
   Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
@@ -52,6 +60,22 @@ target 'smartstayTenant' do
           build_config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++17'
         end
       end
+    end
+
+    # react-native-config reads the env file from its own pod target, which cannot see the app's
+    # build settings, so give it each configuration's ENVFILE from the Xcode project.
+    envfiles = installer.aggregate_targets.first.user_project.build_configurations.to_h do |c|
+      [c.name, c.build_settings['ENVFILE']]
+    end
+    config_target = installer.pods_project.targets.find { |t| t.name == 'react-native-config' }
+    raise 'react-native-config pod target not found' unless config_target
+    envfiles.each do |name, envfile|
+      raise "ENVFILE is not set for #{name} in smartstayTenant.xcodeproj" unless envfile
+    end
+    # The Pods project also keeps its own Debug/Release configurations, which the app never builds.
+    config_target.build_configurations.each do |build_config|
+      envfile = envfiles[build_config.name]
+      build_config.build_settings['ENVFILE'] = envfile if envfile
     end
   end
 end

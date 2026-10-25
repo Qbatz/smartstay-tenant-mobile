@@ -1,3 +1,5 @@
+import Config from 'react-native-config';
+
 export const ACCESS_TOKEN='access-token'
 export const PHONE_NO='PhoneNumber'
 export const LOGGEDIN='loggedin'
@@ -13,21 +15,8 @@ export const HOSTELDETAIL ="hostelDetail"
 export const LOGIN_ANOTHER_NUMBER ="login-With-AnotherNumber"
 
 
-let _BASE_URL;         
-let _initialized = false;
-
-export function initBaseUrl(value) {
-  if (_initialized) {
-    return;
-  }
-
-  _BASE_URL = value;
-  _initialized = true;
-}
-
+// From the env file of the build (.env.dev / .env.prod): the Xcode scheme on iOS, the product
+// flavor on Android. react-native-config exposes it to JS.
 export function BASE_URL() {
-  if (!_initialized) {
-    // throw new Error("BASE_URL not initialized yet");
-  }
-  return _BASE_URL;
+  return Config.API_BASE_URL;
 }

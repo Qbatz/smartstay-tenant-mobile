@@ -75,6 +75,27 @@ def enableProguardInReleaseBuilds = false
  */
 def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 
+/**
+ * Environment config. Each product flavor reads one env file from the project root (the same
+ * files the iOS Dev/Prod schemes use) and exposes every KEY=value in it as BuildConfig.KEY.
+ * react-native-config passes BuildConfig to JavaScript, where the same values are Config.KEY.
+ * Returns the values as Java string literals, ready for buildConfigField.
+ */
+def readEnvFile(String name) {
+    def file = new File(rootDir.parentFile, name)
+    if (!file.exists()) {
+        throw new GradleException("Missing env file: ${file}")
+    }
+    def env = [:]
+    file.eachLine { line ->
+        def match = line =~ /^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*['"]?(.*?)['"]?\s*$/
+        if (match.matches()) {
+            env[match.group(1)] = '"' + match.group(2).replace('\\', '\\\\').replace('"', '\\"') + '"'
+        }
+    }
+    return env
+}
+
 android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -83,6 +104,7 @@ android {
     buildFeatures {
         dataBinding = true
         compose true
+        buildConfig true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.15" // Match your Compose version
@@ -127,14 +149,16 @@ android {
         dev {
             applicationIdSuffix ".dev"
             signingConfig signingConfigs.debug
-
+            readEnvFile(".env.dev").each { key, value -> buildConfigField "String", key, value }
         }
         prod {
 //            applicationId "com.qbatz.smartstay.tenant"
+            readEnvFile(".env.prod").each { key, value -> buildConfigField "String", key, value }
         }
         local {
             applicationIdSuffix ".dev"
             signingConfig signingConfigs.debug
+            readEnvFile(".env.local").each { key, value -> buildConfigField "String", key, value }
         }
     }
 

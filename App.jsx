@@ -61,7 +61,6 @@ import { storeData, retriveData } from './src/Utils/Storage';
 import PaymentContext from './src/Context/PaymentContext';
 import SuccessFlow from './src/SuccessFlow';
 import NotificationContext from './src/Context/NotificationContext';
-import { initBaseUrl } from './src/Utils/Constant';
 import WelcomeBackPage from './src/Components/CreateAccount/WelcomeBackPage';
 import EnterNumber from './src/Components/ForgotMpin/EnterNumber';
 import ForgotMpinOtp from './src/Components/ForgotMpin/ForgotMpinOtp';
@@ -74,8 +73,6 @@ const { width, height } = Dimensions.get("window");
 function App() {
 
   const isDarkMode = useColorScheme() === 'dark';
-
-  const { CommonModule } = NativeModules;
 
 
   const [loggedIn, setloggein] = useState()
@@ -91,14 +88,6 @@ function App() {
     })
   }, [])
 
-  CommonModule.fetchBaseUrl().then(result => {
-    console.log(result)
-    initBaseUrl(result)
-
-  }).
-    catch(error => {
-      console.log(error)
-    })
 
 
 
