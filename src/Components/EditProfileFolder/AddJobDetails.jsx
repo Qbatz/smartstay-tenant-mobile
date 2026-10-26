@@ -202,15 +202,18 @@ const AddJobDetails = ({ route }) => {
         let newErrors = {};
 
         if (!companyName && !companyName.trim()) {
-            newErrors.company = "Please Enter Companyname"
+            newErrors.company = "Please Enter Company/College Name"
         }
 
         if (!location) {
             newErrors.location = "Please Enter Location "
         }
 
-        if (!(formatTime(shiftFrom)) && !formatTime(shiftTo)) {
-            newErrors.shiftTime = "Please Select Time"
+        if (!(formatTime(shiftFrom))) {
+            newErrors.shiftTime = "Please Select Shift From & To Time"
+        }
+        if (!formatTime(shiftTo)) {
+            newErrors.shiftTime = "Please Select Shift  From & To Time"
         }
 
         // if (!guardianMobileNo && !guardianMobileNo.trim()) {
@@ -239,7 +242,7 @@ const AddJobDetails = ({ route }) => {
                     employmentStatus:selectedEmployment,
                     workLocation: location,
                     workStartDate: startDate ? dayjs(startDate).format("DD-MM-YYYY") : "",
-                    workEndDate: endDate ? dayjs(endDate).format("DD-MM-YYYY") : "",
+                    workEndDate: endDate ? dayjs(endDate).format("DD-MM-YYYY") : null,
                     shiftType: shiftType,
                     shiftFrom: formatTime(shiftFrom),
                     shiftTo: formatTime(shiftTo),
@@ -281,7 +284,7 @@ const AddJobDetails = ({ route }) => {
                     role: jobRole,
                     workLocation: location,
                     workStartDate: startDate ? dayjs(startDate).format("DD-MM-YYYY") : "",
-                    workEndDate: endDate ? dayjs(endDate).format("DD-MM-YYYY") : "Select start Date",
+                    workEndDate: endDate ? dayjs(endDate).format("DD-MM-YYYY") : "",
                     shiftType: shiftType,
                     shiftFrom: formatTime(shiftFrom),
                     shiftTo: formatTime(shiftTo),
@@ -508,7 +511,7 @@ const AddJobDetails = ({ route }) => {
                                 ))}
                             </ScrollView>
                         )} */}
-                        <Text style={styles.labelTxt}>{employmentStatus === "Student" ? "College Name" : "Company Name"}
+                        <Text style={styles.labelTxt}>{employmentStatus === "Student" ? "College Name" : "Company / College Name"}
                             <Text style={{ color: 'red' }}> *</Text>
                         </Text>
 
@@ -527,7 +530,9 @@ const AddJobDetails = ({ route }) => {
 
 
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
-                            <TouchableOpacity onPress={() => setIsTickIcon(!isTickIcon)}
+                            <TouchableOpacity onPress={() => {setIsTickIcon(!isTickIcon)
+                                setEndDate("")
+                            }}
                                 style={{
                                     borderWidth: 1, borderColor: "#D9D9D9", width: 15, height: 15, borderRadius: 4,
                                     alignItems: 'center', justifyContent: 'center'
@@ -607,7 +612,7 @@ const AddJobDetails = ({ route }) => {
                         )}
 
 
-                        <Text style={styles.labelTxt}>{employmentStatus === "Student" ? "College/Institute Location" : "Work Location"}
+                        <Text style={styles.labelTxt}>{employmentStatus === "Student" ? "College/Institute Location" : "Location"}
                             <Text style={{ color: 'red' }}> *</Text>
                         </Text>
 
@@ -630,16 +635,19 @@ const AddJobDetails = ({ route }) => {
 
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                             <TouchableOpacity onPress={() => openTimePicker('from')}
-                                style={[styles.shiftInputBox, { marginRight: 6 }]}>
+                                style={[styles.shiftInputBox, {marginRight:6}]}>
                                 <Text> {shiftFrom ? formatTime(shiftFrom) : "From"}</Text>
                                 <Image source={TimerIcon} style={{ width: 22.5, height: 22.5 }} />
                             </TouchableOpacity>
-
+                            
+                           
+                            
+                            
                             <TouchableOpacity onPress={() => openTimePicker('to')}
-                                style={[styles.shiftInputBox, { marginRight: 6 }]}>
+                                style={[styles.shiftInputBox, { marginLeft:6}]}>
                                 <Text>  {shiftTo ? formatTime(shiftTo) : "To"}</Text>
                                 <Image source={TimerIcon} style={{ width: 22.5, height: 22.5 }} />
-                            </TouchableOpacity>
+                            </TouchableOpacity>                                    
                         </View>
 
                         {errors.shiftTime && (<ErrorMessage message={errors.shiftTime} type="error" />)}
@@ -772,7 +780,7 @@ const styles = StyleSheet.create({
     shiftInputBox: {
         borderWidth: 1, borderRadius: 8, borderColor: '#EEEEEE', paddingVertical: 16,
         paddingHorizontal: 14, marginTop: 12, flexDirection: 'row',
-        justifyContent: 'space-between', flex: 1
+        justifyContent: 'space-between',flex:1
 
     },
     dateOverlay: {

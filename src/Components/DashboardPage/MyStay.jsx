@@ -38,10 +38,10 @@ function MyStay(props) {
     const [request, setRequest] = useState([])
 
     const [isLoading, setIsLoading] = useState(false)
-      const [refreshing, setRefreshing] = useState(false)
-    
+    const [refreshing, setRefreshing] = useState(false)
 
-    console.log("Kolla",context)
+
+    console.log("Kolla", context)
 
     const announcements = [
         { id: 1, text: 'Hello water maintenance on 5th June' },
@@ -118,10 +118,13 @@ function MyStay(props) {
         context.jumpComplain('complaint')
     }
 
-    const pending = ["PENDING", "PARTIAL PAID", "PARTIALLY PAID","PARTIAL_PAYMENT"].includes(context?.getPreviousMonthBills?.paymentStatus)
-    const currentPending= ["PENDING", "PARTIAL PAID", "PARTIALLY PAID","PARTIAL_PAYMENT"].includes(context?.getCurrentMonthBills?.paymentStatus)
+    const pending = ["PENDING", "PARTIAL PAID", "PARTIALLY PAID", "PARTIAL_PAYMENT"].includes(context?.getPreviousMonthBills?.paymentStatus)
+    const currentPending = ["PENDING", "PARTIAL PAID", "PARTIALLY PAID", "PARTIAL_PAYMENT"].includes(context?.getCurrentMonthBills?.paymentStatus)
 
-      const onRefresh = async () => {
+    const tenantCurrentStatus = ["VACATED", "BOOKED"].includes(context.getCustomerDetail?.currentStatus)
+    const currentStatus = context?.getCustomerDetail?.currentStatus
+
+    const onRefresh = async () => {
         console.log("REFRESH CALLED");
 
         setRefreshing(true);
@@ -133,25 +136,25 @@ function MyStay(props) {
 
     };
 
-    const handlePhoneCall=(mobile)=>{
-        
-        if(mobile){
+    const handlePhoneCall = (mobile) => {
+
+        if (mobile) {
             CommonModule.makeCall(mobile)
         }
     }
-    
+
 
 
     return (
         <>
             <SkeletonLoader loading={isLoading}>
-                {context.getCustomerDetail?.bookingDetails?.currentStatus === "BOOKED" && (
+                {tenantCurrentStatus && (
                     <ScrollView style={{ backgroundColor: '#ffffff', flex: 1, width: '100%' }}
-                    contentContainerStyle={{paddingBottom:30}} showsVerticalScrollIndicator={false}
-                    scrollEventThrottle={16} onScroll={props.onScroll}
-                    refreshControl={<RefreshControl
-                                            refreshing={refreshing}
-                                            onRefresh={onRefresh} />}>
+                        contentContainerStyle={{ paddingBottom: 30 }} showsVerticalScrollIndicator={false}
+                        scrollEventThrottle={16} onScroll={props.onScroll}
+                        refreshControl={<RefreshControl
+                            refreshing={refreshing}
+                            onRefresh={onRefresh} />}>
 
                         <View style={{ height: 130, marginTop: 15, marginRight: width * 0.10, overflow: 'hidden', width: width * 0.97 }}>
                             <View style={{ marginRight: 10, flex: 1 }}>
@@ -161,20 +164,47 @@ function MyStay(props) {
 
 
                                     <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} colors={['#10267B', '#0227B5']}
-                                        style={{ width: width * 0.9, height: '65%', borderRadius: 10, paddingHorizontal: 20, paddingTop: 10 }} >
-                                        <View style={{ flexDirection: 'row', alignItems: 'center',marginTop:3}}>
-                                            <Text  style={{ color: '#ffffff', fontSize: 18, fontFamily: 'Gilroy-Semibold',
-                                                    lineHeight: 24,flexShrink:1}}
+                                        style={[{ width: width * 0.9, borderRadius: 10, paddingHorizontal: 20, paddingTop: 10, },
+                                        { height: currentStatus === "VACATED" ? "85%" : "65%" }
+                                        ]} >
+                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 3, }}>
+                                                <Text style={{
+                                                    color: '#ffffff', fontSize: 18, fontFamily: 'Gilroy-Semibold',
+                                                    lineHeight: 24, flexShrink: 1
+                                                }}
                                                     numberOfLines={1}>
-                                                Hi, {context.getCustomerDetail?.firstName} {context.getCustomerDetail?.lastName}
-                                            </Text>
-                                            <Image source={WaveIcon} style={{ width: 18.13, height: 18.13, marginLeft: 8 }} />
+                                                    Hi, {context.getCustomerDetail?.firstName} {context.getCustomerDetail?.lastName}
+                                                </Text>
+                                                {currentStatus === "BOOKED" &&
+                                                    <Image source={WaveIcon} style={{ width: 18.13, height: 18.13, marginLeft: 8 }} />
+                                                }
+
+
+
+
+                                            </View>
+                                            {currentStatus === "VACATED" &&
+                                                <View style={{
+                                                    alignSelf: 'flex-end', backgroundColor: '#FF0000', borderRadius: 6,
+                                                    flexDirection: 'row', alignItems: 'center', paddingVertical: 4, paddingHorizontal: 8
+                                                }}>
+                                                    <View style={{ backgroundColor: '#ffffff', width: 5, height: 5, borderRadius: 10, marginRight: 6 }} />
+                                                    <Text style={{ fontSize: 11, fontFamily: 'Gilroy-Medium', color: '#ffffff' }}>
+                                                        Checked out</Text>
+                                                </View>
+                                            }
                                         </View>
 
 
                                         <Text style={{ color: '#ffffff', fontSize: 13, fontFamily: 'Gilroy-Regular', lineHeight: 24, marginTop: 10 }}>
-                                            Your Bed have been reserved
+                                            {tenantCurrentStatus === "BOOKED" ? "Your Bed have been reserved" : "Your stay has ended"}
                                         </Text>
+                                        {currentStatus === "VACATED" &&
+                                            <Text style={{ color: '#ffffff', fontSize: 13, fontFamily: 'Gilroy-Regular', lineHeight: 24, marginTop: 10 }}>
+                                                Checked out on {context?.getCustomerDetail?.bookingDetails?.checkoutDate}
+                                            </Text>
+                                        }
                                     </LinearGradient>
                                 </Swiper>
                             </View>
@@ -198,16 +228,18 @@ function MyStay(props) {
                                 </View>
                             </View>
 
-                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 15 }}>
-                                <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#3C3C4399' }}>
-                                    Check in date
-                                </Text>
+                            {["BOOKED"].includes(context.getCustomerDetail?.bookingDetails?.currentStatus) &&
+                                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 15 }}>
+                                    <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#3C3C4399' }}>
+                                        Check in date
+                                    </Text>
 
 
-                                <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>
-                                    {context.getCustomerDetail?.expJoiningDate}
-                                </Text>
-                            </View>
+                                    <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>
+                                        {context.getCustomerDetail?.expJoiningDate}
+                                    </Text>
+                                </View>
+                            }
 
                             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 15 }}>
                                 <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#3C3C4399' }}>
@@ -219,6 +251,18 @@ function MyStay(props) {
                                     {context.getCustomerDetail?.bookingDetails?.roomSharingType || "N/A"} Sharing
                                 </Text>
                             </View>
+
+                            {currentStatus === "VACATED" &&
+                                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 15 }}>
+                                    <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#3C3C4399' }}>
+                                        Stay Duration
+                                    </Text>
+
+
+                                    <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>
+                                        {context.getCustomerDetail?.displayDuration || "N/A"}
+                                    </Text>
+                                </View>}
 
                             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 15 }}>
                                 <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#3C3C4399' }}>
@@ -241,11 +285,11 @@ function MyStay(props) {
                                 Tenants have beed must follow the PG Rules and checkin on date properly</Text>
                         </View>
 
-                        <TouchableOpacity onPress={()=>handlePhoneCall(context?.getCustomerDetail?.hostel?.mobile)}
-                        style={{
-                            backgroundColor: '#1E45E1', borderRadius: 8, justifyContent: 'center', alignItems: 'center',
-                            marginTop: 25, flexDirection: 'row', paddingVertical: 16, paddingHorizontal: 40, marginHorizontal: 10
-                        }}>
+                        <TouchableOpacity onPress={() => handlePhoneCall(context?.getCustomerDetail?.hostel?.mobile)}
+                            style={{
+                                backgroundColor: '#1E45E1', borderRadius: 8, justifyContent: 'center', alignItems: 'center',
+                                marginTop: 25, flexDirection: 'row', paddingVertical: 16, paddingHorizontal: 40, marginHorizontal: 10
+                            }}>
                             <Image source={callIcon} style={{ width: 20, height: 20, tintColor: '#ffffff' }} />
                             <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium', marginLeft: 8, color: '#ffffff', marginLeft: 10 }}>
                                 Contact Hostel Admin</Text>
@@ -253,13 +297,13 @@ function MyStay(props) {
                     </ScrollView>
                 )}
 
-                {context.getCustomerDetail?.bookingDetails?.currentStatus != "BOOKED" && (
+                {!["BOOKED", "VACATED"].includes(context.getCustomerDetail?.currentStatus) && (
                     <ScrollView style={{ backgroundColor: '#ffffff', flex: 1, width: '100%' }}
                         showsVerticalScrollIndicator={false}
                         contentContainerStyle={{ paddingBottom: 20 }} onScroll={props.onScroll}
                         refreshControl={<RefreshControl
-                                                refreshing={refreshing}
-                                                onRefresh={onRefresh} />}>
+                            refreshing={refreshing}
+                            onRefresh={onRefresh} />}>
 
                         {/* <View style={{height:130, marginTop: 15,marginRight:width*0.10,overflow: 'hidden', width: width*0.97  }}>
             <View style={{marginRight:10,flex:1}}> 
@@ -347,14 +391,14 @@ function MyStay(props) {
                                         <Text style={style.highlightText}>
                                             New Bill Generated
                                         </Text>
-                                        
+
                                         <View style={style.inlineRow}>
                                             <Text style={style.label}>
                                                 {context.getCurrentMonthBills?.eb === 0 ? "Inv on :" : currentPending ? "Due On :" : "Paid On :"}</Text>
                                             <Text style={style.value} numberOfLines={1}>
                                                 {context.getCurrentMonthBills?.eb === 0 ?
-                                                context.getCurrentMonthBills?.currentInvoiceStartDate : currentPending ? 
-                                                context.getCurrentMonthBills?.invoiceDueDate : context.getCurrentMonthBills?.paymentDate ?? 'N/A' }
+                                                    context.getCurrentMonthBills?.currentInvoiceStartDate : currentPending ?
+                                                        context.getCurrentMonthBills?.invoiceDueDate : context.getCurrentMonthBills?.paymentDate ?? 'N/A'}
                                             </Text>
                                         </View>
                                     </View>
@@ -375,7 +419,7 @@ function MyStay(props) {
                                         <View style={style.inlineRow}>
                                             <Text style={style.label}>{currentPending ? "Due On :" : "Paid On"}</Text>
                                             <Text style={style.value} numberOfLines={1}>
-                                                 { currentPending ? context.getCurrentMonthBills?.invoiceDueDate : context.getCurrentMonthBills?.paymentDate ?? 'N/A'}
+                                                {currentPending ? context.getCurrentMonthBills?.invoiceDueDate : context.getCurrentMonthBills?.paymentDate ?? 'N/A'}
                                             </Text>
                                         </View>
                                     </View>
@@ -496,27 +540,27 @@ function MyStay(props) {
                             </View>
                             <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'space-between' }}>
                                 <TouchableOpacity onPress={() => props.onSheet()}
-                                disabled={context?.getCustomerDetail?.currentStatus === "VACATED" }
+                                    disabled={context?.getCustomerDetail?.currentStatus === "VACATED"}
                                     style={{
                                         borderWidth: 1, borderRadius: 10, flex: 1, justifyContent: 'center',
                                         alignItems: 'center', marginRight: 10, padding: 10, borderColor: '#EFF2FF',
                                     }}>
                                     <View style={{ marginBottom: 10 }}>
                                         <Image source={Receipt} style={[{ width: 26, height: 26 },
-                                            context?.getCustomerDetail?.currentStatus === "VACATED" && {opacity:0.4}]} />
+                                        context?.getCustomerDetail?.currentStatus === "VACATED" && { opacity: 0.4 }]} />
                                     </View>
                                     <Text style={{ fontSize: 10, marginTop: 5, fontFamily: 'Gilroy-Medium' }}>Complaint</Text>
                                 </TouchableOpacity>
 
                                 <TouchableOpacity onPress={() => props.onRequestBedChange()}
-                                disabled={context?.getCustomerDetail?.currentStatus === "VACATED" }
+                                    disabled={context?.getCustomerDetail?.currentStatus === "VACATED"}
                                     style={{
                                         borderWidth: 1, borderRadius: 10, flex: 1, justifyContent: 'center', alignItems: 'center',
                                         marginLeft: 5, padding: 10, borderColor: '#EFF2FF'
                                     }}>
                                     <View>
                                         <Image source={FrameAdd} style={[{ width: 24, height: 24 },
-                                            context?.getCustomerDetail?.currentStatus === "VACATED" && {opacity:0.4}]} />
+                                        context?.getCustomerDetail?.currentStatus === "VACATED" && { opacity: 0.4 }]} />
                                     </View>
                                     <View style={{ justifyContent: 'center', alignItems: 'center', paddingTop: 5 }}>
                                         <Text style={{ fontSize: 10, fontFamily: 'Gilroy-Regular' }}>Request</Text>
@@ -570,22 +614,22 @@ function MyStay(props) {
                                 })
                                 :
                                 <>
-                                <View style={{
-                                    borderWidth: 1, borderRadius: 10, flexDirection: 'row', paddingVertical: 15, borderColor: '#EFF2FF',
-                                    justifyContent: 'space-between', marginTop: 10
-                                }}>
-                                    <View style={{ paddingLeft: 12, paddingRight: 10 }}>
-                                        <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold', marginBottom: 5 }}>
-                                            No Request yet
-                                        </Text>
-                                        <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#4B4B4B', marginTop: 5 }}>
-                                            You have'nt raised any request</Text>
-                                    </View>
+                                    <View style={{
+                                        borderWidth: 1, borderRadius: 10, flexDirection: 'row', paddingVertical: 15, borderColor: '#EFF2FF',
+                                        justifyContent: 'space-between', marginTop: 10
+                                    }}>
+                                        <View style={{ paddingLeft: 12, paddingRight: 10 }}>
+                                            <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold', marginBottom: 5 }}>
+                                                No Request yet
+                                            </Text>
+                                            <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#4B4B4B', marginTop: 5 }}>
+                                                You have'nt raised any request</Text>
+                                        </View>
 
-                                    <Image source={requestProfile} style={{ width: 44, height: 44, marginRight: 12, marginTop: 5 }} />
-                                </View>                            
+                                        <Image source={requestProfile} style={{ width: 44, height: 44, marginRight: 12, marginTop: 5 }} />
+                                    </View>
                                 </>
-                                }
+                            }
 
                         </View>
 
