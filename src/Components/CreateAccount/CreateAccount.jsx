@@ -8,6 +8,7 @@ import {
   Image,
   TouchableWithoutFeedback,
   ScrollView,
+  Keyboard,
 } from "react-native";
 import { verifyPhoneNo } from "../../Action/LoginAction";
 import SuccessModal from "../ToastFile/TostFilePage";
@@ -27,7 +28,6 @@ const CreateAccount = ({ navigation }) => {
   const [modelTpe, setModelType] = useState()
   const [phoneNoError, setPhoneNoError] = useState()
   const [showDropdown, setShowDropdown] = useState(false)
-  const [isFocus, setIsFocus] = useState(false)
   const [isSubmitClicked, setIsSubmitClicked] = useState(false)
 
   const countries = [
@@ -79,24 +79,16 @@ const CreateAccount = ({ navigation }) => {
           loginContext.userId(dat.data.xuid)
 
 
-          if (dat?.data?.otp) {
-            setOtp(dat.data.otp)
-            setModelType('success')
-            setShowSuccessModal(true)
-            setTimeout(() => {
-              setShowSuccessModal(false);
-              navigation.navigate("OtpDesign", { phone: phoneNumber });
-              setTimeout(() => {
-                setIsSubmitClicked(false)
-              }, 200);
-            }, 4000);
-          }
-          else {
+          setOtp("OTP Sent")
+          setModelType('success')
+          setShowSuccessModal(true)
+          setTimeout(() => {
+            setShowSuccessModal(false);
             navigation.navigate("OtpDesign", { phone: phoneNumber });
             setTimeout(() => {
               setIsSubmitClicked(false)
-            }, 100);
-          }
+            }, 200);
+          }, 1500);
 
         }
         else if (dat.status == 400) {
@@ -137,7 +129,15 @@ const CreateAccount = ({ navigation }) => {
 
 
 
+  // The iOS number pad has no return key, so tapping outside the field closes it.
+  // The same tap also closes the country list.
   return (
+    <TouchableWithoutFeedback
+      onPress={() => {
+        Keyboard.dismiss()
+        setShowDropdown(false)
+      }}
+      accessible={false}>
     <View style={styles.container}>
       <SuccessModal visible={showSuccessModal}
         onClose={() => setShowSuccessModal(false)}
@@ -171,7 +171,7 @@ const CreateAccount = ({ navigation }) => {
           >
             <Text style={styles.countryCode}>{selectedCountry.dial_code}</Text>
             <Ionicons
-              name={isFocus ? "chevron-up" : "chevron-down"}
+              name={showDropdown ? "chevron-up" : "chevron-down"}
               size={22}
               color="#000"
               style={{ paddingRight: 3 }}
@@ -185,7 +185,6 @@ const CreateAccount = ({ navigation }) => {
             placeholder="98765 43210"
             value={phoneNumber}
             onChangeText={handlePhoneChange}
-            onFocus={() => setIsFocus(true)}
             maxLength={10}
           />
         </View>
@@ -203,7 +202,10 @@ const CreateAccount = ({ navigation }) => {
                       <TouchableOpacity
                         key={index}
                         style={styles.countryItem}
-                        onPress={() => setSelectedCountry(item)}>
+                        onPress={() => {
+                          setSelectedCountry(item)
+                          setShowDropdown(false)
+                        }}>
                         <Text style={{ fontFamily: 'Gilroy-Medium', fontSize: 15 }}>{item.name} {item.dial_code}</Text>
                       </TouchableOpacity>
                     ))
@@ -229,6 +231,7 @@ const CreateAccount = ({ navigation }) => {
         </TouchableOpacity>
       </View>
     </View>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -275,6 +278,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     alignItems: "center",
     marginBottom: 5,
+    height: 50,
   },
   codeContainer: {
     flexDirection: "row",
@@ -290,6 +294,8 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
+    alignSelf: "stretch",
+    paddingVertical: 0,
     fontSize: 16,
     fontFamily: 'Gilroy-Medium',
     color: "#000",
