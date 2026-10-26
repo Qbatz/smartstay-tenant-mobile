@@ -5,7 +5,7 @@ import DigiokycSDK
 // use the dev API and Release builds use production.
 enum Constant {
 #if DEBUG
-  static let BASE_URL = "https://tenentdevapi.qbatz.com"
+  static let BASE_URL = "https://tenantapi.qbatz.com/"
 #else
   static let BASE_URL = "https://tenantapi.qbatz.com"
 #endif
