@@ -156,6 +156,7 @@ const styles = StyleSheet.create({
     },
     phoneInput: {
         flex: 1,
+        alignSelf: "stretch",
         fontSize: 16,
         marginLeft: 12,
     },

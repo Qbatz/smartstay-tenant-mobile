@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import { View, TouchableOpacity, Text, StyleSheet, Image, TextInput } from "react-native";
+import { View, TouchableOpacity, Text, StyleSheet, Image, TextInput, TouchableWithoutFeedback, Keyboard } from "react-native";
 import { LoginContexts } from "../../Context/LoginContext";
 import SuccessModal from "../ToastFile/TostFilePage";
 import { verifyPhoneNo } from "../../Action/LoginAction";
@@ -65,14 +65,14 @@ const EnterNumber = ({ navigation }) => {
 
       if (dat.status == 200) {
         loginContext.userId(dat.data.xuid)
-        setOtp(dat.data.otp)
+        setOtp("OTP Sent")
         setModelType('success')
         setShowSuccessModal(true)
         setTimeout(() => {
           setShowSuccessModal(false);
           navigation.navigate("ForgotMpinOtp", { phone: phoneNumber });
 
-        }, 4000);
+        }, 1500);
       }
       else if (dat.status == 403) {
         setShowSuccessModal(true)
@@ -88,7 +88,9 @@ const EnterNumber = ({ navigation }) => {
 
 
 
+  // The iOS number pad has no return key, so tapping outside the field closes it.
   return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
     <View style={styles.container}>
       <SuccessModal visible={showSuccessModal}
         onClose={() => setShowSuccessModal(false)}
@@ -136,6 +138,7 @@ const EnterNumber = ({ navigation }) => {
         </TouchableOpacity>
       </View>
     </View>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -177,6 +180,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     alignItems: "center",
     marginBottom: 5,
+    height: 50,
   },
   countryCode: {
     fontWeight: "600",
@@ -186,6 +190,8 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
+    alignSelf: "stretch",
+    paddingVertical: 0,
     fontSize: 16,
     color: "#000",
   },

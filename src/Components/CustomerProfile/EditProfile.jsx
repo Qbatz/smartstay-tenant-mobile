@@ -437,7 +437,10 @@ const EditProfile = (route) => {
                       <TouchableOpacity
                         key={index}
                         style={styles.countryItem}
-                        onPress={() => setSelectedCountry(item)}>
+                        onPress={() => {
+                          setSelectedCountry(item)
+                          setShowDropdown(false)
+                        }}>
                         <Text style={{ fontFamily: 'Gilroy-Medium', fontSize: 15 }}>{item.name} {item.dial_code}</Text>
                       </TouchableOpacity>
                     ))
@@ -812,6 +815,7 @@ const styles = StyleSheet.create({
   },
   phoneInput: {
     flex: 1,
+    alignSelf: "stretch",
     fontSize: 15, fontFamily: 'Gilroy-Medium'
   },
   overlay: {

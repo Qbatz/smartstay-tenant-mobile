@@ -206,7 +206,7 @@ const AddGuardianDetails = ({ route }) => {
                         <Text style={styles.label}>Mobile No <Text style={{ color: "red", }}>*</Text></Text>
 
                         <View style={{
-                            flexDirection: 'row', alignItems: 'center', paddingVertical: 5, paddingHorizontal: 10,
+                            flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10,
                             marginTop: 10, borderWidth: 1, borderColor: '#EEEEEE', borderRadius: 8,
                         }}>
                             <Text style={{ fontFamily: 'Gilroy-Regular', fontSize: 15, color: '#111827', }}>+91</Text>
@@ -215,7 +215,7 @@ const AddGuardianDetails = ({ route }) => {
                             <TextInput
                                 value={item?.guardianMobile}
                                 placeholder="Enter mobileNo"
-                                style={{ fontFamily: 'Gilroy-Regular', fontSize: 15, color: '#111827', marginLeft: 4 }}
+                                style={{ flex: 1, paddingVertical: 14, fontFamily: 'Gilroy-Regular', fontSize: 15, color: '#111827', marginLeft: 4 }}
                                 maxLength={10}
                                 onChangeText={(text) => {
                                     const onlyNum = text.replace(/[^0-9]/g, "")
