@@ -23,6 +23,13 @@ import org.jspecify.annotations.NonNull;
 import java.util.Map;
 
 public class FireBaseServices extends FirebaseMessagingService {
+    // FCM REGISTRATION TOKEN IS GENERATED HERE - the token the backend needs to send pushes to this
+    // device. Called on first launch and again whenever FCM rotates the token (same role as
+    // messaging(_:didReceiveRegistrationToken:) in ios/smartstayTenant/AppDelegate.swift).
+    //
+    // It is stored for NotificationModule.fetchFcmToken, which the JS sends to the server with
+    // updateFCMToken at login (EnterMPin.jsx, HostelList.jsx).
+    // TODO(server): confirm the backend stores this token and uses it to send pushes.
     @Override
     public void onNewToken(@NonNull String token) {
         super.onNewToken(token);

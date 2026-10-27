@@ -33,6 +33,18 @@ target 'smartstayTenant' do
   pod 'DigiokycSDK', '~> 2.0'
   pod 'DigioCaptureKit', '~> 2.0'
 
+  # Firebase: push notifications (FCM), Crashlytics and Analytics, started in AppDelegate.
+  # Each scheme's GoogleService-Info.plist is copied in by the "[Firebase] Copy
+  # GoogleService-Info.plist" build phase.
+  pod 'FirebaseMessaging', '~> 12.0', :modular_headers => true
+  pod 'FirebaseCrashlytics', '~> 12.0'
+  pod 'FirebaseAnalytics', '~> 12.0'
+  # Swift code imports these as modules (AppDelegate imports FirebaseMessaging; Firebase's own
+  # Swift pods import the rest), and this project builds pods as static libraries.
+  pod 'GoogleUtilities', :modular_headers => true
+  pod 'GoogleDataTransport', :modular_headers => true
+  pod 'nanopb', :modular_headers => true
+
   post_install do |installer|
     react_native_post_install(
       installer,
