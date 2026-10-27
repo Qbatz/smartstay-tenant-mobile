@@ -8,14 +8,20 @@ const ComplaintContext=(props)=> {
     const [complaintComments,setComplaintComments]=useState([])
     const [complaintDetail,setComplaintDetails]=useState()
     const [newComplaintUpdates,setComplaintNewUpdates]=useState([])
+    const[onlyComplaintList,setOnlyComplaintList]=useState([])
 
     console.log(complaintComments)
+
+    function complaintListfn(value){
+        setOnlyComplaintList(value)
+    }
 
     
 
     return<compliantContexts.Provider value={{ updateComplaintList:setComplaintsList, getComplaintList:complaintsList,
         updateComments:setComplaintComments,getComplaintComments:complaintComments,updateComplaint:setComplaintDetails,
-         getComplaintDetail:complaintDetail, complaintUpdates:setComplaintNewUpdates, NewComplaintUpdates:newComplaintUpdates
+         getComplaintDetail:complaintDetail, complaintUpdates:setComplaintNewUpdates, NewComplaintUpdates:newComplaintUpdates,
+         updateonlyComplaintList:complaintListfn,getOnlyComplaintList:onlyComplaintList
     }} >
         {props.children}
     </compliantContexts.Provider>

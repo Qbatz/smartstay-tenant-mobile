@@ -129,6 +129,10 @@ function Dashboard(props) {
   const [showTopNavigationBar, setShowTopNavigationBar] = useState(true)
   const [showRequestView, setShowRequestView] = useState(false)
   const [selectedRequest, setSelectedRequest] = (useState(""))
+  const [fromDate, setFromDate] = useState(null);
+  const [toDate, setToDate] = useState(null);
+  const [selectedDays, setSelectedDays] = useState()
+  const [resetClicked, setResetClicked] = useState(0)
 
   const { CommonModule } = NativeModules;
 
@@ -146,30 +150,30 @@ function Dashboard(props) {
   const keyboardY = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-  if (props?.route?.params?.initialTab === "payment") {
-     paymentContext.updateInvoice(null)
+    if (props?.route?.params?.initialTab === "payment") {
+      paymentContext.updateInvoice(null)
 
-    try {
-      paymentContext.updateLoading(true)
-      getInvoices(context?.getHostelDetail?.hostelId, props?.route?.params?.sourceId, loginContext.getToken).then(r => {
-        console.log(r)
+      try {
+        paymentContext.updateLoading(true)
+        getInvoices(context?.getHostelDetail?.hostelId, props?.route?.params?.sourceId, loginContext.getToken).then(r => {
+          console.log(r)
 
-        if (r.status === 200) {
-          paymentContext.updateInvoice(r.data);
-          setTimeout(() => {
-            paymentContext.updateLoading(false)
-          }, 1000);
-        }
+          if (r.status === 200) {
+            paymentContext.updateInvoice(r.data);
+            setTimeout(() => {
+              paymentContext.updateLoading(false)
+            }, 1000);
+          }
 
-      })
-      setModalVisible(true);
+        })
+        setModalVisible(true);
 
-    } catch (error) {
-      console.log(error)
+      } catch (error) {
+        console.log(error)
+      }
+      setindex(2);
     }
-    setindex(2);
-  }
-}, [props?.route?.params?.initialTab]);
+  }, [props?.route?.params?.initialTab]);
 
 
 
@@ -317,7 +321,7 @@ function Dashboard(props) {
       console.log(error)
     })
   }, [context.getHostelDetail, loginContext.getToken])
-  console.log("brithta",context)
+  console.log("brithta", context)
 
   //   const handleScroll = (event) => {
   //   const currentY = event.nativeEvent.contentOffset.y;
@@ -846,12 +850,12 @@ function Dashboard(props) {
 
   }
 
-  const handlePhoneCall=(mobile)=>{
-        console.log(mobile)
-        if(mobile){
-            CommonModule.makeCall(mobile)
-        }
+  const handlePhoneCall = (mobile) => {
+    console.log(mobile)
+    if (mobile) {
+      CommonModule.makeCall(mobile)
     }
+  }
 
   const downloadOption = (invoiceId) => {
     console.log(invoiceId)
@@ -861,7 +865,15 @@ function Dashboard(props) {
   }
 
   const filterpay = () => {
+    console.log("cousin")
     setFilterBottomSheet(true)
+  }
+
+  const handleInvoiceRefresh=()=>{
+    console.log("billana")
+    setFromDate(null)
+    setToDate(null)
+    setSelectedDays("")
   }
 
   // ---------------------------
@@ -915,7 +927,8 @@ function Dashboard(props) {
           onScroll={handleScroll} />;
       case 'payment':
         return <Payment onPayment={viewPay} onFilterPayment={filterpay} hostel={props?.route?.params?.hostel} jumpTo={jumpTo}
-          onScroll={handleScroll} />;
+          onScroll={handleScroll} filterFromDate={fromDate} filterToDate={toDate} filterSelectedMonth={selectedDays}
+          onReset={resetClicked} onRefresh={handleInvoiceRefresh}/>;
       default:
         return null;
     }
@@ -1028,11 +1041,11 @@ function Dashboard(props) {
 
 
         <View style={{ marginTop: 15, width: '100%', marginBottom: 10 }}>
-          <TouchableOpacity onPress={()=>handlePhoneCall(context?.getCustomerDetail?.hostel?.mobile)}
-           style={{
-            backgroundColor: '#1E45E1', borderRadius: 8, justifyContent: 'center', alignItems: 'center',
-            marginTop: 20, flexDirection: 'row', paddingVertical: 20, paddingHorizontal: 40
-          }}>
+          <TouchableOpacity onPress={() => handlePhoneCall(context?.getCustomerDetail?.hostel?.mobile)}
+            style={{
+              backgroundColor: '#1E45E1', borderRadius: 8, justifyContent: 'center', alignItems: 'center',
+              marginTop: 20, flexDirection: 'row', paddingVertical: 20, paddingHorizontal: 40
+            }}>
             <Image source={callIcon} style={{ width: 20, height: 20, tintColor: '#ffffff' }} />
             <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium', marginLeft: 8, color: '#ffffff' }}>
               Contact Hostel Admin</Text>
@@ -1586,7 +1599,17 @@ function Dashboard(props) {
       visible={filterBottomsheet}
       onClose={() => { setFilterBottomSheet(false) }}
       sheetY={sheetY}
-      panResponder={panResponder} />
+      panResponder={panResponder}
+      setSelectedFromDate={setFromDate}
+      setSelectedEndDate={setToDate}
+      setSelectedMonth={setSelectedDays}
+      onReset={() => {
+         setResetClicked(prev => prev + 1),
+        setFromDate(null),
+        setToDate(null),
+        setSelectedDays("")
+      }}
+      onApply={()=>{ setResetClicked(prev => prev + 1);}} />
 
     <RequestViewSheet
       visible={showRequestView}

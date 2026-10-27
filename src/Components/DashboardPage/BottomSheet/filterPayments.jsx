@@ -9,6 +9,8 @@ import { getPaymentList } from "../../../Action/HostelAction";
 import { LoginContexts } from "../../../Context/LoginContext";
 import { UsersContext } from "../../../Context/UserContext";
 import { paymentContexts } from "../../../Context/PaymentContext";
+import SuccessModal from "../../ToastFile/TostFilePage";
+import AppLoader from "../../ToastFile/LoaderPage";
 
 
 const FilterPayments = ({
@@ -16,12 +18,17 @@ const FilterPayments = ({
     onClose,
     panResponder,
     sheetY,
+    setSelectedFromDate,
+    setSelectedEndDate,
+    setSelectedMonth,
+    onReset,
+    onApply
 
 }) => {
 
     const { getToken } = useContext(LoginContexts)
     const { getHostelDetail } = useContext(UsersContext)
-    const { updateInvoiceList } = useContext(paymentContexts)
+    const { updateInvoiceList, updateOnlyInvoiceList } = useContext(paymentContexts)
 
     const [fromDate, setFromDate] = useState(null);
     const [toDate, setToDate] = useState(null);
@@ -34,6 +41,10 @@ const FilterPayments = ({
 
     const [tempDate, setTempDate] = useState(new Date());
     const [selectedDays, setSelectedDays] = useState()
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [showModelMessage, setShowModelMessage] = useState()
+    const [modelType, setModelType] = useState();
+    const [loading, setLoading] = useState(false)
 
 
     const onCloseFilter = () => {
@@ -80,8 +91,8 @@ const FilterPayments = ({
         setOpenCalendar(false);
     };
 
-    const resetAll=()=>{
-         setFromDate(null)
+    const resetAll = () => {
+        setFromDate(null)
         setToDate(null)
         setSelectedDays("")
     }
@@ -100,39 +111,55 @@ const FilterPayments = ({
     }
 
     const onApplyFilter = () => {
-        getPaymentList(getHostelDetail.hostelId, getToken, formatDate(fromDate), formatDate(toDate), String(selectedDays)).then(r => {
-            console.log("PaymentList", r)
+        setSelectedFromDate(formatDate(fromDate)),
+            setSelectedEndDate(formatDate(toDate)),
+            setSelectedMonth(selectedDays),
 
-            if (r.status == 200) {
-                updateInvoiceList(r.data)
-                onClose()
-            }else{
-                updateInvoiceList("")
-                onClose()
-            }
-        })
+            getPaymentList(getHostelDetail.hostelId, getToken, formatDate(fromDate), formatDate(toDate), String(selectedDays)).then(r => {
+                console.log("PaymentList", r)
+
+                if (r.status == 200) {
+                    updateInvoiceList(r.data)
+                    updateOnlyInvoiceList(r?.data?.invoices)
+                    onClose()
+                    onApply()
+                } else {
+                    updateInvoiceList("")
+                    updateOnlyInvoiceList("")
+                    onClose()
+                }
+            })
     }
 
-    const resetAllFilter=()=>{
-         setFromDate(null)
+    const resetAllFilter = () => {
+        setLoading(true)
+        setFromDate(null)
         setToDate(null)
         setSelectedDays("")
-       
-        setTimeout(() => {
-             getPaymentList(getHostelDetail.hostelId, getToken, formatDate(fromDate), formatDate(toDate), String(selectedDays)).then(r => {
-            console.log("PaymentList", r)
 
-            if (r.status == 200) {
-                updateInvoiceList(r.data)
-                onClose()
-            }else{
-                updateInvoiceList("")
-                onClose()
-            }
-        })
-            
+        setTimeout(() => {
+            getPaymentList(getHostelDetail.hostelId, getToken).then(r => {
+                console.log("PaymentListson", r)
+
+                if (r.status == 200) {
+                    updateInvoiceList(r?.data)
+                    updateOnlyInvoiceList(r?.data?.invoices)
+
+                    onReset()
+                    setTimeout(() => {
+                        setLoading(false)
+                        onClose()
+                    }, 400);
+
+                } else {
+                    updateInvoiceList("")
+                    updateOnlyInvoiceList("")
+                    onClose()
+                }
+            })
+
         }, 800);
-       
+
     }
 
 
@@ -140,6 +167,12 @@ const FilterPayments = ({
 
     if (!visible) return null;
     return <View style={styles.sheetOverlay}>
+        {/* <SuccessModal
+            visible={showSuccessModal}
+            message={showModelMessage}
+            type={modelType}
+        /> */}
+        <AppLoader visible={loading} />
         <TouchableWithoutFeedback onPress={onCloseFilter}>
             <View style={StyleSheet.absoluteFill} />
         </TouchableWithoutFeedback>
@@ -159,14 +192,14 @@ const FilterPayments = ({
 
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                             <Image source={FilterSimpleIcon} style={{ width: 24, height: 24 }} />
-                            <Text style={{ fontSize: 20,fontFamily:'Gilroy-Semibold', marginLeft: 10 }}>Filter by</Text>
+                            <Text style={{ fontSize: 20, fontFamily: 'Gilroy-Semibold', marginLeft: 10 }}>Filter by</Text>
                         </View>
 
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 16 }}>
-                            <Text style={{ fontSize: 14,fontFamily:'Gilroy-Medium' }}>Date Range</Text>
+                            <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>Date Range</Text>
 
                             <TouchableOpacity onPress={resetAll}>
-                                <Text style={{ fontSize: 14,fontFamily:'Gilroy-Medium', color: '#1E45E1' }}>Reset</Text>
+                                <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#1E45E1' }}>Reset</Text>
                             </TouchableOpacity>
                         </View>
 
@@ -242,21 +275,21 @@ const FilterPayments = ({
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', flex: 1, paddingTop: 15 }}>
                                 <View style={{ paddingRight: 5, flex: 1 }}>
                                     <TouchableOpacity onPress={() => onSelectDays("Today")}
-                                       style={[styles.daysContainer, selectedDays === "Today" && {borderColor:'#1E45E1'}]}>
+                                        style={[styles.daysContainer, selectedDays === "Today" && { borderColor: '#1E45E1' }]}>
                                         <Text style={styles.daysText}>Today</Text>
                                     </TouchableOpacity>
                                 </View>
 
                                 <View style={{ paddingLeft: 5, flex: 1 }}>
                                     <TouchableOpacity onPress={() => onSelectDays("This Week")}
-                                        style={[styles.daysContainer, selectedDays === "This Week" && {borderColor:'#1E45E1'}]}>
+                                        style={[styles.daysContainer, selectedDays === "This Week" && { borderColor: '#1E45E1' }]}>
                                         <Text style={styles.daysText}>This Week</Text>
                                     </TouchableOpacity>
                                 </View>
 
                                 <View style={{ paddingLeft: 10, flex: 1, }}>
                                     <TouchableOpacity onPress={() => onSelectDays("This Month")}
-                                        style={[styles.daysContainer, selectedDays === "This Month" && {borderColor:'#1E45E1'}]}>
+                                        style={[styles.daysContainer, selectedDays === "This Month" && { borderColor: '#1E45E1' }]}>
                                         <Text style={styles.daysText}>This Month</Text>
                                     </TouchableOpacity>
                                 </View>
@@ -267,17 +300,21 @@ const FilterPayments = ({
                             <View style={{ flexDirection: 'row', flex: 1 }}>
                                 <View style={{ paddingRight: 5, flex: 1 }}>
                                     <TouchableOpacity onPress={resetAllFilter}
-                                    style={{ borderRadius: 8, justifyContent: 'center',  paddingHorizontal:10,
-                                                paddingVertical: 16, alignItems: 'center',backgroundColor:'#EFF2FF' }}>
-                                        <Text style={{fontSize:14,fontFamily:'Gilroy-Medium',color:'#1E45E1'}}>Reset all</Text>
+                                        style={{
+                                            borderRadius: 8, justifyContent: 'center', paddingHorizontal: 10,
+                                            paddingVertical: 16, alignItems: 'center', backgroundColor: '#EFF2FF'
+                                        }}>
+                                        <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#1E45E1' }}>Reset all</Text>
                                     </TouchableOpacity>
                                 </View>
 
                                 <View style={{ paddingLeft: 5, flex: 1 }}>
                                     <TouchableOpacity onPress={onApplyFilter}
-                                        style={{borderRadius: 8, justifyContent: 'center', alignItems: 'center', paddingHorizontal:10,
-                                                paddingVertical: 16,backgroundColor:'#1E45E1' }}>
-                                        <Text style={{fontSize:14,fontFamily:'Gilroy-Medium',color:'#FFFFFF'}}>Apply</Text>
+                                        style={{
+                                            borderRadius: 8, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 10,
+                                            paddingVertical: 16, backgroundColor: '#1E45E1'
+                                        }}>
+                                        <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#FFFFFF' }}>Apply</Text>
                                     </TouchableOpacity>
                                 </View>
 
@@ -380,7 +417,7 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 13,
         color: '#9AA0A6',
-        fontFamily:'Gilroy-Medium',
+        fontFamily: 'Gilroy-Medium',
         marginBottom: 6,
     },
     input: {
@@ -396,13 +433,13 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingLeft: 14,
         fontSize: 15,
-        fontFamily:'Gilroy-Regular', 
+        fontFamily: 'Gilroy-Regular',
         color: '#B0B4BB',
         includeFontPadding: false,
     },
     selectedText: {
         color: '#3C4043',
-        fontFamily:'Gilroy-Regular' 
+        fontFamily: 'Gilroy-Regular'
     },
     iconBox: {
         width: 44,
@@ -414,11 +451,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     daysText: {
-        fontSize: 13,fontFamily:'Gilroy-Medium', color: '#555E67'
+        fontSize: 13, fontFamily: 'Gilroy-Medium', color: '#555E67'
     },
     daysContainer: {
         borderRadius: 10, borderWidth: 1, justifyContent: 'center', alignItems: 'center',
-        paddingVertical: 14, borderColor: '#ECEDF0',paddingHorizontal:10
+        paddingVertical: 14, borderColor: '#ECEDF0', paddingHorizontal: 10
     },
     dateOverlay: {
         position: "absolute",

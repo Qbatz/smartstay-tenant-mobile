@@ -476,8 +476,8 @@ const CustomerProfileNew = (route) => {
 
                             <View style={styles.cards}>
 
-                                <TouchableOpacity onPress={HostelClick} style={[styles.row,context.getCustomerDetail?.currentStatus ==="VACATED" && {opacity:0.4}]}
-                                disabled={["VACATED"].includes(context.getCustomerDetail?.currentStatus)}>
+                                <TouchableOpacity onPress={HostelClick} style={[styles.row,]}
+                                >
                                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                         <Image source={buildings} style={{ width: 25, height: 25 }} />
                                         <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium', marginLeft: 5 }}>

@@ -77,7 +77,8 @@ function Services(props) {
         complaints(commonContext.getHostelDetail.hostelId, loginContext.getToken)
             .then(r => {
                 console.log("Complaints API:", r);
-                complaintContext.updateComplaintList(r?.data?.content);
+                complaintContext.updateComplaintList(r?.data);
+                complaintContext?.updateonlyComplaintList(r?.data?.complaints)
             })
             .catch(err => console.log("Error:", err));
 
@@ -110,6 +111,7 @@ function Services(props) {
             console.log('nothissdfsd')
         }
     }, [commonContext.Complaint])
+    console.log(complaintContext.getComplaintList)
 
     function firstclick(value) {
         setselectfield(value)
@@ -199,7 +201,7 @@ function Services(props) {
                     <FlatList showsVerticalScrollIndicator={false}
                         style={{ marginTop: 10, position: 'relative', marginBottom: 10 }}
                         keyExtractor={(item) => item.complaintId}
-                        data={complaintContext.getComplaintList}
+                        data={complaintContext.getOnlyComplaintList}
                         onScroll={props.onScroll}
                         scrollEventThrottle={16}
                         ListEmptyComponent={

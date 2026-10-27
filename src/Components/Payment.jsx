@@ -11,6 +11,8 @@ import {
   TouchableWithoutFeedback, Linking, Alert, Animated,
   PanResponder,
   RefreshControl,
+  FlatList,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import SideArrow from "../assets/Images/arrow-up.png";
@@ -34,7 +36,7 @@ import NoResultPic from "../assets/Images/NoResultPic.png"
 
 
 const Payment = (props) => {
-  console.log(props)
+  console.log("propsPayment", props)
   const sheetY = useRef(new Animated.Value(700)).current;
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
@@ -43,7 +45,10 @@ const Payment = (props) => {
   const loginContext = useContext(LoginContexts)
   const paymentContext = useContext(paymentContexts)
   const [refreshing, setRefreshing] = useState(false)
-
+  const [invoicePage, setInvoicePage] = useState(1)
+  const [hasMoreInvoiceList, setHasMoreInvoiceList] = useState(true)
+  const [pageLoading, setPageLoading] = useState(false)
+  const onEndReachedCalledDuringMomentum = useRef(true);
 
 
 
@@ -52,15 +57,26 @@ const Payment = (props) => {
     getPaymentList(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
       console.log("PaymentList", r)
       paymentContext.updateInvoiceList(r.data)
+      paymentContext?.updateOnlyInvoiceList(r?.data?.invoices)
     })
   }
 
   useEffect(() => {
+    console.log("simbu", invoicePage)
+  }, [invoicePage])
+  useEffect(() => {
     fetchPaymentData();
   }, [context.getHostelDetail.hostelId, loginContext.getToken])
 
+  useEffect(() => {
+    if (props?.onReset > 0) {
+      setInvoicePage(1)
+      setHasMoreInvoiceList(true)
 
+    }
+  }, [props?.onReset])
 
+  console.log("karana", invoicePage, hasMoreInvoiceList)
 
   const staticReceiptData = {
     configurations: {
@@ -105,6 +121,170 @@ const Payment = (props) => {
     setSelectedPayment(null);
   };
 
+  console.log("arabinkuth", paymentContext.getInvoiceList?.invoices)
+
+  // const onEndReachFetchInvoiceList = async (page = 1, isRefresh = false) => {
+  //   if (!context.getHostelDetail.hostelId) {
+  //     return;
+  //   }
+
+
+  //   if (pageLoading) {
+  //     return;
+  //   }
+
+
+  //   if (!isRefresh && !hasMoreInvoiceList) {
+  //     return;
+  //   }
+
+  //   try {
+  //     getPaymentList(
+  //       {
+  //         hostelId: context.getHostelDetail.hostelId,
+  //         token: loginContext.getToken,
+  //         page: invoicePage,
+  //         size: 20,
+  //       }).then(r => {
+  //         console.log("PaymentList", r)
+  //         if (r?.status == 200) {
+  //           paymentContext?.updateOnlyInvoiceList(r?.data?.invoices)
+  //         }
+  //         paymentContext.updateInvoiceList(r.data)
+  //       })
+  //   } catch (error) {
+  //     console.log(error)
+  //   }
+
+  // }
+  console.log("marana", paymentContext?.getOnlyInvoiceList)
+  // const onEndReachFetchInvoiceList = async (
+  //   page = invoicePage,
+  //   isRefresh = false
+  // ) => {
+  //   const hostelId = context.getHostelDetail?.hostelId;
+  //   console.log("sonaatpmut", page)
+
+  //   if (!hostelId || pageLoading) {
+  //     return;
+  //   }
+
+  //   if (!isRefresh && !hasMoreInvoiceList) {
+  //     return;
+  //   }
+
+  //   const requestPage = isRefresh ? 1 : page;
+
+  //   try {
+  //     setPageLoading(true);
+
+  //     const r = await getPaymentList(
+  //       context.getHostelDetail?.hostelId,
+  //       loginContext.getToken,
+  //       "",
+  //       "",
+  //       "",
+  //       requestPage,
+  //       10,
+  //     );
+
+  //     console.log("sillana", r)
+
+  //     if (r?.status === 200) {
+  //       const responseData = r.data;
+  //       const pagination = responseData?.paginationData;
+
+  //       // Replace on refresh; append when loading the next page.
+  //       paymentContext.updateInvoiceList(
+  //         responseData,
+  //         !isRefresh && requestPage > 1
+  //       );
+
+  //       // Keep track of the next page to request.
+  //       const currentPage = pagination?.currentPage ?? requestPage;
+  //       const totalPages = pagination?.totalPages ?? currentPage;
+
+  //       const olddata = paymentContext?.getOnlyInvoiceList
+
+  //       paymentContext?.updateOnlyInvoiceList([...olddata, ...responseData?.invoices])
+
+  //       setInvoicePage(currentPage + 1);
+  //       setHasMoreInvoiceList(currentPage < totalPages);
+  //     }
+  //   } catch (error) {
+  //     console.log("Invoice pagination error:", error);
+  //     setPageLoading(false);
+  //   } finally {
+  //     setPageLoading(false);
+  //   }
+  // };
+
+
+  const onEndReachFetchInvoiceList = async (
+    page = invoicePage,
+    isRefresh = false
+  ) => {
+    const hostelId = context.getHostelDetail?.hostelId;
+
+    if (!hostelId || pageLoading) {
+      return;
+    }
+
+    if (!isRefresh && !hasMoreInvoiceList) {
+      return;
+    }
+
+    const requestPage = isRefresh ? 1 : page;
+    console.log("hasana", requestPage)
+
+    try {
+      setPageLoading(true);
+
+      const r = await getPaymentList(
+        hostelId,
+        loginContext.getToken,
+        (props?.filterFromDate && props?.filterFromDate != "DD-MM-YYYY") ?  props?.filterFromDate : "",
+       (props?.filterToDate && props?.filterToDate != "DD-MM-YYYY") ?  props?.filterToDate : "",
+        props?.filterSelectedMonth || "",
+        requestPage,
+        10
+      );
+
+      if (r?.status === 200) {
+        const responseData = r.data;
+        const pagination = responseData?.paginationData;
+        const newInvoices = responseData?.invoices ?? [];
+
+
+        paymentContext.updateInvoiceList(
+          responseData,
+          !isRefresh && requestPage > 1
+        );
+
+
+        if (isRefresh || requestPage === 1) {
+          paymentContext.updateOnlyInvoiceList(newInvoices);
+        } else {
+          const oldData = paymentContext?.getOnlyInvoiceList ?? [];
+
+          paymentContext.updateOnlyInvoiceList([
+            ...oldData,
+            ...newInvoices,
+          ]);
+        }
+
+        const currentPage = pagination?.currentPage ?? requestPage;
+        const totalPages = pagination?.totalPages ?? currentPage;
+
+        setInvoicePage(currentPage + 1);
+        setHasMoreInvoiceList(currentPage < totalPages);
+      }
+    } catch (error) {
+      console.log("Invoice pagination error:", error);
+    } finally {
+      setPageLoading(false);
+    }
+  };
 
 
 
@@ -148,7 +328,7 @@ const Payment = (props) => {
     navigation.navigate("ReceiptPdfView");
   };
 
-   const formatDate = (joiningDate) => {
+  const formatDate = (joiningDate) => {
 
     if (!joiningDate) return "";
 
@@ -158,184 +338,233 @@ const Payment = (props) => {
 
     const date = new Date(`${year}-${month}-${day}`);
 
-    const options = { month: "long"};
+    const options = { month: "long" };
 
     return date.toLocaleDateString("en-GB", options);
 
   }
 
-   const onRefresh = async () => {
-        console.log("REFRESH CALLED");
-
-        setRefreshing(true);
-        fetchPaymentData();
-        setTimeout(() => {
-            setRefreshing(false);
-        }, 1000);
+  const onRefresh = async () => {
+    console.log("REFRESH CALLED");
+    props?.onRefresh();
+    setInvoicePage(1)
+    setHasMoreInvoiceList(true)
 
 
-    };
+    setRefreshing(true);
+    fetchPaymentData();
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+
+
+  };
 
 
 
   return (
     <>
-      {paymentContext.getInvoiceList?.invoices?.length > 0 ? 
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false} contentContainerStyle={{paddingBottom:110}}
-       onScroll={props.onScroll} nestedScrollEnabled={true}
-       refreshControl={<RefreshControl
-                                   refreshing={refreshing}
-                                   onRefresh={onRefresh} />}>
-        {paymentContext.getInvoiceList?.invoices?.map((item, index) => (
-          <React.Fragment key={index}>
-            <TouchableOpacity onPress={() => props.onPayment(item)} style={styles.card}>
-              <View style={{ flexDirection: "row", }}>
-                <View style={styles.iconContainer}>
-                  {item?.title === "July EB Bill" ? (
-                    <Image
-                      source={ElectrictyIcon}
-                      style={styles.icon}
-                      resizeMode="contain"
-                    />
-                  ) : (
-                    <Image
-                      source={SideArrow}
-                      style={styles.icon}
-                      resizeMode="contain"
-                    />
-                  )}
-                </View>
 
-                <View style={styles.infoContainer}>
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.title}>
-                      {item?.invoiceType === "RENT" && formatDate(item?.invoiceStartDate)} {item.invoiceType}</Text>
+      {paymentContext?.getOnlyInvoiceList?.length > 0 ?
 
-                    {item.status === "Cancelled" || item.status === "Pending Refund" ? (
-                      <Text style={styles.date}>Inv date: {item.invoiceStartDate}</Text>
-                    ) : ["Pending", "Partial Payment"].includes(item.status) ? (
-                      <Text style={styles.date}>
-                        Due: {item?.invoiceDueDate || "N/A"}
-                      </Text>
+        <FlatList
+          data={paymentContext?.getOnlyInvoiceList}
+          keyExtractor={(item, index) =>
+            String(item?.invoiceId ?? index)
+          }
+          style={styles.container}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 110 }}
+          onScroll={props.onScroll}
+          nestedScrollEnabled={true}
+          // onEndReached={() => {
+          //   const filteredInvoices =
+          //     paymentContext?.getOnlyInvoiceList || [];
+          //   if (
+          //     !pageLoading &&
+          //     hasMoreInvoiceList &&
+          //     filteredInvoices.length > 0
+          //   ) {
+          //     onEndReachFetchInvoiceList(invoicePage);
+          //   }
+          // }}
+          onEndReached={() => {
+            if (
+              !onEndReachedCalledDuringMomentum.current &&
+              !pageLoading &&
+              hasMoreInvoiceList
+            ) {
+              onEndReachedCalledDuringMomentum.current = true;
+
+              onEndReachFetchInvoiceList();
+            }
+          }}
+          onEndReachedThreshold={0.5}
+          refreshing={refreshing}
+          onMomentumScrollBegin={() => {
+            onEndReachedCalledDuringMomentum.current = false;
+          }}
+          // onRefresh={() => {
+          //   setInvoicePage(1);
+          //   setHasMoreInvoiceList(true);
+          //   onEndReachFetchInvoiceList(1, true);
+          // }}
+          ListFooterComponent={
+            pageLoading ? <ActivityIndicator size="small" /> : null
+          }
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+            />
+          }
+          renderItem={({ item, index }) => (
+            <>
+              <TouchableOpacity onPress={() => props.onPayment(item)} style={styles.card}>
+                <View style={{ flexDirection: "row", }}>
+                  <View style={styles.iconContainer}>
+                    {item?.title === "July EB Bill" ? (
+                      <Image
+                        source={ElectrictyIcon}
+                        style={styles.icon}
+                        resizeMode="contain"
+                      />
                     ) : (
-                      <Text style={styles.date}>
-                        Paid: {item?.paymentDate || "N/A"}
-                      </Text>
+                      <Image
+                        source={SideArrow}
+                        style={styles.icon}
+                        resizeMode="contain"
+                      />
                     )}
-                    {/* // <Text style={styles.date}>{item.invoiceDueDate}</Text> */}
                   </View>
 
-                  <View style={styles.amountContainer}>
-                    <Text style={styles.amount}>₹{new Intl.NumberFormat('en-IN').format(item.amount)}</Text>
-                                   {/* {item.status === "Pending" ? 
+                  <View style={styles.infoContainer}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.title}>
+                        {item?.invoiceType === "RENT" && formatDate(item?.invoiceStartDate)} {item.invoiceType}</Text>
+
+                      {item.status === "Cancelled" || item.status === "Pending Refund" ? (
+                        <Text style={styles.date}>Inv date: {item.invoiceStartDate}</Text>
+                      ) : ["Pending", "Partial Payment"].includes(item.status) ? (
+                        <Text style={styles.date}>
+                          Due: {item?.invoiceDueDate || "N/A"}
+                        </Text>
+                      ) : (
+                        <Text style={styles.date}>
+                          Paid: {item?.paymentDate || "N/A"}
+                        </Text>
+                      )}
+                      {/* // <Text style={styles.date}>{item.invoiceDueDate}</Text> */}
+                    </View>
+
+                    <View style={styles.amountContainer}>
+                      <Text style={styles.amount}>₹{new Intl.NumberFormat('en-IN').format(item.amount)}</Text>
+                      {/* {item.status === "Pending" ? 
                                   <Text style={styles.amount}>₹{item.amount}</Text>
                                     :
                                   <Text style={styles.amount}>{item.paidAmount}</Text>} */}
-                   {!["Advance_holding", "Eb_holding", "Amount_holding", "AMOUNT_HOLDING","EB_HOLDING", "ADVANCE_HOLDING"].
-                   includes(item?.invoiceType) && (
-                    <View
-                      style={[
-                        styles.statusBadge,
-                        {
-                          backgroundColor: item?.status === "Pending" ||
-                            item?.status === "Partial Payment" || item?.status === "Pending Refund"  ||
-                            item?.status === "Partially Refunded" ?  "#FFF8EA" :
-                            item?.status === "Cancelled" ? "#FFD5D5" : "#A5FF9624"
-                        },
-                      ]}
-                    >
-                      <View style={{ flexDirection: "row", alignItems: 'center' }}>
-                        <Text
-                          style={[styles.statusText,
-                          {
-                            color: item?.status === "Pending" ||
-                              item?.status === "Partial Payment" || item?.status === "Pending Refund" ||
-                              item?.status === "Partially Refunded" ? "#EC9B29" :
-                              item?.status === "Cancelled" ? "#FF3B30" : "#09882C"
-                          }]}
+                      {!["Advance_holding", "Eb_holding", "Amount_holding", "AMOUNT_HOLDING", "EB_HOLDING", "ADVANCE_HOLDING"].
+                        includes(item?.invoiceType) && (
+                          <View
+                            style={[
+                              styles.statusBadge,
+                              {
+                                backgroundColor: (item?.status === "Cancelled" || item?.isCancelled) ? "#FFD5D5" : item?.status === "Pending" ||
+                                  item?.paymentStatus === "Partial Payment" || item?.status === "Pending Refund" ||
+                                  item?.status === "Partially Refunded" ? "#FFF8EA" :
+                                  "#A5FF9624"
+                              },
+                            ]}
+                          >
+                            <View style={{ flexDirection: "row", alignItems: 'center' }}>
+                              <Text
+                                style={[styles.statusText,
+                                {
+                                  color: (item?.status === "Cancelled" || item?.isCancelled) ? "#FF3B30" : item?.status === "Pending" ||
+                                    item?.status === "Partial Payment" || item?.status === "Pending Refund" ||
+                                    item?.status === "Partially Refunded" ? "#EC9B29" : "#09882C"
+                                }]}
+                              >
+                                {item?.isCancelled ? "Cancelled" : item?.status}
+                              </Text>
+                              {paymentContext?.getInvoiceList?.hostelUrl != null ?
+                                (<Image
+                                  source={{ uri: paymentContext.getInvoiceList?.hostelUrl }}
+                                  style={{ width: 16, height: 16, borderRadius: 8, marginLeft: 6 }}
+                                  resizeMode="contain"
+                                />)
+                                : (<View style={{
+                                  width: 18, height: 18, borderRadius: 9, backgroundColor: '#788fed', marginLeft: 5,
+                                  alignItems: 'center', justifyContent: 'center'
+                                }}>
+                                  <Text style={{ fontSize: 9, fontWeight: 600 }}>
+                                    {paymentContext.getInvoiceList.initials}
+                                  </Text>
+                                </View>)
+                              }
+
+
+
+                            </View>
+                          </View>
+                        )}
+
+                      {["Advance_holding", "Eb_holding", "Amount_holding", "AMOUNT_HOLDING", "EB_HOLDING", "ADVANCE_HOLDING"].includes(item?.invoiceType) && (
+                        <View
+                          style={[
+                            styles.statusBadge,
+                            {
+                              backgroundColor: item?.adjustmentStatus === "Not adjusted" ? "#A5FF9624" :
+                                item?.adjustmentStatus === "Partially adjusted" ? "#FFF8EA" : "#FFD5D5"
+                            },
+                          ]}
                         >
-                          {item.status}
-                        </Text>
-                        {paymentContext?.getInvoiceList?.hostelUrl != null ?
-                          (<Image
-                            source={{ uri: paymentContext.getInvoiceList?.hostelUrl }}
-                            style={{ width: 16, height: 16, borderRadius: 8, marginLeft: 6 }}
-                            resizeMode="contain"
-                          />)
-                          : (<View style={{
-                            width: 18, height: 18, borderRadius: 9, backgroundColor: '#788fed', marginLeft: 5,
-                            alignItems: 'center', justifyContent: 'center'
-                          }}>
-                            <Text style={{ fontSize: 9, fontWeight: 600 }}>
-                              {paymentContext.getInvoiceList.initials}
+                          <View style={{ flexDirection: "row", alignItems: 'center' }}>
+                            <Text
+                              style={[styles.statusText,
+                              {
+                                color: item?.adjustmentStatus === "Not adjusted" ? "#09882C" :
+                                  item?.adjustmentStatus === "Partially adjusted" ? "#EC9B29" : "#FF3B30"
+                              }]}
+                            >
+                              {item?.adjustmentStatus === "Not adjusted" ? "Available" :
+                                item?.adjustmentStatus === "Partially adjusted" ? "Partially adjusted" : "Adjusted"
+                              }
                             </Text>
-                          </View>)
-                        }
+                            {paymentContext?.getInvoiceList?.hostelUrl != null ?
+                              (<Image
+                                source={{ uri: paymentContext.getInvoiceList?.hostelUrl }}
+                                style={{ width: 16, height: 16, borderRadius: 8, marginLeft: 6 }}
+                                resizeMode="contain"
+                              />)
+                              : (<View style={{
+                                width: 18, height: 18, borderRadius: 9, backgroundColor: '#788fed', marginLeft: 5,
+                                alignItems: 'center', justifyContent: 'center'
+                              }}>
+                                <Text style={{ fontSize: 9, fontWeight: 600 }}>
+                                  {paymentContext.getInvoiceList.initials}
+                                </Text>
+                              </View>)
+                            }
 
 
 
-                      </View>
+                          </View>
+                        </View>
+                      )}
                     </View>
-                    )}
-
-                    {["Advance_holding", "Eb_holding", "Amount_holding", "AMOUNT_HOLDING","EB_HOLDING", "ADVANCE_HOLDING"].includes(item?.invoiceType) && (
-                    <View
-                      style={[
-                        styles.statusBadge,
-                        {
-                          backgroundColor:  item?.adjustmentStatus === "Not adjusted" ? "#A5FF9624"  :
-                            item?.adjustmentStatus === "Partially adjusted" ? "#FFF8EA"  : "#FFD5D5" 
-                        },
-                      ]}
-                    >
-                      <View style={{ flexDirection: "row", alignItems: 'center' }}>
-                        <Text
-                          style={[styles.statusText,
-                          {
-                            color: item?.adjustmentStatus === "Not adjusted" ? "#09882C"   :
-                              item?.adjustmentStatus === "Partially adjusted" ? "#EC9B29" : "#FF3B30"
-                          }]}
-                        >
-                          {item?.adjustmentStatus === "Not adjusted" ? "Available" :
-                            item?.adjustmentStatus === "Partially adjusted" ? "Partially adjusted" : "Adjusted"
-                                                                }
-                        </Text>
-                        {paymentContext?.getInvoiceList?.hostelUrl != null ?
-                          (<Image
-                            source={{ uri: paymentContext.getInvoiceList?.hostelUrl }}
-                            style={{ width: 16, height: 16, borderRadius: 8, marginLeft: 6 }}
-                            resizeMode="contain"
-                          />)
-                          : (<View style={{
-                            width: 18, height: 18, borderRadius: 9, backgroundColor: '#788fed', marginLeft: 5,
-                            alignItems: 'center', justifyContent: 'center'
-                          }}>
-                            <Text style={{ fontSize: 9, fontWeight: 600 }}>
-                              {paymentContext.getInvoiceList.initials}
-                            </Text>
-                          </View>)
-                        }
-
-
-
-                      </View>
-                    </View>
-                    )}
                   </View>
                 </View>
-              </View>
-            </TouchableOpacity>
-
-            <View style={{
-              borderWidth: 0.5,
-              borderColor: "#E8E8E8",
-              // marginLeft:55
-              // opacity: 0.4,
-              // marginTop: 10, marginBottom: 10
-            }} />
-          </React.Fragment>
-        ))}
-      </ScrollView>
+              </TouchableOpacity>
+              <View
+                style={{
+                  borderWidth: 0.5,
+                  borderColor: "#E8E8E8",
+                }}
+              />
+            </>
+          )}
+        />
         :
         <View style={styles.noResult}>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
@@ -343,10 +572,10 @@ const Payment = (props) => {
               source={NoResultPic}
               style={{ width: 324, height: 221, resizeMode: 'contain', marginBottom: 20, }}
             />
-            <Text style={{ fontSize: 22,fontFamily:'Gilroy-Semibold', color: '#000', marginBottom: 8, }}>
+            <Text style={{ fontSize: 22, fontFamily: 'Gilroy-Semibold', color: '#000', marginBottom: 8, }}>
               No Results Found!
             </Text>
-            <Text style={{ fontSize: 15, color: '#555', textAlign: 'center', width: 260, lineHeight: 18,fontFamily:'Gilroy-Medium' }}>
+            <Text style={{ fontSize: 15, color: '#555', textAlign: 'center', width: 260, lineHeight: 18, fontFamily: 'Gilroy-Medium' }}>
               Try adjusting your search or filters to see more options.
             </Text>
           </View>
@@ -617,17 +846,17 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginLeft: 12,
   },
-  title: { fontSize: 14,fontFamily:'Gilroy-Semibold', color: "#000" },
-  date: { fontSize: 12, color: "#888", marginTop: 5,fontFamily:'Gilroy-Medium' },
+  title: { fontSize: 14, fontFamily: 'Gilroy-Semibold', color: "#000" },
+  date: { fontSize: 12, color: "#888", marginTop: 5, fontFamily: 'Gilroy-Medium' },
   amountContainer: { alignItems: "flex-end", justifyContent: "center" },
-  amount: { fontSize: 14,fontFamily:'Gilroy-Bold', color: "#000" },
+  amount: { fontSize: 14, fontFamily: 'Gilroy-Bold', color: "#000" },
   statusBadge: {
     borderRadius: 20,
     paddingHorizontal: 5,
     paddingVertical: 2,
     marginTop: 6,
   },
-  statusText: { fontSize: 12,fontFamily:'Gilroy-Medium' },
+  statusText: { fontSize: 12, fontFamily: 'Gilroy-Medium' },
 
   // 🔽 Modal Styles
   modalBackground: {

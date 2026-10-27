@@ -148,39 +148,115 @@ export const postRquestAmenties = async (hostelId, token, amenityId) => {
 }
 
 
-export const getPaymentList = async (hostelId, token, startDate, endDate, dateFilter) => {
+// export const getPaymentList = async (hostelId, token, startDate, endDate, dateFilter,page,size) => {
 
-    try {
-        const axios = getAxios()
-        const config = {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        };
+//     console.log("moorthi",hostelId,startDate,endDate,page,size)
+//     try {
+//         const axios = getAxios()
+//         const config = {
+//             headers: {
+//                 Authorization: `Bearer ${token}`,
+//             },
+//         };
 
-        const params = {};
+//         const params = {};
 
-        if (dateFilter) {
-            params.dateFilterOption = dateFilter;
-        }
+//         if (dateFilter) {
+//             params.dateFilterOption = dateFilter;
+//         }
 
-        if (startDate !== "DD-MM-YYYY" && endDate !== "DD-MM-YYYY") {
-            params.startDate = startDate;
-            params.endDate = endDate;
-        }
+//         if(page){
+//             params.page= page
+//         }
 
-        if (Object.keys(params).length > 0) {
-            config.params = params;
-        }
+//         if(size){
+//             params.size = size
+//         }
 
-        console.log("config",config)
+//         if (startDate !== "DD-MM-YYYY" && endDate !== "DD-MM-YYYY") {
+//             params.startDate = startDate;
+//             params.endDate = endDate;
+//         }
 
-        const response = await axios.get(`/v2/invoices/${hostelId}`, config);
-        return response;
-    } catch (error) {
-        return { status: error.response.status, message: error.response.data }
+//         if (Object.keys(params).length > 0) {
+//             config.params = params;
+//         }
+
+//         console.log("config",config)
+
+//         const response = await axios.get(`/v2/invoices/${hostelId}`, config);
+//        console.log("Request config:", response?.config);
+// console.log("Request params:", response?.config?.params);
+// console.log("Backend response:", response?.data);
+//         return response;
+//     } catch (error) {
+//         return { status: error.response.status, message: error.response.data }
+//     }
+// }
+
+
+export const getPaymentList = async (
+  hostelId,
+  token,
+  startDate,
+  endDate,
+  dateFilter,
+  page,
+  size
+) => {
+  try {
+    console.log("kiran",page,size)
+    const axios = getAxios();
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    const params = {};
+
+    if (dateFilter) {
+      params.dateFilterOption = dateFilter;
     }
-}
+
+    if (page !== undefined && page !== null) {
+      params.page = page;
+    }
+
+    if (size !== undefined && size !== null) {
+      params.size = size;
+    }
+
+    // Send dates only when both are provided
+    if (startDate && endDate) {
+      params.startDate = startDate;
+      params.endDate = endDate;
+    }
+
+    if (Object.keys(params).length > 0) {
+      config.params = params;
+    }
+
+    const response = await axios.get(
+      `/v2/invoices/${hostelId}`,
+      config
+    );
+    console.log(response)
+
+    return response;
+  } catch (error) {
+    console.log("kamamla",error)
+     console.log("Error status:", error.response?.status);
+  console.log("Error data:", error.response?.data);
+  console.log("Error URL:", error.config?.url);
+  console.log("Error params:", error.config?.params);
+    return {
+      status: error.response?.status || 500,
+      message: error.response?.data || error.message,
+    };
+  }
+};
 
 export const getInvoices = async (hostelId, invoiceId, token) => {
     try {
