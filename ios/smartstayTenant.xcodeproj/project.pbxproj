@@ -16,7 +16,9 @@
 		1B84C0CEDF84BB4E63DB8D5A /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
 		2212B02BDAF0C1745D7DFD6C /* KYCVerification.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4D778E336895CFEE343D8FB /* KYCVerification.swift */; };
 		44B37EB50AA1489AA3DB6AD6 /* Gilroy-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5EF44D594FD54E86B4A2E66F /* Gilroy-Bold.ttf */; };
+		48ECD4ACB8AF32AC412F29E6 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C650FD1D3069080A4F1BDCF1 /* SceneDelegate.swift */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
+		79712D94E2C5C5EEF9BD8292 /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A26E808B86B72E897A536B43 /* Configuration.swift */; };
 		7CA2A77B8480431D875BB2F5 /* Gilroy-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 55B22AC2E248426FA4D9D24A /* Gilroy-Medium.ttf */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		993DC811E565414D9A2F3E67 /* Gilroy-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 509AA887968F4D64B7878020 /* Gilroy-Regular.ttf */; };
@@ -24,24 +26,30 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		068B61DD436AD22EBF719A25 /* Pods-smartstayTenant.proddebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-smartstayTenant.proddebug.xcconfig"; path = "Target Support Files/Pods-smartstayTenant/Pods-smartstayTenant.proddebug.xcconfig"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* smartstayTenant.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = smartstayTenant.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = smartstayTenant/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = smartstayTenant/Info.plist; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = smartstayTenant/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		25F5A087B1015A6941EA09D6 /* Constant.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Constant.swift; path = smartstayTenant/Constant.swift; sourceTree = "<group>"; };
-		3B4392A12AC88292D35C810B /* Pods-smartstayTenant.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-smartstayTenant.debug.xcconfig"; path = "Target Support Files/Pods-smartstayTenant/Pods-smartstayTenant.debug.xcconfig"; sourceTree = "<group>"; };
 		509AA887968F4D64B7878020 /* Gilroy-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Gilroy-Regular.ttf"; path = "../src/assets/fonts/Gilroy-Regular.ttf"; sourceTree = "<group>"; };
 		55B22AC2E248426FA4D9D24A /* Gilroy-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Gilroy-Medium.ttf"; path = "../src/assets/fonts/Gilroy-Medium.ttf"; sourceTree = "<group>"; };
 		562436FAEABE558DAF966930 /* CommonModule.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CommonModule.swift; path = smartstayTenant/CommonModule.swift; sourceTree = "<group>"; };
-		5709B34CF0A7D63546082F79 /* Pods-smartstayTenant.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-smartstayTenant.release.xcconfig"; path = "Target Support Files/Pods-smartstayTenant/Pods-smartstayTenant.release.xcconfig"; sourceTree = "<group>"; };
 		5DCACB8F33CDC322A6C60F78 /* libPods-smartstayTenant.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-smartstayTenant.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5EF44D594FD54E86B4A2E66F /* Gilroy-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Gilroy-Bold.ttf"; path = "../src/assets/fonts/Gilroy-Bold.ttf"; sourceTree = "<group>"; };
+		6369B5899524E66F003EF4D1 /* Pods-smartstayTenant.devrelease.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-smartstayTenant.devrelease.xcconfig"; path = "Target Support Files/Pods-smartstayTenant/Pods-smartstayTenant.devrelease.xcconfig"; sourceTree = "<group>"; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = smartstayTenant/AppDelegate.swift; sourceTree = "<group>"; };
 		76AB9AD7865718E50E736DB2 /* NotificationModule.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NotificationModule.swift; path = smartstayTenant/NotificationModule.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = smartstayTenant/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		84592258999748FB82F0908E /* Gilroy-Semibold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Gilroy-Semibold.ttf"; path = "../src/assets/fonts/Gilroy-Semibold.ttf"; sourceTree = "<group>"; };
+		A26E808B86B72E897A536B43 /* Configuration.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
+		B01CD4F9A6D04D5EE621A74B /* Pods-smartstayTenant.devdebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-smartstayTenant.devdebug.xcconfig"; path = "Target Support Files/Pods-smartstayTenant/Pods-smartstayTenant.devdebug.xcconfig"; sourceTree = "<group>"; };
+		C650FD1D3069080A4F1BDCF1 /* SceneDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SceneDelegate.swift; path = smartstayTenant/SceneDelegate.swift; sourceTree = "<group>"; };
+		C8CA8E75C813BD60E159B961 /* Pods-smartstayTenant.prodrelease.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-smartstayTenant.prodrelease.xcconfig"; path = "Target Support Files/Pods-smartstayTenant/Pods-smartstayTenant.prodrelease.xcconfig"; sourceTree = "<group>"; };
 		CAB7EA0BD99F953B91DACB21 /* NativeModules.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = NativeModules.m; path = smartstayTenant/NativeModules.m; sourceTree = "<group>"; };
+		E0D967E22124C2701DFDB94D /* Dev.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Dev.xcconfig; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		F11DD213F8791008B8023CEB /* Prod.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Prod.xcconfig; sourceTree = "<group>"; };
 		F4D778E336895CFEE343D8FB /* KYCVerification.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = KYCVerification.swift; path = smartstayTenant/KYCVerification.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -70,6 +78,8 @@
 				76AB9AD7865718E50E736DB2 /* NotificationModule.swift */,
 				CAB7EA0BD99F953B91DACB21 /* NativeModules.m */,
 				F4D778E336895CFEE343D8FB /* KYCVerification.swift */,
+				6DA921F08E5654C3ACE55A60 /* Configuration */,
+				C650FD1D3069080A4F1BDCF1 /* SceneDelegate.swift */,
 			);
 			name = smartstayTenant;
 			sourceTree = "<group>";
@@ -81,6 +91,17 @@
 				5DCACB8F33CDC322A6C60F78 /* libPods-smartstayTenant.a */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		6DA921F08E5654C3ACE55A60 /* Configuration */ = {
+			isa = PBXGroup;
+			children = (
+				E0D967E22124C2701DFDB94D /* Dev.xcconfig */,
+				F11DD213F8791008B8023CEB /* Prod.xcconfig */,
+				A26E808B86B72E897A536B43 /* Configuration.swift */,
+			);
+			name = Configuration;
+			path = smartstayTenant/Configuration;
 			sourceTree = "<group>";
 		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
@@ -127,8 +148,10 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				3B4392A12AC88292D35C810B /* Pods-smartstayTenant.debug.xcconfig */,
-				5709B34CF0A7D63546082F79 /* Pods-smartstayTenant.release.xcconfig */,
+				B01CD4F9A6D04D5EE621A74B /* Pods-smartstayTenant.devdebug.xcconfig */,
+				6369B5899524E66F003EF4D1 /* Pods-smartstayTenant.devrelease.xcconfig */,
+				068B61DD436AD22EBF719A25 /* Pods-smartstayTenant.proddebug.xcconfig */,
+				C8CA8E75C813BD60E159B961 /* Pods-smartstayTenant.prodrelease.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -230,13 +253,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-smartstayTenant/Pods-smartstayTenant-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-smartstayTenant/Pods-smartstayTenant-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -273,13 +292,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-smartstayTenant/Pods-smartstayTenant-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-smartstayTenant/Pods-smartstayTenant-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -299,15 +314,17 @@
 				D45488B978CB4AFBD249656F /* NotificationModule.swift in Sources */,
 				01839436019C1D83CFAD3348 /* NativeModules.m in Sources */,
 				2212B02BDAF0C1745D7DFD6C /* KYCVerification.swift in Sources */,
+				79712D94E2C5C5EEF9BD8292 /* Configuration.swift in Sources */,
+				48ECD4ACB8AF32AC412F29E6 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		13B07F941A680F5B00A75B9A /* Debug */ = {
+		2449C2281B3AA0A92C83D998 /* ProdDebug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3B4392A12AC88292D35C810B /* Pods-smartstayTenant.debug.xcconfig */;
+			baseConfigurationReference = 068B61DD436AD22EBF719A25 /* Pods-smartstayTenant.proddebug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -327,44 +344,86 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.smartstay.tenant;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.smartstay.tenant$(BUNDLE_ID_SUFFIX)";
 				PRODUCT_NAME = smartstayTenant;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
-			name = Debug;
+			name = ProdDebug;
 		};
-		13B07F951A680F5B00A75B9A /* Release */ = {
+		6FB73B9E613F65DC0AE29CE0 /* ProdRelease */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5709B34CF0A7D63546082F79 /* Pods-smartstayTenant.release.xcconfig */;
+			baseConfigurationReference = F11DD213F8791008B8023CEB /* Prod.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
+				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 952KX8Q5Y5;
-				INFOPLIST_FILE = smartstayTenant/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Tenant;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
+					/usr/lib/swift,
 					"$(inherited)",
-					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-ObjC",
-					"-lc++",
+				LIBRARY_SEARCH_PATHS = (
+					"\"$(SDKROOT)/usr/lib/swift\"",
+					"\"$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)\"",
+					"\"$(inherited)\"",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.smartstay.tenant;
-				PRODUCT_NAME = smartstayTenant;
-				SWIFT_VERSION = 5.0;
-				VERSIONING_SYSTEM = "apple-generic";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-DFOLLY_NO_CONFIG",
+					"-DFOLLY_MOBILE=1",
+					"-DFOLLY_USE_LIBCPP=1",
+					"-DFOLLY_CFG_NO_COROUTINES=1",
+					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
+				);
+				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
+				SDKROOT = iphoneos;
+				USE_HERMES = true;
+				VALIDATE_PRODUCT = YES;
 			};
-			name = Release;
+			name = ProdRelease;
 		};
-		83CBBA201A601CBA00E9B192 /* Debug */ = {
+		7A9C3C0639BB90DC8E54BE06 /* DevDebug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = E0D967E22124C2701DFDB94D /* Dev.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
@@ -437,10 +496,174 @@
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
 				USE_HERMES = true;
 			};
-			name = Debug;
+			name = DevDebug;
 		};
-		83CBBA211A601CBA00E9B192 /* Release */ = {
+		9D11922D4C8CFAEF2AA3E174 /* ProdDebug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = F11DD213F8791008B8023CEB /* Prod.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					/usr/lib/swift,
+					"$(inherited)",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"\"$(SDKROOT)/usr/lib/swift\"",
+					"\"$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)\"",
+					"\"$(inherited)\"",
+				);
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-DFOLLY_NO_CONFIG",
+					"-DFOLLY_MOBILE=1",
+					"-DFOLLY_USE_LIBCPP=1",
+					"-DFOLLY_CFG_NO_COROUTINES=1",
+					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
+				);
+				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
+				USE_HERMES = true;
+			};
+			name = ProdDebug;
+		};
+		A35AE5E001FA145C35AAF9AB /* DevDebug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = B01CD4F9A6D04D5EE621A74B /* Pods-smartstayTenant.devdebug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 952KX8Q5Y5;
+				ENABLE_BITCODE = NO;
+				INFOPLIST_FILE = smartstayTenant/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Tenant;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-lc++",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.smartstay.tenant$(BUNDLE_ID_SUFFIX)";
+				PRODUCT_NAME = smartstayTenant;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = DevDebug;
+		};
+		A36AFF26698F4BEE33A9707F /* DevRelease */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6369B5899524E66F003EF4D1 /* Pods-smartstayTenant.devrelease.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 952KX8Q5Y5;
+				INFOPLIST_FILE = smartstayTenant/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Tenant;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-lc++",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.smartstay.tenant$(BUNDLE_ID_SUFFIX)";
+				PRODUCT_NAME = smartstayTenant;
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = DevRelease;
+		};
+		AB4DC4E0AF78C69985BCBBDF /* ProdRelease */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = C8CA8E75C813BD60E159B961 /* Pods-smartstayTenant.prodrelease.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 952KX8Q5Y5;
+				INFOPLIST_FILE = smartstayTenant/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Tenant;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-lc++",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.smartstay.tenant$(BUNDLE_ID_SUFFIX)";
+				PRODUCT_NAME = smartstayTenant;
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = ProdRelease;
+		};
+		E68B459B34FA07C8ECFC1D67 /* DevRelease */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = E0D967E22124C2701DFDB94D /* Dev.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
@@ -505,7 +728,7 @@
 				USE_HERMES = true;
 				VALIDATE_PRODUCT = YES;
 			};
-			name = Release;
+			name = DevRelease;
 		};
 /* End XCBuildConfiguration section */
 
@@ -513,20 +736,24 @@
 		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "smartstayTenant" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				13B07F941A680F5B00A75B9A /* Debug */,
-				13B07F951A680F5B00A75B9A /* Release */,
+				A35AE5E001FA145C35AAF9AB /* DevDebug */,
+				A36AFF26698F4BEE33A9707F /* DevRelease */,
+				2449C2281B3AA0A92C83D998 /* ProdDebug */,
+				AB4DC4E0AF78C69985BCBBDF /* ProdRelease */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = ProdRelease;
 		};
 		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "smartstayTenant" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				83CBBA201A601CBA00E9B192 /* Debug */,
-				83CBBA211A601CBA00E9B192 /* Release */,
+				7A9C3C0639BB90DC8E54BE06 /* DevDebug */,
+				E68B459B34FA07C8ECFC1D67 /* DevRelease */,
+				9D11922D4C8CFAEF2AA3E174 /* ProdDebug */,
+				6FB73B9E613F65DC0AE29CE0 /* ProdRelease */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = ProdRelease;
 		};
 /* End XCConfigurationList section */
 	};

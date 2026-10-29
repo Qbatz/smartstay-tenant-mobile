@@ -1,0 +1,6 @@
+BUNDLE_ID_SUFFIX =
+
+BASE_URL = https:/$()/tenantapi.qbatz.com
+
+// SANDBOX or PRODUCTION.
+DIGIO_ENVIRONMENT = SANDBOX

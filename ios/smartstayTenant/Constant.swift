@@ -1,16 +1,13 @@
 import DigiokycSDK
 
-// iOS counterpart of android/app/src/{dev,prod}/java/com/qbatz/smartstay/utils/Constant.java.
-// Android picks the value by product flavor; iOS has no flavors, so Debug builds
-// use the dev API and Release builds use production.
 enum Constant {
-#if DEBUG
-  static let BASE_URL = "https://tenantapi.qbatz.com/"
-#else
-  static let BASE_URL = "https://tenantapi.qbatz.com"
-#endif
+  static let BASE_URL = Configuration.fetchFromDictionary(key: "BASE_URL")
 
-  // Must be the Digio environment the backend creates KYC requests in.
-  // Android uses SANDBOX for every flavor.
-  static let DIGIO_ENVIRONMENT = DigioEnvironment.SANDBOX
+  static let DIGIO_ENVIRONMENT: DigioEnvironment = {
+    let value = Configuration.fetchFromDictionary(key: "DIGIO_ENVIRONMENT")
+    guard let environment = DigioEnvironment(rawValue: value) else {
+      fatalError("DIGIO_ENVIRONMENT \(value) is not a Digio environment (SANDBOX or PRODUCTION)")
+    }
+    return environment
+  }()
 }

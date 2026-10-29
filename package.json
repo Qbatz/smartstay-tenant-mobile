@@ -5,11 +5,13 @@
   "scripts": {
     "android": "react-native run-android --mode=devDebug",
     "local": "react-native run-android --mode=localDebug",
-    "ios": "react-native run-ios",
+    "ios": "react-native run-ios --scheme Dev",
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "ios:dev": "react-native run-ios --scheme Dev",
+    "ios:prod": "react-native run-ios --scheme Prod"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^2.2.0",

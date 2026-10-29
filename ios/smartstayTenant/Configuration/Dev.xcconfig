@@ -1,0 +1,6 @@
+BUNDLE_ID_SUFFIX = .dev
+
+BASE_URL = https:/$()/tenentdevapi.qbatz.com
+
+// SANDBOX or PRODUCTION.
+DIGIO_ENVIRONMENT = SANDBOX
