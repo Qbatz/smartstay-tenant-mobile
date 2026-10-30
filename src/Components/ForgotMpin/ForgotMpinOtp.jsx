@@ -101,12 +101,12 @@ const ForgotMpinOtp=({route})=>{
 
       if (r.status == 200) {
         setShowSuccessModal(true)
-        setShowModelMessage(r.data)
+        setShowModelMessage("OTP Sent")
         setModelType('success')
 
         setTimeout(() => {
           setShowSuccessModal(false)
-        }, 4000);
+        }, 1500);
       }else{
         setShowSuccessModal(true)
         setShowModelMessage('Invalid Otp')

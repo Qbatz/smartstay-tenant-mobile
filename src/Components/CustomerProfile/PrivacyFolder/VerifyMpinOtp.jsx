@@ -106,7 +106,7 @@ useEffect(() => {
             console.log("resendotp", res)
             if (res?.status == 200) {
                 setShowSuccessModal(true)
-                setShowModelMessage(res?.data)
+                setShowModelMessage("OTP Sent")
                 setModelType("success")
                 setTimeout(() => {
                     setShowSuccessModal(false)
