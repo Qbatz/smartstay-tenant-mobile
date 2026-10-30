@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo, useContext } from "react";
-import { View, Text, TouchableOpacity, ScrollView, Image, StyleSheet, SafeAreaView, FlatList, Pressable, Modal, TouchableWithoutFeedback, TextInput, Button, RefreshControl } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, Image, StyleSheet, SafeAreaView, FlatList, Pressable, Modal, TouchableWithoutFeedback, TextInput, Button, RefreshControl, ActivityIndicator } from "react-native";
 import AddComplaint from '../../assets/Images/addComplaint.png'
 import RightDirection from '../../assets/Images/direction-right.png'
 import AddSquare from '../../assets/Images/add-square.png'
@@ -29,6 +29,10 @@ function Services(props) {
     const [modulevisible, setModalVisible] = useState(false)
     const [comment, setComment] = useState(false)
     const [refreshing, setRefreshing] = useState(false)
+    const [complaintsPage, setComplaintsPage] = useState(1)
+    const [hasMoreComplints, setHasMoreComplaints] = useState(true)
+    const [pageLoading, setPageLoading] = useState(false)
+    const onEndReachedCalledDuringMomentum = useRef(true);
 
     // const [assignedAmenities, setAssignedAmenity] = useState([])
     // const [unassignedAmenities, setUnasignedAmenities] = useState([])
@@ -77,8 +81,16 @@ function Services(props) {
         complaints(commonContext.getHostelDetail.hostelId, loginContext.getToken)
             .then(r => {
                 console.log("Complaints API:", r);
-                complaintContext.updateComplaintList(r?.data);
-                complaintContext?.updateonlyComplaintList(r?.data?.complaints)
+                if (r.status == 200) {
+                    complaintContext.updateComplaintList(r?.data);
+                    complaintContext?.updateonlyComplaintList(r?.data?.complaints)
+                }
+                const currentPage = r?.data?.paginationData?.currentPage;
+                const totalPage = r?.data?.paginationData?.totalPages
+
+                setComplaintsPage(currentPage + 1)
+                setHasMoreComplaints(currentPage < totalPage)
+
             })
             .catch(err => console.log("Error:", err));
 
@@ -138,7 +150,57 @@ function Services(props) {
 
     };
 
+    const onEndReachFetchComplaintList = async (
+        page = complaintsPage,
+        isRefresh = false
+    ) => {
+        const hostelId = commonContext.getHostelDetail?.hostelId;
+        console.log(page)
 
+        if (!hostelId || pageLoading) {
+            return;
+        }
+
+        if (!isRefresh && !hasMoreComplints) {
+            return;
+        }
+
+        const requestPage = isRefresh ? 1 : page;
+        console.log("hasana", requestPage)
+
+        try {
+            setPageLoading(true);
+
+            const res = await complaints(hostelId, loginContext.getToken, requestPage)
+            console.log("refreshedEndreach", res)
+            const currentPage = res?.data?.paginationData?.currentPage;
+            const newComplaintList = res?.data?.complaints;
+            const oldComplaintList = complaintContext.getOnlyComplaintList;
+            const totalPage = res?.data?.paginationData?.totalPages
+
+            if (currentPage === 1) {
+                complaintContext?.updateonlyComplaintList(newComplaintList)
+            } else {
+                complaintContext?.updateonlyComplaintList([...oldComplaintList, ...newComplaintList])
+            }
+
+            setComplaintsPage(currentPage + 1)
+            setHasMoreComplaints(currentPage < totalPage)
+
+
+
+            //  complaintContext?.updateonlyComplaintList(res?.data?.complaints)
+
+
+
+        } catch (error) {
+            console.log("Invoice pagination error:", error);
+        } finally {
+            setPageLoading(false);
+        }
+    };
+
+    console.log("onlyComplaintList", complaintContext.getOnlyComplaintList)
 
     return <View style={{ flex: 1, position: 'relative' }}>
         <View style={{ flexDirection: 'row', marginTop: 20, justifyContent: 'center', alignItems: 'center' }}>
@@ -204,6 +266,24 @@ function Services(props) {
                         data={complaintContext.getOnlyComplaintList}
                         onScroll={props.onScroll}
                         scrollEventThrottle={16}
+                        onEndReached={() => {
+                            if (
+                                !onEndReachedCalledDuringMomentum.current &&
+                                !pageLoading &&
+                                hasMoreComplints
+                            ) {
+                                onEndReachedCalledDuringMomentum.current = true;
+
+                                onEndReachFetchComplaintList(complaintsPage);
+                            }
+                        }}
+                        onEndReachedThreshold={0.3}
+                        onMomentumScrollBegin={() => {
+                            onEndReachedCalledDuringMomentum.current = false;
+                        }}
+                        ListFooterComponent={
+                            pageLoading ? <ActivityIndicator size="small" /> : null
+                        }
                         ListEmptyComponent={
                             <View style={style.noResult}>
                                 <View style={{ justifyContent: 'center', alignItems: 'center' }}>
@@ -312,9 +392,9 @@ function Services(props) {
             :
             noAmenities ? (
                 <ScrollView contentContainerStyle={style.noResult}
-                 refreshControl={<RefreshControl
-                            refreshing={refreshing}
-                            onRefresh={onRefresh} />}>
+                    refreshControl={<RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh} />}>
                     <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                         <Image
                             source={NoResultPic}
@@ -334,9 +414,9 @@ function Services(props) {
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={{ paddingBottom: 80 }}
                     onScroll={props.onScroll}
-                     refreshControl={<RefreshControl
-                            refreshing={refreshing}
-                            onRefresh={onRefresh} />}
+                    refreshControl={<RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh} />}
                 >
                     {/* MY AMENITIES */}
                     {amenitiesContext.getAssignedAmenities?.length > 0 && (
@@ -441,7 +521,7 @@ function Services(props) {
 
         {selectedfield == 'Complaint' && (
             <>
-                {!["BOOKED","VACATED"].includes(commonContext?.getCustomerDetail?.bookingDetails?.currentStatus) &&
+                {!["BOOKED", "VACATED"].includes(commonContext?.getCustomerDetail?.bookingDetails?.currentStatus) &&
                     <View style={{ position: 'absolute', bottom: 35, right: -3 }}>
                         <TouchableOpacity onPress={() => props.onSheet()}>
                             <Image source={AddComplaint} style={{ width: 55, height: 55 }} />

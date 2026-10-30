@@ -1,5 +1,5 @@
 import React, { useContext, useRef, useState } from "react";
-import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity } from "react-native";
+import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity, Platform } from "react-native";
 import Sm_logo from '../../assets/Images/Sm_logo.png'
 import { useNavigation } from "@react-navigation/native";
 import { postMPin } from "../../Action/LoginAction";
@@ -25,6 +25,7 @@ const ConfirmMPin = (props) => {
     const [enterPinError, setEnterPinError] = useState()
 
     console.log(context.getUserId)
+    console.log(loginContext)
 
     const handlePinChange = async (text, index) => {
         const newPin = [...createMpin];
@@ -70,6 +71,8 @@ const ConfirmMPin = (props) => {
             const data = {
                 xuid: loginContext.getUserId,
                 mPin: mPinNumber,
+                platform: Platform.OS,
+                mobileNo: loginContext?.getPhoneNo,
             }
             postMPin(data).then(r => {
                 console.log(r)

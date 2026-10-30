@@ -32,7 +32,7 @@ const HostelList = (route) => {
   const [fcmToken, setFcmToken] = useState();
   const { NotificationModule,CommonModule } = NativeModules;
 
-  console.log(context?.getHostelList[0]?.hostelId)
+  console.log(context?.getHostelList?.[0]?.hostelId)
     console.log(context?.getHostelList)
     console.log(selectedHostel)
 
@@ -75,6 +75,7 @@ const HostelList = (route) => {
     const data = {
       xuid: loginContext.getUserId,
       hostelId: selectedHostel?.hostelId,
+      platform: Platform.OS,
     }
     console.log(data)
 

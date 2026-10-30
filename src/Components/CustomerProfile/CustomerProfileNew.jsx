@@ -12,7 +12,8 @@ import {
     PanResponder,
     Pressable,
     RefreshControl,
-    ActivityIndicator
+    ActivityIndicator,
+    Platform
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -249,6 +250,7 @@ const CustomerProfileNew = (route) => {
 
         const data = {
             xuid: loginContext.getUserId,
+            platform: Platform.OS,
         }
 
         logoutSetup(data, loginContext.getToken).then(r => {

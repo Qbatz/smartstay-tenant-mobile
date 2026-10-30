@@ -28,13 +28,18 @@ export const hostelDetails = async (hostelId, token) => {
     }
 }
 
-export const complaints = async (hostelId, token) => {
+export const complaints = async (hostelId, token, page=1,size=10) => {
     try {
         const axios = getAxios()
         const response = await axios.get('/v2/complaints/' + hostelId, {
+            params:{
+                page:page,
+                size: size,
+            },
             headers: {
                 Authorization: 'Bearer ' + token
             }
+           
         })
         return response
     } catch (error) {
@@ -242,7 +247,7 @@ export const getPaymentList = async (
       `/v2/invoices/${hostelId}`,
       config
     );
-    console.log(response)
+    console.log("refreshPayment",response)
 
     return response;
   } catch (error) {
