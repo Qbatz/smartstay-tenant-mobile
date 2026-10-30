@@ -100,8 +100,8 @@ android {
         applicationId "com.qbatz.smartstay.tenant"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 15
-        versionName "1.0.15"
+        versionCode 16
+        versionName "1.0.16"
         externalNativeBuild {
             cmake {
                 arguments "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
