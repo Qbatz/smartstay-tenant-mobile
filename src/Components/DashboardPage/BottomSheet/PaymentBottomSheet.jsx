@@ -217,7 +217,8 @@ export default function PaymentBottomSheet({
 
 
                 {paymentContext.getInvoiceDetail &&
-                    ["Rent", "Advance", "Booking", "Reassign_rent", "Advance_holding", "Eb_holding", "Amount_holding", "Other"].
+                    ["Rent", "Advance", "Booking", "Reassign_rent", "Advance_holding", "Eb_holding",
+                         "Amount_holding", "Other","Eb"].
                         includes(
                             paymentContext.getInvoiceDetail.invoiceType
                         ) ? (
@@ -815,7 +816,7 @@ export default function PaymentBottomSheet({
                             <View style={style.row}>
                                 <TouchableOpacity onPress={() => setShowVisible(!showVisible)}>
                                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                        <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium' }}>Refundable Rent</Text>
+                                        <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium' }}>Payable Rent</Text>
                                         <Ionicons
                                             name={showVisible ? "chevron-up" : "chevron-down"}
                                             size={20}
@@ -1019,7 +1020,7 @@ export default function PaymentBottomSheet({
                                     </TouchableOpacity>
 
                                     <Text style={{ fontSize: 17, fontFamily: 'Gilroy-Semibold' }}>
-                                        ₹ {paymentContext.getInvoiceDetail?.customerBookingInfo?.availableBalance}</Text>
+                                        ₹ {paymentContext.getInvoiceDetail?.customerBookingInfo?.availableBalance || 0}</Text>
                                 </View>
 
                                 {showRefundableBooking && (
@@ -1093,7 +1094,7 @@ export default function PaymentBottomSheet({
                                     </TouchableOpacity>
 
                                     <Text style={{ fontSize: 17, fontFamily: 'Gilroy-Semibold' }}>
-                                        ₹ {paymentContext.getInvoiceDetail?.settlementRetainerInfo?.totalRetainerBalanceAmount}</Text>
+                                        ₹ {paymentContext.getInvoiceDetail?.settlementRetainerInfo?.totalRetainerBalanceAmount || 0}</Text>
                                 </View>
 
                                 {showRetainerInv && (

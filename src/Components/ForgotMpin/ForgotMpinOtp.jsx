@@ -1,5 +1,5 @@
 import React, {useState,useContext,useRef} from "react";
-import { View,Text,TextInput,StyleSheet,Image,TouchableOpacity } from "react-native";
+import { View,Text,TextInput,StyleSheet,Image,TouchableOpacity, Platform } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { LoginContext } from "../../Context/LoginContext";
 import { postResendOtp, verifyOtp } from "../../Action/LoginAction";
@@ -39,7 +39,7 @@ const ForgotMpinOtp=({route})=>{
     if (newOtp.every((digit) => digit !== "")) {
       const otpValue = newOtp.join("");
       console.log("Entered OTP:", otpValue);
-      const data = await verifyOtp(route.params.phone, otpValue)
+      const data = await verifyOtp(route.params.phone, otpValue, Platform.OS)
       console.log(data)
       if (data.status == 200) {
         console.log(data.data)

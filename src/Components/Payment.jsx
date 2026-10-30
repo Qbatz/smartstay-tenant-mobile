@@ -56,8 +56,23 @@ const Payment = (props) => {
   const fetchPaymentData = () => {
     getPaymentList(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
       console.log("PaymentList", r)
-      paymentContext.updateInvoiceList(r.data)
-      paymentContext?.updateOnlyInvoiceList(r?.data?.invoices)
+      // paymentContext.updateInvoiceList(r.data)
+      // paymentContext?.updateOnlyInvoiceList(r?.data?.invoices)
+      if (r?.status === 200) {
+            const responseData = r.data;
+            const pagination = responseData?.paginationData;
+
+            paymentContext.updateInvoiceList(responseData);
+            paymentContext.updateOnlyInvoiceList(
+                responseData?.invoices ?? []
+            );
+
+            const currentPage = pagination?.currentPage ?? 1;
+            const totalPages = pagination?.totalPages ?? 1;
+
+            setInvoicePage(currentPage + 1);
+            setHasMoreInvoiceList(currentPage < totalPages);
+        }
     })
   }
 
@@ -396,10 +411,10 @@ const Payment = (props) => {
             ) {
               onEndReachedCalledDuringMomentum.current = true;
 
-              onEndReachFetchInvoiceList();
+              onEndReachFetchInvoiceList(invoicePage);
             }
           }}
-          onEndReachedThreshold={0.5}
+          onEndReachedThreshold={0.3}
           refreshing={refreshing}
           onMomentumScrollBegin={() => {
             onEndReachedCalledDuringMomentum.current = false;

@@ -1,6 +1,6 @@
 import { CommonActions, useNavigation, useNavigationState } from "@react-navigation/native";
 import React, { useContext, useEffect, useState } from "react";
-import { Image, NativeModules, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Image, NativeModules, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import LeftArrow from "../../../assets/Images/LeftArrow.png"
 import { LoginContexts } from "../../../Context/LoginContext";
 import { resendMpinOtp, verifyOtpMpin } from "../../../Action/LoginAction";
@@ -62,7 +62,8 @@ useEffect(() => {
 
         const data = {
             mpin: mPin,
-            otp: otp
+            otp: otp,
+            platform: Platform.OS,
         }
         setLoading(true)
         try {
@@ -98,6 +99,8 @@ useEffect(() => {
     }
 
     const resendOtp = async () => {
+       
+        console.log("consumer",data)
         try {
             const res = await resendMpinOtp(loginContext?.getToken)
             console.log("resendotp", res)

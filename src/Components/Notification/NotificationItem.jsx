@@ -17,8 +17,7 @@ const NotificationItem = ({ item }) => {
   const loginContext = useContext(LoginContexts)
   const { CommonModule } = NativeModules;
   const navigation = useNavigation();
-  console.log(CommonModule)
-  console.log(loginContext.getToken)
+ 
 
   const handleKycRequest = (entityId, mobileNo, tokenId) => {
     console.log(entityId, mobileNo, tokenId)

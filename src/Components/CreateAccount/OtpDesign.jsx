@@ -1,5 +1,5 @@
 import React, { useState, useRef, useContext } from "react";
-import { View, Text, TextInput, StyleSheet, Image, Alert, TouchableOpacity, } from "react-native";
+import { View, Text, TextInput, StyleSheet, Image, Alert, TouchableOpacity, Platform, } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { LoginContext } from "../../Context/LoginContext";
 import { postResendOtp, verifyOtp } from "../../Action/LoginAction";
@@ -40,7 +40,7 @@ const OtpDesign = ({ route }) => {
     if (newOtp.every((digit) => digit !== "")) {
       const otpValue = newOtp.join("");
       console.log("Entered OTP:", otpValue);
-      const data = await verifyOtp(route.params.phone, otpValue)
+      const data = await verifyOtp(route.params.phone, otpValue, Platform.OS)
       console.log(data)
       if (data.status == 200) {
         console.log(data.data)
@@ -89,8 +89,11 @@ const OtpDesign = ({ route }) => {
   };
 
   const resendOtp = () => {
+    const data={
+      platform: Platform.OS
+    }
 
-    postResendOtp(loginContext.getUserId).then(r => {
+    postResendOtp(loginContext.getUserId, data).then(r => {
       console.log(r)
 
       if (r.status == 200) {
