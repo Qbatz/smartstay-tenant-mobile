@@ -1,6 +1,7 @@
 apply plugin: "com.android.application"
 apply plugin: "com.facebook.react"
 apply plugin: "com.google.gms.google-services"
+apply plugin: "com.google.firebase.crashlytics"
 apply plugin: "org.jetbrains.kotlin.plugin.compose"
 apply plugin: 'org.jetbrains.kotlin.android'
 
@@ -176,6 +177,8 @@ dependencies {
     implementation jscFlavor
     implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
     implementation 'com.google.firebase:firebase-messaging'
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.google.firebase:firebase-crashlytics'
     implementation "androidx.core:core:1.15.0"
     implementation "androidx.core:core-role:1.1.0"
     implementation "androidx.core:core-animation:1.0.0"

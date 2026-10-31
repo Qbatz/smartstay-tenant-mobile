@@ -37,11 +37,14 @@
 		562436FAEABE558DAF966930 /* CommonModule.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CommonModule.swift; path = smartstayTenant/CommonModule.swift; sourceTree = "<group>"; };
 		5DCACB8F33CDC322A6C60F78 /* libPods-smartstayTenant.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-smartstayTenant.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5EF44D594FD54E86B4A2E66F /* Gilroy-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Gilroy-Bold.ttf"; path = "../src/assets/fonts/Gilroy-Bold.ttf"; sourceTree = "<group>"; };
+		620DF9B4F8C008B04558CFA3 /* Firebase/Prod/GoogleService-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = "Firebase/Prod/GoogleService-Info.plist"; path = "smartstayTenant/Firebase/Prod/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		6369B5899524E66F003EF4D1 /* Pods-smartstayTenant.devrelease.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-smartstayTenant.devrelease.xcconfig"; path = "Target Support Files/Pods-smartstayTenant/Pods-smartstayTenant.devrelease.xcconfig"; sourceTree = "<group>"; };
+		6A9BBEF23A8CFB439D6A4BFA /* Firebase/Dev/GoogleService-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = "Firebase/Dev/GoogleService-Info.plist"; path = "smartstayTenant/Firebase/Dev/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = smartstayTenant/AppDelegate.swift; sourceTree = "<group>"; };
 		76AB9AD7865718E50E736DB2 /* NotificationModule.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NotificationModule.swift; path = smartstayTenant/NotificationModule.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = smartstayTenant/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		84592258999748FB82F0908E /* Gilroy-Semibold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Gilroy-Semibold.ttf"; path = "../src/assets/fonts/Gilroy-Semibold.ttf"; sourceTree = "<group>"; };
+		8FF6286D396DC176E8A8A05E /* smartstayTenant.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; name = smartstayTenant.entitlements; path = smartstayTenant/smartstayTenant.entitlements; sourceTree = "<group>"; };
 		A26E808B86B72E897A536B43 /* Configuration.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
 		B01CD4F9A6D04D5EE621A74B /* Pods-smartstayTenant.devdebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-smartstayTenant.devdebug.xcconfig"; path = "Target Support Files/Pods-smartstayTenant/Pods-smartstayTenant.devdebug.xcconfig"; sourceTree = "<group>"; };
 		C650FD1D3069080A4F1BDCF1 /* SceneDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SceneDelegate.swift; path = smartstayTenant/SceneDelegate.swift; sourceTree = "<group>"; };
@@ -80,6 +83,9 @@
 				F4D778E336895CFEE343D8FB /* KYCVerification.swift */,
 				6DA921F08E5654C3ACE55A60 /* Configuration */,
 				C650FD1D3069080A4F1BDCF1 /* SceneDelegate.swift */,
+				8FF6286D396DC176E8A8A05E /* smartstayTenant.entitlements */,
+				6A9BBEF23A8CFB439D6A4BFA /* Firebase/Dev/GoogleService-Info.plist */,
+				620DF9B4F8C008B04558CFA3 /* Firebase/Prod/GoogleService-Info.plist */,
 			);
 			name = smartstayTenant;
 			sourceTree = "<group>";
@@ -167,9 +173,11 @@
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
+				E768467CF9A823D807549744 /* [Firebase] Copy GoogleService-Info.plist */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */,
 				E235C05ADACE081382539298 /* [CP] Copy Pods Resources */,
+				F20FDA8C7150F86BFC791EA2 /* [Firebase] Upload Crashlytics symbols */,
 			);
 			buildRules = (
 			);
@@ -301,6 +309,52 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-smartstayTenant/Pods-smartstayTenant-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
+		E768467CF9A823D807549744 /* [Firebase] Copy GoogleService-Info.plist */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(FIREBASE_PLIST)",
+				"$(SRCROOT)/smartstayTenant/Firebase/Prod/GoogleService-Info.plist",
+			);
+			name = "[Firebase] Copy GoogleService-Info.plist";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Copies this scheme's GoogleService-Info.plist (FIREBASE_PLIST, set in Configuration/Dev.xcconfig\n# and Prod.xcconfig) into the app, and stops the build if it belongs to another bundle identifier.\nSRC=\"${FIREBASE_PLIST}\"\nPROD_PLIST=\"${SRCROOT}/smartstayTenant/Firebase/Prod/GoogleService-Info.plist\"\nDEST=\"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleService-Info.plist\"\n\nif [ ! -f \"${SRC}\" ]; then\n  echo \"error: GoogleService-Info.plist not found at ${SRC} (FIREBASE_PLIST for ${CONFIGURATION}).\"\n  exit 1\nfi\nPLIST_BUNDLE_ID=$(/usr/libexec/PlistBuddy -c \"Print :BUNDLE_ID\" \"${SRC}\")\nif [ \"${PLIST_BUNDLE_ID}\" != \"${PRODUCT_BUNDLE_IDENTIFIER}\" ]; then\n  echo \"error: ${SRC} is for ${PLIST_BUNDLE_ID}, but ${CONFIGURATION} builds ${PRODUCT_BUNDLE_IDENTIFIER}.\"\n  exit 1\nfi\n# The Dev file started as a copy of the Prod one. Until it is replaced by the file Firebase issues\n# for the dev bundle identifier, the dev app gets no pushes and reports under the prod app.\nif [ \"${SRC}\" != \"${PROD_PLIST}\" ] && [ \"$(/usr/libexec/PlistBuddy -c 'Print :GOOGLE_APP_ID' \"${SRC}\")\" = \"$(/usr/libexec/PlistBuddy -c 'Print :GOOGLE_APP_ID' \"${PROD_PLIST}\")\" ]; then\n  echo \"warning: ${SRC} is a copy of the Prod file (same GOOGLE_APP_ID). Register ${PRODUCT_BUNDLE_IDENTIFIER} in Firebase and replace it: until then the dev app gets no push notifications and its analytics and crashes are reported under the prod app.\"\nfi\ncp \"${SRC}\" \"${DEST}\"\n";
+		};
+		F20FDA8C7150F86BFC791EA2 /* [Firebase] Upload Crashlytics symbols */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${PRODUCT_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist",
+				"$(TARGET_BUILD_DIR)/$(EXECUTABLE_PATH)",
+			);
+			name = "[Firebase] Upload Crashlytics symbols";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Uploads debug symbols (dSYMs) so Crashlytics shows readable stack traces. Skipped only if a\n# configuration is switched to DEBUG_INFORMATION_FORMAT = dwarf, which produces no dSYM.\nif [ \"${DEBUG_INFORMATION_FORMAT}\" != \"dwarf-with-dsym\" ]; then\n  echo \"Skipping Crashlytics symbol upload for ${CONFIGURATION} (no dSYM).\"\n  exit 0\nfi\n\"${PODS_ROOT}/FirebaseCrashlytics/run\"\n";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -328,6 +382,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = smartstayTenant/smartstayTenant.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 952KX8Q5Y5;
 				ENABLE_BITCODE = NO;
@@ -581,6 +636,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = smartstayTenant/smartstayTenant.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 952KX8Q5Y5;
 				ENABLE_BITCODE = NO;
@@ -611,6 +667,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = smartstayTenant/smartstayTenant.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 952KX8Q5Y5;
 				INFOPLIST_FILE = smartstayTenant/Info.plist;
@@ -639,6 +696,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = smartstayTenant/smartstayTenant.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 952KX8Q5Y5;
 				INFOPLIST_FILE = smartstayTenant/Info.plist;

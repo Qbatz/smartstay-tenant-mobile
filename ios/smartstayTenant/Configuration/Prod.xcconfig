@@ -4,3 +4,6 @@ BASE_URL = https:/$()/tenantapi.qbatz.com
 
 // SANDBOX or PRODUCTION.
 DIGIO_ENVIRONMENT = SANDBOX
+
+// Copied into the app by the "[Firebase] Copy GoogleService-Info.plist" build phase.
+FIREBASE_PLIST = $(SRCROOT)/smartstayTenant/Firebase/Prod/GoogleService-Info.plist
