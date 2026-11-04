@@ -16,6 +16,8 @@ import { LoginContexts } from "../../Context/LoginContext";
 import ErrorMessage from "../ToastFile/ErrorMessage";
 import AppLogo from "../../assets/Images/AppLogo.png"
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import DirectionDown from "../../assets/Images/direction-down.png"
+
 
 
 const CreateAccount = ({ navigation }) => {
@@ -78,8 +80,12 @@ const CreateAccount = ({ navigation }) => {
         if (dat.status == 200) {
           loginContext.userId(dat.data.xuid)
 
+          if (dat?.data?.otp) {
+            setOtp(dat?.data?.otp)
+          } else {
+            setOtp("OTP Sent")
+          }
 
-          setOtp("OTP Sent")
           setModelType('success')
           setShowSuccessModal(true)
           setTimeout(() => {
@@ -138,99 +144,107 @@ const CreateAccount = ({ navigation }) => {
         setShowDropdown(false)
       }}
       accessible={false}>
-    <View style={styles.container}>
-      <SuccessModal visible={showSuccessModal}
-        onClose={() => setShowSuccessModal(false)}
-        message={otp}
-        type={modelTpe} />
-      <View style={styles.topContent}>
-        <Image
-          source={AppLogo}
-          style={styles.logo}
-        />
-        <Text style={styles.title}>Login With Mobile</Text>
-        <Text style={styles.subtitle}>
-          Enter your mobile number to get OTP {"\n"}verification
-          {/* Fill in the details below to create your {"\n"}SmartStay account. */}
-        </Text>
+      <View style={styles.container}>
+        <SuccessModal visible={showSuccessModal}
+          onClose={() => setShowSuccessModal(false)}
+          message={otp}
+          type={modelTpe} />
+        <View style={styles.topContent}>
+          <Image
+            source={AppLogo}
+            style={styles.logo}
+          />
+          <Text style={styles.title}>Login With Mobile</Text>
+          <Text style={styles.subtitle}>
+            Enter your mobile number to get OTP {"\n"}verification
+            {/* Fill in the details below to create your {"\n"}SmartStay account. */}
+          </Text>
 
-        <Text style={styles.label}>
-          Phone number <Text style={styles.required}>*</Text>
-        </Text>
+          <Text style={styles.label}>
+            Phone number <Text style={styles.required}>*</Text>
+          </Text>
 
-        <View style={styles.inputContainer}>
-          <TouchableOpacity
-            style={styles.codeContainer}
-            onPress={() => {
-              if (!showDropdown) {
-                setShowDropdown(true)
-              } else {
-                setShowDropdown(false)
-              }
-            }}
-          >
-            <Text style={styles.countryCode}>{selectedCountry.dial_code}</Text>
-            <Ionicons
+          <View style={styles.inputContainer}>
+            <TouchableOpacity
+              style={styles.codeContainer}
+              onPress={() => {
+                if (!showDropdown) {
+                  setShowDropdown(true)
+                } else {
+                  setShowDropdown(false)
+                }
+              }}
+            >
+              <Text style={styles.countryCode}>{selectedCountry.dial_code}</Text>
+              {/* <Ionicons
               name={showDropdown ? "chevron-up" : "chevron-down"}
               size={22}
               color="#000"
               style={{ paddingRight: 3 }}
+            /> */}
+              <Image source={DirectionDown}
+                style={{
+                  width: 22, height: 22,
+                  transform: [{ rotate: showDropdown ? '180deg' : '0deg' }],
+                }} tintColor="#000"
+              />
+
+            </TouchableOpacity>
+
+            <View style={{borderWidth:0.8,height:"100%",marginRight:14,borderColor: "#ccc",}}/>
+
+            <TextInput
+              style={styles.input}
+              keyboardType="number-pad"
+              placeholder="98765 43210"
+              value={phoneNumber}
+              onChangeText={handlePhoneChange}
+              maxLength={10}
             />
-
-          </TouchableOpacity>
-
-          <TextInput
-            style={styles.input}
-            keyboardType="number-pad"
-            placeholder="98765 43210"
-            value={phoneNumber}
-            onChangeText={handlePhoneChange}
-            maxLength={10}
-          />
+          </View>
+          {
+            showDropdown && (
+              <>
+                <TouchableWithoutFeedback onPress={() => setShowDropdown(false)}>
+                  <View style={styles.dropdownOverlay} />
+                </TouchableWithoutFeedback>
+                <View style={styles.overlay}>
+                  <ScrollView keyboardShouldPersistTaps="handled"
+                    style={styles.dropdownBox}>
+                    {
+                      countries.map((item, index) => (
+                        <TouchableOpacity
+                          key={index}
+                          style={styles.countryItem}
+                          onPress={() => {
+                            setSelectedCountry(item)
+                            setShowDropdown(false)
+                          }}>
+                          <Text style={{ fontFamily: 'Gilroy-Medium', fontSize: 15 }}>{item.name} {item.dial_code}</Text>
+                        </TouchableOpacity>
+                      ))
+                    }
+                  </ScrollView>
+                </View>
+              </>
+            )
+          }
+          {phoneNoError && <ErrorMessage message={phoneNoError} type="error" />}
         </View>
-        {
-          showDropdown && (
-            <>
-              <TouchableWithoutFeedback onPress={() => setShowDropdown(false)}>
-                <View style={styles.dropdownOverlay} />
-              </TouchableWithoutFeedback>
-              <View style={styles.overlay}>
-                <ScrollView keyboardShouldPersistTaps="handled"
-                  style={styles.dropdownBox}>
-                  {
-                    countries.map((item, index) => (
-                      <TouchableOpacity
-                        key={index}
-                        style={styles.countryItem}
-                        onPress={() => {
-                          setSelectedCountry(item)
-                          setShowDropdown(false)
-                        }}>
-                        <Text style={{ fontFamily: 'Gilroy-Medium', fontSize: 15 }}>{item.name} {item.dial_code}</Text>
-                      </TouchableOpacity>
-                    ))
-                  }
-                </ScrollView>
-              </View>
-            </>
-          )
-        }
-        {phoneNoError && <ErrorMessage message={phoneNoError} type="error" />}
-      </View>
 
-      <View style={styles.centerButtonContainer}>
-        <TouchableOpacity
-          style={[
-            styles.button,
-            isButtonDisabled || isSubmitClicked ? styles.buttonDisabled : styles.buttonEnabled,
-          ]}
-          disabled={isSubmitClicked}
-          onPress={handleGetOtp}
-        >
-          <Text style={styles.buttonText}>Get OTP →</Text>
-        </TouchableOpacity>
+        <View style={styles.centerButtonContainer}>
+          <TouchableOpacity
+            style={[
+              styles.button,
+              isButtonDisabled || isSubmitClicked ? styles.buttonDisabled : styles.buttonEnabled,
+            ]}
+            disabled={isSubmitClicked}
+            onPress={handleGetOtp}
+          >
+            <Text style={styles.buttonText}>Get OTP →</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
     </TouchableWithoutFeedback>
   );
 };
@@ -274,7 +288,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     borderWidth: 1,
     borderColor: "#ccc",
-    borderRadius: 8,
+    borderRadius: 10,
     paddingHorizontal: 10,
     alignItems: "center",
     marginBottom: 5,
@@ -283,7 +297,7 @@ const styles = StyleSheet.create({
   codeContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginRight: 10
+    marginRight: 6
   },
 
   countryCode: {

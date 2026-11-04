@@ -232,7 +232,7 @@ const AmenitiesBottomSheet = ({
   return (
     <View style={style.overlay}>
       <TouchableWithoutFeedback onPress={onClose}>
-        <View style={StyleSheet.absoluteFillObject} />
+        <View style={StyleSheet.absoluteFill} />
       </TouchableWithoutFeedback>
 
       <Animated.View
@@ -426,7 +426,7 @@ export default AmenitiesBottomSheet;
 
 const style = StyleSheet.create({
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: "rgba(0,0,0,0.4)",
     justifyContent: "flex-end",
   },

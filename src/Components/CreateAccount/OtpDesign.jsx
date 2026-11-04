@@ -98,7 +98,13 @@ const OtpDesign = ({ route }) => {
 
       if (r.status == 200) {
         setShowSuccessModal(true)
-        setShowModelMessage("OTP Sent")
+         if(r?.data){
+            setShowModelMessage(r?.data)
+          }else{
+            setShowModelMessage("OTP Sent")
+          }
+          
+        // setShowModelMessage("OTP Sent")
         setModelType('success')
 
         setTimeout(() => {

@@ -17,7 +17,8 @@ import { generateToken, getToken, updateFCMToken } from "../Action/LoginAction";
 import { remoteData, retriveData, storeData } from "../Utils/Storage";
 import { ACCESS_TOKEN, CUSTOMERDETAIL, CUSTOMERINITIALS, CUSTOMERPROFILEPIC, FCM_TOKEN, HOSTELDETAIL, HOSTELLIST, LOGGEDIN, LOGGEDOUT, LOGIN_ANOTHER_NUMBER, PHONE_NO, SHOULD_TOKEN_UPDATE } from "../Utils/Constant";
 import { useNavigation } from "@react-navigation/native";
-import gobackIcon from "../assets/Images/logout.png"
+import gobackIcon from "../assets/Images/logout.png";
+import LocationIcon from "../assets/Images/locationIcon.png";
 
 
 
@@ -27,28 +28,28 @@ const HostelList = (route) => {
   const loginContext = useContext(LoginContexts)
   const [hostels, setHostelList] = useState([]);
   const [selectedHostel, setSelectedHostel] = useState(null);
-  const [showVerifyKyc,setShowVerifyKyc]=useState(false)
+  const [showVerifyKyc, setShowVerifyKyc] = useState(false)
   const navigation = useNavigation()
   const [fcmToken, setFcmToken] = useState();
-  const { NotificationModule,CommonModule } = NativeModules;
+  const { NotificationModule, CommonModule } = NativeModules;
 
   console.log(context?.getHostelList?.[0]?.hostelId)
-    console.log(context?.getHostelList)
-    console.log(selectedHostel)
+  console.log(context?.getHostelList)
+  console.log(selectedHostel)
 
-    useEffect(() => {
-  if (context?.getHostelList?.length > 0) {
-    setSelectedHostel(context.getHostelList[0]);
-  }
-}, [context?.getHostelList]);
+  useEffect(() => {
+    if (context?.getHostelList?.length > 0) {
+      setSelectedHostel(context.getHostelList[0]);
+    }
+  }, [context?.getHostelList]);
 
 
 
   const fetchFcmTokenAsync = () => {
-      NotificationModule.fetchFcmToken().then(r => {
-        console.log(r)
-        setFcmToken(r)
-      })
+    NotificationModule.fetchFcmToken().then(r => {
+      console.log(r)
+      setFcmToken(r)
+    })
       .catch(error => {
         console.log(error);
         setFcmToken(null)
@@ -60,7 +61,7 @@ const HostelList = (route) => {
     if (Platform.OS == 'android') {
       fetchFcmTokenAsync();
     }
-    
+
   }, [])
 
 
@@ -80,7 +81,7 @@ const HostelList = (route) => {
     console.log(data)
 
     getToken(data).then(r => {
-      console.log("token",r)
+      console.log("token", r)
       if (r?.status == 200) {
         fetchFCMToken(r.data);
         loginContext.updateToken(r.data)
@@ -96,36 +97,36 @@ const HostelList = (route) => {
 
   };
 
-  const fetchFCMToken =  async (authToken) => {
+  const fetchFCMToken = async (authToken) => {
     if (fcmToken != null) {
       await updateFCMToken(loginContext.getUserId, fcmToken, authToken);
     }
-   
+
   }
 
   const handleLoginWithAnotherNo = () => {
-          // loginContext.logout("false")
-          storeData(LOGGEDIN, "false")
-          remoteData(PHONE_NO)
-          remoteData(CUSTOMERPROFILEPIC)
-          storeData(LOGGEDOUT, "false")
-          remoteData(CUSTOMERINITIALS)
-          remoteData(HOSTELDETAIL)
-          remoteData(HOSTELLIST)
-          remoteData(ACCESS_TOKEN)
-          remoteData(CUSTOMERDETAIL)
-           loginContext.updateToken(null)
-           storeData(LOGIN_ANOTHER_NUMBER, "true")
-  
-          loginContext.logout("temp");
-          setTimeout(() => {
-              loginContext.logout("false");
-          }, 0);
-      }
-  
-  
+    // loginContext.logout("false")
+    storeData(LOGGEDIN, "false")
+    remoteData(PHONE_NO)
+    remoteData(CUSTOMERPROFILEPIC)
+    storeData(LOGGEDOUT, "false")
+    remoteData(CUSTOMERINITIALS)
+    remoteData(HOSTELDETAIL)
+    remoteData(HOSTELLIST)
+    remoteData(ACCESS_TOKEN)
+    remoteData(CUSTOMERDETAIL)
+    loginContext.updateToken(null)
+    storeData(LOGIN_ANOTHER_NUMBER, "true")
 
-  
+    loginContext.logout("temp");
+    setTimeout(() => {
+      loginContext.logout("false");
+    }, 0);
+  }
+
+
+
+
 
   const renderHostel = ({ item }) => {
     return <TouchableOpacity
@@ -140,7 +141,7 @@ const HostelList = (route) => {
         {item?.hostelPic ? (
           <Image
             source={{ uri: item.hostelPic }}
-            style={styles.hostelImage}/>
+            style={styles.hostelImage} />
         ) : (
           <View style={[styles.hostelImage, styles.initialContainer]}>
             <Text style={styles.initialText}>
@@ -150,27 +151,41 @@ const HostelList = (route) => {
         )}
 
 
-        <View style={{flex:1}}>
+        <View style={{ flex: 1 }}>
           <Text style={styles.hostelName} numberOfLines={1}>
             {item.hostelName}</Text>
           <View style={styles.locationRow}>
-            <Ionicons name="location-outline" size={16} color="#0057FF" />
+            {/* <Ionicons name="location-outline" size={16} color="#0057FF" /> */}
+            <Image source={LocationIcon} style={{ width: 14, height: 14 }} tintColor="#0057FF" />
             <Text style={styles.locationText} numberOfLines={1}>{item.city}</Text>
           </View>
         </View>
       </View>
 
-      {selectedHostel?.hostelId === item.hostelId ? (
+      {/* {selectedHostel?.hostelId === item.hostelId ? (
         <Ionicons name="radio-button-on" size={22} color="#0057FF" />
       ) : (
         <Ionicons name="radio-button-off" size={22} color="#aaa" />
-      )}
+      )} */}
+      <View
+        style={{
+          width: 20,height: 20,borderWidth: 1.6,borderRadius: 10,
+          borderColor: selectedHostel?.hostelId === item.hostelId
+            ? '#0057FF'
+            : '#999',
+          alignItems: 'center',justifyContent: 'center',alignSelf: 'center',
+        }}
+      >
+        {selectedHostel?.hostelId === item.hostelId && (
+          <View style={{width: 10,height: 10,borderRadius: 5,backgroundColor: '#0057FF'}}/>
+        )}
+      </View>
     </TouchableOpacity>
   }
 
   return (
     <View style={styles.container}>
-      <View style={{  }}>
+      <View style={{}}>
         <Text style={styles.title}>Select Hostel</Text>
         <Text style={styles.subtitle}>Select Your Current Staying Hostel</Text>
 
@@ -178,7 +193,7 @@ const HostelList = (route) => {
           data={context?.getHostelList} showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item.hostelId}
           renderItem={renderHostel}
-          style={{ marginTop: 20,height:'75%'}}
+          style={{ marginTop: 20, height: '75%' }}
         />
       </View>
 
@@ -190,14 +205,14 @@ const HostelList = (route) => {
           <Text style={styles.goButtonText}>Go</Text>
         </TouchableOpacity>
 
-        {context?.getHostelList?.length ===1 && context?.getHostelList?.[0]?.currentStatus === "INACTIVE" && (
-        <TouchableOpacity
-          style={styles.goWithAnotherNo}
-          onPress={handleLoginWithAnotherNo}
-        >
-          <Image source={gobackIcon} style={{ width: 18, height: 18, tintColor: '#4B4B4B',marginRight:6 }} />
-          <Text style={styles.goAnotherNoTxt}>Login With Another Number</Text>
-        </TouchableOpacity>
+        {context?.getHostelList?.length === 1 && context?.getHostelList?.[0]?.currentStatus === "INACTIVE" && (
+          <TouchableOpacity
+            style={styles.goWithAnotherNo}
+            onPress={handleLoginWithAnotherNo}
+          >
+            <Image source={gobackIcon} style={{ width: 18, height: 18, tintColor: '#4B4B4B', marginRight: 6 }} />
+            <Text style={styles.goAnotherNoTxt}>Login With Another Number</Text>
+          </TouchableOpacity>
         )}
       </View>
     </View>
@@ -214,13 +229,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 22,
-   fontFamily:'Gilroy-Semibold',
+    fontFamily: 'Gilroy-Semibold',
     color: "#000",
   },
   subtitle: {
     color: "#666",
     marginTop: 5,
-    fontFamily:'Gilroy-Regular',
+    fontFamily: 'Gilroy-Regular',
     marginBottom: 20,
   },
   hostelCard: {
@@ -244,7 +259,7 @@ const styles = StyleSheet.create({
   cardLeft: {
     flexDirection: "row",
     alignItems: "center",
-    flex:1
+    flex: 1
   },
   hostelImage: {
     width: 50,
@@ -253,19 +268,19 @@ const styles = StyleSheet.create({
     marginRight: 15,
   },
   initialText: {
-  color: '#788fed',
-  fontSize: 20,
-  fontWeight: 'bold',
-},
+    color: '#788fed',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
 
-initialContainer: {
-  backgroundColor: '#eef1ff',
-  justifyContent: 'center',
-  alignItems: 'center',
-},
+  initialContainer: {
+    backgroundColor: '#eef1ff',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   hostelName: {
     fontSize: 16,
-    fontFamily:'Gilroy-Semibold',
+    fontFamily: 'Gilroy-Semibold',
     color: "#000",
   },
   locationRow: {
@@ -275,14 +290,14 @@ initialContainer: {
   },
   locationText: {
     fontSize: 14,
-    fontFamily:'Gilroy-Regular',
+    fontFamily: 'Gilroy-Regular',
     color: "#555",
     marginLeft: 4,
   },
   goButtonContainer: {
     flex: 1,
     justifyContent: "flex-end",
-    alignItems: "center",marginBottom:40
+    alignItems: "center", marginBottom: 40
   },
   goButton: {
     width: "100%",
@@ -298,18 +313,18 @@ initialContainer: {
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FFFFFF",flexDirection:'row',
-    borderWidth:1,borderColor:"#ddd",marginTop:16
+    backgroundColor: "#FFFFFF", flexDirection: 'row',
+    borderWidth: 1, borderColor: "#ddd", marginTop: 16
   },
   goButtonText: {
     color: "#fff",
     fontSize: 16,
-    fontFamily:'Gilroy-Semibold',
+    fontFamily: 'Gilroy-Semibold',
   },
-   goAnotherNoTxt: {
-    color:'#4B4B4B',
+  goAnotherNoTxt: {
+    color: '#4B4B4B',
     fontSize: 16,
-    fontFamily:'Gilroy-Semibold',
+    fontFamily: 'Gilroy-Semibold',
   },
 });
 

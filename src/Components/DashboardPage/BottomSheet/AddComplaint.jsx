@@ -13,7 +13,9 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import CameraPic from '../../../assets/Images/cameraPic.png'
 import { SafeAreaView } from "react-native-safe-area-context";
 import ErrorMessage from "../../ToastFile/ErrorMessage";
-import Trash from "../../../assets/Images/trash 01.png"
+import Trash from "../../../assets/Images/trash 01.png";
+import DirectionDown from "../../../assets/Images/direction-down.png"
+
 
 
 const AddComplaint = ({
@@ -369,27 +371,27 @@ const AddComplaint = ({
     // };
 
     const replaceImage = async () => {
-    const result = await launchImageLibrary({
-        mediaType: "photo",
-        maxWidth: 500,
-        maxHeight: 500,
-        quality: 0.6,
-    });
+        const result = await launchImageLibrary({
+            mediaType: "photo",
+            maxWidth: 500,
+            maxHeight: 500,
+            quality: 0.6,
+        });
 
-    if (result.didCancel) return;
+        if (result.didCancel) return;
 
-    if (!result.assets?.length) return;
+        if (!result.assets?.length) return;
 
-    const updatedImages = [...mediaimage];
+        const updatedImages = [...mediaimage];
 
-    // Replace the selected image URI
-    updatedImages[selectedViewIndex] = result.assets[0].uri;
+        // Replace the selected image URI
+        updatedImages[selectedViewIndex] = result.assets[0].uri;
 
-    setmediaImage(updatedImages);
-    setImageuri(updatedImages);
+        setmediaImage(updatedImages);
+        setImageuri(updatedImages);
 
-    console.log(updatedImages);
-};
+        console.log(updatedImages);
+    };
 
     if (!visible) return null;
 
@@ -482,11 +484,11 @@ const AddComplaint = ({
                                             )}
 
                                             renderRightIcon={() => (
-                                                <Ionicons
-                                                    name={isFocus ? "chevron-up" : "chevron-down"}
-                                                    size={22}
-                                                    color="#000"
-                                                    style={{ paddingRight: 10 }}
+                                                <Image source={DirectionDown}
+                                                    style={{
+                                                        width: 22, height: 22, marginRight: 18,
+                                                        transform: [{ rotate: isFocus ? '180deg' : '0deg' }],
+                                                    }} tintColor="#000"
                                                 />
                                             )}
                                         />

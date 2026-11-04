@@ -15,6 +15,7 @@ import Bed from '../../../assets/Images/Bed_Icon.png'
 import { Dropdown } from "react-native-element-dropdown";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ErrorMessage from "../../ToastFile/ErrorMessage";
+import DirectionDown from "../../../assets/Images/direction-down.png"
 
 
 
@@ -52,7 +53,7 @@ const RequestBedChange = ({ visible,
     const [bedTypeError, setBedTypeError] = useState()
     const [urgencyError, setUrgencyError] = useState()
 
-    console.log(changeBed,urgencyType,bedType)
+    console.log(changeBed, urgencyType, bedType)
 
 
     useEffect(() => {
@@ -102,7 +103,7 @@ const RequestBedChange = ({ visible,
             reason: changeBed,
             // startFrom: urgencyType,
             // preferredType: bedType,
-           
+
         }
 
         if (changeBed != null && bedType != null && urgencyType != null) {
@@ -184,30 +185,30 @@ const RequestBedChange = ({ visible,
                         contentContainerStyle={{ flexGrow: 1 }}>
                         <View style={{ paddingTop: 15, justifyContent: 'space-between', flex: 1 }}>
                             <View>
-                                <Text style={{ fontSize: 20,fontFamily:'Gilroy-Semibold'}}>Request Bed Change</Text>
+                                <Text style={{ fontSize: 20, fontFamily: 'Gilroy-Semibold' }}>Request Bed Change</Text>
 
                                 <View style={{ paddingTop: 20 }}>
-                                    <Text style={{ fontSize: 13,fontFamily:'Gilroy-Medium' }}>Current Bed</Text>
+                                    <Text style={{ fontSize: 13, fontFamily: 'Gilroy-Medium' }}>Current Bed</Text>
 
                                     <View style={{
                                         backgroundColor: '#F6F8FF', borderRadius: 10, paddingVertical: 17,
                                         paddingHorizontal: 8, marginTop: 10, flexDirection: 'row'
                                     }}>
                                         <View style={{ backgroundColor: '#F9D796', flex: 1, paddingVertical: 4.64, paddingHorizontal: 9.28, alignSelf: 'flex-start', borderRadius: 46.38 }}>
-                                            <Text style={{ color: '#642B00', fontSize: 12,fontFamily:'Gilroy-Medium', textAlign: 'center' }}>
+                                            <Text style={{ color: '#642B00', fontSize: 12, fontFamily: 'Gilroy-Medium', textAlign: 'center' }}>
                                                 {context.getCustomerDetail?.bookingDetails?.floorName || "N/A"}</Text>
                                         </View>
 
                                         <View style={{ flexDirection: 'row', paddingLeft: 20, flex: 1, alignItems: 'center' }}>
                                             <Image source={Room} style={{ width: 21.17, height: 21.17 }} />
-                                            <Text style={{ marginLeft: 10, fontSize: 16,fontFamily:'Gilroy-Medium'}}>
+                                            <Text style={{ marginLeft: 10, fontSize: 16, fontFamily: 'Gilroy-Medium' }}>
                                                 {context.getCustomerDetail?.bookingDetails?.roomName || "N/A"}
                                             </Text>
                                         </View>
 
                                         <View style={{ flexDirection: 'row', paddingLeft: 10, alignItems: 'center', flex: 1 }}>
                                             <Image source={Bed} style={{ width: 21.17, height: 21.17 }} />
-                                            <Text style={{ marginLeft: 10, fontSize: 16,fontFamily:'Gilroy-Medium'}}>
+                                            <Text style={{ marginLeft: 10, fontSize: 16, fontFamily: 'Gilroy-Medium' }}>
                                                 {context.getCustomerDetail?.bookingDetails?.bedName || "N/A"}
                                             </Text>
                                         </View>
@@ -215,7 +216,7 @@ const RequestBedChange = ({ visible,
                                 </View>
 
                                 <View style={{ paddingTop: 15 }}>
-                                    <Text style={{ fontSize: 14,fontFamily:'Gilroy-Medium'}}>Reason for Bed change
+                                    <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>Reason for Bed change
                                         <Text style={{ color: 'red' }}> *</Text>
                                     </Text>
 
@@ -234,8 +235,8 @@ const RequestBedChange = ({ visible,
                                         valueField="value"
                                         value={changeBed}
                                         placeholder="Select Reason"
-                                        placeholderStyle={{ fontSize: 14,fontFamily:'Gilroy-Medium',paddingRight: 10,color:'#9C9C9C' }}
-                                        selectedTextStyle={{ fontSize: 15,fontFamily:'Gilroy-Medium',fontWeight: '400' }}
+                                        placeholderStyle={{ fontSize: 14, fontFamily: 'Gilroy-Medium', paddingRight: 10, color: '#9C9C9C' }}
+                                        selectedTextStyle={{ fontSize: 15, fontFamily: 'Gilroy-Medium', fontWeight: '400' }}
                                         containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
 
                                         onFocus={() => setFocusReason(true)}
@@ -246,11 +247,16 @@ const RequestBedChange = ({ visible,
                                         }}
 
                                         renderRightIcon={() => (
-                                            <Ionicons
-                                                name={focusReason ? 'chevron-up' : 'chevron-down'}
-                                                size={22}
-                                                color="#000"
-                                                style={{ paddingRight: 10 }}
+                                            // <Ionicons
+                                            //     name={focusReason ? 'chevron-up' : 'chevron-down'}
+                                            //     size={22}
+                                            //     color="#000"
+                                            //     style={{ paddingRight: 10 }}
+                                            // />
+                                            <Image source={DirectionDown}
+                                                style={{ width: 22, height: 22, marginRight: 14,
+                                                    transform: [{ rotate: focusReason ? '180deg' : '0deg' }],
+                                                }} tintColor="#000"
                                             />
                                         )}
 
@@ -276,7 +282,7 @@ const RequestBedChange = ({ visible,
                                                         backgroundColor: isSelected ? '#1D4ED8' : '#F5F5F5',
                                                     }}
                                                 >
-                                                    <Text style={{ color: isSelected ? '#fff' : '#000', fontSize: 15,fontFamily:'Gilroy-Medium' }}>
+                                                    <Text style={{ color: isSelected ? '#fff' : '#000', fontSize: 15, fontFamily: 'Gilroy-Medium' }}>
                                                         {item.label}
                                                     </Text>
                                                 </TouchableOpacity>
@@ -289,21 +295,22 @@ const RequestBedChange = ({ visible,
                                 </View>
 
                                 <View style={{ paddingTop: 15 }}>
-                                    <Text style={{ fontSize: 14,fontFamily:'Gilroy-Medium'}}>Preffered Bed Type
+                                    <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>Preffered Bed Type
                                         <Text style={{ color: 'red' }}> *</Text>
                                     </Text>
 
                                     <Dropdown ref={bedTypeDropdow}
                                         style={{
                                             borderWidth: 1, borderRadius: 10, paddingVertical: 15,
-                                            marginTop: 10, borderColor: '#e5e5e5', paddingLeft: 10
+                                            marginTop: 10, borderColor: '#e5e5e5', paddingLeft: 10,marginBottom:0
                                         }}
                                         onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
                                         data={selectBed}
-                                        containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
-                                        placeholderStyle={{ fontSize: 14,fontFamily:'Gilroy-Medium',paddingRight: 10,color:'#9C9C9C' }}
-                                        selectedTextStyle={{ fontSize: 15,fontFamily:'Gilroy-Medium',fontWeight: 400 }}
-                                        placeholder="Select Reason"
+                                         dropdownPosition="auto"
+                                        containerStyle={{ borderRadius: 10, paddingLeft: 10,marginTop:0 }}
+                                        placeholderStyle={{ fontSize: 14, fontFamily: 'Gilroy-Medium', paddingRight: 10, color: '#9C9C9C' }}
+                                        selectedTextStyle={{ fontSize: 15, fontFamily: 'Gilroy-Medium', fontWeight: 400 }}
+                                        placeholder="Select "bed type
                                         labelField='label'
                                         valueField='value'
                                         value={bedType}
@@ -313,8 +320,13 @@ const RequestBedChange = ({ visible,
                                         }}
 
                                         renderRightIcon={() => (
-                                            <Ionicons name={isFocus ? "chevron-up" : "chevron-down"} size={22} color="#000"
-                                                style={{ paddingRight: 10 }} />
+                                            // <Ionicons name={isFocus ? "chevron-up" : "chevron-down"} size={22} color="#000"
+                                            //     style={{ paddingRight: 10 }} />
+                                             <Image source={DirectionDown}
+                                                style={{ width: 22, height: 22, marginRight: 14,
+                                                    transform: [{ rotate: isFocus ? '180deg' : '0deg' }],
+                                                }} tintColor="#000"
+                                            />
                                         )}
 
                                         renderItem={(item, index) => {
@@ -340,7 +352,7 @@ const RequestBedChange = ({ visible,
                                                     }}
                                                 >
                                                     <Text
-                                                        style={{ color: isSelected ? "#fff" : "#000", fontSize: 15,fontFamily:'Gilroy-Medium'}}>
+                                                        style={{ color: isSelected ? "#fff" : "#000", fontSize: 15, fontFamily: 'Gilroy-Medium' }}>
                                                         {item.label}
                                                     </Text>
                                                 </TouchableOpacity>
@@ -352,7 +364,7 @@ const RequestBedChange = ({ visible,
                                 </View>
 
                                 <View style={{ paddingTop: 15 }}>
-                                    <Text style={{fontSize:14,fontFamily:'Gilroy-Medium'}}>Bed Change Urgency
+                                    <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>Bed Change Urgency
                                         <Text style={{ color: 'red' }}> *</Text>
                                     </Text>
 
@@ -364,8 +376,8 @@ const RequestBedChange = ({ visible,
                                         onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
                                         data={urgency}
                                         containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
-                                        placeholderStyle={{ fontSize: 14,fontFamily:'Gilroy-Medium', paddingRight: 10,color:'#9C9C9C' }}
-                                        selectedTextStyle={{ fontSize: 15,fontFamily:'Gilroy-Medium', fontWeight: 400 }}
+                                        placeholderStyle={{ fontSize: 14, fontFamily: 'Gilroy-Medium', paddingRight: 10, color: '#9C9C9C' }}
+                                        selectedTextStyle={{ fontSize: 15, fontFamily: 'Gilroy-Medium', fontWeight: 400 }}
                                         placeholder="Select Reason"
                                         labelField="label"
                                         valueField="value"
@@ -376,8 +388,13 @@ const RequestBedChange = ({ visible,
                                         }}
 
                                         renderRightIcon={() => (
-                                            <Ionicons name={focusReason ? "chevron-up" : "chevron-down"} size={22} color="#000"
-                                                style={{ paddingRight: 10 }} />
+                                            // <Ionicons name={focusReason ? "chevron-up" : "chevron-down"} size={22} color="#000"
+                                            //     style={{ paddingRight: 10 }} />
+                                             <Image source={DirectionDown}
+                                                style={{ width: 22, height: 22, marginRight: 14,
+                                                    transform: [{ rotate: focusReason ? '180deg' : '0deg' }],
+                                                }} tintColor="#000"
+                                            />
                                         )}
 
                                         renderItem={(item, index) => {
@@ -399,7 +416,7 @@ const RequestBedChange = ({ visible,
                                                     }}
                                                 >
                                                     <Text
-                                                        style={{ color: isSelected ? "#fff" : "#000", fontSize: 15,fontFamily:'Gilroy-Medium'}}>
+                                                        style={{ color: isSelected ? "#fff" : "#000", fontSize: 15, fontFamily: 'Gilroy-Medium' }}>
                                                         {item.label}
                                                     </Text>
                                                 </TouchableOpacity>
@@ -417,7 +434,7 @@ const RequestBedChange = ({ visible,
                                     backgroundColor: changeBed != null && bedType != null && urgencyType != null ? '#1E45E1' : '#788fed',
                                     alignItems: 'center', marginBottom: 15
                                 }}>
-                                <Text style={{ fontSize: 14,fontFamily:'Gilroy-Semibold', color: '#FFFFFF' }}>Submit Request</Text>
+                                <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Semibold', color: '#FFFFFF' }}>Submit Request</Text>
                             </TouchableOpacity>
 
                         </View>

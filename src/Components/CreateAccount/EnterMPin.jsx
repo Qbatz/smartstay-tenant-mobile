@@ -246,7 +246,7 @@ const EnterMPin = (props) => {
         }
 
         verifyMPin(data).then(r => {
-            console.log(r)
+            console.log("listOfHostels",r)
             if (r.status == 200) {
                 console.log(r.data)
                 setHostelList(r.data)

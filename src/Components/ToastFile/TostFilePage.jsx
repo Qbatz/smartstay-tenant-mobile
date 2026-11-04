@@ -8,6 +8,9 @@ import {
   Image,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import TickIcon from "../../assets/Images/tickIcon.png";
+import CloseCircleIcon from "../../assets/Images/close_circle.png";
+import WarningIcon from "../../assets/Images/warningIcon.png";
 
 const SuccessModal = ({
   visible,
@@ -28,13 +31,17 @@ const SuccessModal = ({
 
     switch (type) {
       case 'success':
-        return <Icon name="checkmark-circle" size={24} color="#4CAF50" />;
+        return <Image source={TickIcon} style={{width:21,height:20, tintColor:'#4CAF50'}}/>;
+        // <Icon name="checkmark-circle" size={24} color="#4CAF50" />;
       case 'error':
-        return <Icon name="close-circle" size={24} color="#F44336" />;
+        return <Image source={CloseCircleIcon} style={{width:21,height:20, tintColor:'#D32F2F'}}/>
+        // <Icon name="close-circle" size={24} color="#F44336" />;
       case 'warning':
-        return <Icon name="warning" size={24} color="#FF9800" />;
+        return <Image source={WarningIcon} style={{width:21,height:20, tintColor:'#FF9800'}}/>;
+        // <Icon name="warning" size={24} color="#FF9800" />;
       default:
-        return <Icon name="checkmark-circle" size={24} color="#4CAF50" />;
+        return <Image source={TickIcon} style={{width:21,height:20, tintColor:'#4CAF50'}}/>;
+        // <Icon name="checkmark-circle" size={24} color="#4CAF50" />;
     }
   };
 

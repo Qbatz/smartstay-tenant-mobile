@@ -11,6 +11,7 @@ import { LoginContexts } from "../../Context/LoginContext";
 import DeleteIcon from "../../assets/Images/trash.png";
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ErrorMessage from "../ToastFile/ErrorMessage";
+import DirectionDown from "../../assets/Images/direction-down.png"
 
 
 
@@ -130,7 +131,13 @@ const AddGuardianDetails = ({ route }) => {
                 <TouchableOpacity onPress={() => toggleCount(item.contactId)}
                     style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold', marginTop: 6 }}>Contact - {count}</Text>
-                    <Ionicons name={selectedContactId.includes(item.contactId) ? "chevron-up" : "chevron-down"} size={17} />
+                    {/* <Ionicons name={selectedContactId.includes(item.contactId) ? "chevron-up" : "chevron-down"} size={17} /> */}
+                    <Image source={DirectionDown}
+                        style={{
+                            width: 23, height: 23,
+                            transform: [{ rotate: selectedContactId.includes(item.contactId) ? '180deg' : '0deg' }],
+                        }} tintColor="#000"
+                    />
                 </TouchableOpacity>
 
 
@@ -210,7 +217,13 @@ const AddGuardianDetails = ({ route }) => {
                             marginTop: 10, borderWidth: 1, borderColor: '#EEEEEE', borderRadius: 8,
                         }}>
                             <Text style={{ fontFamily: 'Gilroy-Regular', fontSize: 15, color: '#111827', }}>+91</Text>
-                            <Ionicons name="chevron-down" size={16} style={{ marginLeft: 3 }} />
+                            {/* <Ionicons name="chevron-down" size={16} style={{ marginLeft: 3 }} /> */}
+                            <Image source={DirectionDown}
+                                style={{
+                                    width: 20, height: 20,marginLeft:3,
+                                   
+                                }} tintColor="#000"
+                            />
 
                             <TextInput
                                 value={item?.guardianMobile}
