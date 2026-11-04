@@ -33,6 +33,8 @@ import CalenderIcon from "../../assets/Images/calendar.png";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import DocumentViewer from "../DocumentsView/DocumentViewer";
 import NoticePeriodRequestRise from "../../Components/CustomerProfile/NoticePeriodRequestRise";
+import DirectionDown from "../../assets/Images/direction-down.png"
+
 
 
 
@@ -598,13 +600,19 @@ const DateRange = ({ joining, checkout, status, bookingDate }) => (
 );
 
 const StayFooter = ({ duration, isExpanded, onToggle, status }) => (
-  <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 6}}>
+  <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 6 }}>
     {/* {status === "VACATED" && */}
-      <Text style={{ fontSize: 13, fontFamily: "Gilroy-Medium", color: "#1E45E1" }}>
-        {status === "VACATED" ? `Stayed for ${duration}` : status === "BOOKED" ? "Stay Info" : `Staying for ${duration}`} </Text>
+    <Text style={{ fontSize: 13, fontFamily: "Gilroy-Medium", color: "#1E45E1" }}>
+      {status === "VACATED" ? `Stayed for ${duration}` : status === "BOOKED" ? "Stay Info" : `Staying for ${duration}`} </Text>
     {/* } */}
-    <TouchableOpacity onPress={onToggle} style={{alignSelf:'flex-end'}}>
-      <Ionicons name={isExpanded ? "chevron-up" : "chevron-down"} size={22} color="#000" />
+    <TouchableOpacity onPress={onToggle} style={{ alignSelf: 'flex-end' }}>
+      {/* <Ionicons name={isExpanded ? "chevron-up" : "chevron-down"} size={22} color="#000" /> */}
+      <Image source={DirectionDown}
+        style={{
+          width: 22, height: 22, marginRight: 14,
+          transform: [{ rotate: isExpanded ? '180deg' : '0deg' }],
+        }} tintColor="#000"
+      />
     </TouchableOpacity>
   </View>
 );

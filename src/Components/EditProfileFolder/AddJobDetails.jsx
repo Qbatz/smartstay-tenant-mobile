@@ -17,6 +17,7 @@ import TimerIcon from "../../assets/Images/timer.png"
 import DatePicker from "react-native-date-picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import ErrorMessage from "../ToastFile/ErrorMessage";
+import DirectionDown from "../../assets/Images/direction-down.png"
 
 
 const AddJobDetails = ({ route }) => {
@@ -239,7 +240,7 @@ const AddJobDetails = ({ route }) => {
                 {
                     organizationName: companyName,
                     role: jobRole,
-                    employmentStatus:selectedEmployment,
+                    employmentStatus: selectedEmployment,
                     workLocation: location,
                     workStartDate: startDate ? dayjs(startDate).format("DD-MM-YYYY") : "",
                     workEndDate: endDate ? dayjs(endDate).format("DD-MM-YYYY") : null,
@@ -415,7 +416,12 @@ const AddJobDetails = ({ route }) => {
                                     if (showEmploymentList) setStateQuery("");
                                 }}
                             >
-                                <Ionicons name="chevron-up" size={16} />
+                                <Image source={DirectionDown}
+                                    style={{
+                                        width: 22, height: 22,
+                                        transform: [{ rotate: showEmploymentList ? '180deg' : '0deg' }],
+                                    }} tintColor="#000"
+                                />
                             </TouchableOpacity>
 
                             {showEmploymentList && (
@@ -530,7 +536,8 @@ const AddJobDetails = ({ route }) => {
 
 
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
-                            <TouchableOpacity onPress={() => {setIsTickIcon(!isTickIcon)
+                            <TouchableOpacity onPress={() => {
+                                setIsTickIcon(!isTickIcon)
                                 setEndDate("")
                             }}
                                 style={{
@@ -589,7 +596,12 @@ const AddJobDetails = ({ route }) => {
                             <TouchableOpacity onPress={() => setOpenShiftList(!openShiftList)}
                                 style={styles.inputBox}>
                                 <Text style={styles.valueTxt}>{shiftType ? shiftType : "Select Shift Type"}</Text>
-                                <Ionicons name={openShiftList ? "chevron-up" : "chevron-down"} size={18} />
+                                <Image source={DirectionDown}
+                                    style={{
+                                        width: 22, height: 22,
+                                        transform: [{ rotate: openShiftList ? '180deg' : '0deg' }],
+                                    }} tintColor="#000"
+                                />
                             </TouchableOpacity>
                         </>
                         {/* )} */}
@@ -635,19 +647,19 @@ const AddJobDetails = ({ route }) => {
 
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                             <TouchableOpacity onPress={() => openTimePicker('from')}
-                                style={[styles.shiftInputBox, {marginRight:6}]}>
+                                style={[styles.shiftInputBox, { marginRight: 6 }]}>
                                 <Text> {shiftFrom ? formatTime(shiftFrom) : "From"}</Text>
                                 <Image source={TimerIcon} style={{ width: 22.5, height: 22.5 }} />
                             </TouchableOpacity>
-                            
-                           
-                            
-                            
+
+
+
+
                             <TouchableOpacity onPress={() => openTimePicker('to')}
-                                style={[styles.shiftInputBox, { marginLeft:6}]}>
+                                style={[styles.shiftInputBox, { marginLeft: 6 }]}>
                                 <Text>  {shiftTo ? formatTime(shiftTo) : "To"}</Text>
                                 <Image source={TimerIcon} style={{ width: 22.5, height: 22.5 }} />
-                            </TouchableOpacity>                                    
+                            </TouchableOpacity>
                         </View>
 
                         {errors.shiftTime && (<ErrorMessage message={errors.shiftTime} type="error" />)}
@@ -780,7 +792,7 @@ const styles = StyleSheet.create({
     shiftInputBox: {
         borderWidth: 1, borderRadius: 8, borderColor: '#EEEEEE', paddingVertical: 16,
         paddingHorizontal: 14, marginTop: 12, flexDirection: 'row',
-        justifyContent: 'space-between',flex:1
+        justifyContent: 'space-between', flex: 1
 
     },
     dateOverlay: {

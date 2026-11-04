@@ -14,12 +14,12 @@ const VerifyMpinOtp = ({ route }) => {
 
     const routes = useNavigationState(state => state.routes);
 
-useEffect(() => {
-  console.log("Routes:", routes.map(r => r.name));
-}, [routes]);
+    useEffect(() => {
+        console.log("Routes:", routes.map(r => r.name));
+    }, [routes]);
 
     const navigation = useNavigation();
-    const { NotificationModule,CommonModule } = NativeModules;
+    const { NotificationModule, CommonModule } = NativeModules;
     const loginContext = useContext(LoginContexts)
     const [otp, setOtp] = useState("")
     const { mPin } = route?.params
@@ -28,7 +28,7 @@ useEffect(() => {
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [showModelMessage, setShowModelMessage] = useState()
     const [modelType, setModelType] = useState();
-    const [loading,setLoading]=useState(false)
+    const [loading, setLoading] = useState(false)
     console.log("verifyroute", route)
     console.log(otp)
 
@@ -58,7 +58,7 @@ useEffect(() => {
         if (otp.trim().length < 6) {
             return;
         }
-       
+
 
         const data = {
             mpin: mPin,
@@ -74,12 +74,12 @@ useEffect(() => {
                 setShowSuccessModal(true)
                 setShowModelMessage("Mpin Changed")
                 setModelType("success")
-               loginContext.updateToken(res.data)
-               storeData(ACCESS_TOKEN, res.data)
-               CommonModule.storeCredentials(res.data)
+                loginContext.updateToken(res.data)
+                storeData(ACCESS_TOKEN, res.data)
+                CommonModule.storeCredentials(res.data)
                 setTimeout(() => {
                     setShowSuccessModal(false)
-                     navigation.pop(2);
+                    navigation.pop(2);
                 }, 1000);
             } else {
                 setLoading(false)
@@ -99,13 +99,19 @@ useEffect(() => {
     }
 
     const resendOtp = async () => {
-       
-        console.log("consumer",data)
+
+        console.log("consumer", data)
         try {
             const res = await resendMpinOtp(loginContext?.getToken)
             console.log("resendotp", res)
             if (res?.status == 200) {
                 setShowSuccessModal(true)
+                // if (res?.data) {
+                //     setOtp(res?.data)
+                // } else {
+                //     setOtp("OTP Sent")
+                // }
+
                 setShowModelMessage("OTP Sent")
                 setModelType("success")
                 setTimeout(() => {

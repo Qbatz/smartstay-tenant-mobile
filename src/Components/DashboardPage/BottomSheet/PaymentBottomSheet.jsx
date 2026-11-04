@@ -30,6 +30,8 @@ import { getInvoiceDownload, getReceiptDownload } from "../../../Action/PaymentA
 import { UsersContext } from "../../../Context/UserContext";
 import { LoginContexts } from "../../../Context/LoginContext";
 import AppLoader from "../../ToastFile/LoaderPage";
+import DirectionDown from "../../../assets/Images/direction-down.png"
+
 
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
@@ -50,6 +52,7 @@ export default function PaymentBottomSheet({
     const [showRefundableAdvance, setShowRefundableAdvance] = useState(true)
     const [showRefundableBooking, setShowRefundableBooking] = useState(true)
     const [showRetainerInv, setShowRetainerInv] = useState(true)
+    const [showAdditionalAdvance,setShowAdditionalAdvance]=useState(true)
 
 
     const { CommonModule } = NativeModules;
@@ -193,7 +196,7 @@ export default function PaymentBottomSheet({
         <View style={style.overlay}>
             <AppLoader visible={paymentContext.getLoading} />
             <TouchableWithoutFeedback onPress={onClose}>
-                <View style={StyleSheet.absoluteFillObject} />
+                <View style={StyleSheet.absoluteFill} />
             </TouchableWithoutFeedback>
 
             <Animated.View
@@ -218,7 +221,7 @@ export default function PaymentBottomSheet({
 
                 {paymentContext.getInvoiceDetail &&
                     ["Rent", "Advance", "Booking", "Reassign_rent", "Advance_holding", "Eb_holding",
-                         "Amount_holding", "Other","Eb"].
+                        "Amount_holding", "Other", "Eb"].
                         includes(
                             paymentContext.getInvoiceDetail.invoiceType
                         ) ? (
@@ -476,10 +479,11 @@ export default function PaymentBottomSheet({
                                     <TouchableOpacity onPress={() => setShowRedeemTo(!showRedeemTo)}
                                         style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                                         <Text style={style.appldTo}>Adjusted to</Text>
-                                        <Ionicons
-                                            name={showRedeemTo ? "chevron-up" : "chevron-down"}
-                                            size={20}
-                                            style={{ marginRight: 5 }}
+                                        <Image source={DirectionDown}
+                                            style={{
+                                                width: 20, height: 20, marginRight: 5,
+                                                transform: [{ rotate: showRedeemTo ? '180deg' : '0deg' }],
+                                            }} tintColor="#000"
                                         />
                                     </TouchableOpacity>
 
@@ -510,10 +514,11 @@ export default function PaymentBottomSheet({
                                     <TouchableOpacity onPress={() => setShowRedeemFrom(!showRedeemFrom)}
                                         style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10, marginBottom: 8 }}>
                                         <Text style={style.appldTo}>Adjusted From</Text>
-                                        <Ionicons
-                                            name={showRedeemFrom ? "chevron-up" : "chevron-down"}
-                                            size={20}
-                                            style={{ marginRight: 5 }}
+                                        <Image source={DirectionDown}
+                                            style={{
+                                                width: 20, height: 20, marginRight: 5,
+                                                transform: [{ rotate: showRedeemFrom ? '180deg' : '0deg' }],
+                                            }} tintColor="#000"
                                         />
                                     </TouchableOpacity>
 
@@ -731,12 +736,12 @@ export default function PaymentBottomSheet({
                                 }}
                             />
 
-                            <View style={[style.row,{flex:1}]}>
-                                <Text style={[style.modalTitle,{flexShrink:1}]}>
-                                    {paymentContext?.getInvoiceDetail?.status === "Pending" ? "Total outstanding payable" : "Total Refund" }</Text>
+                            <View style={[style.row, { flex: 1 }]}>
+                                <Text style={[style.modalTitle, { flexShrink: 1 }]}>
+                                    {paymentContext?.getInvoiceDetail?.status === "Pending" ? "Total outstanding payable" : "Total Refund"}</Text>
 
-                                <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Bold' }}> 
-                                    ₹ {new Intl.NumberFormat('en-IN').format(paymentContext?.getInvoiceDetail?.totalAmount )}</Text>
+                                <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Bold' }}>
+                                    ₹ {new Intl.NumberFormat('en-IN').format(paymentContext?.getInvoiceDetail?.totalAmount)}</Text>
                             </View>
 
                             <View style={{ alignItems: 'flex-end' }}>
@@ -817,17 +822,23 @@ export default function PaymentBottomSheet({
                                 <TouchableOpacity onPress={() => setShowVisible(!showVisible)}>
                                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                         <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium' }}>Payable Rent</Text>
-                                        <Ionicons
+                                        {/* <Ionicons
                                             name={showVisible ? "chevron-up" : "chevron-down"}
                                             size={20}
                                             color="#007FFF"
                                             style={{ marginLeft: 6, padding: 2, borderRadius: 5, backgroundColor: '#EFF6FF', }}
+                                        /> */}
+                                        <Image source={DirectionDown}
+                                            style={{
+                                                width: 20, height: 20, marginLeft: 6, padding: 2, borderRadius: 5, backgroundColor: '#EFF6FF',
+                                                transform: [{ rotate: showVisible ? '180deg' : '0deg' }],
+                                            }} tintColor="#007FFF"
                                         />
                                     </View>
                                 </TouchableOpacity>
 
-                                <Text style={{ fontSize: 16, fontFamily:'Gilroy-Semibold' }}>₹ {new Intl.NumberFormat('en-IN').format(
-                                                paymentContext?.getInvoiceDetail?.currentMonthRentInfo?.currentMonthPayableAmount ? paymentContext?.getInvoiceDetail?.currentMonthRentInfo?.currentMonthPayableAmount : "N/A")}</Text>
+                                <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold' }}>₹ {new Intl.NumberFormat('en-IN').format(
+                                    paymentContext?.getInvoiceDetail?.currentMonthRentInfo?.currentMonthPayableAmount ? paymentContext?.getInvoiceDetail?.currentMonthRentInfo?.currentMonthPayableAmount : "N/A")}</Text>
                             </View>
 
 
@@ -850,11 +861,17 @@ export default function PaymentBottomSheet({
                                                     Actual Stay days ({paymentContext?.getInvoiceDetail?.currentMonthRentInfo?.currentMonthStayDays} days)
                                                 </Text>
 
-                                                <Ionicons
+                                                {/* <Ionicons
                                                     name={rentAmountVisible ? "chevron-up" : "chevron-down"}
                                                     size={20}
                                                     color="#007FFF"
                                                     style={{ marginLeft: 6, padding: 2, borderRadius: 5, backgroundColor: '#EFF6FF', }}
+                                                /> */}
+                                                <Image source={DirectionDown}
+                                                    style={{
+                                                        width: 20, height: 20, marginLeft: 6, padding: 2, borderRadius: 5, backgroundColor: '#EFF6FF',
+                                                        transform: [{ rotate: rentAmountVisible ? '180deg' : '0deg' }],
+                                                    }} tintColor="#007FFF"
                                                 />
                                             </View>
 
@@ -875,11 +892,11 @@ export default function PaymentBottomSheet({
                                                             {r?.floorName}{"  "}{r?.roomName}{"  "}{r?.bedName}</Text>
 
                                                         {/* <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', marginLeft: 5 }}>({r?.noOfDaysStayed} days = {r?.rent})</Text> */}
-                                                         <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', marginLeft: 5 }}>({r?.noOfDays} days  x  {r?.rentPerDay} {""} =  ₹ {r?.noOfDays * r?.rentPerDay})</Text>
+                                                        <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', marginLeft: 5 }}>({r?.noOfDays} days  x  {r?.rentPerDay} {""} =  ₹ {r?.noOfDays * r?.rentPerDay})</Text>
                                                     </View>
 
                                                 })}
-                                                       
+
 
 
                                             </View>
@@ -904,11 +921,14 @@ export default function PaymentBottomSheet({
                                     <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium' }}>Non Refundable Rent</Text>
                                     <TouchableOpacity onPress={() => setNonrefundable(!showNonrefundable)}
                                         style={{ padding: 2, backgroundColor: 'green', marginLeft: 6, borderRadius: 5, backgroundColor: '#EFF6FF', }}>
-                                        <Ionicons
-                                            name={showNonrefundable ? "chevron-up" : "chevron-down"}
-                                            size={20}
-                                            color="#007FFF"
+                                      
+                                        <Image source={DirectionDown}
+                                            style={{
+                                                width: 20, height: 20,
+                                                transform: [{ rotate: showNonrefundable ? '180deg' : '0deg' }],
+                                            }} tintColor="#007FFF"
                                         />
+
                                     </TouchableOpacity>
 
                                 </View>
@@ -939,11 +959,17 @@ export default function PaymentBottomSheet({
                                         onPress={() => setShowRefundableAdvance(!showRefundableAdvance)}>
 
                                         <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold' }}>Refundable Advance</Text>
-                                        <Ionicons
+                                        {/* <Ionicons
                                             name={showRefundableAdvance ? "chevron-up" : "chevron-down"}
                                             size={18}
                                             color="#007FFF"
                                             style={{ marginLeft: 6, marginTop: 4 }}
+                                        /> */}
+                                          <Image source={DirectionDown}
+                                            style={{
+                                                width: 22, height: 22, marginLeft: 6, marginTop: 4,
+                                                transform: [{ rotate: showRefundableAdvance ? '180deg' : '0deg' }],
+                                            }} tintColor="#007FFF"
                                         />
                                     </TouchableOpacity>
 
@@ -1005,17 +1031,23 @@ export default function PaymentBottomSheet({
 
                             </View>
 
-                              <View style={style.fieldBox}>
+                            <View style={style.fieldBox}>
                                 <View style={[style.row, { paddingHorizontal: 10 }]}>
                                     <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }}
                                         onPress={() => setShowRefundableBooking(!showRefundableBooking)}>
 
                                         <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold' }}>Refundable Booking</Text>
-                                        <Ionicons
+                                        {/* <Ionicons
                                             name={showRefundableAdvance ? "chevron-up" : "chevron-down"}
                                             size={18}
                                             color="#007FFF"
                                             style={{ marginLeft: 6, marginTop: 4 }}
+                                        /> */}
+                                        <Image source={DirectionDown}
+                                            style={{
+                                                width: 22, height: 22, marginLeft: 6, marginTop: 4,
+                                                transform: [{ rotate: showRefundableBooking ? '180deg' : '0deg' }],
+                                            }} tintColor="#007FFF"
                                         />
                                     </TouchableOpacity>
 
@@ -1076,7 +1108,67 @@ export default function PaymentBottomSheet({
                                 )}
 
                             </View>
-                     
+
+
+                             <View style={style.fieldBox}>
+                                <View style={[style.row, { paddingHorizontal: 10 }]}>
+
+                                    <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }}
+                                        onPress={() => setShowAdditionalAdvance(!showAdditionalAdvance)}>
+
+                                        <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold' }}>Additional Advance</Text>                                        
+                                        <Image source={DirectionDown}
+                                            style={{
+                                                width: 22, height: 22, marginLeft: 6, marginTop: 3,
+                                                transform: [{ rotate: showUnpaidInv ? '180deg' : '0deg' }],
+                                            }} tintColor="#007FFF"
+                                        />
+                                    </TouchableOpacity>
+
+                                    <Text style={{ fontSize: 17, fontFamily: 'Gilroy-Semibold' }}>
+                                        ₹ {paymentContext.getInvoiceDetail?.settlementAdditionalAdvance?.balanceAmount || 0}</Text>
+                                </View>
+
+                                {showAdditionalAdvance && (
+                                    <View >
+                                        {paymentContext.getInvoiceDetail?.settlementAdditionalAdvance?.additionalAdvanceItems?.length > 0 &&
+                                            <View style={{
+                                                flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#F9F9F9',
+                                                marginBottom: 6, paddingHorizontal: 10, paddingVertical: 6, marginTop: 5
+                                            }}>
+                                                <Text style={{ fontSize: 15, fontFamily: 'Gilroy-Semibold' }}>Inv No</Text>
+                                                <Text style={{ fontSize: 15, fontFamily: 'Gilroy-Semibold' }}>Amount</Text>
+                                            </View>
+                                        }
+                                        {paymentContext.getInvoiceDetail?.settlementAdditionalAdvance?.additionalAdvanceItems?.length > 0 ? (
+                                            <View style={{ marginVertical: 10 }}>
+                                                {paymentContext.getInvoiceDetail?.settlementAdditionalAdvance?.additionalAdvanceItems.map((i, index) => (
+                                                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 7, paddingHorizontal: 10 }}
+                                                        key={index}>
+                                                        <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                                            <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#1E45E1' }}>
+                                                                {i?.invoiceNumber}</Text>
+                                                            <Image source={ReceiptPic} style={{ width: 16, height: 16, marginLeft: 12 }} />
+                                                        </TouchableOpacity>
+
+                                                        <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#2F2F2F' }}>
+                                                            ₹ {i?.amount}</Text>
+                                                    </View>
+                                                ))
+                                                }
+                                            </View>
+                                        ) : <View style={{ alignItems: 'center' }}>
+                                            <View style={{ borderTopWidth: 1, borderColor: '#F1F5F9', width: '100%', marginVertical: 6 }} />
+                                            <Text style={{
+                                                fontSize: 14, fontFamily: 'Gilroy-Medium', marginVertical: 18, backgroundColor: '#FFF5EE',
+                                                padding: 6, color: '#AA6805', borderRadius: 4
+                                            }}>
+                                                No Additional Advance</Text>
+                                        </View>}
+                                    </View>
+                                )}
+                            </View>
+
 
 
                             <View style={style.fieldBox}>
@@ -1085,11 +1177,17 @@ export default function PaymentBottomSheet({
                                         onPress={() => setShowRetainerInv(!showRetainerInv)}>
 
                                         <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold' }}>Retainer Invoice</Text>
-                                        <Ionicons
+                                        {/* <Ionicons
                                             name={showRetainerInv ? "chevron-up" : "chevron-down"}
                                             size={16}
                                             color="#007FFF"
                                             style={{ marginLeft: 6, marginTop: 3 }}
+                                        /> */}
+                                        <Image source={DirectionDown}
+                                            style={{
+                                                width: 22, height: 22, marginLeft: 6, marginTop: 3,
+                                                transform: [{ rotate: showRetainerInv ? '180deg' : '0deg' }],
+                                            }} tintColor="#007FFF"
                                         />
                                     </TouchableOpacity>
 
@@ -1105,7 +1203,7 @@ export default function PaymentBottomSheet({
                                                 {paymentContext.getInvoiceDetail?.settlementRetainerInfo?.retainerInfos?.length > 0 &&
                                                     <View style={{
                                                         flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#F9F9F9',
-                                                        marginBottom: 6,  paddingHorizontal: 10, paddingVertical: 5,marginTop:4
+                                                        marginBottom: 6, paddingHorizontal: 10, paddingVertical: 5, marginTop: 4
                                                     }}>
                                                         <Text style={{ fontSize: 15, fontFamily: 'Gilroy-Semibold' }}>Inv No</Text>
                                                         <Text style={{ fontSize: 15, fontFamily: 'Gilroy-Semibold' }}>Amount</Text>
@@ -1113,21 +1211,21 @@ export default function PaymentBottomSheet({
                                                 }
 
                                                 {paymentContext.getInvoiceDetail?.settlementRetainerInfo?.retainerInfos?.length > 0 ? (
-                                                    <View style={{marginVertical:8}}>{
-                                                    paymentContext.getInvoiceDetail?.settlementRetainerInfo?.retainerInfos?.map((i, index) => (
+                                                    <View style={{ marginVertical: 8 }}>{
+                                                        paymentContext.getInvoiceDetail?.settlementRetainerInfo?.retainerInfos?.map((i, index) => (
 
-                                                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 7, paddingHorizontal: 10 }}
-                                                            key={index}>
-                                                            <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                                <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#1E45E1' }}>
-                                                                    {i?.invoiceNumber}</Text>
-                                                                <Image source={ReceiptPic} style={{ width: 16, height: 16, marginLeft: 12 }} />
-                                                            </TouchableOpacity>
+                                                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 7, paddingHorizontal: 10 }}
+                                                                key={index}>
+                                                                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                                                    <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#1E45E1' }}>
+                                                                        {i?.invoiceNumber}</Text>
+                                                                    <Image source={ReceiptPic} style={{ width: 16, height: 16, marginLeft: 12 }} />
+                                                                </TouchableOpacity>
 
-                                                            <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#2F2F2F' }}>
-                                                                ₹ {i?.balanceAmount}</Text>
-                                                        </View>
-                                                    ))
+                                                                <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#2F2F2F' }}>
+                                                                    ₹ {i?.balanceAmount}</Text>
+                                                            </View>
+                                                        ))
                                                     }</View>
                                                 ) :
                                                     <View style={{ alignItems: 'center' }}>
@@ -1159,11 +1257,17 @@ export default function PaymentBottomSheet({
                                         onPress={() => setShowUnpaidInv(!showUnpaidInv)}>
 
                                         <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold' }}>Unpaid Invoices</Text>
-                                        <Ionicons
+                                        {/* <Ionicons
                                             name={showUnpaidInv ? "chevron-up" : "chevron-down"}
                                             size={18}
                                             color="#007FFF"
-                                            style={{ marginLeft: 6,marginTop:3 }}
+                                            style={{ marginLeft: 6, marginTop: 3 }}
+                                        /> */}
+                                        <Image source={DirectionDown}
+                                            style={{
+                                                width: 22, height: 22, marginLeft: 6, marginTop: 3,
+                                                transform: [{ rotate: showUnpaidInv ? '180deg' : '0deg' }],
+                                            }} tintColor="#007FFF"
                                         />
                                     </TouchableOpacity>
 
@@ -1176,14 +1280,14 @@ export default function PaymentBottomSheet({
                                         {paymentContext.getInvoiceDetail?.unpaidInvoiceInfo?.unpaidInvoiceItems?.length > 0 &&
                                             <View style={{
                                                 flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#F9F9F9',
-                                                marginBottom: 6, paddingHorizontal: 10, paddingVertical: 6,marginTop:5
+                                                marginBottom: 6, paddingHorizontal: 10, paddingVertical: 6, marginTop: 5
                                             }}>
                                                 <Text style={{ fontSize: 15, fontFamily: 'Gilroy-Semibold' }}>Inv No</Text>
                                                 <Text style={{ fontSize: 15, fontFamily: 'Gilroy-Semibold' }}>Amount</Text>
                                             </View>
                                         }
                                         {paymentContext.getInvoiceDetail?.unpaidInvoiceInfo?.unpaidInvoiceItems?.length > 0 ? (
-                                            <View style={{marginVertical:10}}>
+                                            <View style={{ marginVertical: 10 }}>
                                                 {paymentContext.getInvoiceDetail?.unpaidInvoiceInfo?.unpaidInvoiceItems.map((i, index) => (
                                                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 7, paddingHorizontal: 10 }}
                                                         key={index}>
@@ -1335,7 +1439,14 @@ export default function PaymentBottomSheet({
 
 const style = StyleSheet.create({
     overlay: {
-        ...StyleSheet.absoluteFillObject,
+        // ...StyleSheet.absoluteFillObject,
+        // backgroundColor: "rgba(0,0,0,0.4)",
+        // justifyContent: "flex-end",
+        position: "absolute",
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
         backgroundColor: "rgba(0,0,0,0.4)",
         justifyContent: "flex-end",
     },

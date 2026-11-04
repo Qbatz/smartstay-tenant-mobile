@@ -11,6 +11,7 @@ import { customerDetails, editProfile } from "../../Action/CustomerAction";
 import { LoginContexts } from "../../Context/LoginContext";
 import AppLoader from "../ToastFile/LoaderPage";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import DirectionDown from "../../assets/Images/direction-down.png"
 
 
 
@@ -33,8 +34,9 @@ const EditBasicDetail = ({ }) => {
     const [modalType, setModalType] = useState("")
     const [loading, setLoading] = useState(false)
     const [emailError, setEmailError] = useState("");
+    const [showDropdown,setShowDropdrown]=useState(false)
 
-      const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
+    const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
 
     console.log(getCustomerDetail)
 
@@ -82,7 +84,7 @@ const EditBasicDetail = ({ }) => {
 
         console.log("sona")
 
-        
+
 
         const payload = {
             firstName: firstName,
@@ -193,7 +195,7 @@ const EditBasicDetail = ({ }) => {
 
                         }} />
 
-                    {emailError && <ErrorMessage message={emailError} type="error"/>}
+                    {emailError && <ErrorMessage message={emailError} type="error" />}
 
                     <Text style={[styles.labelTxt, { marginTop: 12 }]}>Mobile No</Text>
                     <View style={{
@@ -201,8 +203,16 @@ const EditBasicDetail = ({ }) => {
                         paddingHorizontal: 10, marginTop: 10, fontFamily: 'Gilroy-Regular',
                         borderWidth: 1, borderColor: '#EEEEEE', borderRadius: 8,
                     }}>
+                        <TouchableOpacity onPress={()=>setShowDropdrown(true)}
+                            style={{flexDirection:'row',alignItems:'center'}}>
                         <Text style={{ fontSize: 15, color: '#111827', fontFamily: 'Gilroy-Regular', }}>+91</Text>
-                        <Ionicons name="chevron-down" size={16} />
+                        <Image source={DirectionDown}
+                            style={{
+                                width: 22, height: 22, marginRight: 14,
+                                transform: [{ rotate: showDropdown ? '180deg' : '0deg' }],
+                            }} tintColor="#000"
+                        />
+                        </TouchableOpacity>
                         <TextInput
                             value={mobileNo}
                             style={{ flex: 1, paddingVertical: 14, fontSize: 15, color: '#111827', fontFamily: 'Gilroy-Regular', marginLeft: 6 }}

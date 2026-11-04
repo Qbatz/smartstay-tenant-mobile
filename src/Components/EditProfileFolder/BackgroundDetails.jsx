@@ -14,7 +14,8 @@ import ErrorMessage from "../ToastFile/ErrorMessage";
 import AddCircle from "../../assets/Images/add-circle.png"
 import NoResultPic from "../../assets/Images/NoResultPic.png"
 import Briefcase from "../../assets/Images/briefcase.png"
-import EditIcon from "../../assets/Images/edit.png"
+import EditIcon from "../../assets/Images/edit.png";
+import DirectionRight from "../../assets/Images/direction-right.png"
 
 
 
@@ -467,11 +468,12 @@ const BackgroundDetails = (route) => {
                             <TouchableOpacity onPress={() => navigation.navigate("AddGuardianDetails", { mode: "add" })}
                                 style={[{ flexDirection: 'row', alignItems: 'center' }, getCustomerDetail?.currentStatus === "VACATED" && { opacity: 0.4 }]}
                                 disabled={getCustomerDetail?.currentStatus === "VACATED"}>
-                                <Ionicons
+                                {/* <Ionicons
                                     name="add-circle-outline"
                                     size={18}
                                     color="#1E45E1"
-                                />
+                                /> */}
+                                <Image source={AddCircle} style={{width:17.3,height:17.3,tintColor:'#1E45E1'}}/>
                                 <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#1E45E1', marginLeft: 5 }}>
                                     Add New Row</Text>
                             </TouchableOpacity>
@@ -479,8 +481,9 @@ const BackgroundDetails = (route) => {
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', color: '#0D1B8E' }}>Swipe</Text>
                                 <View style={{ flexDirection: "row" }}>
-                                    <Ionicons name="chevron-forward" size={14} color="#0D1B8E" />
-                                    <Ionicons name="chevron-forward" size={14} color="#0D1B8E" style={{ marginLeft: -6 }} />
+                                    {/* <Ionicons name="chevron-forward" size={14} color="#0D1B8E" />
+                                    <Ionicons name="chevron-forward" size={14} color="#0D1B8E" style={{ marginLeft: -6 }} /> */}
+                                    <Image source={DirectionRight} style={{width:17,height:17,tintColor:'#0D1B8E',marginTop:2}}/>
                                 </View>
                             </View>
                         </View>
