@@ -28,7 +28,7 @@ const NotificationItem = ({ item }) => {
   const handleViewDetails = (sourceId, type) => {
     console.log("billana")
     console.log(sourceId, type)
-    if (type === "INVOICE_GENERATION") {
+    if (type === "INVOICE_GENERATION" || "MANUAL_INVOICE") {
       // navigation.navigate("Dashboard")
       navigation.navigate("Dashboard", {
         initialTab: "payment",

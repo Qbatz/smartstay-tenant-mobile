@@ -1,9 +1,9 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { View, Image, TouchableOpacity, ScrollView, Text, StyleSheet, TextInput, Platform, KeyboardAvoidingView } from "react-native";
 import { UsersContext } from "../../Context/UserContext";
 import { FlatList } from "react-native-gesture-handler";
 import LeftArrow from "../../assets/Images/LeftArrow.png"
-import { useNavigation } from "@react-navigation/native";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { addGuardian, customerDetails, deleteContact, editProfile } from "../../Action/CustomerAction";
 import AppLoader from "../ToastFile/LoaderPage";
 import SuccessModal from "../ToastFile/TostFilePage";
@@ -12,6 +12,7 @@ import DeleteIcon from "../../assets/Images/trash.png";
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ErrorMessage from "../ToastFile/ErrorMessage";
 import DirectionDown from "../../assets/Images/direction-down.png"
+import CommonInputComponent from "../CommonComponent/CommonInputComponent";
 
 
 
@@ -60,6 +61,16 @@ const AddGuardianDetails = ({ route }) => {
     const [modelType, setModelType] = useState();
     const [selectedContactId, setSelectedContactId] = useState(items.map(item => item.contactId))
     const [errors, setErrors] = useState([])
+    const isScreenFocused = useIsFocused()
+    const [isFocused, setIsFocused] = useState(false)
+
+    useEffect(() => {
+        if (isScreenFocused) {
+            setIsFocused(true)
+        } else {
+            setIsFocused(false)
+        }
+    }, [isScreenFocused])
 
     console.log(items)
     const handleChange = (index, key, value) => {
@@ -144,7 +155,7 @@ const AddGuardianDetails = ({ route }) => {
                 {selectedContactId.includes(item.contactId) && (<>
 
                     <View style={[styles.fieldContainer, { marginTop: 15 }]}>
-                        <Text style={styles.label}>Guardian Full Name </Text>
+                        {/* <Text style={styles.label}>Guardian Full Name </Text>
 
                         <TextInput
                             value={item.guardianName}
@@ -156,6 +167,20 @@ const AddGuardianDetails = ({ route }) => {
                                 // setGuardianFullName(onlyLetters)
                                 // setErrorMsg((prev) => ({ ...prev, fullName: "" }))
                             }}
+                        /> */}
+                        <CommonInputComponent
+                            label="FullName"
+                            type="text"
+                            value={item.guardianName}
+                            placeholder="Enter fullName"
+                            onChangeText={(text) => {
+                                const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
+                                handleChange(index, "guardianName", onlyLetters)
+                            }}
+                            required={true}
+                            isActive={isFocused}
+                            error={!!errors[index]?.guardianName}
+
                         />
 
                         {errors[index]?.guardianName && (
@@ -167,7 +192,7 @@ const AddGuardianDetails = ({ route }) => {
 
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <View style={[styles.rltnOccptField, { marginRight: 3 }]}>
-                            <Text style={styles.label}>Relationship <Text style={{ color: "red", }}>*</Text></Text>
+                            {/* <Text style={styles.label}>Relationship <Text style={{ color: "red", }}>*</Text></Text>
 
                             <TextInput
                                 value={item?.guardianRelation}
@@ -179,6 +204,22 @@ const AddGuardianDetails = ({ route }) => {
                                     handleChange(index, "guardianRelation", onlyLetters)
                                     // setErrorMsg((prev) => ({ ...prev, occupation: "" }))
                                 }}
+                            /> */}
+
+                            <CommonInputComponent
+                                label="Relationship"
+                                type="text"
+                                value={item.guardianRelation}
+                                placeholder="Enter Relation"
+                                onChangeText={(text) => {
+                                    const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
+                                    // setOccupation(onlyLetters)
+                                    handleChange(index, "guardianRelation", onlyLetters)
+                                }}
+                                required={true}
+                                isActive={isFocused}
+                                error={!!errors[index]?.guardianRelation}
+
                             />
 
                             {errors[index]?.guardianRelation && (
@@ -192,7 +233,7 @@ const AddGuardianDetails = ({ route }) => {
                     {/* {errorMsg.occupation && (<ErrorMessage message={errorMsg.occupation} type="error" />)} */}
 
                     <View style={[styles.rltnOccptField, { marginLeft: 3 }]}>
-                        <Text style={styles.label}>Guardian Occupation</Text>
+                        {/* <Text style={styles.label}>Guardian Occupation</Text>
 
                         <TextInput
                             value={item?.guardianOccupation}
@@ -204,7 +245,23 @@ const AddGuardianDetails = ({ route }) => {
                                 handleChange(index, "guardianOccupation", onlyLetters)
                                 // setErrorMsg((prev) => ({ ...prev, occupation: "" }))
                             }}
+                        /> */}
+                        <CommonInputComponent
+                            label="Guardian Occupation"
+                            type="text"
+                            value={item.guardianOccupation}
+                            placeholder="Enter Occupation"
+                            onChangeText={(text) => {
+                                const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
+                                // setOccupation(onlyLetters)
+                                handleChange(index, "guardianOccupation", onlyLetters)
+                            }}
+                            // required={true}
+                            isActive={isFocused}
+                        // error={!!errors[index]?.guardianRelation}
+
                         />
+
 
 
                     </View>
@@ -220,8 +277,8 @@ const AddGuardianDetails = ({ route }) => {
                             {/* <Ionicons name="chevron-down" size={16} style={{ marginLeft: 3 }} /> */}
                             <Image source={DirectionDown}
                                 style={{
-                                    width: 20, height: 20,marginLeft:3,
-                                   
+                                    width: 20, height: 20, marginLeft: 3,
+
                                 }} tintColor="#000"
                             />
 
@@ -468,13 +525,13 @@ const styles = StyleSheet.create({
 
         // borderWidth: 1,
         borderBottomColor: '#E5E7EB',
-        paddingBottom: 6,
+        // paddingBottom: 6,
         marginTop: 15
     },
     rltnOccptField: {
         // borderBottomWidth: 1,
         // borderBottomColor: '#E5E7EB',
-        flex: 1, marginTop: 15, paddingBottom: 6
+        flex: 1, 
     },
 
     label: {

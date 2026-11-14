@@ -355,14 +355,19 @@ export const deactivateAmenity=async(hostelId,token,amenityId)=>{
     console.log(amenityId)
     try{
         const axios=getAxios()
-        const res= axios.post("/v2/amenities/deactivate/" + hostelId + "/" + amenityId, null, {
+        const res=await axios.post("/v2/amenities/deactivate/" + hostelId + "/" + amenityId, null, {
             headers: {
                 Authorization: "Bearer " + token
             }
         })
         return res;
-    }catch(error){     
-         return{status: error.response.status, message: error.response.data || error.response}
+    }
+    catch(error){     
+        console.log("errorsOfDeactive",error)
+        console.log(error?.response)
+        console.log(error.response?.Body)
+        console.log(error?.Body)
+         return{status: error.response.status, message: error.response?.data || error.response}
     }
 }
 

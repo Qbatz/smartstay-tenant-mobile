@@ -17,6 +17,8 @@ import RemoveIcon from "../../assets/Images/removeIcon.png";
 import EditSmallIcon from "../../assets/Images/editSmallIcon.png"
 import NoResultPic from "../../assets/Images/NoResultPic.png"
 import Ionicons from "react-native-vector-icons/Ionicons";
+import DirectionDown from "../../assets/Images/direction-down.png"
+
 
 
 
@@ -26,7 +28,7 @@ const PersonalDetails = (route) => {
 
     const navigation = useNavigation();
     const context = useContext(UsersContext)
-    const { getCustomerDetail, updateCustomer} = useContext(UsersContext)
+    const { getCustomerDetail, updateCustomer } = useContext(UsersContext)
     const loginContext = useContext(LoginContexts)
 
     const [firstname, setfirstName] = useState(route.route?.params?.customer?.firstName);
@@ -414,8 +416,10 @@ const PersonalDetails = (route) => {
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: "space-between", marginTop: 15 }}>
                     <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Semibold', }}>Basic Info</Text>
                     <TouchableOpacity onPress={() => navigation.navigate("EditBasicDetail")}
-                        style={[{ backgroundColor: '#E7F1FF', paddingVertical: 5, paddingHorizontal: 10,
-                                 borderRadius: 8, flexDirection: 'row' }, getCustomerDetail?.currentStatus === "VACATED" && {opacity:0.4}]}
+                        style={[{
+                            backgroundColor: '#E7F1FF', paddingVertical: 5, paddingHorizontal: 10,
+                            borderRadius: 8, flexDirection: 'row'
+                        }, getCustomerDetail?.currentStatus === "VACATED" && { opacity: 0.4 }]}
                         disabled={getCustomerDetail?.currentStatus === "VACATED"}>
                         <Image source={EditSmallIcon} style={{ width: 16, height: 16 }} />
                         <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#1E45E1', marginLeft: 6 }}>Edit</Text>
@@ -473,7 +477,12 @@ const PersonalDetails = (route) => {
 
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Text style={styles.input}>+91</Text>
-                        <Ionicons name="chevron-down" size={16} />
+                        <Image source={DirectionDown}
+                            style={{
+                                width: 22, height: 22,
+                                // transform: [{ rotate: showEmploymentList ? '180deg' : '0deg' }],
+                            }} tintColor="#000"
+                        />
                         <TextInput
                             value={mobile}
                             placeholder="Enter first name"
@@ -491,8 +500,10 @@ const PersonalDetails = (route) => {
 
                     {(houseNo || streetName || landmark || city || pincode != 0 || state) && (
                         <TouchableOpacity onPress={() => navigation.navigate("EditAddressDetail", { mode: "edit" })}
-                            style={[{ backgroundColor: '#E7F1FF', paddingVertical: 5, paddingHorizontal: 10, 
-                            borderRadius: 8, flexDirection: 'row' }, getCustomerDetail?.currentStatus === "VACATED" && {opacity:0.4}]}
+                            style={[{
+                                backgroundColor: '#E7F1FF', paddingVertical: 5, paddingHorizontal: 10,
+                                borderRadius: 8, flexDirection: 'row'
+                            }, getCustomerDetail?.currentStatus === "VACATED" && { opacity: 0.4 }]}
                             disabled={getCustomerDetail?.currentStatus === "VACATED"}>
                             <Image source={EditSmallIcon} style={{ width: 16, height: 16 }} />
                             <Text style={{ fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#1E45E1', marginLeft: 6 }}>Edit</Text>
@@ -511,7 +522,7 @@ const PersonalDetails = (route) => {
                             style={[{
                                 backgroundColor: "#1E45E1", borderRadius: 10, width: '100%', paddingVertical: 10,
                                 marginHorizontal: 14, marginTop: 16, alignItems: 'center'
-                            }, getCustomerDetail?.currentStatus === "VACATED" && {opacity:0.4}]}
+                            }, getCustomerDetail?.currentStatus === "VACATED" && { opacity: 0.4 }]}
                             disabled={getCustomerDetail?.currentStatus === "VACATED"}>
                             <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Semibold', color: '#FFFFFF' }}>
                                 Add Address Details</Text>
@@ -576,7 +587,7 @@ const PersonalDetails = (route) => {
             selectPicUpload && (
                 <View style={styles.overlay}>
                     <Pressable
-                        style={StyleSheet.absoluteFillObject}
+                        style={StyleSheet.absoluteFill}
                         onPress={closeSheet}
                     />
 
@@ -696,7 +707,7 @@ const styles = StyleSheet.create({
         // dynamic height limit
     },
     overlay: {
-        ...StyleSheet.absoluteFillObject,
+        ...StyleSheet.absoluteFill,
         backgroundColor: "rgba(0,0,0,0.4)",
         justifyContent: "flex-end",
         zIndex: 999

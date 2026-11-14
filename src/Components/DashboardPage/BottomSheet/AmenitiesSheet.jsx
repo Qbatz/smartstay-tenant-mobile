@@ -37,7 +37,9 @@ const AmenitiesBottomSheet = ({
   const [loading, setLoading] = useState(false);
   const [monthlyplan, setPlan] = useState();
   const translateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
-
+   const [isSubmitClicked, setIsSubmitClicked]=useState(false);
+   console.log(context)
+console.log(loginContext)
   useEffect(() => {
     if (!visible) {
       setPlan(null)
@@ -90,9 +92,12 @@ const AmenitiesBottomSheet = ({
     });
   };
 
+  console.log("myAmenities",myAmenitis)
 
 
   const onRequestAmenities = (amenityId) => {
+
+    
 
     if (monthlyplan == null) {
       setShowSuccessModal(true)
@@ -102,6 +107,9 @@ const AmenitiesBottomSheet = ({
       return;
 
     }
+
+    if(isSubmitClicked) return;
+    setIsSubmitClicked(true)
     postRquestAmenties(context.getHostelDetail.hostelId, loginContext.getToken, amenityId).then(r => {
 
 
@@ -114,6 +122,7 @@ const AmenitiesBottomSheet = ({
           setShowSuccessModal(true)
           setToastMessage('Request Raised')
           setModelType('success')
+           setIsSubmitClicked(false)
 
           getRequestRaised(context.getHostelDetail.hostelId, loginContext.getToken).then(res => {
             console.log(res)
@@ -133,6 +142,7 @@ const AmenitiesBottomSheet = ({
           setShowSuccessModal(true)
           setToastMessage(r.message || 'Something went wrong')
           setModelType('error')
+           setIsSubmitClicked(false)
 
           setTimeout(() => {
             setShowSuccessModal(false)
@@ -198,7 +208,7 @@ const AmenitiesBottomSheet = ({
 
     try {
       const res = await deactivateAmenity(context?.getHostelDetail.hostelId, loginContext?.getToken, amenityId)
-      console.log(res)
+      console.log("handleDeactive",res)
       if (res?.status == 200) {
         fetchServiceData()
         setShowSuccessModal(true)
@@ -220,7 +230,8 @@ const AmenitiesBottomSheet = ({
         }, 1000);
       }
     } catch (error) {
-      console.log(error?.message)
+      console.log(error)
+    
       setLoading(false)
     }
   }
@@ -277,9 +288,9 @@ const AmenitiesBottomSheet = ({
                         <TouchableOpacity onPress={() => handleDeactiveAmenity(myAmenitis?.amenityId)}
                           style={{
                             borderWidth: 1, borderColor: '#eee', paddingTop: 9, paddingBottom: 14, paddingHorizontal: 15,
-                            borderRadius: 5, flexDirection: 'row', justifyContent: 'center'
+                            borderRadius: 8, flexDirection: 'row', justifyContent: 'center',alignItems:'center'
                           }}>
-                          <Image source={calenderTick} style={{ width: 16, height: 16, marginTop: 3 }} />
+                          <Image source={calenderTick} style={{ width: 16, height: 16, marginTop: 1 }} />
                           <Text style={{ marginLeft: 5, fontSize: 14, fontFamily: 'Gilroy-Medium' }}>Make Deactive</Text>
                         </TouchableOpacity>
                       </View>
@@ -295,16 +306,19 @@ const AmenitiesBottomSheet = ({
                     <View style={{ paddingTop: 18 }}>
                       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                         <Text style={{ fontSize: 13, fontFamily: 'Gilroy-Regular', color: '#4B4B4B' }}>Price plans</Text>
-                        <TouchableOpacity>
+                        {/* <TouchableOpacity>
                           <Text style={{ fontSize: 12, color: '#1E45E1', fontFamily: 'Gilroy-Medium' }}>Change Plan</Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                       </View>
                       <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold', marginTop: 9 }}>{'\u20B9'}{myAmenitis.amenityAmount} /month</Text>
                     </View>
 
+                    
                     <View style={{ paddingTop: 15 }}>
-                      <Text style={{ fontSize: 13, fontFamily: 'Gilroy-Regular', color: '#4B4B4B' }}>Next Bill</Text>
-                      <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold', marginTop: 9 }}>{formatDate(myAmenitis?.nextBillStartDate)}</Text>
+                      <Text style={{ fontSize: 13, fontFamily: 'Gilroy-Regular', color: '#4B4B4B' }}>
+                       {myAmenitis?.actionType === "DEACTIVATION" ? "Bill EndDate on" : "Next Bill"} </Text>
+                      <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold', marginTop: 9 }}>
+                        {myAmenitis?.actionType === "DEACTIVATION" ? myAmenitis?.currentBillEndDate :formatDate(myAmenitis?.nextBillStartDate)}</Text>
                     </View>
 
                     <TouchableOpacity style={{ paddingVertical: 13, borderWidth: 1, borderRadius: 10, alignItems: 'center', backgroundColor: '#F5FFF8', borderColor: '#77D391', marginTop: 30 }}>
@@ -394,12 +408,12 @@ const AmenitiesBottomSheet = ({
                           <Text style={{ fontSize: 14.11, fontFamily: 'Gilroy-Semibold', color: '#EB6617' }}>Request Raised</Text>
                         </TouchableOpacity>
                       ) : (
-                        <TouchableOpacity onPress={() => onRequestAmenities(available.amenityId)}
+                        <TouchableOpacity onPress={() => onRequestAmenities(available.amenityId)}                       
                           style={[{
                             backgroundColor: '#1d41d5', paddingVertical: 12, alignItems: 'center', borderRadius: 10,
                             marginTop: 35
                           }, context?.getCustomerDetail?.currentStatus === "VACATED" && {opacity:0.4}] }
-                          disabled={context?.getCustomerDetail?.currentStatus === "VACATED"}>
+                          disabled={context?.getCustomerDetail?.currentStatus === "VACATED" || isSubmitClicked}>
                           <Text style={{ fontSize: 14.11, fontFamily: 'Gilroy-Semibold', color: '#ffffff' }}>Request Amenity</Text>
                         </TouchableOpacity>
                       )}

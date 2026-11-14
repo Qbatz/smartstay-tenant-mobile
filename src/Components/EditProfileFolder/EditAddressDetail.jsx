@@ -3,7 +3,7 @@ import { Image, Keyboard, KeyboardAvoidingView, Platform, ScrollView, Text, Touc
 import { StyleSheet, View } from "react-native";
 import LeftArrow from "../../assets/Images/LeftArrow.png"
 import { TextInput } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { UsersContext } from "../../Context/UserContext";
 import ErrorMessage from "../ToastFile/ErrorMessage";
 import SuccessModal from "../ToastFile/TostFilePage";
@@ -13,6 +13,7 @@ import AppLoader from "../ToastFile/LoaderPage";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DirectionDown from "../../assets/Images/direction-down.png"
+import CommonInputComponent from "../CommonComponent/CommonInputComponent";
 
 
 
@@ -45,6 +46,16 @@ const EditAddressDetail = ({ route }) => {
     const [stateQuery, setStateQuery] = useState("");
 
     const [stateOpen, setStateOpen] = useState(false);
+    const isScreenFocused = useIsFocused();
+    const [isFocused, setIsFocused] = useState(false)
+
+    useEffect(() => {
+        if (isScreenFocused) {
+            setIsFocused(true)
+        } else {
+            setIsFocused(false)
+        }
+    }, [isScreenFocused])
 
     console.log(getCustomerDetail)
     console.log(pincode, "pincode")
@@ -215,8 +226,8 @@ const EditAddressDetail = ({ route }) => {
                             contentContainerStyle={{ paddingBottom: 180, flexGrow: 1 }}
                             keyboardShouldPersistTaps="handled">
 
-                            <Text style={[styles.labelTxt, { marginTop: 18 }]}>HouseNo/Apartment
-                                {/* <Text style={{ color: 'red' }}> *</Text> */}
+                            {/* <Text style={[styles.labelTxt, { marginTop: 18 }]}>HouseNo/Apartment
+                              
                             </Text>
                             <TextInput
                                 value={houseNo}
@@ -226,9 +237,23 @@ const EditAddressDetail = ({ route }) => {
                                     const onlyLetters = text.replace(/[^A-Za-z0-9"/,-\s]/g, "")
                                     setHouseNo(onlyLetters)
 
-                                }} />
+                                }} /> */}
 
-                            <Text style={[styles.labelTxt, { marginTop: 12 }]}>Street / Area</Text>
+                            <CommonInputComponent
+                                label="HouseNo/Apartment"
+                                type="text"
+                                value={houseNo}
+                                placeholder="Enter HouseNo"
+                                onChangeText={(text) => {
+                                    const onlyLetters = text.replace(/[^A-Za-z0-9"/,-\s]/g, "")
+                                    setHouseNo(onlyLetters)
+                                }}
+                                isActive={isFocused}
+                            // error={!!commentError}
+
+                            />
+
+                            {/* <Text style={[styles.labelTxt, { marginTop: 12 }]}>Street / Area</Text>
                             <TextInput
                                 value={street}
                                 style={styles.input}
@@ -237,9 +262,23 @@ const EditAddressDetail = ({ route }) => {
                                     const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
                                     setStreet(onlyLetters)
 
-                                }} />
+                                }} /> */}
 
-                            <Text style={[styles.labelTxt, { marginTop: 12 }]}>Landmark</Text>
+                            <CommonInputComponent
+                                label="Street / Area"
+                                type="text"
+                                value={street}
+                                placeholder="Enter Street Name"
+                                onChangeText={(text) => {
+                                    const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
+                                    setStreet(onlyLetters)
+                                }}
+                                isActive={isFocused}
+                            // error={!!commentError}
+
+                            />
+
+                            {/* <Text style={[styles.labelTxt, { marginTop: 12 }]}>Landmark</Text>
                             <TextInput
                                 value={landmark}
                                 style={styles.input}
@@ -248,9 +287,23 @@ const EditAddressDetail = ({ route }) => {
                                     const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
                                     setLandmark(onlyLetters)
 
-                                }} />
+                                }} /> */}
 
-                            <Text style={[styles.labelTxt, { marginTop: 12 }]}>City</Text>
+                            <CommonInputComponent
+                                label="Landmark"
+                                type="text"
+                                value={landmark}
+                                placeholder="Enter Street Name"
+                                onChangeText={(text) => {
+                                    const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
+                                    setLandmark(onlyLetters)
+                                }}
+                                isActive={isFocused}
+                            // error={!!commentError}
+
+                            />
+
+                            {/* <Text style={[styles.labelTxt, { marginTop: 12 }]}>City</Text>
                             <TextInput
                                 value={city}
                                 style={styles.input}
@@ -259,9 +312,25 @@ const EditAddressDetail = ({ route }) => {
                                     const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
                                     setCity(onlyLetters)
 
-                                }} />
+                                }} /> */}
 
-                            <Text style={[styles.labelTxt, { marginTop: 12 }]}>Pincode</Text>
+
+                            <CommonInputComponent
+                                label="City"
+                                type="text"
+                                value={city}
+                                placeholder="Enter City"
+                                onChangeText={(text) => {
+                                    const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
+                                    setCity(onlyLetters)
+                                }}
+                                isActive={isFocused}
+                            // error={!!commentError}
+
+                            />
+
+
+                            {/* <Text style={[styles.labelTxt, { marginTop: 12 }]}>Pincode</Text>
                             <TextInput
                                 value={pincode}
                                 maxLength={6}
@@ -272,7 +341,22 @@ const EditAddressDetail = ({ route }) => {
                                     const onlyLetters = text.replace(/[^0-9\s]/g, "")
                                     setPincode(onlyLetters)
                                     setPincodeError("")
-                                }} />
+                                }} /> */}
+                            <CommonInputComponent
+                                label="Pincode"
+                                type="text"
+                                value={pincode}
+                                placeholder="Enter Pincode"
+                                onChangeText={(text) => {
+                                    const onlyLetters = text.replace(/[^0-9\s]/g, "")
+                                    setPincode(onlyLetters)
+                                    setPincodeError("")
+                                }}
+                                isActive={isFocused}
+                            error={!!pincodeError}
+
+                            />
+
                             {pincodeError && <ErrorMessage message={pincodeError} type="error" />}
 
                             <Text style={[styles.labelTxt, { marginTop: 12 }]}>State</Text>

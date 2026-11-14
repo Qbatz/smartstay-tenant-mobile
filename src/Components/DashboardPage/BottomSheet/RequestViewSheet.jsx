@@ -162,7 +162,7 @@ export default function RequestViewSheet({
                 message={toastMessage}
                 type={modelType}/>
             <TouchableWithoutFeedback onPress={onClose}>
-                <View style={StyleSheet.absoluteFillObject} />
+                <View style={StyleSheet.absoluteFill} />
             </TouchableWithoutFeedback>
 
             <Animated.View
@@ -202,7 +202,7 @@ export default function RequestViewSheet({
                                             <TouchableOpacity onPress={()=>ClickCancelReq(requestDetail?.requestId)}
                                             style={[{
                                                 borderWidth: 1, borderColor: '#eee', paddingTop: 9, paddingBottom: 14, paddingHorizontal: 15,
-                                                borderRadius: 5, flexDirection: 'row', justifyContent: 'center',alignItems:'center'
+                                                borderRadius: 8, flexDirection: 'row', justifyContent: 'center',alignItems:'center'
                                             }, getCustomerDetail?.currentStatus === "VACATED" && {opacity:0.4}]}
                                              disabled={getCustomerDetail?.currentStatus === "VACATED"}>
                                                 <Image source={DeleteIcon} style={{ width: 16, height: 18,tintColor:'#EB6617' }} />
@@ -329,7 +329,7 @@ export default function RequestViewSheet({
 
 const style = StyleSheet.create({
     overlay: {
-        ...StyleSheet.absoluteFillObject,
+        ...StyleSheet.absoluteFill,
         backgroundColor: "rgba(0,0,0,0.4)",
         justifyContent: "flex-end",
     },
