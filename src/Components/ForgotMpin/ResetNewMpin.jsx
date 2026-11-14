@@ -28,6 +28,27 @@ const ResetNewMpin = (props) => {
     const [modelType, setModelType] = useState();
     const [loading, setLoading] = useState(false)
       const [enterPinError, setEnterPinError] = useState()
+      const [mpinStatus, setMpinStatus] = useState('default');
+          const [focusedmpinIndex, setFocusedMpinIndex] = useState(null);
+
+           const getOtpBorderColor = (index) => {
+
+     
+        if (mpinStatus === 'error') {
+            return '#EF4444';
+        }
+        if (focusedmpinIndex === index) {
+            return '#2563EB';
+        }
+
+
+
+        if (mpinStatus === 'success') {
+            return '#16A34A';
+        }
+
+        return '#D1D5DB';
+    };
 
     console.log(context.getUserId)
 
@@ -144,11 +165,16 @@ const ResetNewMpin = (props) => {
                         key={index}
                         ref={(ref) => (inputs.current[index] = ref)}
                         keyboardType="number-pad"
-                        style={style.pinBox}
+                        style={[style.pinBox,{
+                            borderColor: getOtpBorderColor(index),
+                            borderWidth: focusedmpinIndex === index ? 2 : 1.5,
+                        }]}
                         maxLength={1}
                         value={digit}
                         onChangeText={(text) => handlePinChange(text, index)}
                         onKeyPress={(e) => handleKeyPress(e, index)}
+                        onFocus={()=> setFocusedMpinIndex(index)}
+                        onBlur={() => setFocusedMpinIndex(null)}
                     />
                 ))}
             </View>
@@ -169,15 +195,18 @@ const ResetNewMpin = (props) => {
 
 const style = StyleSheet.create({
     logo: { width: 151, height: 28.22, marginTop: 70, },
-    createText: { fontSize: 27, fontWeight: 600, color: '#222222', marginTop: 20 },
-    subtitle: { fontSize: 14, fontWeight: 400, color: '#4B4B4B', marginTop: 15 },
-    pinContainer: { flexDirection: 'row', justifyContent: 'space-between', paddingTop: 20, paddingLeft: 10, paddingRight: 10,marginBottom:5 },
-    pinBox: {
-        width: 60, heiht: 60, borderWidth: 1, borderColor: "#ccc", borderRadius: 8, textAlign: "center",
-        fontSize: 20, color: "#000"
+    createText: { fontSize: 26,fontFamily:'Gilroy-Semibold', color: '#222222', marginTop: 20 },
+    subtitle: { fontSize: 14,fontFamily: 'Gilroy-Medium', color: '#4B4B4B', marginTop: 15 },
+      pinContainer: {
+        flexDirection: 'row', justifyContent: 'space-between', paddingLeft: 10,
+        paddingRight: 10, marginBottom: 5, marginTop: 40, height: 60
     },
-    nextButton: { backgroundColor: '#00A32E', borderRadius: 8, paddingVertical: 20, alignItems: 'center', marginTop: 250 },
-    nextText: { color: '#ffffff', fontSize: 16, fontWeight: 600 }
+    pinBox: {
+        width: 60, heiht: 60, borderWidth: 1, borderColor: "#ccc", borderRadius: 12, textAlign: "center",
+        fontSize: 24, color: "#000", fontFamily: 'Gilroy-Medium'
+    },
+    nextButton: { backgroundColor: '#00A32E', borderRadius: 12, paddingVertical: 18, alignItems: 'center', marginTop: 250 },
+    nextText: { color: '#ffffff', fontSize: 16,fontFamily:'Gilroy-Bold' }
 
 })
 
