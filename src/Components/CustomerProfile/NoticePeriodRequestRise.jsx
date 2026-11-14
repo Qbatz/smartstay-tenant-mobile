@@ -14,6 +14,7 @@ import { useCallback } from "react";
 import AppLoader from "../ToastFile/LoaderPage";
 import SuccessModal from "../ToastFile/TostFilePage";
 import { SafeAreaView } from "react-native-safe-area-context";
+import CommonInputComponent from "../CommonComponent/CommonInputComponent";
 
 
 
@@ -40,6 +41,9 @@ const NoticePeriodRequestRise = ({
     const [showMessage, setShowMessage] = useState("")
     const [modalType, setModalType] = useState("")
     const translateY = useRef(new Animated.Value(SHEET_HEIGHT)).current;
+    const [activeDropdown, setActiveDropdown] = useState("")
+
+
 
     const [keyboardHeight, setKeyboardHeight] = useState(0);
     const safeKeyboardHeight = keyboardHeight > 0 ? 260 : 0;
@@ -118,6 +122,11 @@ const NoticePeriodRequestRise = ({
             }
         }, [])
     )
+
+    const reasonOptions = noticeReason?.map(i => ({
+        label: i?.value,
+        value: i?.key
+    }))
 
     const handleRiseRequest = async () => {
 
@@ -343,7 +352,7 @@ const NoticePeriodRequestRise = ({
                                 </View>
                             </View>
 
-                            <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', marginTop: 15 }}>
+                            {/* <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', marginTop: 15 }}>
                                 Reason <Text style={{ color: 'red' }}> *</Text></Text>
 
                             <TouchableOpacity onPress={() => {
@@ -353,7 +362,36 @@ const NoticePeriodRequestRise = ({
                                 style={styles.inputBox}>
                                 <Text style={styles.valueTxt}>{selectedReason ? selectedReason?.value : "Select reason"}</Text>
                                 <Ionicons name={openReason ? "chevron-up" : "chevron-down"} size={18} />
-                            </TouchableOpacity>
+                            </TouchableOpacity> */}
+
+                            <CommonInputComponent
+                                label="Reason"
+                                type="dropdown"
+                                value={selectedReason?.value}
+                                placeholder="Select reason"
+                                options={reasonOptions}
+
+                                optionLabelKey="label"
+                                optionValueKey="value"
+
+                                isOpen={activeDropdown === 'reason'}
+                                closeActiveDropdown={() => { setActiveDropdown(null) }}
+                                isActive={visible}
+
+                                onToggleDropdown={() => {
+                                    setActiveDropdown(
+                                        activeDropdown === 'reason' ? null : 'reason'
+                                    );
+                                }}
+
+                                onSelect={(item) => {
+                                    setSelectedReasonType(item);
+                                    setActiveDropdown(null);
+                                    setErrorMsg("")
+                                }}
+                                required={true}
+                                error={!!errormsg}
+                            />
 
                             {errormsg && <ErrorMessage message={errormsg} type="error" />}
 
@@ -375,7 +413,7 @@ const NoticePeriodRequestRise = ({
                                 </View>
                             )}
 
-                            <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', marginTop: 16 }}>Remarks if any</Text>
+                            {/* <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium', marginTop: 16 }}>Remarks if any</Text>
 
                             <TextInput
                                 style={styles.remarkInputbox}
@@ -385,7 +423,23 @@ const NoticePeriodRequestRise = ({
                                 onChangeText={(text) => {
                                     const onlyLetters = text.replace(/[^A-Za-z/.,'\s]/g, "")
                                     setRemarks(onlyLetters)
-                                }} />
+                                }} /> */}
+                            <CommonInputComponent
+                                label="Remarks if any"
+                                type="text"
+                                value={remarks}
+                                placeholder="Max 100 characters"
+                                onChangeText={(text) => {
+                                    const onlyLetters = text.replace(/[^A-Za-z/.,'\s]/g, "")
+                                    setRemarks(onlyLetters)
+                                }}
+                                multiline
+                                height={100}
+                                minLength={15}
+                                isActive={visible}
+
+
+                            />
 
 
                         </ScrollView>
@@ -426,15 +480,15 @@ const NoticePeriodRequestRise = ({
 export default NoticePeriodRequestRise;
 
 const styles = StyleSheet.create({
-    container: { ...StyleSheet.absoluteFillObject, zIndex: 999 },
+    container: { ...StyleSheet.absoluteFill, zIndex: 999 },
     root: {
-        ...StyleSheet.absoluteFillObject,
+        ...StyleSheet.absoluteFill,
         zIndex: 9999,          // 🔥 VERY IMPORTANT
         elevation: 9999,      // 🔥 Android
     },
 
     overlay: {
-        ...StyleSheet.absoluteFillObject,  // 🔥 FULL SCREEN
+        ...StyleSheet.absoluteFill,  // 🔥 FULL SCREEN
         backgroundColor: "rgba(0,0,0,0.5)",
     },
 

@@ -575,13 +575,13 @@ function MyStay(props) {
                             <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold' }}>Request</Text>
 
 
-                            {context.getRequestRaised && context.getRequestRaised.length > 0 ?
+                            {context?.getRequestRaised?.customerRequests && context.getRequestRaised?.customerRequests?.length > 0 ?
 
-                                context.getRequestRaised.map(i => {
+                                context.getRequestRaised?.customerRequests?.map(i => {
                                     return <TouchableOpacity onPress={() => props.onHandleViewRequest(i)}
                                         key={i?.requestId}
                                         style={{
-                                            borderWidth: 1, borderRadius: 10, flexDirection: 'row', paddingVertical: 15,
+                                            borderWidth: 1, borderRadius: 12, flexDirection: 'row', paddingVertical: 14,
                                             borderColor: '#EFF2FF', justifyContent: 'space-between', marginTop: 10
                                         }}>
                                         <View style={{ paddingLeft: 12, paddingRight: 10, flex: 1 }}>

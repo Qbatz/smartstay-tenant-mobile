@@ -14,6 +14,7 @@ import ErrorMessage from "../../ToastFile/ErrorMessage";
 import { useFocusEffect } from "@react-navigation/native";
 import Trash from "../../../assets/Images/trash 01.png"
 import { getComplaints } from "../../../Action/HostelAction";
+import CommonInputComponent from "../../CommonComponent/CommonInputComponent";
 
 
 
@@ -55,6 +56,7 @@ const EditComplaintSheet = ({
     const flatListRef = useRef(null);
     const [viewerVisible, setViewerVisible] = useState(false);
     const [selectedViewIndex, setSelectedViewIndex] = useState(0);
+    const [activeDropdown, setActiveDropdown] = useState("")
 
     console.log("mediaimg", mediaimage)
     console.log(imageuri)
@@ -155,7 +157,10 @@ const EditComplaintSheet = ({
     // setSelectedIndex(null);
     // setDeleteVisible(false);
 
-
+    const complaintTypeOptions = complaintType?.map(i => ({
+        label: i?.complaintTypeName,
+        value: i?.complaintTypeId,
+    }))
 
     const validateForm = () => {
         let valid = true;
@@ -423,7 +428,7 @@ const EditComplaintSheet = ({
                             <View>
                                 <Text style={{ fontSize: 20, fontFamily: "Gilroy-Semibold" }}>Edit complaint</Text>
 
-                                <View style={{ paddingTop: 20 }}>
+                                {/* <View style={{ paddingTop: 20 }}>
                                     <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>Complaint type
                                         <Text style={{ color: 'red' }}> *</Text>
                                     </Text>
@@ -476,10 +481,39 @@ const EditComplaintSheet = ({
                                             />
                                         )}
                                     />
-                                </View>
+                                </View> */}
+
+                                <CommonInputComponent
+                                    label="Complaint Type"
+                                    type="dropdown"
+                                    value={selectedComplaintTypeId}
+                                    placeholder="Select Complaint Type"
+                                    options={complaintTypeOptions}
+
+                                    optionLabelKey="label"
+                                    optionValueKey="value"
+
+                                    isOpen={activeDropdown === 'complaint'}
+                                    closeActiveDropdown={() => { setActiveDropdown(null) }}
+                                    isActive={visible}
+
+                                    onToggleDropdown={() => {
+                                        setActiveDropdown(
+                                            activeDropdown === 'complaint' ? null : 'complaint'
+                                        );
+                                    }}
+
+                                    onSelect={(item) => {
+                                        setSelectedComplaintTypeId(item.value);
+                                        setActiveDropdown(null);
+                                        setComplaintTypeError("")
+                                    }}
+                                    required={true}
+                                    error={!!compliantTypeError}
+                                />
                                 {compliantTypeError && <ErrorMessage message={compliantTypeError} type="error" />}
 
-                                <View style={{ paddingTop: 16 }}>
+                                {/* <View style={{ paddingTop: 16 }}>
                                     <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>Complaint message
                                         <Text style={{ color: 'red' }}> *</Text>
                                     </Text>
@@ -499,7 +533,27 @@ const EditComplaintSheet = ({
                                     </View>
                                     {commentError && <ErrorMessage message={commentError} type="error" />}
                                     {commentNoChanges && <ErrorMessage message={commentNoChanges} type="error" />}
-                                </View>
+                                </View> */}
+
+                                <CommonInputComponent
+                                    label="Complaint message"
+                                    type="text"
+                                    value={description}
+                                    placeholder="Enter message"
+                                    onChangeText={(text) => {
+                                        setDespriction(text),
+                                        setCommentError("")
+                                    }}
+                                    required={true}
+                                    multiline
+                                    height={80}
+                                    minLength={15}
+                                    isActive={visible}
+                                    error={!!commentError}
+
+                                />
+                                {commentError && <ErrorMessage message={commentError} type="error" />}
+                                {commentNoChanges && <ErrorMessage message={commentNoChanges} type="error" />}
 
                                 <View style={{ paddingTop: 16 }}>
                                     <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>Add Proof</Text>

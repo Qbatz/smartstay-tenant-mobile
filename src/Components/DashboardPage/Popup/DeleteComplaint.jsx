@@ -9,6 +9,7 @@ import { UsersContext } from "../../../Context/UserContext";
 import { LoginContexts } from "../../../Context/LoginContext";
 import { compliantContexts } from "../../../Context/ComplaintContext";
 import ErrorMessage from "../../ToastFile/ErrorMessage";
+import WaveLoader from "../../ToastFile/WaveLoader";
 
 const DeleteComplaint = ({
     visible,
@@ -23,10 +24,12 @@ const DeleteComplaint = ({
     const complaintContext = useContext(compliantContexts)
     const [selectedReason, setSelectedReason] = useState(null);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
-    // const [toastMessage, setToastMessage] = useState()
-    // const [modelType, setModelType] = useState()
+    const [toastMessage, setToastMessage] = useState()
+    const [modelType, setModelType] = useState()
     const [deletComplaintError, setDeleteComplaintError] = useState()
     const [otherReason, setOtherReason] = useState('');
+    const [loading, setLoading] = useState(false)
+    console.log("lllaa", loading)
 
     const reasons = [
         "Issue already getting solved",
@@ -36,8 +39,9 @@ const DeleteComplaint = ({
         "Other",
     ];
 
+
     const cancel = () => {
-        setShowPopUp(false)
+
         setSelectedReason(null)
         setDeleteComplaintError("")
     }
@@ -50,34 +54,61 @@ const DeleteComplaint = ({
             valid = false;
         }
 
-        if (selectedReason === "Other" && !otherReason.trim()){
+        if (selectedReason === "Other" && !otherReason.trim()) {
             setDeleteComplaintError("Please enter the reason")
-            valid =false;
+            valid = false;
         }
         return valid;
     }
     const deleteItem = (complaintiId) => {
 
         if (!validateForm()) return;
+        console.log("halala")
 
-        deleteComplaint(context.getHostelDetail.hostelId, complaintiId, loginContext.getToken, selectedReason).then(r => {
-            console.log(r)
-            if (r.status == 200) {
-                setShowSuccessModal(true);
+        setLoading(true)
+        try {
 
-                setTimeout(() => {
+            deleteComplaint(context.getHostelDetail.hostelId, complaintiId, loginContext.getToken, selectedReason).then(r => {
+                console.log(r)
+                if (r.status == 200) {
+                    setShowSuccessModal(true);
+                    setToastMessage("Complaint Deleted")
+                    setModelType("success")
+
+                    setTimeout(() => {
+                        setShowSuccessModal(false);
+                        onClose();
+                        cancel();
+                        setSelectedReason(null)
+                        setShowSheet(false)
+
+                        complaints(context.getHostelDetail.hostelId, loginContext.getToken).then(res => {
+                            console.log("dleltecomplaint", res)
+
+                            if (res?.status === 200) {
+                                complaintContext.updateComplaintList(res?.data)
+                                complaintContext?.updateonlyComplaintList(res?.data?.complaints)
+                                setLoading(false)
+                            }
+                        })
+                    }, 1800);
+
+                } else {
                     setShowSuccessModal(false);
-                    onClose();
-                    setSelectedReason(null)
-                    setShowSheet(false)
+                    setToastMessage(r?.message || "Failed to Delete")
+                    setModelType("error")
 
-                    complaints(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
-                        complaintContext.updateComplaintList(r?.data?.content)
-                    })
-                }, 2000);
-
-            }
-        })
+                    setTimeout(() => {
+                        setShowSuccessModal(false);
+                        onClose();
+                        cancel();
+                    }, 2000);
+                }
+            })
+        } catch (error) {
+            console.log(error)
+            setLoading(false)
+        }
     }
 
 
@@ -113,11 +144,14 @@ const DeleteComplaint = ({
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 18, paddingVertical: 13, }}>
                             <View style={{ flexDirection: 'row' }}>
                                 <Image source={Exclamation} style={{ width: 25, height: 25 }} />
-                                <Text style={{ fontSize: 18, fontWeight: 400, marginLeft: 6 }}> Delete Complaint?  </Text>
+                                <Text style={{ fontSize: 20, fontFamily: "Gilroy-Bold", marginLeft: 6 }}> Delete Complaint?  </Text>
                             </View>
 
-                            <TouchableOpacity onPress={onClose} style={{ justifyContent: 'center', paddingTop: 5 }}>
-                                <Image source={DeleteIcon} style={{ width: 20, height: 20 }} />
+                            <TouchableOpacity onPress={() => {
+                                onClose()
+                                cancel()
+                            }} style={{ justifyContent: 'center', paddingTop: 5 }}>
+                                <Image source={DeleteIcon} style={{ width: 20, height: 20, tintColor: '#000' }} />
                             </TouchableOpacity>
 
                         </View>
@@ -125,7 +159,7 @@ const DeleteComplaint = ({
                         <View style={{ height: 1, width: '100%', backgroundColor: "#eee", marginTop: 4 }} />
 
                         <View style={{ paddingHorizontal: 20, paddingVertical: 13 }}>
-                            <Text style={{ flexWrap: 'wrap', width: "80%", color: '#4B4B4B', flexShrink: 1, lineHeight: 24 }}>
+                            <Text style={{ flexWrap: 'wrap', width: "90%", color: '#4B4B4B', flexShrink: 1, lineHeight: 24, fontSize: 16, fontFamily: 'Gilroy-Semibold' }}>
                                 Please let us know the reason before deleting.</Text>
 
                             {deletComplaintError && <ErrorMessage message={deletComplaintError} type="error" />}
@@ -165,18 +199,19 @@ const DeleteComplaint = ({
                                                 />
                                             )}
                                         </View>
-                                        <Text style={{ color: "#000", fontSize: 14 }}>{item}</Text>
+                                        <Text style={{ color: "#000", fontSize: 14, fontFamily: 'Gilroy-Medium' }}>{item}</Text>
                                     </TouchableOpacity>
                                 ))}
 
                                 {selectedReason == 'Other' ? <View style={{ borderRadius: 10, backgroundColor: '#FAFAFA', height: 80 }}>
                                     <TextInput placeholder="Enter the reason"
                                         value={otherReason}
-                                        style={{ marginLeft: 5 }}
+                                        style={{ marginLeft: 5, fontSize: 14, fontFamily: "Gilroy-Medium" }}
+
                                         onChangeText={(text) => {
                                             setOtherReason(text);
                                             setDeleteComplaintError('');
-                                        }} 
+                                        }}
                                         multiline
                                         blurOnSubmit={false} />
                                 </View> : null}
@@ -186,16 +221,28 @@ const DeleteComplaint = ({
                         </View>
 
                         <View style={{ flexDirection: 'row', justifyContent: 'flex-end', paddingRight: 13, }}>
-                            <TouchableOpacity onPress={onClose} style={{ paddingRight: 10, borderRadius: 8, paddingVertical: 8, paddingHorizontal: 15, justifyContent: 'center' }}>
-                                <Text style={{ fontSize: 14, fontWeight: 400, color: '#4B4B4B' }}>Cancel</Text>
+                            <TouchableOpacity onPress={() => {
+                                onClose()
+                                cancel();
+                            }} style={{ paddingRight: 10, borderRadius: 8, paddingVertical: 8, paddingHorizontal: 15, justifyContent: 'center' }}>
+                                <Text style={{ fontSize: 14, fontFamily: "Gilroy-Medium", color: '#4B4B4B' }}>Cancel</Text>
                             </TouchableOpacity>
 
                             <TouchableOpacity onPress={() => deleteItem(complaintId)}
                                 style={{
-                                    backgroundColor: selectedReason != null ? '#1E45E1' : '#788fed',
-                                    borderWidth: 2, borderRadius: 8, paddingVertical: 8, paddingHorizontal: 15, borderColor: '#C3DDFD'
+                                    backgroundColor: selectedReason != null ? '#da252a' : '#ffcfd3',
+                                    borderRadius: 8, paddingVertical: 10, paddingHorizontal: 16,
                                 }}>
-                                <Text style={{ fontSize: 14, fontWeight: 600, color: '#FFFFFF' }}>Delete</Text>
+                                {loading ?
+                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                        <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Semibold', color: '#ffffff', marginRight: 6 }}>Deleting</Text>
+                                        <WaveLoader size={4} />
+                                    </View>
+
+                                    :
+                                    <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Semibold', color: '#FFFFFF' }}>Delete</Text>
+                                }
+
                             </TouchableOpacity>
                         </View>
 
@@ -321,7 +368,7 @@ const styles = StyleSheet.create({
     },
     popup: {
 
-        width: '90%', backgroundColor: '#ffffff', borderWidth: 1, borderRadius: 8, borderColor: '#E5E7EB', paddingBottom: 15,
+        width: '90%', backgroundColor: '#ffffff', borderWidth: 1, borderRadius: 20, borderColor: '#E5E7EB', paddingBottom: 15,
     },
 });
 

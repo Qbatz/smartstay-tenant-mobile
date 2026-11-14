@@ -97,7 +97,10 @@ const HistoryCommentsScreen = ({ route, navigation }) => {
 
   useEffect(() => {
     getComplaintsUpdates(userContext.getHostelDetail?.hostelId, loginContext.getToken, route.params.complaintId).then(r => {
-      complaintContext.complaintUpdates(r.data.complaintsUpdates)
+      console.log("complaintsHistory", r)
+      if (r.status === 200) {
+        complaintContext.complaintUpdates(r.data.complaintsUpdates)
+      }
     })
   }, [])
 
@@ -142,7 +145,7 @@ const HistoryCommentsScreen = ({ route, navigation }) => {
 
           {item.comments && (
             item.comments.map(r => {
-              return <View style={styles.commentBox}>
+              return <View style={styles.commentBox} keyExtractor={(index)=> index}>
                 <View style={styles.commentHeader}>
                   {r.profilePic ? <Image
                     source={{ uri: r.profilePic }}
@@ -206,9 +209,9 @@ const HistoryCommentsScreen = ({ route, navigation }) => {
               <TextInput
                 placeholder="Add new comment"
                 value={comment}
-                onChangeText={(value)=>{
+                onChangeText={(value) => {
                   setComment(value);
-                  if(comment.trim().length >0){
+                  if (comment.trim().length > 0) {
                     setAddCommentError("")
                   }
                 }}
@@ -232,7 +235,7 @@ const HistoryCommentsScreen = ({ route, navigation }) => {
 
       <FlatList
         data={complaintContext.NewComplaintUpdates}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item,index) => item.id || index}
         renderItem={renderItem}
         contentContainerStyle={{ padding: 16 }}
       />

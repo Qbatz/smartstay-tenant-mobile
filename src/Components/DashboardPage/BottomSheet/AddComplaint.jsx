@@ -15,6 +15,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import ErrorMessage from "../../ToastFile/ErrorMessage";
 import Trash from "../../../assets/Images/trash 01.png";
 import DirectionDown from "../../../assets/Images/direction-down.png"
+import WaveLoader from "../../ToastFile/WaveLoader";
+import CommonInputComponent from "../../CommonComponent/CommonInputComponent";
+
 
 
 
@@ -51,6 +54,7 @@ const AddComplaint = ({
     const flatListRef = useRef(null);
     const [viewerVisible, setViewerVisible] = useState(false);
     const [selectedViewIndex, setSelectedViewIndex] = useState(0);
+    const [activeDropdown, setActiveDropdown] = useState("")
 
     useEffect(() => {
         if (visible) {
@@ -69,6 +73,7 @@ const AddComplaint = ({
             setmediaImage([])
             setComplaintTypeError('')
             setCommentError("")
+            setActiveDropdown("")
         }
     }, [visible])
 
@@ -100,6 +105,7 @@ const AddComplaint = ({
 
     console.log("mediaimg", mediaimage)
     console.log(imageuri)
+    console.log("complaintpe", complaintType)
 
 
 
@@ -143,6 +149,10 @@ const AddComplaint = ({
         setDeleteVisible(false);
     };
 
+    const complaintTypeOptions = complaintType?.map(i => ({
+        label: i?.complaintTypeName,
+        value: i?.complaintTypeId,
+    }))
 
 
     const validateForm = () => {
@@ -258,42 +268,54 @@ const AddComplaint = ({
         //     setTimeout(() => setShowSuccessModal(false), 2000);
         //     return;
         // }
+        setLoading(true);
 
-        postComplaint(context.getHostelDetail.hostelId, loginContext.getToken, formData).then(r => {
-            setLoading(true);
+        try {
 
-            setTimeout(() => {
-                setLoading(false);
+            postComplaint(context.getHostelDetail.hostelId, loginContext.getToken, formData).then(r => {
 
-                if (r.status === 201) {
-                    setShowSuccessModal(true);
-                    setToastMessage("Complaint Added Successfully!");
-                    setModelType('success');
 
-                    setTimeout(() => {
-                        setShowSuccessModal(false);
-                        setSelectedComplaintTypeId(0);
-                        setDespriction('');
-                        onClose();
+                setTimeout(() => {
+                    setLoading(false);
 
-                        complaints(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
-                            complaintContext.updateComplaintList(r?.data?.content);
-                        });
+                    if (r.status === 201) {
+                        setShowSuccessModal(true);
+                        setToastMessage("Complaint Added Successfully!");
+                        setModelType('success');
 
-                    }, 2000);
-                }
-                else {
-                    setShowSuccessModal(true);
-                    setToastMessage(r.message || "Something went wrong");
-                    setModelType('error');
-                    setTimeout(() => {
-                        setShowSuccessModal(false);
-                        onClose();
-                    }, 2000);
-                }
+                        setTimeout(() => {
+                            setShowSuccessModal(false);
+                            setSelectedComplaintTypeId(0);
+                            setDespriction('');
+                            onClose();
 
-            }, 2000);
-        });
+                            complaints(context.getHostelDetail.hostelId, loginContext.getToken).then(r => {
+                                console.log("newAddComplaint", r)
+
+                                if (r?.status === 200) {
+                                    complaintContext.updateComplaintList(r?.data);
+                                    complaintContext?.updateonlyComplaintList(r?.data?.complaints)
+                                }
+
+                            });
+
+                        }, 2000);
+                    }
+                    else {
+                        setShowSuccessModal(true);
+                        setToastMessage(r.message || "Something went wrong");
+                        setModelType('error');
+                        setTimeout(() => {
+                            setShowSuccessModal(false);
+                            onClose();
+                        }, 2000);
+                    }
+
+                }, 2000);
+            });
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     const openViewer = (index) => {
@@ -427,12 +449,42 @@ const AddComplaint = ({
                             <View>
                                 <Text style={{ fontSize: 20, fontFamily: 'Gilroy-Semibold' }}>Add complaint</Text>
 
-                                <View style={{ paddingTop: 20 }}>
+                                <CommonInputComponent
+                                    label="Complaint Type"
+                                    type="dropdown"
+                                    value={selectedComplaintTypeId}
+                                    placeholder="Select Complaint Type"
+                                    options={complaintTypeOptions}
+
+                                    optionLabelKey="label"
+                                    optionValueKey="value"
+
+                                    isOpen={activeDropdown === 'complaint'}
+                                    closeActiveDropdown={() => { setActiveDropdown(null) }}
+                                    isActive={visible}
+
+                                    onToggleDropdown={() => {
+                                        setActiveDropdown(
+                                            activeDropdown === 'complaint' ? null : 'complaint'
+                                        );
+                                    }}
+
+                                    onSelect={(item) => {
+                                        setSelectedComplaintTypeId(item.value);
+                                        setActiveDropdown(null);
+                                        setComplaintTypeError("")
+                                    }}
+                                    required={true}
+                                    error={!!compliantTypeError}
+                                />
+
+
+                                {/* <View style={{ paddingTop: 20 }}>
                                     <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>Complaint type
                                         <Text style={{ color: 'red' }}> *</Text>
                                     </Text>
 
-                                    {complaintType && complaintType.length > 0 ? (
+                                 {complaintType && complaintType.length > 0 ? (
                                         <Dropdown
                                             style={{
                                                 borderWidth: 1,
@@ -536,10 +588,10 @@ const AddComplaint = ({
                                                 style={{ paddingRight: 10 }}
                                             />
                                         )} /> */}
-                                </View>
+                                {/* </View> */}
                                 {compliantTypeError && <ErrorMessage message={compliantTypeError} type="error" />}
 
-                                <View style={{ paddingTop: 16 }}>
+                                {/* <View style={{ paddingTop: 16 }}>
                                     <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>Complaint message
                                         <Text style={{ color: 'red' }}> *</Text>
                                     </Text>
@@ -555,7 +607,24 @@ const AddComplaint = ({
                                             textAlignVertical="top"
                                             style={{ flex: 1, padding: 0, textAlignVertical: "top", fontSize: 14, fontFamily: "Gilroy-Medium", }} />
                                     </View>
-                                </View>
+                                </View> */}
+
+                                <CommonInputComponent
+                                    label="Complaint message"
+                                    type="text"
+                                    value={complaintDescription}
+                                    placeholder="Enter message"
+                                    onChangeText={(text)=>{setDespriction(text),
+                                        setCommentError("")
+                                    }}
+                                    required={true}
+                                    multiline
+                                    height={80}
+                                    minLength={15}
+                                    isActive={visible}
+                                    error={!!commentError}
+                                   
+                                />
 
                                 {commentError && <ErrorMessage message={commentError} type="error" />}
 
@@ -610,13 +679,20 @@ const AddComplaint = ({
 
                             <View style={{ paddingBottom: 20 }}>
                                 <TouchableOpacity onPress={submitClick}
-
+                                    disabled={loading}
                                     style={{
-                                        paddingTop: 12, paddingBottom: 12, borderRadius: 22, justifyContent: 'center',
+                                        paddingTop: 12, paddingBottom: 12, borderRadius: 14, justifyContent: 'center',
                                         backgroundColor: selectedComplaintTypeId === 0 || !complaintDescription || complaintDescription.trim().length < 15 ? '#9EB3FF' : '#1E45E1',
                                         alignItems: 'center'
                                     }}>
-                                    <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Semibold', color: '#ffffff' }}>Submit</Text>
+                                    {loading ?
+                                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                            <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Semibold', color: '#ffffff', marginRight: 6 }}>Submitting</Text>
+                                            <WaveLoader size={4} />
+                                        </View> :
+
+                                        <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Semibold', color: '#ffffff' }}>Submit</Text>
+                                    }
                                 </TouchableOpacity>
                             </View>
 

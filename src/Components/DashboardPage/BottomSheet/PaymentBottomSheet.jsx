@@ -52,7 +52,7 @@ export default function PaymentBottomSheet({
     const [showRefundableAdvance, setShowRefundableAdvance] = useState(true)
     const [showRefundableBooking, setShowRefundableBooking] = useState(true)
     const [showRetainerInv, setShowRetainerInv] = useState(true)
-    const [showAdditionalAdvance,setShowAdditionalAdvance]=useState(true)
+    const [showAdditionalAdvance, setShowAdditionalAdvance] = useState(true)
 
 
     const { CommonModule } = NativeModules;
@@ -60,6 +60,7 @@ export default function PaymentBottomSheet({
     const loginContext = useContext(LoginContexts)
     const [showRedeemTo, setShowRedeemTo] = useState(false);
     const [showRedeemFrom, setShowRedeemFrom] = useState(true)
+    const [showEbDetails, setShowEbDetails] = useState(false)
 
     // useEffect(() => {
     //     if (visible && selectedComplaintSend) {
@@ -738,7 +739,9 @@ export default function PaymentBottomSheet({
 
                             <View style={[style.row, { flex: 1 }]}>
                                 <Text style={[style.modalTitle, { flexShrink: 1 }]}>
-                                    {paymentContext?.getInvoiceDetail?.status === "Pending" ? "Total outstanding payable" : "Total Refund"}</Text>
+                                    {/* {paymentContext?.getInvoiceDetail?.status === "Pending" ? "Total outstanding payable" : "Total Refund"} */}
+                                    {paymentContext?.getInvoiceDetail?.totalAmountLabelText || "Total Refund"}
+                                </Text>
 
                                 <Text style={{ fontSize: 18, fontFamily: 'Gilroy-Bold' }}>
                                     ₹ {new Intl.NumberFormat('en-IN').format(paymentContext?.getInvoiceDetail?.totalAmount)}</Text>
@@ -815,9 +818,46 @@ export default function PaymentBottomSheet({
                                     ₹ {paymentContext.getInvoiceDetail?.walletInfo?.totalWalletAmount || "0"}</Text>
                             </View>
 
+                            <View style={style.row}>
+                                <TouchableOpacity onPress={() => setShowEbDetails(!showEbDetails)}>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                        <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium' }}>Electricity Bill</Text>
+                                        <Image source={DirectionDown}
+                                            style={{
+                                                width: 20, height: 20, marginLeft: 6, padding: 2, borderRadius: 5, backgroundColor: '#EFF6FF',
+                                                transform: [{ rotate: showEbDetails ? '180deg' : '0deg' }],
+                                            }} tintColor="#007FFF"
+                                        />
+                                    </View>
+                                </TouchableOpacity>
+
+                                <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold' }}>₹ {new Intl.NumberFormat('en-IN').format(
+                                    paymentContext?.getInvoiceDetail?.currentMonthEbInfo?.currentMonthEbAmount ? paymentContext?.getInvoiceDetail?.currentMonthEbInfo?.currentMonthEbAmount : "0")}</Text>
+                            </View>
+
+
+                            {showEbDetails && (
+                                <>
+
+                                    {paymentContext?.getInvoiceDetail?.currentMonthEbInfo?.ebItems?.length > 0 && (
+                                        paymentContext?.getInvoiceDetail?.currentMonthEbInfo?.ebItems?.map((item) => {
+                                            return <View style={[style.row,{marginLeft:8}]} key={(item,index)=> item?.readingId}>
+                                                <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Regular', color: '#2F2F2F' }}>
+                                                  ₹ {item?.totalAmount} ({item?.consumption} units)
+                                                </Text>
+                                                
+                                            </View>
+                                        })
+                                    )}
+                                    
+                                </>
+
+                            )}
 
 
 
+
+                            {/* -------------------- */}
                             <View style={style.row}>
                                 <TouchableOpacity onPress={() => setShowVisible(!showVisible)}>
                                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -921,7 +961,7 @@ export default function PaymentBottomSheet({
                                     <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Medium' }}>Non Refundable Rent</Text>
                                     <TouchableOpacity onPress={() => setNonrefundable(!showNonrefundable)}
                                         style={{ padding: 2, backgroundColor: 'green', marginLeft: 6, borderRadius: 5, backgroundColor: '#EFF6FF', }}>
-                                      
+
                                         <Image source={DirectionDown}
                                             style={{
                                                 width: 20, height: 20,
@@ -965,7 +1005,7 @@ export default function PaymentBottomSheet({
                                             color="#007FFF"
                                             style={{ marginLeft: 6, marginTop: 4 }}
                                         /> */}
-                                          <Image source={DirectionDown}
+                                        <Image source={DirectionDown}
                                             style={{
                                                 width: 22, height: 22, marginLeft: 6, marginTop: 4,
                                                 transform: [{ rotate: showRefundableAdvance ? '180deg' : '0deg' }],
@@ -1110,13 +1150,13 @@ export default function PaymentBottomSheet({
                             </View>
 
 
-                             <View style={style.fieldBox}>
+                            <View style={style.fieldBox}>
                                 <View style={[style.row, { paddingHorizontal: 10 }]}>
 
                                     <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }}
                                         onPress={() => setShowAdditionalAdvance(!showAdditionalAdvance)}>
 
-                                        <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold' }}>Additional Advance</Text>                                        
+                                        <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold' }}>Additional Advance</Text>
                                         <Image source={DirectionDown}
                                             style={{
                                                 width: 22, height: 22, marginLeft: 6, marginTop: 3,
@@ -1316,13 +1356,33 @@ export default function PaymentBottomSheet({
                             </View>
 
 
+                            {paymentContext?.getInvoiceDetail?.deductions.length > 0 && (
+                                <View style={{ paddingTop: 10, marginBottom: 10 }}>
+                                    <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold' }}>Deductions</Text>
+
+                                    {paymentContext?.getInvoiceDetail?.deductions.map((i, index) => {
+
+                                        return <View key={index}
+                                            style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 8, alignItems: 'center' }}>
+                                            <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Regular' }}>{i.type}</Text>
+
+                                            <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>₹ {i.amount}</Text>
+                                        </View>
+                                    }
+                                    )}
+
+                                </View>
+                            )}
+
+
+
                             {paymentContext.getInvoiceDetail?.currentMonthRentInfo?.listCurrentMonthOtherItems.length > 0 && (
                                 <>
                                     <View style={{ marginTop: 6 }}>
                                         <Text style={{ fontSize: 16, fontFamily: 'Gilroy-Semibold' }}>Other Items</Text>
                                         <View style={{ marginTop: 2 }}>
                                             {paymentContext.getInvoiceDetail?.currentMonthRentInfo?.listCurrentMonthOtherItems.map((i, index) => (
-                                                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 8 }}
+                                                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 11 }}
                                                     key={index}>
                                                     <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>{i?.item}</Text>
                                                     <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>{i?.amount}</Text>

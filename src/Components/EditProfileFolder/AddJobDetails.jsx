@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Alert, Image, Keyboard, KeyboardAvoidingView, NativeModules, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import LeftArrow from "../../assets/Images/LeftArrow.png"
-import { useNavigation } from "@react-navigation/native";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import CheckBox from "../../assets/Images/Checkboxes.png"
 import { Calendar } from "react-native-calendars";
@@ -18,6 +18,7 @@ import DatePicker from "react-native-date-picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import ErrorMessage from "../ToastFile/ErrorMessage";
 import DirectionDown from "../../assets/Images/direction-down.png"
+import CommonInputComponent from "../CommonComponent/CommonInputComponent";
 
 
 const AddJobDetails = ({ route }) => {
@@ -36,7 +37,7 @@ const AddJobDetails = ({ route }) => {
     const [openCalendar, setOpenCalendar] = useState(false);
     const [calendarType, setCalendarType] = useState("");
     const today = dayjs();
-    const shiftTypeList = [{ id: 1, type: "Morning Shift" }, { id: 2, type: "Night Shift" }]
+    const shiftTypeList = [{ value: 1, label: "Morning Shift" }, { value: 2, label: "Night Shift" }]
     const [openShiftList, setOpenShiftList] = useState(false)
     const [showSuccessModal, setShowSuccessModal] = useState(false)
     const [showModalMessage, setShowModalMessage] = useState("")
@@ -52,6 +53,9 @@ const AddJobDetails = ({ route }) => {
     const [showEmploymentList, setShowEmploymentList] = useState(false)
     const [selectedEmployment, setSelectedEmployment] = useState("")
     const [stateQuery, setStateQuery] = useState("")
+    const isScreenFocused = useIsFocused()
+    const [isFocused, setIsFocused] = useState(false)
+    const [activeDropdown, setActiveDropdown] = useState("")
 
     const { CommonModule } = NativeModules
 
@@ -60,6 +64,15 @@ const AddJobDetails = ({ route }) => {
     console.log(typeof shiftFrom); // string
     console.log(shiftFrom instanceof Date); // false
     console.log("errormsg", errors)
+
+
+    useEffect(() => {
+        if (isScreenFocused) {
+            setIsFocused(true)
+        } else {
+            setIsFocused(false)
+        }
+    }, [isScreenFocused])
 
     const employmentType = [{ id: 1, type: "Employed" }, { id: 2, type: "Self-Employed" }, { id: 3, type: "Student" },
     { id: 4, type: "Business Owner" }, { id: 5, type: "Freelancer" }, { id: 6, type: "Govt Employee" }, { id: 7, type: "Pvt Employee" },
@@ -399,7 +412,7 @@ const AddJobDetails = ({ route }) => {
                                 }}
                                 onChangeText={(t) => {
                                     const sanitized = t.replace(/[^a-zA-Z\s]/g, "");
-                                    setSelectedEmployment(sanitized);    // 🔥 typing always search
+                                    setStateQuery(sanitized);    // 🔥 typing always search
                                     setShowEmploymentList(true);
                                 }}
                             />
@@ -517,7 +530,7 @@ const AddJobDetails = ({ route }) => {
                                 ))}
                             </ScrollView>
                         )} */}
-                        <Text style={styles.labelTxt}>{employmentStatus === "Student" ? "College Name" : "Company / College Name"}
+                        {/* <Text style={styles.labelTxt}>{employmentStatus === "Student" ? "College Name" : "Company / College Name"}
                             <Text style={{ color: 'red' }}> *</Text>
                         </Text>
 
@@ -530,7 +543,26 @@ const AddJobDetails = ({ route }) => {
                                     const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
                                     setCompanyName(onlyLetters)
                                 }} />
-                        </View>
+                        </View> */}
+                        <CommonInputComponent
+                            label="Company / College Name"
+                            type="text"
+                            value={companyName}
+                            placeholder="Enter Name"
+                            onChangeText={(text) => {
+                                const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
+                                setCompanyName(onlyLetters)
+                                if (errors.company) {
+                                    setErrors(prev => ({
+                                        ...prev, company: ""
+                                    }));
+                                }
+                            }}
+                            required={true}
+                            isActive={isFocused}
+                            error={!!errors.company}
+
+                        />
 
                         {errors.company && (<ErrorMessage message={errors.company} type="error" />)}
 
@@ -573,7 +605,7 @@ const AddJobDetails = ({ route }) => {
 
                         {/* {employmentStatus !== "Student" && ( */}
                         <>
-                            <Text style={styles.labelTxt}>Job Role</Text>
+                            {/* <Text style={styles.labelTxt}>Job Role</Text>
 
                             <View>
                                 <TextInput
@@ -584,25 +616,66 @@ const AddJobDetails = ({ route }) => {
                                         const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
                                         setJobRole(onlyLetters)
                                     }} />
-                            </View>
+                            </View> */}
+                            <CommonInputComponent
+                                label="Job Role"
+                                type="text"
+                                value={jobRole}
+                                placeholder="Enter Job Role"
+                                onChangeText={(text) => {
+                                    const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
+                                    setJobRole(onlyLetters)
+                                }}
+                                isActive={isFocused}
+                            // error={!!errors.company}
+
+                            />
                         </>
                         {/* )} */}
 
 
                         {/* {employmentStatus !== "Student" && ( */}
                         <>
-                            <Text style={styles.labelTxt}>Shift Type </Text>
+                            {/* <Text style={styles.labelTxt}>Shift Type </Text>
 
                             <TouchableOpacity onPress={() => setOpenShiftList(!openShiftList)}
                                 style={styles.inputBox}>
                                 <Text style={styles.valueTxt}>{shiftType ? shiftType : "Select Shift Type"}</Text>
-                                <Image source={DirectionDown}
+                               <Image source={DirectionDown}
                                     style={{
                                         width: 22, height: 22,
                                         transform: [{ rotate: openShiftList ? '180deg' : '0deg' }],
                                     }} tintColor="#000"
                                 />
-                            </TouchableOpacity>
+                            </TouchableOpacity> */}
+                            <CommonInputComponent
+                                label="Shift Type"
+                                type="dropdown"
+                                value={shiftType}
+                                placeholder="Select Complaint Type"
+                                options={shiftTypeList}
+
+                                optionLabelKey="label"
+                                optionValueKey="value"
+
+                                isOpen={activeDropdown === 'jobRole'}
+                                closeActiveDropdown={() => { setActiveDropdown(null) }}
+                                isActive={isFocused}
+
+                                onToggleDropdown={() => {
+                                    setActiveDropdown(
+                                        activeDropdown === 'jobRole' ? null : 'jobRole'
+                                    );
+                                }}
+
+                                onSelect={(item) => {
+                                    setShiftType(item.label);
+                                    setActiveDropdown(null);
+
+                                }}
+                            // required={true}
+                            // error={!!compliantTypeError}
+                            />
                         </>
                         {/* )} */}
 
@@ -624,7 +697,7 @@ const AddJobDetails = ({ route }) => {
                         )}
 
 
-                        <Text style={styles.labelTxt}>{employmentStatus === "Student" ? "College/Institute Location" : "Location"}
+                        {/* <Text style={styles.labelTxt}>{employmentStatus === "Student" ? "College/Institute Location" : "Location"}
                             <Text style={{ color: 'red' }}> *</Text>
                         </Text>
 
@@ -637,7 +710,27 @@ const AddJobDetails = ({ route }) => {
                                     const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
                                     setLocation(onlyLetters)
                                 }} />
-                        </View>
+                        </View> */}
+
+                        <CommonInputComponent
+                            label="Location"
+                            type="text"
+                            value={location}
+                            placeholder="Enter message"
+                            onChangeText={(text) => {
+                                const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
+                                setLocation(onlyLetters)
+                                if (errors.location) {
+                                    setErrors(prev => ({
+                                        ...prev, location: ""
+                                    }));
+                                }
+                            }}
+                            required={true}
+                            isActive={isFocused}
+                            error={!!errors.location}
+
+                        />
 
                         {errors.location && (<ErrorMessage message={errors.location} type="error" />)}
 
@@ -648,7 +741,8 @@ const AddJobDetails = ({ route }) => {
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                             <TouchableOpacity onPress={() => openTimePicker('from')}
                                 style={[styles.shiftInputBox, { marginRight: 6 }]}>
-                                <Text> {shiftFrom ? formatTime(shiftFrom) : "From"}</Text>
+                                <Text style={{fontSize:14,fontFamily:'Gilroy-Medium'}}> 
+                                    {shiftFrom ? formatTime(shiftFrom) : "From"}</Text>
                                 <Image source={TimerIcon} style={{ width: 22.5, height: 22.5 }} />
                             </TouchableOpacity>
 
@@ -657,7 +751,8 @@ const AddJobDetails = ({ route }) => {
 
                             <TouchableOpacity onPress={() => openTimePicker('to')}
                                 style={[styles.shiftInputBox, { marginLeft: 6 }]}>
-                                <Text>  {shiftTo ? formatTime(shiftTo) : "To"}</Text>
+                                <Text style={{fontSize:14,fontFamily:'Gilroy-Medium'}}>
+                                      {shiftTo ? formatTime(shiftTo) : "To"}</Text>
                                 <Image source={TimerIcon} style={{ width: 22.5, height: 22.5 }} />
                             </TouchableOpacity>
                         </View>
@@ -775,8 +870,8 @@ const styles = StyleSheet.create({
         height: 51,
         // paddingVertical:16,
         borderWidth: 1,
-        borderColor: "#EEEEEE",
-        borderRadius: 8,
+        borderColor: "#E1E4EA",
+        borderRadius: 10,
         paddingHorizontal: 14,
         flexDirection: "row",
         justifyContent: "space-between",
@@ -784,13 +879,13 @@ const styles = StyleSheet.create({
         color: '#111827', fontFamily: 'Gilroy-Medium',
     },
     inputBox: {
-        borderWidth: 1, borderRadius: 8, borderColor: '#EEEEEE', paddingVertical: 16,
+        borderWidth: 1, borderRadius: 10, borderColor: '#E1E4EA', paddingVertical: 16,
         paddingHorizontal: 14, marginTop: 12, flexDirection: 'row',
         justifyContent: 'space-between', fontSize: 15,
         fontFamily: "Gilroy-Medium",
     },
     shiftInputBox: {
-        borderWidth: 1, borderRadius: 8, borderColor: '#EEEEEE', paddingVertical: 16,
+        borderWidth: 1, borderRadius: 10, borderColor: '#E1E4EA', paddingVertical: 14,
         paddingHorizontal: 14, marginTop: 12, flexDirection: 'row',
         justifyContent: 'space-between', flex: 1
 
@@ -807,7 +902,7 @@ const styles = StyleSheet.create({
     },
 
     overlayBg: {
-        ...StyleSheet.absoluteFillObject,
+        ...StyleSheet.absoluteFill,
         backgroundColor: "rgba(0,0,0,0.3)",
     },
 

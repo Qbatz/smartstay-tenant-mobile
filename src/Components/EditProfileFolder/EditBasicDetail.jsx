@@ -3,7 +3,7 @@ import { Image, ScrollView, Text, TouchableOpacity } from "react-native";
 import { StyleSheet, View } from "react-native";
 import LeftArrow from "../../assets/Images/LeftArrow.png"
 import { TextInput } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { UsersContext } from "../../Context/UserContext";
 import ErrorMessage from "../ToastFile/ErrorMessage";
 import SuccessModal from "../ToastFile/TostFilePage";
@@ -12,6 +12,7 @@ import { LoginContexts } from "../../Context/LoginContext";
 import AppLoader from "../ToastFile/LoaderPage";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import DirectionDown from "../../assets/Images/direction-down.png"
+import CommonInputComponent from "../CommonComponent/CommonInputComponent";
 
 
 
@@ -34,7 +35,19 @@ const EditBasicDetail = ({ }) => {
     const [modalType, setModalType] = useState("")
     const [loading, setLoading] = useState(false)
     const [emailError, setEmailError] = useState("");
-    const [showDropdown,setShowDropdrown]=useState(false)
+    const [showDropdown, setShowDropdrown] = useState(false)
+
+    const isScreenFocused = useIsFocused();
+
+    const [isFocused, setIsFocused] = useState(false);
+
+    useEffect(() => {
+        if (isScreenFocused) {
+            setIsFocused(true);
+        } else {
+            setIsFocused(false);
+        }
+    }, [isScreenFocused]);
 
     const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
 
@@ -48,6 +61,7 @@ const EditBasicDetail = ({ }) => {
         }
     }, [])
     console.log(firstNameError)
+
 
     const validateForm = () => {
         let isValid = true;
@@ -156,7 +170,7 @@ const EditBasicDetail = ({ }) => {
                     </View>
 
 
-                    <Text style={[styles.labelTxt, { marginTop: 18 }]}>First Name
+                    {/* <Text style={[styles.labelTxt, { marginTop: 18 }]}>First Name
                         <Text style={{ color: 'red' }}> *</Text>
                     </Text>
                     <TextInput
@@ -168,10 +182,26 @@ const EditBasicDetail = ({ }) => {
                             setFirstName(onlyLetters)
                             setFirstNameError("")
 
-                        }} />
+                        }} /> */}
+                    {console.log("jaja", isFocused)}
+                    <CommonInputComponent
+                        label="First Name"
+                        type="text"
+                        value={firstName}
+                        placeholder="Enter firstname"
+                        onChangeText={(text) => {
+                            const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
+                            setFirstName(onlyLetters),
+                                setFirstNameError("")
+                        }}
+                        required={true}
+                        isActive={isFocused}
+                        error={!!firstNameError}
+
+                    />
                     {firstNameError && <ErrorMessage message={firstNameError} type="error" />}
 
-                    <Text style={[styles.labelTxt, { marginTop: 12 }]}>Last Name</Text>
+                    {/* <Text style={[styles.labelTxt, { marginTop: 12 }]}>Last Name</Text>
                     <TextInput
                         value={lastName}
                         style={styles.input}
@@ -180,9 +210,25 @@ const EditBasicDetail = ({ }) => {
                             const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
                             setLastName(onlyLetters)
 
-                        }} />
+                        }} /> */}
 
-                    <Text style={[styles.labelTxt, { marginTop: 12 }]}>Mail ID</Text>
+                    <CommonInputComponent
+                        label="Last Name"
+                        type="text"
+                        value={lastName}
+                        placeholder="Enter lastname"
+                        onChangeText={(text) => {
+                            const onlyLetters = text.replace(/[^A-Za-z\s]/g, "")
+                            setLastName(onlyLetters)
+
+                        }}
+                        // required={true}
+                        isActive={isFocused}
+
+
+                    />
+
+                    {/* <Text style={[styles.labelTxt, { marginTop: 12 }]}>Mail ID</Text>
                     <TextInput
                         value={mailId}
                         style={styles.input}
@@ -193,7 +239,23 @@ const EditBasicDetail = ({ }) => {
                             setMailId(noEmojis)
                             setEmailError("")
 
-                        }} />
+                        }} /> */}
+                    <CommonInputComponent
+                        label="Mail ID"
+                        type="text"
+                        value={mailId}
+                        placeholder="Enter mailId"
+                        onChangeText={(text) => {
+                            const noEmojis = text.replace(
+                                /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, "");
+                            setMailId(noEmojis)
+                            setEmailError("")
+                        }}
+                      
+                        isActive={isFocused}
+                        error={!!firstNameError}
+
+                    />
 
                     {emailError && <ErrorMessage message={emailError} type="error" />}
 
@@ -203,15 +265,15 @@ const EditBasicDetail = ({ }) => {
                         paddingHorizontal: 10, marginTop: 10, fontFamily: 'Gilroy-Regular',
                         borderWidth: 1, borderColor: '#EEEEEE', borderRadius: 8,
                     }}>
-                        <TouchableOpacity onPress={()=>setShowDropdrown(true)}
-                            style={{flexDirection:'row',alignItems:'center'}}>
-                        <Text style={{ fontSize: 15, color: '#111827', fontFamily: 'Gilroy-Regular', }}>+91</Text>
-                        <Image source={DirectionDown}
-                            style={{
-                                width: 22, height: 22, marginRight: 14,
-                                transform: [{ rotate: showDropdown ? '180deg' : '0deg' }],
-                            }} tintColor="#000"
-                        />
+                        <TouchableOpacity onPress={() => setShowDropdrown(true)}
+                            style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Text style={{ fontSize: 15, color: '#111827', fontFamily: 'Gilroy-Regular', }}>+91</Text>
+                            <Image source={DirectionDown}
+                                style={{
+                                    width: 22, height: 22, marginRight: 14,
+                                    transform: [{ rotate: showDropdown ? '180deg' : '0deg' }],
+                                }} tintColor="#000"
+                            />
                         </TouchableOpacity>
                         <TextInput
                             value={mobileNo}

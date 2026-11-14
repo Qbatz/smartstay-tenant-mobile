@@ -19,68 +19,161 @@ const OtpDesign = ({ route }) => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showModelMessage, setShowModelMessage] = useState()
   const [modelType, setModelType] = useState();
+  const[isFocused,setIsFocused]=useState(false)
+  const [otpStatus, setOtpStatus] = useState('default');
+  const [focusedOtpIndex, setFocusedOtpIndex] = useState(null);
 
 
   const context = useContext(UsersContext)
   const loginContext = useContext(LoginContexts)
   // const { verifyOtp , resendOtp } = useContext(LoginContext); 
+  const otpBorderColors = {
+    default: '#D1D5DB',
+    focus: '#5366FF',
+    error: '#EF4444',
+    success: '#16A34A',
+};
+const getOtpBorderColor = (index) => {
+
+    // Only the focused box gets blue
+     if (otpStatus === 'error') {
+        return '#EF4444';
+    }
+    if (focusedOtpIndex === index) {
+        return '#2563EB';
+    }
+
+   
+
+    if (otpStatus === 'success') {
+        return '#16A34A';
+    }
+
+    return '#D1D5DB';
+};
+
+    
+
+
+   const handleOtpFocus = (index) => {
+    if (otpStatus !== 'success') {
+        setOtpStatus('focus');
+    }
+};
+
+const handleOtpBlur = () => {
+    if (otpStatus === 'focus') {
+        setOtpStatus('default');
+    }
+};
+
+  // const handleOtpChange = async (text, index) => {
+  //   const cleanText = text.replace(/[^0-9]/g, "");
+  //   const newOtp = [...otp];
+  //   newOtp[index] = cleanText;
+  //   setOtp(newOtp);
+
+  //   if (cleanText && index < 5) {
+  //     inputs.current[index + 1].focus();
+  //   }
+
+
+
+  //   if (newOtp.every((digit) => digit !== "")) {
+  //     const otpValue = newOtp.join("");
+  //     console.log("Entered OTP:", otpValue);
+  //     const data = await verifyOtp(route.params.phone, otpValue, Platform.OS)
+  //     console.log(data)
+  //     if (data.status == 200) {
+  //       console.log(data.data)
+  //       loginContext.userId(data.data.xuid)
+  //       loginContext.phoneNo(route.params.phone)
+  //       storeData(PHONE_NO, route.params.phone)
+  //       storeData(LOGGEDIN, 'true')
+  //       storeData(USERID, data.data.xuid)
+
+  //       if (data.data.isMpinVerified == true) {
+  //         loginContext.loggedin('true')
+  //         // navigation.navigate("WelcomeBackPage")
+  //       }
+  //       else {
+  //         navigation.navigate('CreateMpin')
+  //       }
+  //     }
+  //     else if (data.status == 401) {
+  //       setShowSuccessModal(true)
+  //       setShowModelMessage("Invalid OTP")
+  //       setModelType('error')
+
+  //       setTimeout(() => {
+  //         setShowSuccessModal(false);
+  //         setOtp(["", "", "", "", "", ""])
+  //           inputs.current[0].focus();
+  //       }, 2000);
+  //     }else{
+  //        setShowSuccessModal(true)
+  //       setShowModelMessage(data?.message)
+  //       setModelType('error')
+
+  //       setTimeout(() => {
+  //         setShowSuccessModal(false);
+  //         setOtp(["", "", "", "", "", ""])
+  //          inputs.current[0].focus();
+  //       }, 2000);
+  //     }
+  //   }
+  // };
 
   const handleOtpChange = async (text, index) => {
     const cleanText = text.replace(/[^0-9]/g, "");
     const newOtp = [...otp];
+
     newOtp[index] = cleanText;
     setOtp(newOtp);
 
     if (cleanText && index < 5) {
-      inputs.current[index + 1].focus();
+        inputs.current[index + 1].focus();
     }
-
-
 
     if (newOtp.every((digit) => digit !== "")) {
-      const otpValue = newOtp.join("");
-      console.log("Entered OTP:", otpValue);
-      const data = await verifyOtp(route.params.phone, otpValue, Platform.OS)
-      console.log(data)
-      if (data.status == 200) {
-        console.log(data.data)
-        loginContext.userId(data.data.xuid)
-        loginContext.phoneNo(route.params.phone)
-        storeData(PHONE_NO, route.params.phone)
-        storeData(LOGGEDIN, 'true')
-        storeData(USERID, data.data.xuid)
+        setOtpStatus('default');
 
-        if (data.data.isMpinVerified == true) {
-          loginContext.loggedin('true')
-          // navigation.navigate("WelcomeBackPage")
+        const otpValue = newOtp.join("");
+
+        const data = await verifyOtp(route.params.phone, otpValue,Platform.OS);
+
+        if (data.status === 200) {
+            setOtpStatus('success');
+
+            loginContext.userId(data.data.xuid);
+            loginContext.phoneNo(route.params.phone);
+
+            storeData(PHONE_NO, route.params.phone);
+            storeData(LOGGEDIN, 'true');
+            storeData(USERID, data.data.xuid);
+
+            if (data.data.isMpinVerified === true) {
+                loginContext.loggedin('true');
+            } else {
+                navigation.navigate('CreateMpin');
+            }
+
+        } else {
+            setOtpStatus('error');
+
+            setShowSuccessModal(true);
+            setShowModelMessage(data.status === 401 ? "Invalid OTP" : data?.message);
+            setModelType('error');
+
+            setTimeout(() => {
+                setShowSuccessModal(false);
+                setOtp(["", "", "", "", "", ""]);
+                setOtpStatus('default');
+                inputs.current[0]?.focus();
+            }, 2000);
         }
-        else {
-          navigation.navigate('CreateMpin')
-        }
-      }
-      else if (data.status == 401) {
-        setShowSuccessModal(true)
-        setShowModelMessage("Invalid OTP")
-        setModelType('error')
-
-        setTimeout(() => {
-          setShowSuccessModal(false);
-          setOtp(["", "", "", "", "", ""])
-            inputs.current[0].focus();
-        }, 2000);
-      }else{
-         setShowSuccessModal(true)
-        setShowModelMessage(data?.message)
-        setModelType('error')
-
-        setTimeout(() => {
-          setShowSuccessModal(false);
-          setOtp(["", "", "", "", "", ""])
-           inputs.current[0].focus();
-        }, 2000);
-      }
     }
-  };
+};
 
   const handleKeyPress = (e, index) => {
     if (e.nativeEvent.key === "Backspace" && otp[index] === "" && index > 0) {
@@ -139,16 +232,36 @@ const OtpDesign = ({ route }) => {
 
       <View style={styles.otpContainer}>
         {otp.map((digit, index) => (
+          // <TextInput
+          //   key={index}
+          //   ref={(ref) => (inputs.current[index] = ref)}
+          //   style={styles.otpBox}
+          //   keyboardType="number-pad"
+          //   maxLength={1}
+          //   value={digit}
+          //   onChangeText={(text) => handleOtpChange(text, index)}
+          //   onKeyPress={(e) => handleKeyPress(e, index)}
+          // />
           <TextInput
-            key={index}
-            ref={(ref) => (inputs.current[index] = ref)}
-            style={styles.otpBox}
-            keyboardType="number-pad"
-            maxLength={1}
-            value={digit}
-            onChangeText={(text) => handleOtpChange(text, index)}
-            onKeyPress={(e) => handleKeyPress(e, index)}
-          />
+    key={index}
+    ref={(ref) => (inputs.current[index] = ref)}
+    style={[
+        styles.otpBox,
+        {
+             borderColor: getOtpBorderColor(index),
+            borderWidth: focusedOtpIndex === index ? 2 : 1.5,
+        }
+    ]}
+    keyboardType="number-pad"
+    maxLength={1}
+    value={digit}
+    onChangeText={(text) => handleOtpChange(text, index)}
+    onKeyPress={(e) => handleKeyPress(e, index)}
+    // onFocus={() => handleOtpFocus(index)}
+    // onBlur={handleOtpBlur}
+     onFocus={() => setFocusedOtpIndex(index)}
+    onBlur={() => setFocusedOtpIndex(null)}
+/>
         ))}
       </View>
 

@@ -16,6 +16,8 @@ import { Dropdown } from "react-native-element-dropdown";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ErrorMessage from "../../ToastFile/ErrorMessage";
 import DirectionDown from "../../../assets/Images/direction-down.png"
+import WaveLoader from "../../ToastFile/WaveLoader";
+import CommonInputComponent from "../../CommonComponent/CommonInputComponent";
 
 
 
@@ -52,6 +54,7 @@ const RequestBedChange = ({ visible,
     const [bedChangeReasonError, setBedChangeReasonError] = useState()
     const [bedTypeError, setBedTypeError] = useState()
     const [urgencyError, setUrgencyError] = useState()
+    const [activeDropdown, setActiveDropdown] = useState("")
 
     console.log(changeBed, urgencyType, bedType)
 
@@ -95,6 +98,7 @@ const RequestBedChange = ({ visible,
 
 
     const bedRequestSubmit = () => {
+
         if (!validateForm()) return;
 
         const data = {
@@ -106,56 +110,73 @@ const RequestBedChange = ({ visible,
 
         }
 
+
         if (changeBed != null && bedType != null && urgencyType != null) {
-            postRequestBedChange(context.getHostelDetail.hostelId, data, loginContext.getToken).then(r => {
-                setLoading(true)
-                console.log(r)
+            setLoading(true)
+            try {
+                postRequestBedChange(context.getHostelDetail.hostelId, data, loginContext.getToken).then(r => {
 
-                setTimeout(() => {
-                    setLoading(false)
+                    console.log(r)
 
-                    if (r.status == 200) {
-                        setShowSuccessModal(true)
-                        setToastMessage('Request raised')
-                        setModelType('success')
+                    setTimeout(() => {
+                        setLoading(false)
 
-                        setTimeout(() => {
-                            setShowSuccessModal(false)
-                            setBedType(null)
-                            setChangeBed(null)
-                            setUrgencyType(null)
-                            onClose();
-                        }, 2000);
-                    }
-                    else if (r.status == r.status) {
-                        setShowSuccessModal(true)
-                        setToastMessage(r.message)
-                        setModelType('error')
+                        if (r.status == 200) {
+                            setShowSuccessModal(true)
+                            setToastMessage('Request raised')
+                            setModelType('success')
 
-                        setTimeout(() => {
-                            setShowSuccessModal(false)
-                            setBedType(null)
-                            setChangeBed(null)
-                            setUrgencyType(null)
-                            onClose();
-                        }, 2000);
-                    }
+                            setTimeout(() => {
+                                setShowSuccessModal(false)
+                                setBedType(null)
+                                setChangeBed(null)
+                                setUrgencyType(null)
+                                onClose();
+                            }, 2000);
+                        }
+                        else if (r.status == r.status) {
+                            setShowSuccessModal(true)
+                            setToastMessage(r.message)
+                            setModelType('error')
 
-                }, 2000);
-            })
+                            setTimeout(() => {
+                                setShowSuccessModal(false)
+                                setBedType(null)
+                                setChangeBed(null)
+                                setUrgencyType(null)
+                                onClose();
+                            }, 2000);
+                        }
+
+                    }, 2000);
+                })
+            } catch (error) {
+                console.log(error)
+            } finally {
+                setLoading(false)
+            }
 
         }
         else {
-            // setShowSuccessModal(true)
-            // setToastMessage('Fill all Fields')
-            // setModelType('error')
+            setShowSuccessModal(true)
+            setToastMessage('Fill all Fields')
+            setModelType('error')
 
-            // setTimeout(() => {
-            //     setShowSuccessModal(false)
-            // }, 2000);
+            setTimeout(() => {
+                setShowSuccessModal(false)
+                setLoading(false)
+            }, 2000);
         }
 
     }
+
+    // const bedChangeOptions= bed?.map(i => ({
+    //     label: i?.
+    // }))
+
+    // console.log(bed)
+    // console.log(urgency)
+    // console.log()
 
     if (!visible) return null;
 
@@ -215,7 +236,7 @@ const RequestBedChange = ({ visible,
                                     </View>
                                 </View>
 
-                                <View style={{ paddingTop: 15 }}>
+                                {/* <View style={{ paddingTop: 15 }}>
                                     <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>Reason for Bed change
                                         <Text style={{ color: 'red' }}> *</Text>
                                     </Text>
@@ -223,8 +244,8 @@ const RequestBedChange = ({ visible,
                                     <Dropdown ref={bedDropdownRef}
                                         style={{
                                             borderWidth: 1,
-                                            borderRadius: 10,
-                                            paddingVertical: 15,
+                                            borderRadius: 12,
+                                            paddingVertical: 14,
                                             marginTop: 10,
                                             borderColor: '#e5e5e5',
                                             paddingLeft: 10,
@@ -254,7 +275,8 @@ const RequestBedChange = ({ visible,
                                             //     style={{ paddingRight: 10 }}
                                             // />
                                             <Image source={DirectionDown}
-                                                style={{ width: 22, height: 22, marginRight: 14,
+                                                style={{
+                                                    width: 22, height: 22, marginRight: 14,
                                                     transform: [{ rotate: focusReason ? '180deg' : '0deg' }],
                                                 }} tintColor="#000"
                                             />
@@ -282,35 +304,67 @@ const RequestBedChange = ({ visible,
                                                         backgroundColor: isSelected ? '#1D4ED8' : '#F5F5F5',
                                                     }}
                                                 >
-                                                    <Text style={{ color: isSelected ? '#fff' : '#000', fontSize: 15, fontFamily: 'Gilroy-Medium' }}>
+                                                    <Text style={{ color: isSelected ? '#fff' : '#000', fontSize: 14, fontFamily: 'Gilroy-Medium' }}>
                                                         {item.label}
                                                     </Text>
                                                 </TouchableOpacity>
                                             );
                                         }}
                                     />
+
+
                                     {bedChangeReasonError && <ErrorMessage message={bedChangeReasonError} type="error" />}
 
 
-                                </View>
+                                </View> */}
 
-                                <View style={{ paddingTop: 15 }}>
+                                <CommonInputComponent
+                                    label="Reason for Bed Change"
+                                    type="dropdown"
+                                    value={changeBed}
+                                    placeholder="Select Reason"
+                                    options={bed}
+
+                                    optionLabelKey="label"
+                                    optionValueKey="value"
+
+                                    isOpen={activeDropdown === 'bedChangeReason'}
+                                    closeActiveDropdown={() => { setActiveDropdown(null) }}
+                                    isActive={visible}
+
+                                    onToggleDropdown={() => {
+                                        setActiveDropdown(
+                                            activeDropdown === 'bedChangeReason' ? null : 'bedChangeReason'
+                                        );
+                                    }}
+
+                                    onSelect={(item) => {
+                                        setChangeBed(item.value);
+                                        setActiveDropdown(null);
+                                        setBedChangeReasonError("")
+                                    }}
+                                    required={true}
+                                    error={!!bedChangeReasonError} />
+
+                                {bedChangeReasonError && <ErrorMessage message={bedChangeReasonError} type="error" />}
+
+                                {/* <View style={{ paddingTop: 15 }}>
                                     <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>Preffered Bed Type
                                         <Text style={{ color: 'red' }}> *</Text>
                                     </Text>
 
                                     <Dropdown ref={bedTypeDropdow}
                                         style={{
-                                            borderWidth: 1, borderRadius: 10, paddingVertical: 15,
-                                            marginTop: 10, borderColor: '#e5e5e5', paddingLeft: 10,marginBottom:0
+                                            borderWidth: 1, borderRadius: 12, paddingVertical: 14,
+                                            marginTop: 10, borderColor: '#e5e5e5', paddingLeft: 10, marginBottom: 0
                                         }}
                                         onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
                                         data={selectBed}
-                                         dropdownPosition="auto"
-                                        containerStyle={{ borderRadius: 10, paddingLeft: 10,marginTop:0 }}
+                                        dropdownPosition="auto"
+                                        containerStyle={{ borderRadius: 10, paddingLeft: 10, marginTop: 0 }}
                                         placeholderStyle={{ fontSize: 14, fontFamily: 'Gilroy-Medium', paddingRight: 10, color: '#9C9C9C' }}
                                         selectedTextStyle={{ fontSize: 15, fontFamily: 'Gilroy-Medium', fontWeight: 400 }}
-                                        placeholder="Select "bed type
+                                        placeholder="Select bed type"
                                         labelField='label'
                                         valueField='value'
                                         value={bedType}
@@ -322,8 +376,9 @@ const RequestBedChange = ({ visible,
                                         renderRightIcon={() => (
                                             // <Ionicons name={isFocus ? "chevron-up" : "chevron-down"} size={22} color="#000"
                                             //     style={{ paddingRight: 10 }} />
-                                             <Image source={DirectionDown}
-                                                style={{ width: 22, height: 22, marginRight: 14,
+                                            <Image source={DirectionDown}
+                                                style={{
+                                                    width: 22, height: 22, marginRight: 14,
                                                     transform: [{ rotate: isFocus ? '180deg' : '0deg' }],
                                                 }} tintColor="#000"
                                             />
@@ -352,7 +407,7 @@ const RequestBedChange = ({ visible,
                                                     }}
                                                 >
                                                     <Text
-                                                        style={{ color: isSelected ? "#fff" : "#000", fontSize: 15, fontFamily: 'Gilroy-Medium' }}>
+                                                        style={{ color: isSelected ? "#fff" : "#000", fontSize: 14, fontFamily: 'Gilroy-Medium' }}>
                                                         {item.label}
                                                     </Text>
                                                 </TouchableOpacity>
@@ -361,16 +416,46 @@ const RequestBedChange = ({ visible,
 
                                     />
                                     {bedTypeError && <ErrorMessage message={bedTypeError} type="error" />}
-                                </View>
+                                </View> */}
 
-                                <View style={{ paddingTop: 15 }}>
+                                <CommonInputComponent
+                                    label="Preffered Bed Type"
+                                    type="dropdown"
+                                    value={bedType}
+                                    placeholder="Select bed type"
+                                    options={selectBed}
+
+                                    optionLabelKey="label"
+                                    optionValueKey="value"
+
+                                    isOpen={activeDropdown === 'bedType'}
+                                    closeActiveDropdown={() => { setActiveDropdown(null) }}
+                                    isActive={visible}
+
+                                    onToggleDropdown={() => {
+                                        setActiveDropdown(
+                                            activeDropdown === 'bedType' ? null : 'bedType'
+                                        );
+                                    }}
+
+                                    onSelect={(item) => {
+                                        setBedType(item.value);
+                                        setActiveDropdown(null);
+                                        setBedTypeError("")
+                                    }}
+                                    required={true}
+                                    error={!!bedTypeError} />
+
+                                {bedTypeError && <ErrorMessage message={bedTypeError} type="error" />}
+
+                                {/* <View style={{ paddingTop: 15 }}>
                                     <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Medium' }}>Bed Change Urgency
                                         <Text style={{ color: 'red' }}> *</Text>
                                     </Text>
 
                                     <Dropdown ref={urgencyDropdown}
                                         style={{
-                                            borderWidth: 1, borderRadius: 10, paddingVertical: 15, borderColor: '#e5e5e5',
+                                            borderWidth: 1, borderRadius: 12, paddingVertical: 14, borderColor: '#e5e5e5',
                                             marginTop: 10, paddingLeft: 10
                                         }}
                                         onFocus={() => setIsFocus(true)} onBlur={() => setIsFocus(false)}
@@ -378,7 +463,7 @@ const RequestBedChange = ({ visible,
                                         containerStyle={{ borderRadius: 10, paddingLeft: 10 }}
                                         placeholderStyle={{ fontSize: 14, fontFamily: 'Gilroy-Medium', paddingRight: 10, color: '#9C9C9C' }}
                                         selectedTextStyle={{ fontSize: 15, fontFamily: 'Gilroy-Medium', fontWeight: 400 }}
-                                        placeholder="Select Reason"
+                                        placeholder="Select Urgency"
                                         labelField="label"
                                         valueField="value"
                                         value={urgencyType}
@@ -390,8 +475,9 @@ const RequestBedChange = ({ visible,
                                         renderRightIcon={() => (
                                             // <Ionicons name={focusReason ? "chevron-up" : "chevron-down"} size={22} color="#000"
                                             //     style={{ paddingRight: 10 }} />
-                                             <Image source={DirectionDown}
-                                                style={{ width: 22, height: 22, marginRight: 14,
+                                            <Image source={DirectionDown}
+                                                style={{
+                                                    width: 22, height: 22, marginRight: 14,
                                                     transform: [{ rotate: focusReason ? '180deg' : '0deg' }],
                                                 }} tintColor="#000"
                                             />
@@ -416,7 +502,7 @@ const RequestBedChange = ({ visible,
                                                     }}
                                                 >
                                                     <Text
-                                                        style={{ color: isSelected ? "#fff" : "#000", fontSize: 15, fontFamily: 'Gilroy-Medium' }}>
+                                                        style={{ color: isSelected ? "#fff" : "#000", fontSize: 14, fontFamily: 'Gilroy-Medium' }}>
                                                         {item.label}
                                                     </Text>
                                                 </TouchableOpacity>
@@ -424,17 +510,55 @@ const RequestBedChange = ({ visible,
                                         }}
                                     />
                                     {urgencyError && <ErrorMessage message={urgencyError} type="error" />}
-                                </View>
+                                </View> */}
+
+
+                                <CommonInputComponent
+                                    label="Bed Change Urgency"
+                                    type="dropdown"
+                                    value={urgencyType}
+                                    placeholder="Select Urgency"
+                                    options={urgency}
+
+                                    optionLabelKey="label"
+                                    optionValueKey="value"
+
+                                    isOpen={activeDropdown === 'urgency'}
+                                    closeActiveDropdown={() => { setActiveDropdown(null) }}
+                                    isActive={visible}
+
+                                    onToggleDropdown={() => {
+                                        setActiveDropdown(
+                                            activeDropdown === 'urgency' ? null : 'urgency'
+                                        );
+                                    }}
+
+                                    onSelect={(item) => {
+                                        setUrgencyType(item.value);
+                                        setActiveDropdown(null);
+                                        setUrgencyError("")
+                                    }}
+                                    required={true}
+                                    error={!!bedTypeError} />
+                                {urgencyError && <ErrorMessage message={urgencyError} type="error" />}
 
                             </View>
 
+
+
                             <TouchableOpacity onPress={bedRequestSubmit}
+                                disabled={loading}
                                 style={{
-                                    paddingVertical: 16, paddingHorizontal: 32, borderRadius: 50,
+                                    paddingVertical: 16, paddingHorizontal: 32, borderRadius: 14,
                                     backgroundColor: changeBed != null && bedType != null && urgencyType != null ? '#1E45E1' : '#788fed',
                                     alignItems: 'center', marginBottom: 15
                                 }}>
-                                <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Semibold', color: '#FFFFFF' }}>Submit Request</Text>
+                                {loading ? <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Semibold', color: '#ffffff', marginRight: 6 }}>Submitting</Text>
+                                    <WaveLoader size={4} />
+                                </View> :
+                                    <Text style={{ fontSize: 14, fontFamily: 'Gilroy-Semibold', color: '#FFFFFF' }}>Submit Request</Text>}
+
                             </TouchableOpacity>
 
                         </View>

@@ -31,6 +31,8 @@ const EnterMPin = (props) => {
 
     const [customerName, setCustomerName] = useState();
     const [fcmToken, setFcmToken] = useState();
+    const [mpinStatus, setMpinStatus] = useState('default');
+    const [focusedmpinIndex, setFocusedMpinIndex] = useState(null);
 
     const rotation = useRef(new Animated.Value(0)).current;
 
@@ -93,6 +95,26 @@ const EnterMPin = (props) => {
 
     }
 
+    const getOtpBorderColor = (index) => {
+
+        // Only the focused box gets blue
+        if (mpinStatus === 'error') {
+            return '#EF4444';
+        }
+        if (focusedmpinIndex === index) {
+            return '#2563EB';
+        }
+
+
+
+        if (mpinStatus === 'success') {
+            return '#16A34A';
+        }
+
+        return '#D1D5DB';
+    };
+
+
 
     const handlePinChange = async (text, index) => {
         const cleanText = text.replace(/[^0-9]/g, "");
@@ -105,6 +127,7 @@ const EnterMPin = (props) => {
         }
 
         if (newPin.every((digit) => digit !== "")) {
+            setMpinStatus('default');
             const pinNumber = newPin.join("");
             setmPinNumber(pinNumber)
             setEnterPinError("")
@@ -118,6 +141,7 @@ const EnterMPin = (props) => {
             verifyMPin(data).then(res => {
                 console.log(res)
                 if (res.status == 200) {
+                    setMpinStatus('success');
                     console.log("hostelList", res.data)
                     setHostelList(res.data)
                     console.log("manuallyselecthostel", res.data?.[0])
@@ -135,7 +159,7 @@ const EnterMPin = (props) => {
                         loginContext.loggedin('true')
 
                         // navigation.navigate('HostelList')
-                    
+
                         if (res.data.length == 1 && res.data?.[0].currentStatus !== "INACTIVE") {
                             const data = {
                                 xuid: loginContext.getUserId,
@@ -154,23 +178,25 @@ const EnterMPin = (props) => {
                                     // navigation.navigate("Dashboard");
                                     CommonModule.storeCredentials(r.data)
                                     setTimeout(() => {
-                                          props.callbackMpin()
+                                        props.callbackMpin()
                                     }, 200);
 
                                 }
                             })
-                        }else{
-                             props.callbackMpin()
+                        } else {
+                            props.callbackMpin()
                         }
                     }, 2000);
                 }
                 else if (res.status == 400) {
+                    setMpinStatus('error');
                     setShowSuccessModal(true)
                     setShowModelMessage("Incorrect MPIN")
                     setModelType('error')
                     setCreateMpin(["", "", "", ""])
 
                     setTimeout(() => {
+                        setMpinStatus('default')
                         setShowSuccessModal(false);
                         inputs.current[0].focus();
                     }, 2000);
@@ -199,6 +225,7 @@ const EnterMPin = (props) => {
     }
 
     const handleFocus = (index) => {
+        setFocusedMpinIndex(index)
         const firstEmptyIndex = createMpin.findIndex((digit) => digit === "");
 
         console.log(firstEmptyIndex)
@@ -240,13 +267,15 @@ const EnterMPin = (props) => {
     const enterPinClick = () => {
         if (!validateForm()) return;
 
+
         const data = {
             xuid: loginContext.getUserId,
             mPin: mPinNumber,
         }
 
+
         verifyMPin(data).then(r => {
-            console.log("listOfHostels",r)
+            console.log("listOfHostels", r)
             if (r.status == 200) {
                 console.log(r.data)
                 setHostelList(r.data)
@@ -339,12 +368,16 @@ const EnterMPin = (props) => {
                         key={index}
                         ref={(ref) => (inputs.current[index] = ref)}
                         keyboardType="number-pad"
-                        style={style.pinBox}
+                        style={[style.pinBox, {
+                            borderColor: getOtpBorderColor(index),
+                            borderWidth: focusedmpinIndex === index ? 2 : 1.5,
+                        }]}
                         maxLength={1}
                         value={digit}
                         onChangeText={(text) => handlePinChange(text, index)}
                         onFocus={() => handleFocus(index)}
                         onKeyPress={(e) => handleKeyPress(e, index)}
+                        onBlur={() => setFocusedMpinIndex(null)}
                     />
                 ))}
             </View>

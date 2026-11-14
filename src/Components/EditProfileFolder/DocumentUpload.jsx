@@ -14,6 +14,7 @@ import SuccessModal from "../ToastFile/TostFilePage";
 import DocumentViewer from "../DocumentsView/DocumentViewer";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { storeData } from "../../Utils/Storage";
+import CloseCircle from "../../assets/Images/close_circle.png"
 
 
 
@@ -304,7 +305,7 @@ const DocumentsUpload = (route) => {
                                         style={{
                                             borderWidth: 1, paddingVertical: 20, borderColor: '#eaeaec', borderRadius: 10, paddingHorizontal: 10,
                                             backgroundColor: "#f9fafc", flexDirection: "row", alignItems: "center", marginBottom: 5,
-                                            justifyContent: 'space-between', marginTop: 10
+                                            justifyContent: 'space-between', marginTop: 10,paddingRight:22
                                         }}>
 
                                         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, marginRight: 5 }}>
@@ -332,11 +333,11 @@ const DocumentsUpload = (route) => {
                                                         setViewerVisible(true);
                                                     }
                                                 }}>
-                                                <Image source={EyeIcon} style={{ width: 20, height: 20, tintColor: '#28303F', marginRight: 5 }} />
+                                                <Image source={EyeIcon} style={{ width: 22, height: 22, tintColor: '#28303F', marginRight: 8 }} />
                                             </TouchableOpacity>
 
                                             <TouchableOpacity onPress={() => handleDownload(item?.documentUrl)}>
-                                                <Image source={DownloadIcon} style={{ width: 20, height: 20, marginLeft: 8, tintColor: '#28303F' }} />
+                                                <Image source={DownloadIcon} style={{ width: 22, height: 22, marginLeft: 8, tintColor: '#28303F' }} />
                                             </TouchableOpacity>
                                         </View>
 
@@ -344,10 +345,10 @@ const DocumentsUpload = (route) => {
                                     </View>
                                     <TouchableOpacity onPress={() => removeDocument(item?.documentId)}
                                         style={{
-                                            position: "absolute", top: 2, right: 1, width: 20, height: 20, borderRadius: 10,
+                                            position: "absolute", top: 2, right: 1, width: 22, height: 22, borderRadius: 10,
                                             alignItems: 'center', justifyContent: 'center', backgroundColor: "#E0E0E0"
                                         }}>
-                                        <Text style={{ fontSize: 18, textAlign: 'center', lineHeight: 18 }}>x</Text>
+                                        <Image source={CloseCircle} style={{width:22,height:22,backgroundColor:'#ffffff'}}/>
                                     </TouchableOpacity>
                                 </>
                             )} />
