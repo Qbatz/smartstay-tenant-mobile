@@ -97,7 +97,7 @@ const EnterMPin = (props) => {
 
     const getOtpBorderColor = (index) => {
 
-        // Only the focused box gets blue
+     
         if (mpinStatus === 'error') {
             return '#EF4444';
         }

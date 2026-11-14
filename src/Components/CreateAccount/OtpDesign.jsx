@@ -19,7 +19,7 @@ const OtpDesign = ({ route }) => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showModelMessage, setShowModelMessage] = useState()
   const [modelType, setModelType] = useState();
-  const[isFocused,setIsFocused]=useState(false)
+  const [isFocused, setIsFocused] = useState(false)
   const [otpStatus, setOtpStatus] = useState('default');
   const [focusedOtpIndex, setFocusedOtpIndex] = useState(null);
 
@@ -32,40 +32,40 @@ const OtpDesign = ({ route }) => {
     focus: '#5366FF',
     error: '#EF4444',
     success: '#16A34A',
-};
-const getOtpBorderColor = (index) => {
+  };
+  const getOtpBorderColor = (index) => {
 
     // Only the focused box gets blue
-     if (otpStatus === 'error') {
-        return '#EF4444';
+    if (otpStatus === 'error') {
+      return '#EF4444';
     }
     if (focusedOtpIndex === index) {
-        return '#2563EB';
+      return '#2563EB';
     }
 
-   
+
 
     if (otpStatus === 'success') {
-        return '#16A34A';
+      return '#16A34A';
     }
 
     return '#D1D5DB';
-};
-
-    
+  };
 
 
-   const handleOtpFocus = (index) => {
+
+
+  const handleOtpFocus = (index) => {
     if (otpStatus !== 'success') {
-        setOtpStatus('focus');
+      setOtpStatus('focus');
     }
-};
+  };
 
-const handleOtpBlur = () => {
+  const handleOtpBlur = () => {
     if (otpStatus === 'focus') {
-        setOtpStatus('default');
+      setOtpStatus('default');
     }
-};
+  };
 
   // const handleOtpChange = async (text, index) => {
   //   const cleanText = text.replace(/[^0-9]/g, "");
@@ -132,48 +132,48 @@ const handleOtpBlur = () => {
     setOtp(newOtp);
 
     if (cleanText && index < 5) {
-        inputs.current[index + 1].focus();
+      inputs.current[index + 1].focus();
     }
 
     if (newOtp.every((digit) => digit !== "")) {
-        setOtpStatus('default');
+      setOtpStatus('default');
 
-        const otpValue = newOtp.join("");
+      const otpValue = newOtp.join("");
 
-        const data = await verifyOtp(route.params.phone, otpValue,Platform.OS);
+      const data = await verifyOtp(route.params.phone, otpValue, Platform.OS);
 
-        if (data.status === 200) {
-            setOtpStatus('success');
+      if (data.status === 200) {
+        setOtpStatus('success');
 
-            loginContext.userId(data.data.xuid);
-            loginContext.phoneNo(route.params.phone);
+        loginContext.userId(data.data.xuid);
+        loginContext.phoneNo(route.params.phone);
 
-            storeData(PHONE_NO, route.params.phone);
-            storeData(LOGGEDIN, 'true');
-            storeData(USERID, data.data.xuid);
+        storeData(PHONE_NO, route.params.phone);
+        storeData(LOGGEDIN, 'true');
+        storeData(USERID, data.data.xuid);
 
-            if (data.data.isMpinVerified === true) {
-                loginContext.loggedin('true');
-            } else {
-                navigation.navigate('CreateMpin');
-            }
-
+        if (data.data.isMpinVerified === true) {
+          loginContext.loggedin('true');
         } else {
-            setOtpStatus('error');
-
-            setShowSuccessModal(true);
-            setShowModelMessage(data.status === 401 ? "Invalid OTP" : data?.message);
-            setModelType('error');
-
-            setTimeout(() => {
-                setShowSuccessModal(false);
-                setOtp(["", "", "", "", "", ""]);
-                setOtpStatus('default');
-                inputs.current[0]?.focus();
-            }, 2000);
+          navigation.navigate('CreateMpin');
         }
+
+      } else {
+        setOtpStatus('error');
+
+        setShowSuccessModal(true);
+        setShowModelMessage(data.status === 401 ? "Invalid OTP" : data?.message);
+        setModelType('error');
+
+        setTimeout(() => {
+          setShowSuccessModal(false);
+          setOtp(["", "", "", "", "", ""]);
+          setOtpStatus('default');
+          inputs.current[0]?.focus();
+        }, 2000);
+      }
     }
-};
+  };
 
   const handleKeyPress = (e, index) => {
     if (e.nativeEvent.key === "Backspace" && otp[index] === "" && index > 0) {
@@ -182,7 +182,7 @@ const handleOtpBlur = () => {
   };
 
   const resendOtp = () => {
-    const data={
+    const data = {
       platform: Platform.OS
     }
 
@@ -191,12 +191,12 @@ const handleOtpBlur = () => {
 
       if (r.status == 200) {
         setShowSuccessModal(true)
-         if(r?.data){
-            setShowModelMessage(r?.data)
-          }else{
-            setShowModelMessage("OTP Sent")
-          }
-          
+        if (r?.data) {
+          setShowModelMessage(r?.data)
+        } else {
+          setShowModelMessage("OTP Sent")
+        }
+
         // setShowModelMessage("OTP Sent")
         setModelType('success')
 
@@ -224,7 +224,7 @@ const handleOtpBlur = () => {
         message={showModelMessage}
         type={modelType}
       />
-      <Image source={AppLogo} style={{width:45,height:45, resizeMode:'contain'}} />
+      <Image source={AppLogo} style={{ width: 45, height: 45, resizeMode: 'contain' }} />
       <Text style={styles.title}>Otp Validation</Text>
       <Text style={styles.subtitle}>
         Enter the 6 digit otp sent on +91 {phone} to proceed
@@ -243,30 +243,30 @@ const handleOtpBlur = () => {
           //   onKeyPress={(e) => handleKeyPress(e, index)}
           // />
           <TextInput
-    key={index}
-    ref={(ref) => (inputs.current[index] = ref)}
-    style={[
-        styles.otpBox,
-        {
-             borderColor: getOtpBorderColor(index),
-            borderWidth: focusedOtpIndex === index ? 2 : 1.5,
-        }
-    ]}
-    keyboardType="number-pad"
-    maxLength={1}
-    value={digit}
-    onChangeText={(text) => handleOtpChange(text, index)}
-    onKeyPress={(e) => handleKeyPress(e, index)}
-    // onFocus={() => handleOtpFocus(index)}
-    // onBlur={handleOtpBlur}
-     onFocus={() => setFocusedOtpIndex(index)}
-    onBlur={() => setFocusedOtpIndex(null)}
-/>
+            key={index}
+            ref={(ref) => (inputs.current[index] = ref)}
+            style={[
+              styles.otpBox,
+              {
+                borderColor: getOtpBorderColor(index),
+                borderWidth: focusedOtpIndex === index ? 2 : 1.5,
+              }
+            ]}
+            keyboardType="number-pad"
+            maxLength={1}
+            value={digit}
+            onChangeText={(text) => handleOtpChange(text, index)}
+            onKeyPress={(e) => handleKeyPress(e, index)}
+            // onFocus={() => handleOtpFocus(index)}
+            // onBlur={handleOtpBlur}
+            onFocus={() => setFocusedOtpIndex(index)}
+            onBlur={() => setFocusedOtpIndex(null)}
+          />
         ))}
       </View>
 
 
-      <View style={{flexDirection:'row',alignItems:'center'}}>
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <Text style={styles.resendText}>
           Didn’t receive OTP?
         </Text>
@@ -281,8 +281,8 @@ const handleOtpBlur = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff", padding: 25, paddingTop: 50 },
-  title: { fontSize: 22, fontFamily:'Gilroy-Semibold', color: "#000", marginBottom: 5,marginTop:14 },
-  subtitle: { color: "#555", marginBottom: 25,fontFamily:'Gilroy-Medium' },
+  title: { fontSize: 22, fontFamily: 'Gilroy-Semibold', color: "#000", marginBottom: 5, marginTop: 14 },
+  subtitle: { color: "#555", marginBottom: 25, fontFamily: 'Gilroy-Medium' },
   otpContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -298,8 +298,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: "#000",
   },
-  resendText: { color: "#555", alignItems: 'center', justifyContent: 'center',fontFamily:'Gilroy-Medium' },
-  resendLink: { color: "#0057FF", fontFamily:'Gilroy-Medium',marginLeft:3 },
+  resendText: { color: "#555", alignItems: 'center', justifyContent: 'center', fontFamily: 'Gilroy-Medium' },
+  resendLink: { color: "#0057FF", fontFamily: 'Gilroy-Medium', marginLeft: 3 },
 });
 
 export default OtpDesign;

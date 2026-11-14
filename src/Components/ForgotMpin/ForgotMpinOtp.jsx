@@ -1,5 +1,5 @@
-import React, {useState,useContext,useRef} from "react";
-import { View,Text,TextInput,StyleSheet,Image,TouchableOpacity, Platform } from "react-native";
+import React, { useState, useContext, useRef } from "react";
+import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity, Platform } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { LoginContext } from "../../Context/LoginContext";
 import { postResendOtp, verifyOtp } from "../../Action/LoginAction";
@@ -10,22 +10,44 @@ import SuccessModal from "../ToastFile/TostFilePage";
 import { LoginContexts } from "../../Context/LoginContext";
 
 
-const ForgotMpinOtp=({route})=>{
-    const navigation = useNavigation();
+const ForgotMpinOtp = ({ route }) => {
+  const navigation = useNavigation();
   const { phone } = route.params;
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const inputs = useRef([]);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showModelMessage, setShowModelMessage] = useState()
   const [modelType, setModelType] = useState();
+  const [otpStatus, setOtpStatus] = useState('default');
+  const [focusedOtpIndex, setFocusedOtpIndex] = useState(null);
 
 
   const context = useContext(UsersContext)
   const loginContext = useContext(LoginContexts)
   // const { verifyOtp , resendOtp } = useContext(LoginContext); 
 
+
+  const getOtpBorderColor = (index) => {
+
+    if (otpStatus === 'error') {
+      return '#EF4444';
+    }
+    if (focusedOtpIndex === index) {
+      return '#2563EB';
+    }
+
+
+
+    if (otpStatus === 'success') {
+      return '#16A34A';
+    }
+
+    return '#D1D5DB';
+  };
+
+
   const handleOtpChange = async (text, index) => {
-     const cleanText = text.replace(/[^0-9]/g, "");
+    const cleanText = text.replace(/[^0-9]/g, "");
     const newOtp = [...otp];
     newOtp[index] = cleanText;
     setOtp(newOtp);
@@ -42,6 +64,7 @@ const ForgotMpinOtp=({route})=>{
       const data = await verifyOtp(route.params.phone, otpValue, Platform.OS)
       console.log(data)
       if (data.status == 200) {
+        setOtpStatus('success');
         console.log(data.data)
         loginContext.userId(data.data.xuid)
         loginContext.phoneNo(route.params.phone)
@@ -49,9 +72,9 @@ const ForgotMpinOtp=({route})=>{
         storeData(LOGGEDIN, 'true')
         storeData(USERID, data.data.xuid)
 
-          if (data.data.isMpinVerified == true) {
-            navigation.navigate('ResetNewMpin')
-        //   loginContext.loggedin('true')
+        if (data.data.isMpinVerified == true) {
+          navigation.navigate('ResetNewMpin')
+          //   loginContext.loggedin('true')
         }
         else {
           navigation.navigate('CreateMpin')
@@ -65,24 +88,28 @@ const ForgotMpinOtp=({route})=>{
         // }
       }
       else if (data.status == 401) {
+        setOtpStatus('error');
         setShowSuccessModal(true)
         setShowModelMessage("Invalid OTP")
         setModelType('error')
 
         setTimeout(() => {
+          setOtpStatus('default');
           setShowSuccessModal(false);
           setOtp(["", "", "", "", "", ""])
-           inputs.current[0].focus();
+          inputs.current[0].focus();
         }, 2000);
-      }else{
-         setShowSuccessModal(true)
+      } else {
+        setOtpStatus('error');
+        setShowSuccessModal(true)
         setShowModelMessage(data?.message)
         setModelType('error')
 
         setTimeout(() => {
+          setOtpStatus('default');
           setShowSuccessModal(false);
           setOtp(["", "", "", "", "", ""])
-           inputs.current[0].focus();
+          inputs.current[0].focus();
         }, 2000);
       }
     }
@@ -95,19 +122,27 @@ const ForgotMpinOtp=({route})=>{
   };
 
   const resendOtp = () => {
+    const data = {
+      platform: Platform.OS
+    }
 
-    postResendOtp(loginContext.getUserId).then(r => {
-      console.log(r)
+    postResendOtp(loginContext.getUserId, data).then(r => {
+      console.log("resendForgototp", r)
 
       if (r.status == 200) {
         setShowSuccessModal(true)
-        setShowModelMessage("OTP Sent")
+        if (r?.data) {
+          setShowModelMessage(r?.data)
+        }else{
+          setShowModelMessage("OTP Sent")
+        }
+
         setModelType('success')
 
         setTimeout(() => {
           setShowSuccessModal(false)
         }, 1500);
-      }else{
+      } else {
         setShowSuccessModal(true)
         setShowModelMessage('Invalid Otp')
         setModelType('error')
@@ -139,18 +174,25 @@ const ForgotMpinOtp=({route})=>{
           <TextInput
             key={index}
             ref={(ref) => (inputs.current[index] = ref)}
-            style={styles.otpBox}
+            style={[styles.otpBox,
+            {
+              borderColor: getOtpBorderColor(index),
+              borderWidth: focusedOtpIndex === index ? 2 : 1.5,
+            }
+            ]}
             keyboardType="number-pad"
             maxLength={1}
             value={digit}
             onChangeText={(text) => handleOtpChange(text, index)}
             onKeyPress={(e) => handleKeyPress(e, index)}
+            onFocus={() => setFocusedOtpIndex(index)}
+            onBlur={() => setFocusedOtpIndex(null)}
           />
         ))}
       </View>
 
       <View style={styles.resendText}>
-        <Text style={{color: "#555"}}>Didn’t receive OTP?</Text>  
+        <Text style={{ color: "#555" }}>Didn’t receive OTP?</Text>
         <TouchableOpacity onPress={resendOtp} >
           <Text style={styles.resendLink}>Resend</Text></TouchableOpacity>
       </View>
@@ -178,8 +220,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: "#000",
   },
-  resendText: { flexDirection:'row'},
-  resendLink: { color: "#0057FF", fontWeight: "600",marginLeft:3 },
+  resendText: { flexDirection: 'row' },
+  resendLink: { color: "#0057FF", fontWeight: "600", marginLeft: 3 },
 
 });
 export default ForgotMpinOtp;
